@@ -16,5 +16,4 @@ The columns in bridge_tolls and value_tolls.csv are as follows.
   9 | **TOLL_SML** | The small commercial trucks toll for this tollbooth and time period
  10 | **TOLL_MED** | The medium commercial trucks toll for this tollbooth and time period
  11 | **TOLL_LRG** | The large commercial trucks toll for this tollbooth and time period
- 12 | **feet multiplier** | 1 if the toll should be multiplied by **FEET**, or 0 if flat toll.  This is for
-     `value_tolls.csv` only, since `bridge_tolls.csv` are all assumed to be flat.
+ 12 | **feet multiplier** | 1 if the toll should be multiplied by **FEET**, or 0 if flat toll.  This is for `value_tolls.csv` only, since `bridge_tolls.csv` are all assumed to be flat.
