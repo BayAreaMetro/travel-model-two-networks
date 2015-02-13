@@ -1,7 +1,7 @@
 
 The columns in bridge_tolls and value_tolls.csv are as follows.
 
-**TOLL_XXX** values are in 2000 cents.
+**TOLL_XXX** values are in 2010 cents.
 
  Column Number | Column Name | Description
  --------------|-------------|-------------
