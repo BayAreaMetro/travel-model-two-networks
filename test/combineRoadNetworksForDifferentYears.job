@@ -1,0 +1,341 @@
+
+RUN PGM=NETWORK
+  PAR  NODES=10000000
+  FILEI NETI[1] = INPUT_tm2_2005\hwy\mtc_final_network_base.net, 
+    RENAME=   F_JNCTID-F_JNCTID_2000,           T_JNCTID-T_JNCTID_2000,                  FRC-FRC_2000,
+                      NAME-NAME_2000,             FREEWAY-FREEWAY_2000,            TOLLRD-TOLLRD_2000,
+                  ONEWAY-ONEWAY_2000,                     KPH-KPH_2000,          MINUTES-MINUTES_2000,
+              CARRIAGE-CARRIAGE_2000,                 LANES-LANES_2000,                RAMP-RAMP_2000,
+              SPEEDCAT-SPEEDCAT_2000,                   FEET-FEET_2000,    ASSIGNABLE-ASSIGNABLE_2000,
+                  CNTYPE-CNTYPE_2000,             TRANSIT-TRANSIT_2000,        HIGHWAYT-HIGHWAYT_2000,
+                B_CLASS-B_CLASS_2000,     REPRIORITIZE-REPRIORITI_2000,      GRADE_CAT-GRADE_CAT_2000,
+              PED_FLAG-PED_FLAG_2000,         BIKEPEDOK-BIKEPEDOK_2000,            PEMSID-PEMSID_2000,
+            PEMSLANES-PEMSLANES_2000,               RTEDIR-RTEDIR_2000,        PEMSDIST-PEMSDIST_2000,
+            TMCLOCREF-TMCLOCREF_2000,         TAP_DRIVE-TAP_DRIVE_2000,                    FT-FT_2000,
+                        FFS-FFS_2000,           NUMLANES-NUMLAMES_2000,        USECLASS-USECLASS_2000,
+            TOLLBOOTH-TOLLBOOTH_2000
+  FILEI NETI[2] = INPUT_tm2_2005\hwy\mtc_final_network_base.net,
+    RENAME=   F_JNCTID-F_JNCTID_2005,           T_JNCTID-T_JNCTID_2005,                  FRC-FRC_2005,
+                      NAME-NAME_2005,             FREEWAY-FREEWAY_2005,            TOLLRD-TOLLRD_2005,
+                  ONEWAY-ONEWAY_2005,                     KPH-KPH_2005,          MINUTES-MINUTES_2005,
+              CARRIAGE-CARRIAGE_2005,                 LANES-LANES_2005,                RAMP-RAMP_2005,
+              SPEEDCAT-SPEEDCAT_2005,                   FEET-FEET_2005,    ASSIGNABLE-ASSIGNABLE_2005,
+                  CNTYPE-CNTYPE_2005,             TRANSIT-TRANSIT_2005,        HIGHWAYT-HIGHWAYT_2005,
+                B_CLASS-B_CLASS_2005,     REPRIORITIZE-REPRIORITI_2005,      GRADE_CAT-GRADE_CAT_2005,
+              PED_FLAG-PED_FLAG_2005,         BIKEPEDOK-BIKEPEDOK_2005,            PEMSID-PEMSID_2005,
+            PEMSLANES-PEMSLANES_2005,               RTEDIR-RTEDIR_2005,        PEMSDIST-PEMSDIST_2005,
+            TMCLOCREF-TMCLOCREF_2005,         TAP_DRIVE-TAP_DRIVE_2005,                    FT-FT_2005,
+                        FFS-FFS_2005,           NUMLANES-NUMLAMES_2005,        USECLASS-USECLASS_2005,
+            TOLLBOOTH-TOLLBOOTH_2005
+  FILEI NETI[3] = INPUT_tm2_2010\hwy\mtc_final_network_base.net,
+    RENAME=   F_JNCTID-F_JNCTID_2010,           T_JNCTID-T_JNCTID_2010,                  FRC-FRC_2010,
+                      NAME-NAME_2010,             FREEWAY-FREEWAY_2010,            TOLLRD-TOLLRD_2010,
+                  ONEWAY-ONEWAY_2010,                     KPH-KPH_2010,          MINUTES-MINUTES_2010,
+              CARRIAGE-CARRIAGE_2010,                 LANES-LANES_2010,                RAMP-RAMP_2010,
+              SPEEDCAT-SPEEDCAT_2010,                   FEET-FEET_2010,    ASSIGNABLE-ASSIGNABLE_2010,
+                  CNTYPE-CNTYPE_2010,             TRANSIT-TRANSIT_2010,        HIGHWAYT-HIGHWAYT_2010,
+                B_CLASS-B_CLASS_2010,     REPRIORITIZE-REPRIORITI_2010,      GRADE_CAT-GRADE_CAT_2010,
+              PED_FLAG-PED_FLAG_2010,         BIKEPEDOK-BIKEPEDOK_2010,            PEMSID-PEMSID_2010,
+            PEMSLANES-PEMSLANES_2010,               RTEDIR-RTEDIR_2010,        PEMSDIST-PEMSDIST_2010,
+            TMCLOCREF-TMCLOCREF_2010,         TAP_DRIVE-TAP_DRIVE_2010,                    FT-FT_2010,
+                        FFS-FFS_2010,           NUMLANES-NUMLAMES_2010,        USECLASS-USECLASS_2010,
+            TOLLBOOTH-TOLLBOOTH_2010
+
+  ; reorder fields to be adjacent
+  FILEO NETO    = master_mtc_network_allfields.net
+  REPORT MERGE  = TRUE
+
+  MERGE RECORD=TRUE
+
+  PHASE=NODEMERGE
+  ; ------------ Check if 2005 nodes differ -------------------------------
+    IF (NI.2.X        != NI.1.X       ) _N2_M_X        = _N2_M_X        + 1
+    IF (NI.2.Y        != NI.1.Y       ) _N2_M_Y        = _N2_M_Y        + 1
+    IF (NI.2.COUNTY   != NI.1.COUNTY  ) _N2_M_COUNTY   = _N2_M_COUNTY   + 1
+    IF (NI.2.MODE     != NI.1.MODE    ) _N2_M_MODE     = _N2_M_MODE     + 1
+    IF (NI.2.TYPE     != NI.1.TYPE    ) _N2_M_TYPE     = _N2_M_TYPE     + 1
+    IF (NI.2.ID       != NI.1.ID      ) _N2_M_ID       = _N2_M_ID       + 1
+    IF (NI.2.PNR_CAP  != NI.1.PNR_CAP ) _N2_M_PNR_CAP  = _N2_M_PNR_CAP  + 1
+
+    IF (NI.2.PNR1     != NI.1.PNR1    ) _N2_M_PNR1     = _N2_M_PNR1     + 1
+    IF (NI.2.PNR_FEE1 != NI.1.PNR_FEE1) _N2_M_PNR_FEE1 = _N2_M_PNR_FEE1 + 1
+    IF (NI.2.PNR2     != NI.1.PNR2    ) _N2_M_PNR2     = _N2_M_PNR2     + 1
+    IF (NI.2.PNR_FEE2 != NI.1.PNR_FEE2) _N2_M_PNR_FEE2 = _N2_M_PNR_FEE2 + 1
+    IF (NI.2.PNR3     != NI.1.PNR3    ) _N2_M_PNR3     = _N2_M_PNR3     + 1
+    IF (NI.2.PNR_FEE3 != NI.1.PNR_FEE3) _N2_M_PNR_FEE3 = _N2_M_PNR_FEE3 + 1
+    IF (NI.2.PNR4     != NI.1.PNR4    ) _N2_M_PNR4     = _N2_M_PNR4     + 1
+    IF (NI.2.PNR_FEE4 != NI.1.PNR_FEE4) _N2_M_PNR_FEE4 = _N2_M_PNR_FEE4 + 1
+    IF (NI.2.PNR5     != NI.1.PNR5    ) _N2_M_PNR5     = _N2_M_PNR5     + 1
+    IF (NI.2.PNR_FEE5 != NI.1.PNR_FEE5) _N2_M_PNR_FEE5 = _N2_M_PNR_FEE5 + 1
+
+    IF (NI.2.STOP     != NI.1.STOP    ) _N2_M_STOP     = _N2_M_STOP     + 1
+    IF (NI.2.RTDMODE  != NI.1.RTDMODE ) _N2_M_RTDMODE  = _N2_M_RTDMODE  + 1
+    IF (NI.2.FAREZONE != NI.1.FAREZONE) _N2_M_FAREZONE = _N2_M_FAREZONE + 1
+
+  ; ------------ Check if 2010 nodes differ -------------------------------
+    IF (NI.3.X        != NI.1.X       ) _N3_M_X        = _N3_M_X        + 1
+    IF (NI.3.Y        != NI.1.Y       ) _N3_M_Y        = _N3_M_Y        + 1
+    IF (NI.3.COUNTY   != NI.1.COUNTY  ) _N3_M_COUNTY   = _N3_M_COUNTY   + 1
+    IF (NI.3.MODE     != NI.1.MODE    ) _N3_M_MODE     = _N3_M_MODE     + 1
+    IF (NI.3.TYPE     != NI.1.TYPE    ) _N3_M_TYPE     = _N3_M_TYPE     + 1
+    IF (NI.3.ID       != NI.1.ID      ) _N3_M_ID       = _N3_M_ID       + 1
+    IF (NI.3.PNR_CAP  != NI.1.PNR_CAP ) _N3_M_PNR_CAP  = _N3_M_PNR_CAP  + 1
+
+    IF (NI.3.PNR1     != NI.1.PNR1    ) _N3_M_PNR1     = _N3_M_PNR1     + 1
+    IF (NI.3.PNR_FEE1 != NI.1.PNR_FEE1) _N3_M_PNR_FEE1 = _N3_M_PNR_FEE1 + 1
+    IF (NI.3.PNR2     != NI.1.PNR2    ) _N3_M_PNR2     = _N3_M_PNR2     + 1
+    IF (NI.3.PNR_FEE2 != NI.1.PNR_FEE2) _N3_M_PNR_FEE2 = _N3_M_PNR_FEE2 + 1
+    IF (NI.3.PNR3     != NI.1.PNR3    ) _N3_M_PNR3     = _N3_M_PNR3     + 1
+    IF (NI.3.PNR_FEE3 != NI.1.PNR_FEE3) _N3_M_PNR_FEE3 = _N3_M_PNR_FEE3 + 1
+    IF (NI.3.PNR4     != NI.1.PNR4    ) _N3_M_PNR4     = _N3_M_PNR4     + 1
+    IF (NI.3.PNR_FEE4 != NI.1.PNR_FEE4) _N3_M_PNR_FEE4 = _N3_M_PNR_FEE4 + 1
+    IF (NI.3.PNR5     != NI.1.PNR5    ) _N3_M_PNR5     = _N3_M_PNR5     + 1
+    IF (NI.3.PNR_FEE5 != NI.1.PNR_FEE5) _N3_M_PNR_FEE5 = _N3_M_PNR_FEE5 + 1
+
+    IF (NI.3.STOP     != NI.1.STOP    ) _N3_M_STOP     = _N3_M_STOP     + 1
+    IF (NI.3.RTDMODE  != NI.1.RTDMODE ) _N3_M_RTDMODE  = _N3_M_RTDMODE  + 1
+    IF (NI.3.FAREZONE != NI.1.FAREZONE) _N3_M_FAREZONE = _N3_M_FAREZONE + 1
+  ENDPHASE
+
+  PHASE=LINKMERGE
+    IN_2000 = 1
+    IN_2005 = 1
+    IN_2010 = 1
+    IF (LI.1.A=0 && LI.1.B=0) IN_2000 = 0
+    IF (LI.2.A=0 && LI.2.B=0) IN_2005 = 0
+    IF (LI.3.A=0 && LI.3.B=0) IN_2010 = 0
+
+    ; count mismatches to see if we should bother with year-based versions of these
+    IF ((IN_2000=1) & (IN_2005=1)) 
+      IF (LI.1.F_JNCTID_2000     != LI.2.F_JNCTID_2005     )   _M_F_JUNCTID    = _M_F_JUNCTID    + 1
+      IF (LI.1.T_JNCTID_2000     != LI.2.T_JNCTID_2005     )   _M_T_JNCTID     = _M_T_JNCTID     + 1
+      IF (LI.1.FRC_2000          != LI.2.FRC_2005          )   _M_FRC          = _M_FRC          + 1
+      IF (LI.1.NAME_2000         != LI.2.NAME_2005         )   _M_NAME         = _M_NAME         + 1
+      IF (LI.1.FREEWAY_2000      != LI.2.FREEWAY_2005      )   _M_FREEWAY      = _M_FREEWAY      + 1
+      IF (LI.1.TOLLRD_2000       != LI.2.TOLLRD_2005       )   _M_TOLLRD       = _M_TOLLRD       + 1
+      IF (LI.1.ONEWAY_2000       != LI.2.ONEWAY_2005       )   _M_ONEWAY       = _M_ONEWAY       + 1
+      IF (LI.1.KPH_2000          != LI.2.KPH_2005          )   _M_KPH          = _M_KPH          + 1
+      IF (LI.1.MINUTES_2000      != LI.2.MINUTES_2005      )   _M_MINUTES      = _M_MINUTES      + 1
+      IF (LI.1.CARRIAGE_2000     != LI.2.CARRIAGE_2005     )   _M_CARRIAGE     = _M_CARRIAGE     + 1
+      IF (LI.1.LANES_2000        != LI.2.LANES_2005        )   _M_LANES        = _M_LANES        + 1
+      IF (LI.1.RAMP_2000         != LI.2.RAMP_2005         )   _M_RAMP         = _M_RAMP         + 1
+      IF (LI.1.SPEEDCAT_2000     != LI.2.SPEEDCAT_2005     )   _M_SPEEDCAT     = _M_SPEEDCAT     + 1
+      IF (LI.1.FEET_2000         != LI.2.FEET_2005         )   _M_FEET         = _M_FEET         + 1
+      IF (LI.1.ASSIGNABLE_2000   != LI.2.ASSIGNABLE_2005   )   _M_ASSIGNABLE   = _M_ASSIGNABLE   + 1
+      IF (LI.1.CNTYPE_2000       != LI.2.CNTYPE_2005       )   _M_CNTYPE       = _M_CNTYPE       + 1
+      IF (LI.1.TRANSIT_2000      != LI.2.TRANSIT_2005      )   _M_TRANSIT      = _M_TRANSIT      + 1
+      IF (LI.1.HIGHWAYT_2000     != LI.2.HIGHWAYT_2005     )   _M_HIGHWAYT     = _M_HIGHWAYT     + 1
+      IF (LI.1.B_CLASS_2000      != LI.2.B_CLASS_2005      )   _M_B_CLASS      = _M_B_CLASS      + 1
+      IF (LI.1.REPRIORITI_2000   != LI.2.REPRIORITI_2005   )   _M_REPRIORITIZE = _M_REPRIORITIZE + 1 
+      IF (LI.1.GRADE_CAT_2000    != LI.2.GRADE_CAT_2005    )   _M_GRADE_CAT    = _M_GRADE_CAT    + 1
+      IF (LI.1.PED_FLAG_2000     != LI.2.PED_FLAG_2005     )   _M_PED_FLAG     = _M_PED_FLAG     + 1
+      IF (LI.1.BIKEPEDOK_2000    != LI.2.BIKEPEDOK_2005    )   _M_BIKEPEDOK    = _M_BIKEPEDOK    + 1
+      IF (LI.1.PEMSID_2000       != LI.2.PEMSID_2005       )   _M_PEMSID       = _M_PEMSID       + 1
+      IF (LI.1.PEMSLANES_2000    != LI.2.PEMSLANES_2005    )   _M_PEMSLANES    = _M_PEMSLANES    + 1
+      IF (LI.1.RTEDIR_2000       != LI.2.RTEDIR_2005       )   _M_RTEDIR       = _M_RTEDIR       + 1
+      IF (LI.1.PEMSDIST_2000     != LI.2.PEMSDIST_2005     )   _M_PEMSDIST     = _M_PEMSDIST     + 1
+      IF (LI.1.TMCLOCREF_2000    != LI.2.TMCLOCREF_2005    )   _M_TMCLOCREF    = _M_TMCLOCREF    + 1
+      IF (LI.1.TAP_DRIVE_2000    != LI.2.TAP_DRIVE_2005    )   _M_TAP_DRIVE    = _M_TAP_DRIVE    + 1
+      IF (LI.1.FT_2000           != LI.2.FT_2005           )   _M_FT           = _M_FT           + 1
+      IF (LI.1.FFS_2000          != LI.2.FFS_2005          )   _M_FFS          = _M_FFS          + 1
+      IF (LI.1.NUMLAMES_2000     != LI.2.NUMLAMES_2005     )   _M_NUMLAMES     = _M_NUMLAMES     + 1
+      IF (LI.1.USECLASS_2000     != LI.2.USECLASS_2005     )   _M_USECLASS     = _M_USECLASS     + 1
+      IF (LI.1.TOLLBOOTH_2000    != LI.2.TOLLBOOTH_2005    )   _M_TOLLBOOTH    = _M_TOLLBOOTH    + 1
+    ENDIF
+
+    IF ((IN_2000=1) & (IN_2010=1)) 
+      IF (LI.1.F_JNCTID_2000     != LI.3.F_JNCTID_2010     )   _M_F_JUNCTID    = _M_F_JUNCTID    + 1
+      IF (LI.1.T_JNCTID_2000     != LI.3.T_JNCTID_2010     )   _M_T_JNCTID     = _M_T_JNCTID     + 1
+      IF (LI.1.FRC_2000          != LI.3.FRC_2010          )   _M_FRC          = _M_FRC          + 1
+      IF (LI.1.NAME_2000         != LI.3.NAME_2010         )   _M_NAME         = _M_NAME         + 1
+      IF (LI.1.FREEWAY_2000      != LI.3.FREEWAY_2010      )   _M_FREEWAY      = _M_FREEWAY      + 1
+      IF (LI.1.TOLLRD_2000       != LI.3.TOLLRD_2010       )   _M_TOLLRD       = _M_TOLLRD       + 1
+      IF (LI.1.ONEWAY_2000       != LI.3.ONEWAY_2010       )   _M_ONEWAY       = _M_ONEWAY       + 1
+      IF (LI.1.KPH_2000          != LI.3.KPH_2010          )   _M_KPH          = _M_KPH          + 1
+      IF (LI.1.MINUTES_2000      != LI.3.MINUTES_2010      )   _M_MINUTES      = _M_MINUTES      + 1
+      IF (LI.1.CARRIAGE_2000     != LI.3.CARRIAGE_2010     )   _M_CARRIAGE     = _M_CARRIAGE     + 1
+      IF (LI.1.LANES_2000        != LI.3.LANES_2010        )   _M_LANES        = _M_LANES        + 1
+      IF (LI.1.RAMP_2000         != LI.3.RAMP_2010         )   _M_RAMP         = _M_RAMP         + 1
+      IF (LI.1.SPEEDCAT_2000     != LI.3.SPEEDCAT_2010     )   _M_SPEEDCAT     = _M_SPEEDCAT     + 1
+      IF (LI.1.FEET_2000         != LI.3.FEET_2010         )   _M_FEET         = _M_FEET         + 1
+      IF (LI.1.ASSIGNABLE_2000   != LI.3.ASSIGNABLE_2010   )   _M_ASSIGNABLE   = _M_ASSIGNABLE   + 1
+      IF (LI.1.CNTYPE_2000       != LI.3.CNTYPE_2010       )   _M_CNTYPE       = _M_CNTYPE       + 1
+      IF (LI.1.TRANSIT_2000      != LI.3.TRANSIT_2010      )   _M_TRANSIT      = _M_TRANSIT      + 1
+      IF (LI.1.HIGHWAYT_2000     != LI.3.HIGHWAYT_2010     )   _M_HIGHWAYT     = _M_HIGHWAYT     + 1
+      IF (LI.1.B_CLASS_2000      != LI.3.B_CLASS_2010      )   _M_B_CLASS      = _M_B_CLASS      + 1
+      IF (LI.1.REPRIORITI_2000   != LI.3.REPRIORITI_2010   )   _M_REPRIORITIZE = _M_REPRIORITIZE + 1 
+      IF (LI.1.GRADE_CAT_2000    != LI.3.GRADE_CAT_2010    )   _M_GRADE_CAT    = _M_GRADE_CAT    + 1
+      IF (LI.1.PED_FLAG_2000     != LI.3.PED_FLAG_2010     )   _M_PED_FLAG     = _M_PED_FLAG     + 1
+      IF (LI.1.BIKEPEDOK_2000    != LI.3.BIKEPEDOK_2010    )   _M_BIKEPEDOK    = _M_BIKEPEDOK    + 1
+      IF (LI.1.PEMSID_2000       != LI.3.PEMSID_2010       )   _M_PEMSID       = _M_PEMSID       + 1
+      IF (LI.1.PEMSLANES_2000    != LI.3.PEMSLANES_2010    )   _M_PEMSLANES    = _M_PEMSLANES    + 1
+      IF (LI.1.RTEDIR_2000       != LI.3.RTEDIR_2010       )   _M_RTEDIR       = _M_RTEDIR       + 1
+      IF (LI.1.PEMSDIST_2000     != LI.3.PEMSDIST_2010     )   _M_PEMSDIST     = _M_PEMSDIST     + 1
+      IF (LI.1.TMCLOCREF_2000    != LI.3.TMCLOCREF_2010    )   _M_TMCLOCREF    = _M_TMCLOCREF    + 1
+      IF (LI.1.TAP_DRIVE_2000    != LI.3.TAP_DRIVE_2010    )   _M_TAP_DRIVE    = _M_TAP_DRIVE    + 1
+      IF (LI.1.FT_2000           != LI.3.FT_2010           )   _M_FT           = _M_FT           + 1
+      IF (LI.1.FFS_2000          != LI.3.FFS_2010          )   _M_FFS          = _M_FFS          + 1
+      IF (LI.1.NUMLAMES_2000     != LI.3.NUMLAMES_2010     )   _M_NUMLAMES     = _M_NUMLAMES     + 1
+      IF (LI.1.USECLASS_2000     != LI.3.USECLASS_2010     )   _M_USECLASS     = _M_USECLASS     + 1
+      IF (LI.1.TOLLBOOTH_2000    != LI.3.TOLLBOOTH_2010    )   _M_TOLLBOOTH    = _M_TOLLBOOTH    + 1
+    ENDIF
+
+    IF ((IN_2005=1) & (IN_2010=1)) 
+      IF (LI.2.F_JNCTID_2005     != LI.3.F_JNCTID_2010     )   _M_F_JUNCTID    = _M_F_JUNCTID    + 1
+      IF (LI.2.T_JNCTID_2005     != LI.3.T_JNCTID_2010     )   _M_T_JNCTID     = _M_T_JNCTID     + 1
+      IF (LI.2.FRC_2005          != LI.3.FRC_2010          )   _M_FRC          = _M_FRC          + 1
+      IF (LI.2.NAME_2005         != LI.3.NAME_2010         )   _M_NAME         = _M_NAME         + 1
+      IF (LI.2.FREEWAY_2005      != LI.3.FREEWAY_2010      )   _M_FREEWAY      = _M_FREEWAY      + 1
+      IF (LI.2.TOLLRD_2005       != LI.3.TOLLRD_2010       )   _M_TOLLRD       = _M_TOLLRD       + 1
+      IF (LI.2.ONEWAY_2005       != LI.3.ONEWAY_2010       )   _M_ONEWAY       = _M_ONEWAY       + 1
+      IF (LI.2.KPH_2005          != LI.3.KPH_2010          )   _M_KPH          = _M_KPH          + 1
+      IF (LI.2.MINUTES_2005      != LI.3.MINUTES_2010      )   _M_MINUTES      = _M_MINUTES      + 1
+      IF (LI.2.CARRIAGE_2005     != LI.3.CARRIAGE_2010     )   _M_CARRIAGE     = _M_CARRIAGE     + 1
+      IF (LI.2.LANES_2005        != LI.3.LANES_2010        )   _M_LANES        = _M_LANES        + 1
+      IF (LI.2.RAMP_2005         != LI.3.RAMP_2010         )   _M_RAMP         = _M_RAMP         + 1
+      IF (LI.2.SPEEDCAT_2005     != LI.3.SPEEDCAT_2010     )   _M_SPEEDCAT     = _M_SPEEDCAT     + 1
+      IF (LI.2.FEET_2005         != LI.3.FEET_2010         )   _M_FEET         = _M_FEET         + 1
+      IF (LI.2.ASSIGNABLE_2005   != LI.3.ASSIGNABLE_2010   )   _M_ASSIGNABLE   = _M_ASSIGNABLE   + 1
+      IF (LI.2.CNTYPE_2005       != LI.3.CNTYPE_2010       )   _M_CNTYPE       = _M_CNTYPE       + 1
+      IF (LI.2.TRANSIT_2005      != LI.3.TRANSIT_2010      )   _M_TRANSIT      = _M_TRANSIT      + 1
+      IF (LI.2.HIGHWAYT_2005     != LI.3.HIGHWAYT_2010     )   _M_HIGHWAYT     = _M_HIGHWAYT     + 1
+      IF (LI.2.B_CLASS_2005      != LI.3.B_CLASS_2010      )   _M_B_CLASS      = _M_B_CLASS      + 1
+      IF (LI.2.REPRIORITI_2005   != LI.3.REPRIORITI_2010   )   _M_REPRIORITIZE = _M_REPRIORITIZE + 1 
+      IF (LI.2.GRADE_CAT_2005    != LI.3.GRADE_CAT_2010    )   _M_GRADE_CAT    = _M_GRADE_CAT    + 1
+      IF (LI.2.PED_FLAG_2005     != LI.3.PED_FLAG_2010     )   _M_PED_FLAG     = _M_PED_FLAG     + 1
+      IF (LI.2.BIKEPEDOK_2005    != LI.3.BIKEPEDOK_2010    )   _M_BIKEPEDOK    = _M_BIKEPEDOK    + 1
+      IF (LI.2.PEMSID_2005       != LI.3.PEMSID_2010       )   _M_PEMSID       = _M_PEMSID       + 1
+      IF (LI.2.PEMSLANES_2005    != LI.3.PEMSLANES_2010    )   _M_PEMSLANES    = _M_PEMSLANES    + 1
+      IF (LI.2.RTEDIR_2005       != LI.3.RTEDIR_2010       )   _M_RTEDIR       = _M_RTEDIR       + 1
+      IF (LI.2.PEMSDIST_2005     != LI.3.PEMSDIST_2010     )   _M_PEMSDIST     = _M_PEMSDIST     + 1
+      IF (LI.2.TMCLOCREF_2005    != LI.3.TMCLOCREF_2010    )   _M_TMCLOCREF    = _M_TMCLOCREF    + 1
+      IF (LI.2.TAP_DRIVE_2005    != LI.3.TAP_DRIVE_2010    )   _M_TAP_DRIVE    = _M_TAP_DRIVE    + 1
+      IF (LI.2.FT_2005           != LI.3.FT_2010           )   _M_FT           = _M_FT           + 1
+      IF (LI.2.FFS_2005          != LI.3.FFS_2010          )   _M_FFS          = _M_FFS          + 1
+      IF (LI.2.NUMLAMES_2005     != LI.3.NUMLAMES_2010     )   _M_NUMLAMES     = _M_NUMLAMES     + 1
+      IF (LI.2.USECLASS_2005     != LI.3.USECLASS_2010     )   _M_USECLASS     = _M_USECLASS     + 1
+      IF (LI.2.TOLLBOOTH_2005    != LI.3.TOLLBOOTH_2010    )   _M_TOLLBOOTH    = _M_TOLLBOOTH    + 1
+    ENDIF 
+  ENDPHASE
+
+ENDRUN
+
+RUN PGM=NETWORK
+ ; From running the previous part, these are the only
+ ; _Variables with values:
+ ;
+ ; _M_FT                       30      
+ ; _M_NUMLAMES                736      
+ ; _M_TOLLBOOTH                 6  
+ ; 
+ ; So we can get rid of the year version of everything else -- rename the 2000 versions back :p
+ 
+  PAR  NODES=10000000
+  FILEI NETI    = master_mtc_network_allfields.net,
+      RENAME= F_JNCTID_2000-F_JNCTID,      T_JNCTID_2000-T_JNCTID,            FRC_2000-FRC,
+                  NAME_2000-NAME,           FREEWAY_2000-FREEWAY,          TOLLRD_2000-TOLLRD,
+                ONEWAY_2000-ONEWAY,             KPH_2000-KPH,             MINUTES_2000-MINUTES,
+              CARRIAGE_2000-CARRIAGE,         LANES_2000-LANES,              RAMP_2000-RAMP,
+              SPEEDCAT_2000-SPEEDCAT,          FEET_2000-FEET,         ASSIGNABLE_2000-ASSIGNABLE,
+                CNTYPE_2000-CNTYPE,         TRANSIT_2000-TRANSIT,        HIGHWAYT_2000-HIGHWAYT,
+               B_CLASS_2000-B_CLASS,     REPRIORITI_2000-REPRIORITIZE,  GRADE_CAT_2000-GRADE_CAT,
+              PED_FLAG_2000-PED_FLAG,     BIKEPEDOK_2000-BIKEPEDOK,        PEMSID_2000-PEMSID,
+             PEMSLANES_2000-PEMSLANES,       RTEDIR_2000-RTEDIR,         PEMSDIST_2000-PEMSDIST,
+             TMCLOCREF_2000-TMCLOCREF,    TAP_DRIVE_2000-TAP_DRIVE,
+                   FFS_2000-FFS,                                         USECLASS_2000-USECLASS
+
+  FILEO NETO    = master_mtc_network.net,
+    EXCLUDE=  F_JNCTID_2005,               T_JNCTID_2005,                     FRC_2005,
+                  NAME_2005,                FREEWAY_2005,                  TOLLRD_2005,
+                ONEWAY_2005,                    KPH_2005,                 MINUTES_2005,
+              CARRIAGE_2005,                  LANES_2005,                    RAMP_2005,
+              SPEEDCAT_2005,                   FEET_2005,              ASSIGNABLE_2005,
+                CNTYPE_2005,                TRANSIT_2005,                HIGHWAYT_2005,
+               B_CLASS_2005,             REPRIORITI_2005,               GRADE_CAT_2005,
+              PED_FLAG_2005,              BIKEPEDOK_2005,                  PEMSID_2005,
+             PEMSLANES_2005,                 RTEDIR_2005,                PEMSDIST_2005,
+             TMCLOCREF_2005,              TAP_DRIVE_2005,             
+                   FFS_2005,                                             USECLASS_2010,
+              F_JNCTID_2010,               T_JNCTID_2010,                     FRC_2010,
+                  NAME_2010,                FREEWAY_2010,                  TOLLRD_2010,
+                ONEWAY_2010,                    KPH_2010,                 MINUTES_2010,
+              CARRIAGE_2010,                  LANES_2010,                    RAMP_2010,
+              SPEEDCAT_2010,                   FEET_2010,              ASSIGNABLE_2010,
+                CNTYPE_2010,                TRANSIT_2010,                HIGHWAYT_2010,
+               B_CLASS_2010,             REPRIORITI_2010,               GRADE_CAT_2010,
+              PED_FLAG_2010,              BIKEPEDOK_2010,                  PEMSID_2010,
+             PEMSLANES_2010,                 RTEDIR_2010,                PEMSDIST_2010,
+             TMCLOCREF_2010,              TAP_DRIVE_2010,             
+                   FFS_2010,                                             USECLASS_2010
+             
+    
+
+  IF (IN_2000=1)
+    ; everything is already set to this because of the rename
+  ELSEIF (IN_2005=1)
+    F_JNCTID          = F_JNCTID_2005     
+    T_JNCTID          = T_JNCTID_2005     
+    FRC               = FRC_2005          
+    NAME              = NAME_2005         
+    FREEWAY           = FREEWAY_2005      
+    TOLLRD            = TOLLRD_2005       
+    ONEWAY            = ONEWAY_2005       
+    KPH               = KPH_2005          
+    MINUTES           = MINUTES_2005      
+    CARRIAGE          = CARRIAGE_2005     
+    LANES             = LANES_2005        
+    RAMP              = RAMP_2005         
+    SPEEDCAT          = SPEEDCAT_2005     
+    FEET              = FEET_2005         
+    ASSIGNABLE        = ASSIGNABLE_2005   
+    CNTYPE            = CNTYPE_2005       
+    TRANSIT           = TRANSIT_2005      
+    HIGHWAYT          = HIGHWAYT_2005     
+    B_CLASS           = B_CLASS_2005      
+    REPRIORITIZE      = REPRIORITI_2005   
+    GRADE_CAT         = GRADE_CAT_2005    
+    PED_FLAG          = PED_FLAG_2005     
+    BIKEPEDOK         = BIKEPEDOK_2005    
+    PEMSID            = PEMSID_2005       
+    PEMSLANES         = PEMSLANES_2005    
+    RTEDIR            = RTEDIR_2005       
+    PEMSDIST          = PEMSDIST_2005     
+    TMCLOCREF         = TMCLOCREF_2005    
+    TAP_DRIVE         = TAP_DRIVE_2005    
+    FFS               = FFS_2005          
+    USECLASS          = USECLASS_2005   
+  ELSEIF (IN_2010=1)
+    F_JNCTID          = F_JNCTID_2010     
+    T_JNCTID          = T_JNCTID_2010     
+    FRC               = FRC_2010          
+    NAME              = NAME_2010         
+    FREEWAY           = FREEWAY_2010      
+    TOLLRD            = TOLLRD_2010       
+    ONEWAY            = ONEWAY_2010       
+    KPH               = KPH_2010          
+    MINUTES           = MINUTES_2010      
+    CARRIAGE          = CARRIAGE_2010     
+    LANES             = LANES_2010        
+    RAMP              = RAMP_2010         
+    SPEEDCAT          = SPEEDCAT_2010     
+    FEET              = FEET_2010         
+    ASSIGNABLE        = ASSIGNABLE_2010   
+    CNTYPE            = CNTYPE_2010       
+    TRANSIT           = TRANSIT_2010      
+    HIGHWAYT          = HIGHWAYT_2010     
+    B_CLASS           = B_CLASS_2010      
+    REPRIORITIZE      = REPRIORITI_2010 
+    GRADE_CAT         = GRADE_CAT_2010    
+    PED_FLAG          = PED_FLAG_2010     
+    BIKEPEDOK         = BIKEPEDOK_2010    
+    PEMSID            = PEMSID_2010       
+    PEMSLANES         = PEMSLANES_2010    
+    RTEDIR            = RTEDIR_2010       
+    PEMSDIST          = PEMSDIST_2010     
+    TMCLOCREF         = TMCLOCREF_2010    
+    TAP_DRIVE         = TAP_DRIVE_2010    
+    FFS               = FFS_2010          
+    USECLASS          = USECLASS_2010   
+  ENDIF
+ENDRUN
+
