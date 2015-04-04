@@ -1,7 +1,7 @@
 
 RUN PGM=NETWORK
   PAR  NODES=10000000
-  FILEI NETI[1] = INPUT_tm2_2005\hwy\mtc_final_network_base.net, 
+  FILEI NETI[1] = INPUT_tm2_2000\hwy\mtc_final_network_base.net, 
     RENAME=   F_JNCTID-F_JNCTID_2000,           T_JNCTID-T_JNCTID_2000,                  FRC-FRC_2000,
                       NAME-NAME_2000,             FREEWAY-FREEWAY_2000,            TOLLRD-TOLLRD_2000,
                   ONEWAY-ONEWAY_2000,                     KPH-KPH_2000,          MINUTES-MINUTES_2000,
