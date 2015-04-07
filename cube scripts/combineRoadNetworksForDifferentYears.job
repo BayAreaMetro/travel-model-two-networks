@@ -12,7 +12,7 @@ RUN PGM=NETWORK
               PED_FLAG-PED_FLAG_2000,         BIKEPEDOK-BIKEPEDOK_2000,            PEMSID-PEMSID_2000,
             PEMSLANES-PEMSLANES_2000,               RTEDIR-RTEDIR_2000,        PEMSDIST-PEMSDIST_2000,
             TMCLOCREF-TMCLOCREF_2000,         TAP_DRIVE-TAP_DRIVE_2000,                    FT-FT_2000,
-                        FFS-FFS_2000,           NUMLANES-NUMLAMES_2000,        USECLASS-USECLASS_2000,
+                        FFS-FFS_2000,           NUMLANES-NUMLANES_2000,        USECLASS-USECLASS_2000,
             TOLLBOOTH-TOLLBOOTH_2000
   FILEI NETI[2] = INPUT_tm2_2005\hwy\mtc_final_network_base.net,
     RENAME=   F_JNCTID-F_JNCTID_2005,           T_JNCTID-T_JNCTID_2005,                  FRC-FRC_2005,
@@ -25,7 +25,7 @@ RUN PGM=NETWORK
               PED_FLAG-PED_FLAG_2005,         BIKEPEDOK-BIKEPEDOK_2005,            PEMSID-PEMSID_2005,
             PEMSLANES-PEMSLANES_2005,               RTEDIR-RTEDIR_2005,        PEMSDIST-PEMSDIST_2005,
             TMCLOCREF-TMCLOCREF_2005,         TAP_DRIVE-TAP_DRIVE_2005,                    FT-FT_2005,
-                        FFS-FFS_2005,           NUMLANES-NUMLAMES_2005,        USECLASS-USECLASS_2005,
+                        FFS-FFS_2005,           NUMLANES-NUMLANES_2005,        USECLASS-USECLASS_2005,
             TOLLBOOTH-TOLLBOOTH_2005
   FILEI NETI[3] = INPUT_tm2_2010\hwy\mtc_final_network_base.net,
     RENAME=   F_JNCTID-F_JNCTID_2010,           T_JNCTID-T_JNCTID_2010,                  FRC-FRC_2010,
@@ -38,7 +38,7 @@ RUN PGM=NETWORK
               PED_FLAG-PED_FLAG_2010,         BIKEPEDOK-BIKEPEDOK_2010,            PEMSID-PEMSID_2010,
             PEMSLANES-PEMSLANES_2010,               RTEDIR-RTEDIR_2010,        PEMSDIST-PEMSDIST_2010,
             TMCLOCREF-TMCLOCREF_2010,         TAP_DRIVE-TAP_DRIVE_2010,                    FT-FT_2010,
-                        FFS-FFS_2010,           NUMLANES-NUMLAMES_2010,        USECLASS-USECLASS_2010,
+                        FFS-FFS_2010,           NUMLANES-NUMLANES_2010,        USECLASS-USECLASS_2010,
             TOLLBOOTH-TOLLBOOTH_2010
 
   ; reorder fields to be adjacent
@@ -138,7 +138,7 @@ RUN PGM=NETWORK
       IF (LI.1.TAP_DRIVE_2000    != LI.2.TAP_DRIVE_2005    )   _M_TAP_DRIVE    = _M_TAP_DRIVE    + 1
       IF (LI.1.FT_2000           != LI.2.FT_2005           )   _M_FT           = _M_FT           + 1
       IF (LI.1.FFS_2000          != LI.2.FFS_2005          )   _M_FFS          = _M_FFS          + 1
-      IF (LI.1.NUMLAMES_2000     != LI.2.NUMLAMES_2005     )   _M_NUMLAMES     = _M_NUMLAMES     + 1
+      IF (LI.1.NUMLANES_2000     != LI.2.NUMLANES_2005     )   _M_NUMLANES     = _M_NUMLANES     + 1
       IF (LI.1.USECLASS_2000     != LI.2.USECLASS_2005     )   _M_USECLASS     = _M_USECLASS     + 1
       IF (LI.1.TOLLBOOTH_2000    != LI.2.TOLLBOOTH_2005    )   _M_TOLLBOOTH    = _M_TOLLBOOTH    + 1
     ENDIF
@@ -175,7 +175,7 @@ RUN PGM=NETWORK
       IF (LI.1.TAP_DRIVE_2000    != LI.3.TAP_DRIVE_2010    )   _M_TAP_DRIVE    = _M_TAP_DRIVE    + 1
       IF (LI.1.FT_2000           != LI.3.FT_2010           )   _M_FT           = _M_FT           + 1
       IF (LI.1.FFS_2000          != LI.3.FFS_2010          )   _M_FFS          = _M_FFS          + 1
-      IF (LI.1.NUMLAMES_2000     != LI.3.NUMLAMES_2010     )   _M_NUMLAMES     = _M_NUMLAMES     + 1
+      IF (LI.1.NUMLANES_2000     != LI.3.NUMLANES_2010     )   _M_NUMLANES     = _M_NUMLANES     + 1
       IF (LI.1.USECLASS_2000     != LI.3.USECLASS_2010     )   _M_USECLASS     = _M_USECLASS     + 1
       IF (LI.1.TOLLBOOTH_2000    != LI.3.TOLLBOOTH_2010    )   _M_TOLLBOOTH    = _M_TOLLBOOTH    + 1
     ENDIF
@@ -212,7 +212,7 @@ RUN PGM=NETWORK
       IF (LI.2.TAP_DRIVE_2005    != LI.3.TAP_DRIVE_2010    )   _M_TAP_DRIVE    = _M_TAP_DRIVE    + 1
       IF (LI.2.FT_2005           != LI.3.FT_2010           )   _M_FT           = _M_FT           + 1
       IF (LI.2.FFS_2005          != LI.3.FFS_2010          )   _M_FFS          = _M_FFS          + 1
-      IF (LI.2.NUMLAMES_2005     != LI.3.NUMLAMES_2010     )   _M_NUMLAMES     = _M_NUMLAMES     + 1
+      IF (LI.2.NUMLANES_2005     != LI.3.NUMLANES_2010     )   _M_NUMLANES     = _M_NUMLANES     + 1
       IF (LI.2.USECLASS_2005     != LI.3.USECLASS_2010     )   _M_USECLASS     = _M_USECLASS     + 1
       IF (LI.2.TOLLBOOTH_2005    != LI.3.TOLLBOOTH_2010    )   _M_TOLLBOOTH    = _M_TOLLBOOTH    + 1
     ENDIF 
@@ -225,7 +225,7 @@ RUN PGM=NETWORK
  ; _Variables with values:
  ;
  ; _M_FT                       30      
- ; _M_NUMLAMES                736      
+ ; _M_NUMLANES                736      
  ; _M_TOLLBOOTH                 6  
  ; 
  ; So we can get rid of the year version of everything else -- rename the 2000 versions back :p
@@ -339,3 +339,5 @@ RUN PGM=NETWORK
   ENDIF
 ENDRUN
 
+; delete temp file
+*del master_mtc_network_allfields.net
