@@ -1,0 +1,73 @@
+TomTom,TM2,count,measure
+"Motorway, Freeway, or Other Major Road",Connector,229757,Facility Type
+"Motorway, Freeway, or Other Major Road",Freeway to Freeway,141,Facility Type
+"Motorway, Freeway, or Other Major Road",Freeway,6624,Facility Type
+"Motorway, Freeway, or Other Major Road",Ramp,135,Facility Type
+"Motorway, Freeway, or Other Major Road",Special Facility,361360,Facility Type
+"Motorway, Freeway, or Other Major Road",Major Arterial,2,Facility Type
+Major Road Less Important than a Motorway,Freeway to Freeway,443,Facility Type
+Major Road Less Important than a Motorway,Freeway,7835,Facility Type
+Major Road Less Important than a Motorway,Ramp,290,Facility Type
+Major Road Less Important than a Motorway,Special Facility,4277,Facility Type
+Other Major Road,Freeway to Freeway,24,Facility Type
+Other Major Road,Freeway,1214,Facility Type
+Other Major Road,Ramp,12,Facility Type
+Other Major Road,Special Facility,298,Facility Type
+Secondary Road,Freeway,41,Facility Type
+Secondary Road,Expressway,21485,Facility Type
+Secondary Road,Ramp,815,Facility Type
+Secondary Road,Special Facility,915,Facility Type
+Local Connecting Road,Ramp,3277,Facility Type
+Local Connecting Road,Special Facility,246,Facility Type
+Local Connecting Road,Major Arterial,82065,Facility Type
+Local Road of High Importance,Ramp,675,Facility Type
+Local Road of High Importance,Major Arterial,80733,Facility Type
+Local Road,Collector,325912,Facility Type
+Local Road,Ramp,392,Facility Type
+Local Road,Special Facility,868,Facility Type
+Local Road,Major Arterial,16,Facility Type
+Local Road of Minor Importance,Collector,270264,Facility Type
+Local Road of Minor Importance,Ramp,114,Facility Type
+Other Road,Collector,4621,Facility Type
+0,0,587904,Lanes
+0,1,665807,Lanes
+0,2,1,Lanes
+0,3,18,Lanes
+0,4,1,Lanes
+0,7,60,Lanes
+1,1,16918,Lanes
+1,2,20,Lanes
+1,3,4,Lanes
+2,1,32297,Lanes
+2,2,38017,Lanes
+2,3,62,Lanes
+2,4,2,Lanes
+2,5,1,Lanes
+3,0,1,Lanes
+3,1,6756,Lanes
+3,2,23,Lanes
+3,3,22176,Lanes
+3,4,84,Lanes
+3,5,12,Lanes
+3,6,1,Lanes
+4,2,7967,Lanes
+4,3,27,Lanes
+4,4,8282,Lanes
+4,5,52,Lanes
+4,6,1,Lanes
+5,2,5444,Lanes
+5,3,27,Lanes
+5,4,8,Lanes
+5,5,2771,Lanes
+5,6,3,Lanes
+6,3,606,Lanes
+6,5,1,Lanes
+6,6,465,Lanes
+7,0,8518,Lanes
+7,3,320,Lanes
+7,7,116,Lanes
+8,3,1,Lanes
+8,4,12,Lanes
+8,8,13,Lanes
+9,9,50,Lanes
+16,16,2,Lanes

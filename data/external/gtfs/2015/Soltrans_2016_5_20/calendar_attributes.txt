@@ -1,0 +1,12 @@
+service_id,service_description
+1306A2330,Year-round (Mon-Fri)
+1307A2330,Year-round (Sat)
+1308A2330,Year-round (Sun)
+1309A2330,Year-round (Wed)
+1310A2330,Year-round (Fri)
+1311A2330,"Year-round (Mon-Tues, Thur-Fri)"
+1312A2330,Year-round (Mon-Thur)
+1420A2567,Beginning 1/31/15 (Mon-Fri)
+1421A2567,Beginning 1/31/15 (Sat)
+1483A2726,Route 20 Pilot (Mon-Fri)
+2935A4387,Beginning 11/22/2015 (Sun)

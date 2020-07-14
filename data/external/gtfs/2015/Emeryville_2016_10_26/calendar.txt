@@ -1,0 +1,10 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+3903A5279,Year Round (Mon-Fri),1,1,1,1,1,0,0,20160101,20180101
+3961A5279,Year Round (Sat),0,0,0,0,0,1,0,20160101,20180101
+3962A5279,Year Round (Sun),0,0,0,0,0,0,1,20160101,20180101
+4046A5368,Friday after Thanksgiving (Fri),0,0,0,0,1,0,0,20171124,20171124
+4046A5367,Friday after Thanksgiving (Fri),0,0,0,0,1,0,0,20161125,20161125
+4047A5372,Christmas Eve and New Years Eve (Sat-Sun),0,0,0,0,0,1,1,20171224,20171224
+4047A5371,Christmas Eve and New Years Eve (Sat-Sun),0,0,0,0,0,1,1,20161224,20161224
+4047A5370,Christmas Eve and New Years Eve (Sat-Sun),0,0,0,0,0,1,1,20161231,20161231
+4047A5369,Christmas Eve and New Years Eve (Sat-Sun),0,0,0,0,0,1,1,20171231,20171231

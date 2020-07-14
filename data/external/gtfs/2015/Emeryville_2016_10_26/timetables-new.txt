@@ -1,0 +1,22 @@
+timetable_id,route_id,direction_id,start_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday,route_label,service_notes,direction_label,orientation
+1,4817,0,20160101,20180101,1,1,1,1,1,0,0,Hollis,Year Round,Loop,horizontal
+2,4817,0,20161125,20161125,0,0,0,0,1,0,0,Hollis,Friday after Thanksgiving,Loop,horizontal
+3,4817,0,20161224,20161224,0,0,0,0,0,1,1,Hollis,Christmas Eve and New Years Eve,Loop,horizontal
+4,4817,0,20161231,20161231,0,0,0,0,0,1,1,Hollis,Christmas Eve and New Years Eve,Loop,horizontal
+5,4817,0,20171124,20171124,0,0,0,0,1,0,0,Hollis,Friday after Thanksgiving,Loop,horizontal
+6,4817,0,20171224,20171224,0,0,0,0,0,1,1,Hollis,Christmas Eve and New Years Eve,Loop,horizontal
+7,4817,0,20171231,20171231,0,0,0,0,0,1,1,Hollis,Christmas Eve and New Years Eve,Loop,horizontal
+8,4818,0,20160101,20180101,1,1,1,1,1,0,0,Hollis North,Year Round,Loop,horizontal
+9,4819,0,20160101,20180101,1,1,1,1,1,0,0,Hollis South,Year Round,Loop,horizontal
+10,4822,0,20160101,20180101,1,1,1,1,1,0,0,North Shellmound,Year Round,Loop,horizontal
+11,4820,0,20160101,20180101,0,0,0,0,0,0,1,Shellmound-Powell,Year Round,Loop,horizontal
+12,4820,0,20160101,20180101,0,0,0,0,0,1,0,Shellmound-Powell,Year Round,Loop,horizontal
+13,4820,0,20160101,20180101,1,1,1,1,1,0,0,Shellmound-Powell,Year Round,Loop,horizontal
+14,4820,0,20161125,20161125,0,0,0,0,1,0,0,Shellmound-Powell,Friday after Thanksgiving,Loop,horizontal
+15,4820,0,20161224,20161224,0,0,0,0,0,1,1,Shellmound-Powell,Christmas Eve and New Years Eve,Loop,horizontal
+16,4820,0,20161231,20161231,0,0,0,0,0,1,1,Shellmound-Powell,Christmas Eve and New Years Eve,Loop,horizontal
+17,4820,0,20171124,20171124,0,0,0,0,1,0,0,Shellmound-Powell,Friday after Thanksgiving,Loop,horizontal
+18,4820,0,20171224,20171224,0,0,0,0,0,1,1,Shellmound-Powell,Christmas Eve and New Years Eve,Loop,horizontal
+19,4820,0,20171231,20171231,0,0,0,0,0,1,1,Shellmound-Powell,Christmas Eve and New Years Eve,Loop,horizontal
+20,4821,0,20160101,20180101,1,1,1,1,1,0,0,South Shellmound-Powell,Year Round,Loop,horizontal
+21,4823,0,20160101,20180101,1,1,1,1,1,0,0,Watergate Express,Year Round,Loop,horizontal

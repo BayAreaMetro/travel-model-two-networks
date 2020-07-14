@@ -1,0 +1,5 @@
+rider_category_id,rider_category_description
+6,Persons with Disabilities
+4,"Student: Full-time student, 18 years or younger"
+2,Senior Citizen: Persons 60 years or older
+15,Medicare Card Holders

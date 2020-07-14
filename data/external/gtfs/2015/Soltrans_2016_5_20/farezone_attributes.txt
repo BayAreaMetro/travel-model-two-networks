@@ -1,0 +1,3 @@
+zone_id,zone_name
+671,Local
+672,Multi-Zone

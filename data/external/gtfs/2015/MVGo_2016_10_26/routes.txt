@@ -1,0 +1,5 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,min_headway_minutes
+533,3652,,East Bayshore,,3,http://mvgo.org/east-bayshore-route.html,E38A1B,000000,0,
+533,3654,,East Whisman AM,,3,http://mvgo.org/east-whisman-route.html,003D84,FFFFFF,0,
+533,3655,,East Whisman PM,,3,http://mvgo.org/east-whisman-route.html,4A5F9C,FFFFFF,0,
+533,3656,,West Bayshore,,3,http://mvgo.org/west-bayshore-route.html,378F36,FFFFFF,0,

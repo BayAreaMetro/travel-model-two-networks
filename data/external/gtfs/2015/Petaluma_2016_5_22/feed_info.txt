@@ -1,0 +1,2 @@
+feed_id,feed_publisher_name,feed_publisher_url,feed_lang,feed_version,feed_license,feed_contact_email,feed_contact_url,feed_start_date,feed_end_date
+petalumatransit-petaluma-ca-us,"Trillium Solutions, Inc.",http://www.trilliumtransit.com,en,USA-Pacific: 19-May-2016 14:20,,support+petalumatransit-petaluma-ca-us@trilliumtransit.com,http://support.trilliumtransit.com,20160519,20170101

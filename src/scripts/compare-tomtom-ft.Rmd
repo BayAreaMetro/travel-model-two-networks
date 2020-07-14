@@ -1,0 +1,101 @@
+---
+title: "TomTom FRC and FT"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "sf")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+interim_dir <- "../../data/interim/"
+processed_dir <- "../../data/processed/" 
+
+input_file_name <- paste0(processed_dir, "version_00/network_links.shp")
+
+output_file_name <- paste0(interim_dir, "version-00-network-links.csv")
+```
+
+# Parameters
+```{r parameters}
+frc_dict_df <- tibble(code = seq(-1, 8),
+                      label = c("Not Applicable",
+                                "Motorway, Freeway, or Other Major Road",
+                                "Major Road Less Important than a Motorway",
+                                "Other Major Road",
+                                "Secondary Road",
+                                "Local Connecting Road",
+                                "Local Road of High Importance",
+                                "Local Road",
+                                "Local Road of Minor Importance",
+                                "Other Road"))
+
+ft_dict_df <- tibble(code = seq(0, 7),
+                     label = c("Connector",
+                               "Freeway to Freeway",
+                               "Freeway",
+                               "Expressway",
+                               "Collector",
+                               "Ramp",
+                               "Special Facility",
+                               "Major Arterial"))
+```
+
+
+# Data Reads
+```{r read}
+links_sf <- st_read(input_file_name)
+
+```
+
+# Reductions for TM Network
+```{r reductions}
+working_df <- tibble(A = links_sf$A,
+                    B = links_sf$B,
+                    FRC = links_sf$FRC,
+                    FT = links_sf$FT,
+                    tomtom_lanes = links_sf$LANES,
+                    model_lanes = links_sf$NUMLANES) %>%
+  left_join(., frc_dict_df, by = c("FRC" = "code")) %>%
+  rename(frc_label = label) %>%
+  left_join(., ft_dict_df, by = c("FT" = "code")) %>%
+  rename(ft_label = label)
+
+ft_df <- working_df %>%
+  group_by(FRC, frc_label, FT, ft_label) %>%
+  summarise(count = n()) %>%
+  ungroup() %>%
+  select(TomTom = frc_label, TM2 = ft_label, count) %>%
+  mutate(measure = "Facility Type")
+
+lanes_df <- working_df %>%
+  group_by(tomtom_lanes, model_lanes) %>%
+  summarise(count = n()) %>%
+  ungroup() %>%
+  select(TomTom = tomtom_lanes, TM2 = model_lanes, count) %>%
+  mutate(TomTom = paste0(TomTom), 
+         TM2 = paste0(TM2)) %>%
+  mutate(measure = "Lanes")
+  
+
+output_df <- bind_rows(ft_df, lanes_df)
+
+```
+
+# Write
+```{r write}
+write_csv(output_df, path = output_file_name)
+```
+

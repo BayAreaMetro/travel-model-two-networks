@@ -1,0 +1,39 @@
+timetable_id,route_id,direction_id,start_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday,route_label,service_notes,direction_label,orientation
+1,2034,0,20150101,20170101,1,1,1,1,1,1,0,,Yearly Service,No direction,horizontal
+2,2036,0,20150101,20170101,0,0,0,0,0,0,1,,Yearly Service,Northbound,horizontal
+3,2036,0,20150101,20170101,0,0,0,0,0,1,0,,Yearly Service,Northbound,horizontal
+4,2036,0,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,Northbound,horizontal
+5,2036,1,20150101,20170101,0,0,0,0,0,0,1,,Yearly Service,Southbound,horizontal
+6,2036,1,20150101,20170101,0,0,0,0,0,1,0,,Yearly Service,Southbound,horizontal
+7,2036,1,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,Southbound,horizontal
+8,2037,0,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,No direction,horizontal
+9,2038,0,20150101,20170101,0,0,0,0,0,0,1,,Yearly Service,No direction,horizontal
+10,2038,0,20150101,20170101,0,0,0,0,0,1,0,,Yearly Service,No direction,horizontal
+11,2038,0,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,No direction,horizontal
+12,2039,0,20150101,20170101,0,0,0,0,0,0,1,,Yearly Service,Northbound,horizontal
+13,2039,0,20150101,20170101,0,0,0,0,0,1,0,,Yearly Service,Northbound,horizontal
+14,2039,0,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,Northbound,horizontal
+15,2039,1,20150101,20170101,0,0,0,0,0,0,1,,Yearly Service,Southbound,horizontal
+16,2039,1,20150101,20170101,0,0,0,0,0,1,0,,Yearly Service,Southbound,horizontal
+17,2039,1,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,Southbound,horizontal
+18,2040,0,20150101,20170101,0,0,0,0,0,1,0,,Yearly Service,No direction,horizontal
+19,2040,0,20150101,20170101,1,1,1,1,1,0,0,,Yearly Service,No direction,horizontal
+20,2035,0,20160328,20160603,0,0,1,0,0,0,0,,School Days,No direction,horizontal
+21,2035,0,20160328,20160603,1,1,0,1,1,0,0,,School Days,No direction,horizontal
+22,2035,0,20160328,20160603,1,1,1,1,1,0,0,,School Days,No direction,horizontal
+23,2048,0,20160328,20160603,0,0,1,0,0,0,0,,School Days,No direction,horizontal
+24,2048,0,20160328,20160603,1,1,0,1,1,0,0,,School Days,No direction,horizontal
+25,2048,0,20160328,20160603,1,1,1,1,1,0,0,,School Days,No direction,horizontal
+26,2049,0,20160328,20160603,0,0,1,0,0,0,0,,School Days,No direction,horizontal
+27,2049,0,20160328,20160603,1,1,0,1,1,0,0,,School Days,No direction,horizontal
+28,2051,0,20160328,20160603,0,0,1,0,0,0,0,,School Days,No direction,horizontal
+29,2051,0,20160328,20160603,1,1,0,1,1,0,0,,School Days,No direction,horizontal
+30,2051,0,20160328,20160603,1,1,1,1,1,0,0,,School Days,No direction,horizontal
+31,2052,0,20160328,20160603,0,0,1,0,0,0,0,,School Days,No direction,horizontal
+32,2052,0,20160328,20160603,1,1,0,1,1,0,0,,School Days,No direction,horizontal
+33,2035,0,20160604,20160816,1,1,1,1,1,0,0,,Non-School Days,No direction,horizontal
+34,2034,0,20160715,20160716,0,0,0,0,0,1,0,,Saturday Parade (July),No direction,horizontal
+35,2037,0,20160715,20160716,0,0,0,0,0,1,0,,Saturday Parade (July),No direction,horizontal
+36,2038,0,20160715,20160716,0,0,0,0,0,1,0,,Saturday Parade (July),No direction,horizontal
+37,2039,0,20160715,20160716,0,0,0,0,0,1,0,,Saturday Parade (July),Northbound,horizontal
+38,2039,1,20160715,20160716,0,0,0,0,0,1,0,,Saturday Parade (July),Southbound,horizontal

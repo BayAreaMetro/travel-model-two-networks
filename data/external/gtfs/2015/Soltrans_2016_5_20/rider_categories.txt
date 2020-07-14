@@ -1,0 +1,5 @@
+rider_category_id,rider_category_description
+5,Youth (ages 6-18)
+6,Disabled
+2,Senior (Age 65+)
+15,Medicare Card Holders

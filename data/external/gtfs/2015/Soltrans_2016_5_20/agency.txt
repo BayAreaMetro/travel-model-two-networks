@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_fare_url,agency_lang
+247,SolTrans,http://www.soltransride.com,America/Vancouver,(707) 648-4666,http://www.soltransride.com/fares/fares,en

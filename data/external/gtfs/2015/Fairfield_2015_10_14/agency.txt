@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_fare_url,agency_lang
+36,Fairfield and Suisun Transit,http://www.fasttransit.org/,America/Los_Angeles,707-422-2877,http://www.fasttransit.org/fares-passes/,en

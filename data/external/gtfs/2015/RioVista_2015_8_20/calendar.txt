@@ -1,0 +1,2 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+1710A3027,"Starting May 12 2015 (Mon-Fri)",1,1,1,1,1,0,0,20150512,20170101
