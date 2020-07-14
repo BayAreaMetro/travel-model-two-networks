@@ -1,0 +1,16 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+2373A3650,Year Round Calendar (Wed),0,0,1,0,0,0,0,20160601,20170601
+2374A3650,Year Round Calendar (Sat),0,0,0,0,0,1,0,20160601,20170601
+2375A3650,Year Round Calendar (Sun),0,0,0,0,0,0,1,20160601,20170601
+2376A3650,Year Round Calendar (Mon-Fri),1,1,1,1,1,0,0,20160601,20170601
+2377A3650,"Year Round Calendar (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20160601,20170601
+2404A4032,School Calendar (Mon-Fri),1,1,1,1,1,0,0,20160411,20160608
+2405A4032,"School Calendar (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20160411,20160608
+2555A3810,Express J (Mon-Fri),1,1,1,1,1,0,0,20160601,20170601
+2556A4034,Express J Non-school day calendar (Mon-Fri),1,1,1,1,1,0,0,20160609,20160823
+2583A3844,Lynx Limited Service (No regular service days),0,0,0,0,0,0,0,20160601,20170601
+2606A3861,Modified Holiday Service (No regular service days),0,0,0,0,0,0,0,20160601,20170601
+2607A3810,Express J (Sat),0,0,0,0,0,1,0,20160601,20170601
+2608A3810,Express J (Sun),0,0,0,0,0,0,1,20160601,20170601
+2609A3862,Routes 11 & 19 Saturday Service (Sat),0,0,0,0,0,1,0,20160601,20170601
+2612A3865,JX Year Round Service (Mon-Fri),1,1,1,1,1,0,0,20160601,20170601

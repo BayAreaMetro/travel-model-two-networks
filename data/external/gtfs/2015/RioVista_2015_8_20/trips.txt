@@ -1,0 +1,11 @@
+﻿route_id,service_id,trip_id,trip_short_name,trip_headsign,direction_id,block_id,shape_id,trip_bikes_allowed,bikes_allowed
+31,1710A3027,108495A1710B3027,"","Southbound",,,0,0,0
+29,1710A3027,108502A1710B3027,"","Eastbound",1,,1,0,0
+29,1710A3027,108509A1710B3027,"","Eastbound",1,,1,0,0
+31,1710A3027,108494A1710B3027,"","Northbound",1,,2,0,0
+29,1710A3027,108498A1710B3027,"","Westbound",,,3,0,0
+29,1710A3027,108496A1710B3027,"","Westbound",,,4,0,0
+29,1710A3027,108500A1710B3027,"","Westbound",,,5,0,0
+29,1710A3027,108510A1710B3027,"","Eastbound",1,,1,0,0
+29,1710A3027,108508A1710B3027,"","Eastbound",1,,1,0,0
+29,1710A3027,108506A1710B3027,"","Westbound",,,3,0,0

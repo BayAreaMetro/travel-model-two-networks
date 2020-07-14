@@ -1,0 +1,4 @@
+"service_id","date","exception_type"
+"EXP-551","20150829","1"
+"Weekdays","20150907","2"
+"Sunday","20150907","1"

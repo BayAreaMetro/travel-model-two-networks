@@ -1,0 +1,16 @@
+service_id,service_description
+2373A3650,Year Round Calendar (Wed)
+2374A3650,Year Round Calendar (Sat)
+2375A3650,Year Round Calendar (Sun)
+2376A3650,Year Round Calendar (Mon-Fri)
+2377A3650,"Year Round Calendar (Mon-Tues, Thur-Fri)"
+2404A4032,School Calendar (Mon-Fri)
+2405A4032,"School Calendar (Mon-Tues, Thur-Fri)"
+2555A3810,Express J (Mon-Fri)
+2556A4034,Express J Non-school day calendar (Mon-Fri)
+2583A3844,Lynx Limited Service (No regular service days)
+2606A3861,Modified Holiday Service (No regular service days)
+2607A3810,Express J (Sat)
+2608A3810,Express J (Sun)
+2609A3862,Routes 11 & 19 Saturday Service (Sat)
+2612A3865,JX Year Round Service (Mon-Fri)

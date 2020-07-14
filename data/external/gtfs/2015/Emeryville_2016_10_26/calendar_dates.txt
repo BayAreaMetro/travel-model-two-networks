@@ -1,0 +1,19 @@
+service_id,date,holiday_name,exception_type
+3903A5279,20170704,Independence Day (4th of July),2
+3903A5279,20170101,New Year’s Day,2
+3961A5279,20161224,Christmas Eve,2
+3962A5279,20171231,New Year's Eve,2
+3903A5279,20161125,Friday after Thanksgiving,2
+3903A5279,20170904,Labor Day,2
+3903A5279,20171123,Thanksgiving Day,2
+3903A5279,20170220,Presidents Day,2
+3962A5279,20170416,Easter Sunday,2
+3903A5279,20170529,Memorial Day,2
+3903A5279,20171225,Christmas Day,2
+3961A5279,20161231,New Year's Eve,2
+3962A5279,20171224,Christmas Eve,2
+3962A5279,20170101,New Year’s Day,2
+3903A5279,20171124,Friday after Thanksgiving,2
+3903A5279,20160905,Labor Day,2
+3962A5279,20161225,Christmas Day,2
+3903A5279,20161124,Thanksgiving Day,2

@@ -1,0 +1,6 @@
+fare_id,route_id
+200415,Ala-Oak-SF
+200420,Vallejo-SF
+200425,Harbor Bay-SF
+200430,South SF-East Bay
+200435,South SF-SF

@@ -1,0 +1,23 @@
+zone_id,zone_name
+460,Cloverdale
+461,Geyserville
+462,Healdsburg
+463,Windsor
+464,Russian River
+465,Forestville
+466,Sebastopol
+467,Santa Rosa
+468,Kenwood / Oakmont
+469,Glen Ellen
+470,Sonoma
+471,Rohnert Park / Cotati
+472,Petaluma
+473,Lakeville
+583,Novato
+482,Jenner
+483,Larkfield / Fulton
+486,Bodega
+485,Asti
+584,San Rafael
+550,Cloverdale
+479,Bodega Bay

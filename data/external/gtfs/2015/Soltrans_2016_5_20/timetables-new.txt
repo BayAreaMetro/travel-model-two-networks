@@ -1,0 +1,64 @@
+timetable_id,route_id,direction_id,start_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday,route_label,service_notes,direction_label,orientation
+1,1638,0,20141201,20170101,0,0,0,0,0,0,1,1,Year-round,Northbound,horizontal
+2,1638,0,20141201,20170101,0,0,0,0,0,1,0,1,Year-round,Northbound,horizontal
+3,1638,1,20141201,20170101,0,0,0,0,0,0,1,1,Year-round,Southbound,horizontal
+4,1638,1,20141201,20170101,0,0,0,0,0,1,0,1,Year-round,Southbound,horizontal
+5,1638,0,20150131,20170101,1,1,1,1,1,0,0,1,Beginning 1-31-15,Northbound,horizontal
+6,1638,1,20150131,20170101,1,1,1,1,1,0,0,1,Beginning 1-31-15,Southbound,horizontal
+7,1645,0,20141201,20170101,1,1,1,1,1,0,0,12,Year-round,Northbound,horizontal
+8,1645,1,20141201,20170101,0,0,1,0,0,0,0,12,Year-round,Southbound,horizontal
+9,1645,1,20141201,20170101,1,1,0,1,1,0,0,12,Year-round,Southbound,horizontal
+10,1646,0,20141201,20170101,1,1,1,1,1,0,0,15,Year-round,Northbound,horizontal
+11,1646,1,20141201,20170101,0,0,0,0,1,0,0,15,Year-round,Southbound,horizontal
+12,1646,1,20141201,20170101,1,1,1,1,0,0,0,15,Year-round,Southbound,horizontal
+13,1647,0,20141201,20170101,1,1,1,1,1,0,0,17,Year-round,Northbound,horizontal
+14,1647,1,20141201,20170101,0,0,0,0,1,0,0,17,Year-round,Southbound,horizontal
+15,1647,1,20141201,20170101,1,1,1,1,0,0,0,17,Year-round,Southbound,horizontal
+16,1639,0,20141201,20170101,0,0,0,0,0,1,0,2,Year-round,Northbound,horizontal
+17,1639,1,20141201,20170101,0,0,0,0,0,1,0,2,Year-round,Southbound,horizontal
+18,1639,0,20150131,20170101,1,1,1,1,1,0,0,2,Beginning 1-31-15,Northbound,horizontal
+19,1639,1,20150131,20170101,1,1,1,1,1,0,0,2,Beginning 1-31-15,Southbound,horizontal
+20,1875,0,20150202,20170101,1,1,1,1,1,0,0,20,Route 20 Pilot,Westbound,horizontal
+21,1875,1,20150202,20170101,1,1,1,1,1,0,0,20,Route 20 Pilot,Eastbound,horizontal
+22,1640,1,20141201,20170101,0,0,0,0,0,1,0,3,Year-round,Clockwise,horizontal
+23,1640,1,20150131,20170101,1,1,1,1,1,0,0,3,Beginning 1-31-15,Clockwise,horizontal
+24,1641,0,20150131,20170101,0,0,0,0,0,1,0,4,Beginning 1-31-15,Northbound,horizontal
+25,1641,0,20150131,20170101,1,1,1,1,1,0,0,4,Beginning 1-31-15,Northbound,horizontal
+26,1641,1,20150131,20170101,0,0,0,0,0,1,0,4,Beginning 1-31-15,Southbound,horizontal
+27,1641,1,20150131,20170101,1,1,1,1,1,0,0,4,Beginning 1-31-15,Southbound,horizontal
+28,1642,0,20150131,20170101,0,0,0,0,0,1,0,5,Beginning 1-31-15,Northbound,horizontal
+29,1642,0,20150131,20170101,1,1,1,1,1,0,0,5,Beginning 1-31-15,Northbound,horizontal
+30,1642,1,20150131,20170101,0,0,0,0,0,1,0,5,Beginning 1-31-15,Southbound,horizontal
+31,1642,1,20150131,20170101,1,1,1,1,1,0,0,5,Beginning 1-31-15,Southbound,horizontal
+32,1643,0,20150131,20170101,0,0,0,0,0,1,0,6,Beginning 1-31-15,Westbound,horizontal
+33,1643,0,20150131,20170101,1,1,1,1,1,0,0,6,Beginning 1-31-15,Westbound,horizontal
+34,1643,1,20150131,20170101,0,0,0,0,0,1,0,6,Beginning 1-31-15,Eastbound,horizontal
+35,1643,1,20150131,20170101,1,1,1,1,1,0,0,6,Beginning 1-31-15,Eastbound,horizontal
+36,1644,0,20141201,20170101,0,0,0,0,0,0,1,7,Year-round,Westbound,horizontal
+37,1644,0,20141201,20170101,0,0,0,0,0,1,0,7,Year-round,Westbound,horizontal
+38,1644,1,20141201,20170101,0,0,0,0,0,0,1,7,Year-round,Eastbound,horizontal
+39,1644,1,20141201,20170101,0,0,0,0,0,1,0,7,Year-round,Eastbound,horizontal
+40,1644,0,20150131,20170101,1,1,1,1,1,0,0,7,Beginning 1-31-15,Westbound,horizontal
+41,1644,1,20150131,20170101,1,1,1,1,1,0,0,7,Beginning 1-31-15,Eastbound,horizontal
+42,1649,0,20150131,20170101,0,0,0,0,0,1,0,78,Beginning 1-31-15,Northbound,horizontal
+43,1649,0,20150131,20170101,1,1,1,1,1,0,0,78,Beginning 1-31-15,Northbound,horizontal
+44,1649,1,20150131,20170101,0,0,0,0,0,1,0,78,Beginning 1-31-15,Southbound,horizontal
+45,1649,1,20150131,20170101,1,1,1,1,1,0,0,78,Beginning 1-31-15,Southbound,horizontal
+46,1649,0,20151122,20171231,0,0,0,0,0,0,1,78,Beginning 11-22-2015,Northbound,horizontal
+47,1649,1,20151122,20171231,0,0,0,0,0,0,1,78,Beginning 11-22-2015,Southbound,horizontal
+48,1861,0,20150131,20170101,0,0,0,0,0,1,0,8,Beginning 1-31-15,Westbound,horizontal
+49,1861,0,20150131,20170101,1,1,1,1,1,0,0,8,Beginning 1-31-15,Westbound,horizontal
+50,1861,1,20150131,20170101,0,0,0,0,0,1,0,8,Beginning 1-31-15,Eastbound,horizontal
+51,1861,1,20150131,20170101,1,1,1,1,1,0,0,8,Beginning 1-31-15,Eastbound,horizontal
+52,1650,0,20141201,20170101,0,0,0,0,0,1,0,80,Year-round,Westbound,horizontal
+53,1650,0,20141201,20170101,1,1,1,1,1,0,0,80,Year-round,Westbound,horizontal
+54,1650,1,20141201,20170101,0,0,0,0,0,1,0,80,Year-round,Eastbound,horizontal
+55,1650,1,20141201,20170101,1,1,1,1,1,0,0,80,Year-round,Eastbound,horizontal
+56,1650,0,20151122,20171231,0,0,0,0,0,0,1,80,Beginning 11-22-2015,Westbound,horizontal
+57,1650,1,20151122,20171231,0,0,0,0,0,0,1,80,Beginning 11-22-2015,Eastbound,horizontal
+58,1652,0,20141201,20170101,0,0,0,0,0,0,1,80s,Year-round,Northbound,horizontal
+59,1652,1,20141201,20170101,0,0,0,0,0,0,1,80s,Year-round,Southbound,horizontal
+60,1651,0,20150131,20170101,0,0,0,0,0,1,0,85,Beginning 1-31-15,Northbound,horizontal
+61,1651,0,20150131,20170101,1,1,1,1,1,0,0,85,Beginning 1-31-15,Northbound,horizontal
+62,1651,1,20150131,20170101,0,0,0,0,0,1,0,85,Beginning 1-31-15,Southbound,horizontal
+63,1651,1,20150131,20170101,1,1,1,1,1,0,0,85,Beginning 1-31-15,Southbound,horizontal

@@ -1,0 +1,8 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,min_headway_minutes
+573,4817,,Hollis,,3,,FF0001,FFFFFF,0,
+573,4818,,Hollis North,,3,https://www.emerygoround.com/hollis.html,FF0001,FFFFFF,1,
+573,4819,,Hollis South,,3,https://www.emerygoround.com/hollis.html,FFB311,000000,2,
+573,4820,,Shellmound/Powell,,3,,5E3767,FFFFFF,3,
+573,4822,,North Shellmound,,3,,603669,FFFFFF,4,
+573,4821,,South Shellmound/Powell,,3,,9B6BDF,000000,5,
+573,4823,,Watergate Express,,3,,00A1EA,000000,6,

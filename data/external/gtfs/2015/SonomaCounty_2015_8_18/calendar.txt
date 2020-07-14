@@ -1,0 +1,10 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+723A3867,School Service Calendar (Mon-Fri),1,1,1,1,1,0,0,20150819,20160604
+784A2751,Year Round Service (Mon-Fri),1,1,1,1,1,0,0,20150101,20160101
+750A3227,29 summer service (Sat-Sun),0,0,0,0,0,1,1,20150711,20150913
+1162A2143,"Year-round service, beginning Aug 16 (Mon-Fri)",1,1,1,1,1,0,0,20150816,20160131
+1164A2143,"Year-round service, beginning Aug 16 (Mon-Sat)",1,1,1,1,1,1,0,20150816,20160131
+1169A2143,"Year-round service, beginning Aug 16 (Sat)",0,0,0,0,0,1,0,20150816,20160131
+1165A2143,"Year-round service, beginning Aug 16 (Sat-Sun)",0,0,0,0,0,1,1,20150816,20160131
+1171A3867,"School Service Calendar (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20150819,20160604
+1172A3867,School Service Calendar (Wed),0,0,1,0,0,0,0,20150819,20160604

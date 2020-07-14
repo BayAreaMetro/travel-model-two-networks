@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone
+SB,San Francisco Bay Ferry,http://www.sanfranciscobayferry.com,America/Los_Angeles,en,4157058291

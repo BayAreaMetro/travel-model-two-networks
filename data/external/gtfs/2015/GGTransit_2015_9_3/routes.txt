@@ -1,0 +1,76 @@
+route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+2-191,2,"Marin City - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_2.php",CC3333,FFFFFF
+2-193,2,"Marin City - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_2.php",CC3333,FFFFFF
+4-191,4,"Mill Valley - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_4.php",CC3333,FFFFFF
+4-193,4,"Mill Valley - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_4.php",CC3333,FFFFFF
+8-191,8,"Tiburon - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_8.php",CC3333,FFFFFF
+8-193,8,"Tiburon - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_8.php",CC3333,FFFFFF
+10-191,10,"Strawberry - Marin City - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_10.php",3366FF,FFFFFF
+10-193,10,"Strawberry - Marin City - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_10.php",3366FF,FFFFFF
+17-191,17,"San Rafael - Sausalito",,3,"http://marintransit.org/routes/17.html",53A946,FFFFFF
+17-193,17,"San Rafael - Sausalito",,3,"http://marintransit.org/routes/17.html",53A946,FFFFFF
+18-191,18,"College of Marin - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_18.php",CC3333,FFFFFF
+18-193,18,"College of Marin - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_18.php",CC3333,FFFFFF
+22-191,22,"San Rafael - Marin City",,3,"http://marintransit.org/routes/22.html",53A946,FFFFFF
+22-193,22,"San Rafael - Marin City",,3,"http://marintransit.org/routes/22.html",53A946,FFFFFF
+23-191,23,"San Rafael/Canal - Fairfax/Manor",,3,"http://marintransit.org/routes/23.html",53A946,FFFFFF
+23-193,23,"San Rafael/Canal - Fairfax/Manor",,3,"http://marintransit.org/routes/23.html",53A946,FFFFFF
+24-191,24,"Fairfax/Manor - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_24.php",CC3333,FFFFFF
+24-193,24,"Fairfax/Manor - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_24.php",CC3333,FFFFFF
+25-191,25,"Fairfax/Manor - Larkspur Ferry Terminal",,3,"http://goldengatetransit.org/schedules/current/route_25.php",993333,FFFFFF
+25-193,25,"Fairfax/Manor - Larkspur Ferry Terminal",,3,"http://goldengatetransit.org/schedules/current/route_25.php",993333,FFFFFF
+27-191,27,"San Anselmo - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_27.php",CC3333,FFFFFF
+27-193,27,"San Anselmo - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_27.php",CC3333,FFFFFF
+29-191,29,"San Rafael - Fairfax/Manor",,3,"http://marintransit.org/routes/29.html",53A946,FFFFFF
+29-193,29,"San Rafael - Fairfax/Manor",,3,"http://marintransit.org/routes/29.html",53A946,FFFFFF
+31-193,31,"Central San Rafael-SRTC-Larkspur Ferry",,3,"http://goldengatetransit.org/schedules/current/route_31.php",993333,FFFFFF
+35-191,35,"Canal - San Rafael Transit Center",,3,"http://marintransit.org/routes/35.html",53A946,FFFFFF
+35-193,35,"Canal - San Rafael Transit Center",,3,"http://marintransit.org/routes/35.html",53A946,FFFFFF
+36-191,36,"Canal - Marin City",,3,"http://marintransit.org/routes/36.html",53A946,FFFFFF
+36-193,36,"Canal - Marin City",,3,"http://marintransit.org/routes/36.html",53A946,FFFFFF
+37-191,37,"Smith Ranch Road P&R to LFT",,3,"",993333,FFFFFF
+37-193,37,"Smith Ranch Road P&R to LFT",,3,"http://goldengatetransit.org/schedules/current/route_37.php",993333,FFFFFF
+38-191,38,"Terra Linda - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_38.php",CC3333,FFFFFF
+38-193,38,"Terra Linda - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_38.php",CC3333,FFFFFF
+40-191,40,"Del Norte BART Station - San Rafael",,3,"http://goldengatetransit.org/schedules/current/route_40.php",3366FF,FFFFFF
+40-193,40,"Del Norte BART Station - San Rafael",,3,"http://goldengatetransit.org/schedules/current/route_40.php",3366FF,FFFFFF
+42-191,42,"Del Norte BART Station - San Rafael",,3,"http://goldengatetransit.org/schedules/current/route_40.php",3366FF,FFFFFF
+42-193,42,"Del Norte BART Station - San Rafael",,3,"http://goldengatetransit.org/schedules/current/route_40.php",3366FF,FFFFFF
+44-191,44,"Lucas Valley - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_44.php",CC3333,FFFFFF
+44-193,44,"Lucas Valley - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_44.php",CC3333,FFFFFF
+45-191,45,"Kaiser Hospital - Northgate - San Rafael",,3,"http://marintransit.org/routes/45.html",53A946,FFFFFF
+45-193,45,"Kaiser Hospital - Northgate - San Rafael",,3,"http://marintransit.org/routes/45.html",53A946,FFFFFF
+49-191,49,"Novato - San Rafael",,3,"http://marintransit.org/routes/49.html",53A946,FFFFFF
+49-193,49,"Novato - San Rafael",,3,"http://marintransit.org/routes/49.html",53A946,FFFFFF
+54-191,54,"Novato/San Marin - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_54.php",CC3333,FFFFFF
+54-193,54,"Novato/San Marin - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_54.php",CC3333,FFFFFF
+56-191,56,"San Marin - San Francisco via Broadway Tunnel",,3,"http://goldengatetransit.org/schedules/current/route_56.php",CC3333,FFFFFF
+56-193,56,"San Marin - San Francisco via Broadway Tunnel",,3,"http://goldengatetransit.org/schedules/current/route_56.php",CC3333,FFFFFF
+58-191,58,"Hamilton/Novato - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_58.php",CC3333,FFFFFF
+58-193,58,"Hamilton/Novato - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_58.php",CC3333,FFFFFF
+70-191,70,"Novato - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_70.php",3366FF,FFFFFF
+70-193,70,"Novato - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_70.php",3366FF,FFFFFF
+71-191,71,"Novato - Marin City",,3,"http://marintransit.org/routes/71.html",53A946,FFFFFF
+71-193,71,"Novato - Marin City",,3,"http://marintransit.org/routes/71.html",53A946,FFFFFF
+72-191,72,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_72.php",CC3333,FFFFFF
+72-193,72,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_72.php",CC3333,FFFFFF
+72X-191,72X,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_72.php",CC3333,FFFFFF
+72X-193,72X,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_72.php",CC3333,FFFFFF
+74-191,74,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_74.php",CC3333,FFFFFF
+74-193,74,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_74.php",CC3333,FFFFFF
+76-191,76,"East Petaluma - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_76.php",CC3333,FFFFFF
+76-193,76,"East Petaluma - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_76.php",CC3333,FFFFFF
+92-191,92,"Marin City - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_92.php",CC3333,FFFFFF
+92-193,92,"Marin City - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_92.php",CC3333,FFFFFF
+93-191,93,"Golden Gate Bridge Toll Plaza - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_93.php",CC3333,FFFFFF
+93-193,93,"Golden Gate Bridge Toll Plaza - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_93.php",CC3333,FFFFFF
+97-191,97,"Larkspur Ferry Terminal - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_97.php",CC3333,FFFFFF
+97-193,97,"Larkspur Ferry Terminal - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_97.php",CC3333,FFFFFF
+101-191,101,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_101.php",3366FF,FFFFFF
+101-193,101,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_101.php",3366FF,FFFFFF
+101X-191,101X,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_101.php",3366FF,FFFFFF
+101X-193,101X,"Santa Rosa - San Francisco",,3,"http://goldengatetransit.org/schedules/current/route_101.php",3366FF,FFFFFF
+LF-191,LF,"Larkspur - San Francisco Ferry",,2,"http://goldengateferry.org/schedules/Larkspur.php",0000FF,FFFFFF
+LF-193,LF,"Larkspur - San Francisco Ferry",,2,"http://goldengateferry.org/schedules/Larkspur.php",0000FF,FFFFFF
+SF-191,SF,"Sausalito - San Francisco Ferry",,2,"http://goldengateferry.org/schedules/Sausalito.php",0000FF,FFFFFF
+SF-193,SF,"Sausalito - San Francisco Ferry",,2,"http://goldengateferry.org/schedules/Sausalito.php",0000FF,FFFFFF
