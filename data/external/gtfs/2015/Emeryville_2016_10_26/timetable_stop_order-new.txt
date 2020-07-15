@@ -1,0 +1,185 @@
+timetable_id,stop_id,stop_sequence,stop_name,connected_routes
+1,2309331,0,MacArthur BART Station,-Loop
+1,2316832,1,Park Ave at Pixar,-Loop
+1,2316833,2,Hollis at 53rd,-Loop
+1,2318570,3,Hollis at 65th,-Loop
+1,2318571,4,Ninth at West Berkeley Bowl,-Loop
+1,2318572,5,Hollis at 65th,-Loop
+1,2318573,6,Hollis at 59th,-Loop
+1,2318574,7,Hollis at 53rd,-Loop
+1,2318575,8,Park Ave at Pixar,-Loop
+1,2309331,9,MacArthur BART Station,-Loop
+2,2309331,0,MacArthur BART Station,-Loop
+2,2316832,1,Park Ave at Pixar,-Loop
+2,2316833,2,Hollis at 53rd,-Loop
+2,2318570,3,Hollis at 65th,-Loop
+2,2318571,4,Ninth at West Berkeley Bowl,-Loop
+2,2318572,5,Hollis at 65th,-Loop
+2,2318573,6,Hollis at 59th,-Loop
+2,2318574,7,Hollis at 53rd,-Loop
+2,2318575,8,Park Ave at Pixar,-Loop
+2,2309331,9,MacArthur BART Station,-Loop
+3,2309331,0,MacArthur BART Station,-Loop
+3,2316832,1,Park Ave at Pixar,-Loop
+3,2316833,2,Hollis at 53rd,-Loop
+3,2318570,3,Hollis at 65th,-Loop
+3,2318571,4,Ninth at West Berkeley Bowl,-Loop
+3,2318572,5,Hollis at 65th,-Loop
+3,2318573,6,Hollis at 59th,-Loop
+3,2318574,7,Hollis at 53rd,-Loop
+3,2318575,8,Park Ave at Pixar,-Loop
+3,2309331,9,MacArthur BART Station,-Loop
+4,2309331,0,MacArthur BART Station,-Loop
+4,2316832,1,Park Ave at Pixar,-Loop
+4,2316833,2,Hollis at 53rd,-Loop
+4,2318570,3,Hollis at 65th,-Loop
+4,2318571,4,Ninth at West Berkeley Bowl,-Loop
+4,2318572,5,Hollis at 65th,-Loop
+4,2318573,6,Hollis at 59th,-Loop
+4,2318574,7,Hollis at 53rd,-Loop
+4,2318575,8,Park Ave at Pixar,-Loop
+4,2309331,9,MacArthur BART Station,-Loop
+5,2309331,0,MacArthur BART Station,-Loop
+5,2316832,1,Park Ave at Pixar,-Loop
+5,2316833,2,Hollis at 53rd,-Loop
+5,2318570,3,Hollis at 65th,-Loop
+5,2318571,4,Ninth at West Berkeley Bowl,-Loop
+5,2318572,5,Hollis at 65th,-Loop
+5,2318573,6,Hollis at 59th,-Loop
+5,2318574,7,Hollis at 53rd,-Loop
+5,2318575,8,Park Ave at Pixar,-Loop
+5,2309331,9,MacArthur BART Station,-Loop
+6,2309331,0,MacArthur BART Station,-Loop
+6,2316832,1,Park Ave at Pixar,-Loop
+6,2316833,2,Hollis at 53rd,-Loop
+6,2318570,3,Hollis at 65th,-Loop
+6,2318571,4,Ninth at West Berkeley Bowl,-Loop
+6,2318572,5,Hollis at 65th,-Loop
+6,2318573,6,Hollis at 59th,-Loop
+6,2318574,7,Hollis at 53rd,-Loop
+6,2318575,8,Park Ave at Pixar,-Loop
+6,2309331,9,MacArthur BART Station,-Loop
+7,2309331,0,MacArthur BART Station,-Loop
+7,2316832,1,Park Ave at Pixar,-Loop
+7,2316833,2,Hollis at 53rd,-Loop
+7,2318570,3,Hollis at 65th,-Loop
+7,2318571,4,Ninth at West Berkeley Bowl,-Loop
+7,2318572,5,Hollis at 65th,-Loop
+7,2318573,6,Hollis at 59th,-Loop
+7,2318574,7,Hollis at 53rd,-Loop
+7,2318575,8,Park Ave at Pixar,-Loop
+7,2309331,9,MacArthur BART Station,-Loop
+8,2309331,0,MacArthur BART Station,-Loop
+8,2319185,1,Hollis at 59th,-Loop
+8,2318570,2,Hollis at 65th,-Loop
+8,2318571,3,Ninth at West Berkeley Bowl,-Loop
+8,2318572,4,Hollis at 65th,-Loop
+8,2318573,5,Hollis at 59th,-Loop
+8,2309331,6,MacArthur BART Station,-Loop
+9,2309331,0,MacArthur BART Station,-Loop
+9,2316832,1,Park Ave at Pixar,-Loop
+9,2316833,2,Hollis at 53rd,-Loop
+9,2318573,3,Hollis at 59th,-Loop
+9,2318574,4,Hollis at 53rd,-Loop
+9,2318575,5,Park Ave at Pixar,-Loop
+9,2309331,6,MacArthur BART Station,-Loop
+10,2309331,0,MacArthur BART Station,-Loop
+10,2318576,1,Christie at Trader Joe's ,-Loop
+10,2318577,2,Shellmound at Public Market,-Loop
+10,2318578,3,65th at Shellmound,-Loop
+10,2318579,4,Christie at Public Market SB,-Loop
+10,2309331,5,MacArthur BART Station,-Loop
+11,2309331,0,MacArthur BART Station,-Loop
+11,2318580,1,40th at San Pablo,-Loop
+11,2319627,2,Shellmound at Bay Street,-Loop
+11,2318577,3,Shellmound at Public Market,-Loop
+11,2318578,4,65th at Shellmound,-Loop
+11,2319634,5,Powell at Police-Fire Station,-Loop
+11,2319629,6,Shellmound at Bay Street,-Loop
+11,2319182,7,40th at San Pablo ,-Loop
+11,2309331,8,MacArthur BART Station,-Loop
+12,2309331,0,MacArthur BART Station,-Loop
+12,2318580,1,40th at San Pablo,-Loop
+12,2319627,2,Shellmound at Bay Street,-Loop
+12,2318577,3,Shellmound at Public Market,-Loop
+12,2318578,4,65th at Shellmound,-Loop
+12,2319634,5,Powell at Police-Fire Station,-Loop
+12,2319629,6,Shellmound at Bay Street,-Loop
+12,2319182,7,40th at San Pablo ,-Loop
+12,2309331,8,MacArthur BART Station,-Loop
+13,2309331,0,MacArthur BART Station,-Loop
+13,2318580,1,40th at San Pablo,-Loop
+13,2319627,2,Shellmound at Bay Street,-Loop
+13,2318577,3,Shellmound at Public Market,-Loop
+13,2318578,4,65th at Shellmound,-Loop
+13,2319634,5,Powell at Police-Fire Station,-Loop
+13,2319629,6,Shellmound at Bay Street,-Loop
+13,2319182,7,40th at San Pablo ,-Loop
+13,2309331,8,MacArthur BART Station,-Loop
+14,2309331,0,MacArthur BART Station,-Loop
+14,2318580,1,40th at San Pablo,-Loop
+14,2319627,2,Shellmound at Bay Street,-Loop
+14,2318577,3,Shellmound at Public Market,-Loop
+14,2318578,4,65th at Shellmound,-Loop
+14,2319634,5,Powell at Police-Fire Station,-Loop
+14,2319629,6,Shellmound at Bay Street,-Loop
+14,2319182,7,40th at San Pablo ,-Loop
+14,2309331,8,MacArthur BART Station,-Loop
+15,2309331,0,MacArthur BART Station,-Loop
+15,2318580,1,40th at San Pablo,-Loop
+15,2319627,2,Shellmound at Bay Street,-Loop
+15,2318577,3,Shellmound at Public Market,-Loop
+15,2318578,4,65th at Shellmound,-Loop
+15,2319634,5,Powell at Police-Fire Station,-Loop
+15,2319629,6,Shellmound at Bay Street,-Loop
+15,2319182,7,40th at San Pablo ,-Loop
+15,2309331,8,MacArthur BART Station,-Loop
+16,2309331,0,MacArthur BART Station,-Loop
+16,2318580,1,40th at San Pablo,-Loop
+16,2319627,2,Shellmound at Bay Street,-Loop
+16,2318577,3,Shellmound at Public Market,-Loop
+16,2318578,4,65th at Shellmound,-Loop
+16,2319634,5,Powell at Police-Fire Station,-Loop
+16,2319629,6,Shellmound at Bay Street,-Loop
+16,2319182,7,40th at San Pablo ,-Loop
+16,2309331,8,MacArthur BART Station,-Loop
+17,2309331,0,MacArthur BART Station,-Loop
+17,2318580,1,40th at San Pablo,-Loop
+17,2319627,2,Shellmound at Bay Street,-Loop
+17,2318577,3,Shellmound at Public Market,-Loop
+17,2318578,4,65th at Shellmound,-Loop
+17,2319634,5,Powell at Police-Fire Station,-Loop
+17,2319629,6,Shellmound at Bay Street,-Loop
+17,2319182,7,40th at San Pablo ,-Loop
+17,2309331,8,MacArthur BART Station,-Loop
+18,2309331,0,MacArthur BART Station,-Loop
+18,2318580,1,40th at San Pablo,-Loop
+18,2319627,2,Shellmound at Bay Street,-Loop
+18,2318577,3,Shellmound at Public Market,-Loop
+18,2318578,4,65th at Shellmound,-Loop
+18,2319634,5,Powell at Police-Fire Station,-Loop
+18,2319629,6,Shellmound at Bay Street,-Loop
+18,2319182,7,40th at San Pablo ,-Loop
+18,2309331,8,MacArthur BART Station,-Loop
+19,2309331,0,MacArthur BART Station,-Loop
+19,2318580,1,40th at San Pablo,-Loop
+19,2319627,2,Shellmound at Bay Street,-Loop
+19,2318577,3,Shellmound at Public Market,-Loop
+19,2318578,4,65th at Shellmound,-Loop
+19,2319634,5,Powell at Police-Fire Station,-Loop
+19,2319629,6,Shellmound at Bay Street,-Loop
+19,2319182,7,40th at San Pablo ,-Loop
+19,2309331,8,MacArthur BART Station,-Loop
+20,2309331,0,MacArthur BART Station,-Loop
+20,2318580,1,40th at San Pablo,-Loop
+20,2319627,2,Shellmound at Bay Street,-Loop
+20,2319631,3,The Towers,-Loop
+20,2319634,4,Powell at Police-Fire Station,-Loop
+20,2318576,5,Christie at Trader Joe's ,-Loop
+20,2319629,6,Shellmound at Bay Street,-Loop
+20,2319182,7,40th at San Pablo ,-Loop
+20,2309331,8,MacArthur BART Station,-Loop
+21,2309331,0,MacArthur BART Station,-Loop
+21,2319633,1,Powell Marina,-Loop
+21,2319631,2,The Towers,-Loop
+21,2309331,3,MacArthur BART Station,-Loop

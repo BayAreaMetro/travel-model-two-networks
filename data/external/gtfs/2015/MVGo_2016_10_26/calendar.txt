@@ -1,0 +1,2 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+3630A5060,Year Round (Mon-Fri),1,1,1,1,1,0,0,20160501,20170501

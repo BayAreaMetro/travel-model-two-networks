@@ -1,0 +1,5 @@
+timetable_id,route_id,direction_id,start_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday,route_label,service_notes,direction_label,orientation
+1,3652,0,20160501,20170501,1,1,1,1,1,0,0,East Bayshore,Year Round,No direction,horizontal
+2,3654,0,20160501,20170501,1,1,1,1,1,0,0,East Whisman AM,Year Round,No direction,horizontal
+3,3655,0,20160501,20170501,1,1,1,1,1,0,0,East Whisman PM,Year Round,No direction,horizontal
+4,3656,0,20160501,20170501,1,1,1,1,1,0,0,West Bayshore,Year Round,No direction,horizontal

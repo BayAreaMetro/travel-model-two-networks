@@ -1,0 +1,2 @@
+feed_id,feed_publisher_name,feed_publisher_url,feed_lang,feed_version,feed_license,feed_contact_email,feed_contact_url,feed_start_date,feed_end_date
+emerygoround-ca-us,"Trillium Solutions, Inc.",http://www.trilliumtransit.com,en,USA-Pacific: 26-Oct-2016 16:51,,,http://support.trilliumtransit.com,20161026,20180101

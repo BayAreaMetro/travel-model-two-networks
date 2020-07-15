@@ -1,0 +1,4 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
+Angel Island,BG,Angel Island,Pier 41 - Angel Island Ferry,4,,
+Sausalito,BG,Sausalito,Pier 41 - Sausalito Ferry,4,,
+Tiburon,BG,Tiburon,Pier 41 - Tiburon Ferry,4,,

@@ -1,0 +1,7 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+127A2472,Year-round (Mon-Fri),1,1,1,1,1,0,0,20130101,20160101
+128A2472,Year-round (Sat),0,0,0,0,0,1,0,20130101,20160101
+420A2472,Year-round (Mon-Thur),1,1,1,1,0,0,0,20130101,20160101
+421A2472,Year-round (Fri),0,0,0,0,1,0,0,20130101,20160101
+2788A2472,Year-round (Mon-Fri),1,1,1,1,1,0,0,20130101,20160101
+2809A4108,School Year (Mon-Fri),1,1,1,1,1,0,0,20150812,20160602

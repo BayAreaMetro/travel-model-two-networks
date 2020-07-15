@@ -1,0 +1,12 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,min_headway_minutes
+267,2034,1,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route1.pdf,89c867,000000,0,
+267,2039,11,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route11.pdf,884b9d,ffffff,0,60
+267,2036,2,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route2.pdf,ee1f23,ffffff,0,60
+267,2040,24,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route24.pdf,f9a91b,000000,0,75
+267,2037,3,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,0,60
+267,2038,33,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,0,60
+267,2052,33M,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,0,
+267,2051,33T,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,0,
+267,2049,3S,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,0,
+267,2048,3T,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,0,
+267,2035,5,,"Route 5, formerly named Route 1T",3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route1.pdf,FF0000,ffffff,0,

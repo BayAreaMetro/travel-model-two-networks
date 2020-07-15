@@ -1,0 +1,21 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+9,MCTD,61,West Marin Stagecoach (South), ,3,http://www.marintransit.org/routes/61.html,3161AB,FFFFFF
+50,MCTD,65,Dillon Beach - Tomales - Petaluma, ,3,http://www.marintransit.org/routes/65.html,3161AB,FFFFFF
+49,MCTD,66,Muir Woods Shuttle, ,3,http://www.marintransit.org/routes/66.html,996633,FFFFFF
+10,MCTD,68,West Marin Stagecoach (North), ,3,http://www.marintransit.org/routes/68.html,3161AB,FFFFFF
+17,MCTD,113,Paradise Cay - Redwood HS, ,3,http://www.marintransit.org/routes/113.html,F89838,FFFFFF
+18,MCTD,115,Sausalito - St Hilary School, ,3,http://www.marintransit.org/routes/115.html,F89838,FFFFFF
+19,MCTD,117,Cove School - E Corte Madera - Hall MS, ,3,http://www.marintransit.org/routes/117.html,F89838,FFFFFF
+20,MCTD,119,Tiburon - Redwood HS, ,3,http://www.marintransit.org/routes/119.html,F89838,FFFFFF
+53,MCTD,122,College of Marin Express, ,3,http://www.marintransit.org/routes/122.html,F89838,FFFFFF
+21,MCTD,125,Lagunitas - Sir Francis Drake HS - San Rafael, ,3,http://www.marintransit.org/routes/125.html,F89838,FFFFFF
+24,MCTD,139,Lucas Valley - Terra Linda HS, ,3,http://www.marintransit.org/routes/139.html,F89838,FFFFFF
+52,MCTD,145,San Rafael - Terra Linda HS, ,3,http://www.marintransit.org/routes/145.html,F89838,FFFFFF
+25,MCTD,151,Hamilton - San Marin HS, ,3,http://www.marintransit.org/routes/151.html,F89838,FFFFFF
+26,MCTD,154,Olive - Novato, ,3,http://www.marintransit.org/routes/154.html,F89838,FFFFFF
+12,MCTD,219,Tiburon Shuttle, ,3,http://www.marintransit.org/routes/219.html,A5C73C,FFFFFF
+27,MCTD,228,Fairfax Manor Shuttle, ,3,http://www.marintransit.org/routes/228.html,A5C73C,FFFFFF
+13,MCTD,233,Santa Venetia Shuttle, ,3,http://www.marintransit.org/routes/233.html,A5C73C,FFFFFF
+14,MCTD,251,Novato Shuttle, ,3,http://www.marintransit.org/routes/251.html,A5C73C,FFFFFF
+15,MCTD,257,Smith Ranch Road - Ignacio, ,3,http://www.marintransit.org/routes/257.html,A5C73C,FFFFFF
+16,MCTD,259,Marinwood - Novato, ,3,http://www.marintransit.org/routes/259.html,A5C73C,FFFFFF

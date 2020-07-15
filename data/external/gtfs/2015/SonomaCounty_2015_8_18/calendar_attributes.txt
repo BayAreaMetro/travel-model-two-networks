@@ -1,0 +1,10 @@
+service_id,service_description
+723A3867,School Service Calendar (Mon-Fri)
+784A2751,Year Round Service (Mon-Fri)
+750A3227,29 summer service (Sat-Sun)
+1162A2143,"Year-round service, beginning Aug 16 (Mon-Fri)"
+1164A2143,"Year-round service, beginning Aug 16 (Mon-Sat)"
+1169A2143,"Year-round service, beginning Aug 16 (Sat)"
+1165A2143,"Year-round service, beginning Aug 16 (Sat-Sun)"
+1171A3867,"School Service Calendar (Mon-Tues, Thur-Fri)"
+1172A3867,School Service Calendar (Wed)

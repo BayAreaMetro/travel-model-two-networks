@@ -1,0 +1,6 @@
+fare_id,price,currency_type,payment_method,transfers,transfer_duration
+200415,6.00,USD,1,0,
+200420,13.80,USD,1,0,
+200425,6.90,USD,1,0,
+200430,7.90,USD,1,0,
+200435,7.90,USD,1,0,

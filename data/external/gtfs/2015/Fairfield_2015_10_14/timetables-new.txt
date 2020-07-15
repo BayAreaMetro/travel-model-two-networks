@@ -1,0 +1,54 @@
+timetable_id,route_id,direction_id,start_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday,route_label,service_notes,direction_label
+1,3204,1,20150812,20160602,1,1,1,1,1,0,0,7T-Green Valley MS,School Year,Southbound
+2,3205,0,20150812,20160602,1,1,1,1,1,0,0,7T-Solano Town Center,School Year,Northbound
+3,980,0,20130101,20160101,0,0,0,0,0,1,0,Cordelia Library-Oakbrook Dr,Year-round,Northbound
+4,980,0,20130101,20160101,1,1,1,1,1,0,0,Cordelia Library-Oakbrook Dr,Year-round,Northbound
+5,980,1,20130101,20160101,0,0,0,0,0,1,0,Cordelia Library-Oakbrook Dr,Year-round,Southbound
+6,980,1,20130101,20160101,1,1,1,1,1,0,0,Cordelia Library-Oakbrook Dr,Year-round,Southbound
+7,193,0,20130101,20160101,0,0,0,0,0,1,0,Fairfield-Vacaville,Year-round,No direction
+8,193,0,20130101,20160101,1,1,1,1,1,0,0,Fairfield-Vacaville,Year-round,No direction
+9,979,0,20130101,20160101,0,0,0,0,0,1,0,FTC-Cordelia Library,Year-round,Northbound
+10,979,0,20130101,20160101,1,1,1,1,1,0,0,FTC-Cordelia Library,Year-round,Northbound
+11,979,1,20130101,20160101,0,0,0,0,0,1,0,FTC-Cordelia Library,Year-round,Southbound
+12,979,1,20130101,20160101,1,1,1,1,1,0,0,FTC-Cordelia Library,Year-round,Southbound
+13,259,0,20130101,20160101,1,1,1,1,1,0,0,FTC-El Cerrito Del Norte BART-Suisun City Amtrak,Year-round,Westbound
+14,259,1,20130101,20160101,1,1,1,1,1,0,0,FTC-El Cerrito Del Norte BART-Suisun City Amtrak,Year-round,Eastbound
+15,975,0,20130101,20160101,0,0,0,0,0,1,0,FTC-Solano Town Center-Walmart,Year-round,Northbound
+16,975,0,20130101,20160101,1,1,1,1,1,0,0,FTC-Solano Town Center-Walmart,Year-round,Northbound
+17,975,1,20130101,20160101,0,0,0,0,0,1,0,FTC-Solano Town Center-Walmart,Year-round,Southbound
+18,975,1,20130101,20160101,1,1,1,1,1,0,0,FTC-Solano Town Center-Walmart,Year-round,Southbound
+19,977,0,20130101,20160101,0,0,0,0,0,1,0,FTC-Suisun Senior Center,Year-round,Westbound
+20,977,0,20130101,20160101,1,1,1,1,1,0,0,FTC-Suisun Senior Center,Year-round,Westbound
+21,977,1,20130101,20160101,0,0,0,0,0,1,0,FTC-Suisun Senior Center,Year-round,Eastbound
+22,977,1,20130101,20160101,1,1,1,1,1,0,0,FTC-Suisun Senior Center,Year-round,Eastbound
+23,973,0,20130101,20160101,0,0,0,0,0,1,0,FTC-Walmart,Year-round,Northbound
+24,973,0,20130101,20160101,1,1,1,1,1,0,0,FTC-Walmart,Year-round,Northbound
+25,973,1,20130101,20160101,0,0,0,0,0,1,0,FTC-Walmart,Year-round,Southbound
+26,973,1,20130101,20160101,1,1,1,1,1,0,0,FTC-Walmart,Year-round,Southbound
+27,976,0,20130101,20160101,0,0,0,0,0,1,0,KMart-Travis Air Force Base,Year-round,Westbound
+28,976,0,20130101,20160101,1,1,1,1,1,0,0,KMart-Travis Air Force Base,Year-round,Westbound
+29,976,1,20130101,20160101,0,0,0,0,0,1,0,KMart-Travis Air Force Base,Year-round,Eastbound
+30,976,1,20130101,20160101,1,1,1,1,1,0,0,KMart-Travis Air Force Base,Year-round,Eastbound
+31,3202,1,20150812,20160602,1,1,1,1,1,0,0,Rodriguez High School,School Year,Southbound
+32,190,0,20130101,20160101,0,0,0,0,0,1,0,Sacramento-Davis-Fairfield,Year-round,Westbound
+33,190,0,20130101,20160101,0,0,0,0,1,0,0,Sacramento-Davis-Fairfield,Year-round,Westbound
+34,190,0,20130101,20160101,1,1,1,1,0,0,0,Sacramento-Davis-Fairfield,Year-round,Westbound
+35,190,0,20130101,20160101,1,1,1,1,1,0,0,Sacramento-Davis-Fairfield,Year-round,Westbound
+36,190,1,20130101,20160101,0,0,0,0,0,1,0,Sacramento-Davis-Fairfield,Year-round,Eastbound
+37,190,1,20130101,20160101,0,0,0,0,1,0,0,Sacramento-Davis-Fairfield,Year-round,Eastbound
+38,190,1,20130101,20160101,1,1,1,1,0,0,0,Sacramento-Davis-Fairfield,Year-round,Eastbound
+39,190,1,20130101,20160101,1,1,1,1,1,0,0,Sacramento-Davis-Fairfield,Year-round,Eastbound
+40,974,0,20130101,20160101,0,0,0,0,0,1,0,Solano Town Ctr-Huntington Ct,Year-round,Westbound
+41,974,0,20130101,20160101,1,1,1,1,1,0,0,Solano Town Ctr-Huntington Ct,Year-round,Westbound
+42,974,1,20130101,20160101,0,0,0,0,0,1,0,Solano Town Ctr-Huntington Ct,Year-round,Eastbound
+43,974,1,20130101,20160101,1,1,1,1,1,0,0,Solano Town Ctr-Huntington Ct,Year-round,Eastbound
+44,978,0,20130101,20160101,0,0,0,0,0,1,0,Solano Town Ctr-Suisun Senior Ctr-Montebello Dr,Year-round,Westbound
+45,978,0,20130101,20160101,1,1,1,1,1,0,0,Solano Town Ctr-Suisun Senior Ctr-Montebello Dr,Year-round,Westbound
+46,978,1,20130101,20160101,0,0,0,0,0,1,0,Solano Town Ctr-Suisun Senior Ctr-Montebello Dr,Year-round,Eastbound
+47,978,1,20130101,20160101,1,1,1,1,1,0,0,Solano Town Ctr-Suisun Senior Ctr-Montebello Dr,Year-round,Eastbound
+48,2720,0,20130101,20160101,0,0,0,0,0,1,0,Suisun Senior Center-Suisun City Walmart,Year-round,Westbound
+49,2720,0,20130101,20160101,1,1,1,1,1,0,0,Suisun Senior Center-Suisun City Walmart,Year-round,Westbound
+50,2720,1,20130101,20160101,0,0,0,0,0,1,0,Suisun Senior Center-Suisun City Walmart,Year-round,Eastbound
+51,2720,1,20130101,20160101,1,1,1,1,1,0,0,Suisun Senior Center-Suisun City Walmart,Year-round,Eastbound
+52,196,0,20130101,20160101,1,1,1,1,1,0,0,WC-PH BART - Vacaville-Fairfield,Year-round,Westbound
+53,196,1,20130101,20160101,1,1,1,1,1,0,0,WC-PH BART - Vacaville-Fairfield,Year-round,Eastbound

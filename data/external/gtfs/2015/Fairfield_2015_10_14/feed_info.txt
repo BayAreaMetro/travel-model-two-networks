@@ -1,0 +1,2 @@
+feed_id,feed_publisher_name,feed_publisher_url,feed_lang,feed_version,feed_license,feed_contact_email,feed_contact_url,feed_start_date,feed_end_date
+fairfield-ca-us,"Trillium Solutions, Inc.",http://www.trilliumtransit.com,en,USA-Pacific: 13-Oct-2015 18:23,,support+fairfield-ca-us@trilliumtransit.com,http://support.trilliumtransit.com,20151013,20160602
