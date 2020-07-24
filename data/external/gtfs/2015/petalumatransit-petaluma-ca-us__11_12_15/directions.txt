@@ -1,0 +1,5 @@
+route_id,direction_id,direction
+2036,1,Southbound
+2039,1,Southbound
+2039,0,Northbound
+2036,0,Northbound

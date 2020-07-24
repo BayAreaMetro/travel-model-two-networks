@@ -1,0 +1,2 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+c_19530_b_25910_d_63,Year Round Reduced (No Sunday),1,1,1,1,1,1,0,20200328,20210101

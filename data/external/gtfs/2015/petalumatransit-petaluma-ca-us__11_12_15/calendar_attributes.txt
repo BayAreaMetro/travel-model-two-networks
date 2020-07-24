@@ -1,0 +1,23 @@
+service_id,service_description
+1692A3010,Yearly Service (Mon-Fri)
+1693A3010,Yearly Service (Sat)
+1694A3010,Yearly Service (Sun)
+1695A3010,Yearly Service (Mon-Sat)
+1696A3010,"Yearly Service (Mon-Tues, Thur-Fri)"
+1697A3010,Yearly Service (Wed)
+1701A3018,"School Days (Mon-Tues, Thur-Fri)"
+1701A3016,"School Days (Mon-Tues, Thur-Fri)"
+1701A3015,"School Days (Mon-Tues, Thur-Fri)"
+1701A3017,"School Days (Mon-Tues, Thur-Fri)"
+1702A3018,School Days (Wed)
+1702A3016,School Days (Wed)
+1702A3015,School Days (Wed)
+1702A3017,School Days (Wed)
+1703A3018,School Days (Mon-Fri)
+1703A3016,School Days (Mon-Fri)
+1703A3015,School Days (Mon-Fri)
+1703A3017,School Days (Mon-Fri)
+2598A3857,Non-School Days (Mon-Fri)
+2598A3856,Non-School Days (Mon-Fri)
+2598A3855,Non-School Days (Mon-Fri)
+2598A3853,Non-School Days (Mon-Fri)

@@ -1,0 +1,20 @@
+route_id,agency_id,route_short_name,route_long_name,route_type,route_color,route_text_color
+7146a77,tri-delta-transit,384,Antioch / Brentwood,3,8e93ed,ffffff
+2d1bf88,tri-delta-transit,383,Antioch / Oakley,3,909393,ffffff
+356b89a,tri-delta-transit,381,LMC / Pittsburg,3,63ce7d,ffffff
+c7347cd,tri-delta-transit,391,Pittsburg BART / Brentwood,3,f9c77c,ffffff
+a652b17,tri-delta-transit,380,Pittsburg BART / Antioch,3,0D7215,ffffff
+c7f28b2,tri-delta-transit,200,Martinez / Pittsburg,3,cea202,ffffff
+a2c0567,tri-delta-transit,300,Express Bart / Brentwood,3,a502ce,ffffff
+9016482,tri-delta-transit,385,Antioch / Brentwood,3,0eb2cc,ffffff
+fc4f8bf,tri-delta-transit,201,Pittsburg / Concord BART,3,025ace,ffffff
+3b29cf5,tri-delta-transit,389,Pittsburg BART / Bay Point,3,ffa14f,ffffff
+e0c3cae,tri-delta-transit,387,Pittsburg BART / Antioch,3,efa7d6,ffffff
+fc3f6b8,tri-delta-transit,390,Pittsburg BART / Antioch,3,824a02,ffffff
+2eef964,tri-delta-transit,388,Pittsburg BART / Kaiser Deer Valley,3,0071CA,ffffff
+b2fbe68,tri-delta-transit,379,Antioch Deer Valley,3,a9d9e8,ffffff
+2ad98d8,tri-delta-transit,396,Bay Point / Antioch,3,CE5504,ffffff
+a857d03,tri-delta-transit,395,Antioch / Brentwood,3,4E0963,ffffff
+b88e084,tri-delta-transit,393,BART / Brentwood,3,7ec625,ffffff
+a3c2d22,tri-delta-transit,392,BART / Antioch,3,AD0101,ffffff
+61f23b4,tri-delta-transit,394,BART / Antioch,3,d8d500,ffffff
