@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_phone,agency_fare_url,agency_lang,agency_email
+tri-delta-transit,Tri Delta Transit,http://trideltatransit.com,America/Los Angeles,(925) 754-4040,http://trideltatransit.com/fares.aspx,en,

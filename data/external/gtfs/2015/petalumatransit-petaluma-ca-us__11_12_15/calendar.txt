@@ -1,0 +1,23 @@
+service_id,service_name,monday,tuesday,wednesday,thursday,friday,saturday,sunday,start_date,end_date
+1692A3010,Yearly Service (Mon-Fri),1,1,1,1,1,0,0,20150101,20170101
+1693A3010,Yearly Service (Sat),0,0,0,0,0,1,0,20150101,20170101
+1694A3010,Yearly Service (Sun),0,0,0,0,0,0,1,20150101,20170101
+1695A3010,Yearly Service (Mon-Sat),1,1,1,1,1,1,0,20150101,20170101
+1696A3010,"Yearly Service (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20150101,20170101
+1697A3010,Yearly Service (Wed),0,0,1,0,0,0,0,20150101,20170101
+1701A3018,"School Days (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20160328,20160603
+1701A3016,"School Days (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20151128,20151221
+1701A3015,"School Days (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20150819,20151122
+1701A3017,"School Days (Mon-Tues, Thur-Fri)",1,1,0,1,1,0,0,20160105,20160317
+1702A3018,School Days (Wed),0,0,1,0,0,0,0,20160328,20160603
+1702A3016,School Days (Wed),0,0,1,0,0,0,0,20151128,20151221
+1702A3015,School Days (Wed),0,0,1,0,0,0,0,20150819,20151122
+1702A3017,School Days (Wed),0,0,1,0,0,0,0,20160105,20160317
+1703A3018,School Days (Mon-Fri),1,1,1,1,1,0,0,20160328,20160603
+1703A3016,School Days (Mon-Fri),1,1,1,1,1,0,0,20151128,20151221
+1703A3015,School Days (Mon-Fri),1,1,1,1,1,0,0,20150819,20151122
+1703A3017,School Days (Mon-Fri),1,1,1,1,1,0,0,20160105,20160317
+2598A3857,Non-School Days (Mon-Fri),1,1,1,1,1,0,0,20160604,20160816
+2598A3856,Non-School Days (Mon-Fri),1,1,1,1,1,0,0,20160318,20160327
+2598A3855,Non-School Days (Mon-Fri),1,1,1,1,1,0,0,20151222,20160104
+2598A3853,Non-School Days (Mon-Fri),1,1,1,1,1,0,0,20151123,20151127

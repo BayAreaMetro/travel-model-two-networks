@@ -1,0 +1,216 @@
+stop_id,stop_code,platform_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,position,direction,wheelchair_boarding
+2454899,100,,Ulatis Cultural Center,,38.35576904,-121.961981,,,0,,America/Los_Angeles,,,0
+2454900,101,,Ulatis Dr. at Harbison Dr.,,38.35735397,-121.961745,,,0,,America/Los_Angeles,,,0
+2454901,102,,Ulatis Dr. at Burton Dr.,,38.35743997,-121.958919,,,0,,America/Los_Angeles,,,0
+2454902,103,,Burton Dr. at Ulatis Dr.,,38.35816501,-121.9578,,,0,,America/Los_Angeles,,,0
+2454903,104,,Burton Dr. between Ulatis Dr. and Helen Power Dr.,,38.36055603,-121.957817,,,0,,America/Los_Angeles,,,0
+2454904,105,,Burton Dr. at Helen Power Dr. (Walmart),,38.36181197,-121.957749,,,0,,America/Los_Angeles,,,0
+2454905,106,,Burton Dr.,,38.36371902,-121.95575,,,0,,America/Los_Angeles,,,0
+2454907,107,,Burton Dr. at Nut Tree Rd.,,38.364707,-121.954466,,,0,,America/Los_Angeles,,,0
+2454909,108,,Nut Tree Rd. at Burton Dr.,,38.36454799,-121.952787,,,0,,America/Los_Angeles,,,0
+2454910,109,,Yellowstone Dr. at Nut Tree Rd.,,38.362306,-121.949417,,,0,,America/Los_Angeles,,,0
+2454911,110,,Yellowstone Dr. at Ponderosa Dr.,,38.36374199,-121.947556,,,0,,America/Los_Angeles,,,0
+2454912,111,,Yellowstone Dr. at McKinley Cir.,,38.36540898,-121.945379,,,0,,America/Los_Angeles,,,0
+2454913,112,,Yellowstone Dr. at Teton Dr.,,38.36810402,-121.943031,,,0,,America/Los_Angeles,,,0
+2454914,113,,Yellowstone Dr. at Glacier Cir.,,38.36978903,-121.940847,,,0,,America/Los_Angeles,,,0
+2454915,114,,Yellowstone Dr. at Rushmore Dr.,,38.371179,-121.939012,,,0,,America/Los_Angeles,,,0
+2454916,116,,Leisure Town Rd. at Maple Rd.,,38.37476604,-121.93363,,,0,,America/Los_Angeles,,,0
+2454917,117,,Leisure Town Rd. at Popular Rd.,,38.380786,-121.933671,,,0,,America/Los_Angeles,,,0
+2454918,118,,Orange Dr. at Leisure Town Rd.,,38.38463204,-121.935026,,,0,,America/Los_Angeles,,,0
+2454919,119,,Leisure Town Rd. at Gilley Way,,38.38182201,-121.933872,,,0,,America/Los_Angeles,,,0
+2454920,120,,Yellowstone Dr. at Sequoia Dr. (Brookdale Vacaville Leisure Town),,38.37329996,-121.93742,,,0,,America/Los_Angeles,,,0
+2454921,121,,Yellowstone Dr. at Bryce Way,,38.37136097,-121.938951,,,0,,America/Los_Angeles,,,0
+2454922,122,,Yellowstone Dr. at Glacier Cir.,,38.37013403,-121.940588,,,0,,America/Los_Angeles,,,0
+2454923,123,,Yellowstone Dr. at Isle Royale Cir.,,38.36904396,-121.94203,,,0,,America/Los_Angeles,,,0
+2454924,124,,Yellowstone Dr. before Lassen Cir.,,38.36784803,-121.943399,,,0,,America/Los_Angeles,,,0
+2454925,125,,Yellowstone Dr. at Lassen Cir.,,38.3670628,-121.9438878,,,0,,America/Los_Angeles,,,0
+2454926,126,,Yellowstone Dr. before McKinley Cir.,,38.36636703,-121.944395,,,0,,America/Los_Angeles,,,0
+2454927,127,,Yellowstone Dr. at McKinley Cir.,,38.36576404,-121.945105,,,0,,America/Los_Angeles,,,0
+2454928,128,,Yellowstone Dr. at Olympic Cir.,,38.36515903,-121.945894,,,0,,America/Los_Angeles,,,0
+2454929,129,,Yellowstone Dr. before Rainier Cir.,,38.363973,-121.94746,,,0,,America/Los_Angeles,,,0
+2454930,130,,Yellowstone Dr. at Rainier Cir.,,38.36339397,-121.9482,,,0,,America/Los_Angeles,,,0
+2454931,131,,Yellowstone Dr. at Nut Tree Rd.,,38.36281604,-121.948974,,,0,,America/Los_Angeles,,,0
+2454932,132,,Burton Dr. at Nut Tree Rd. (Outlets),,38.36431397,-121.955308,,,0,,America/Los_Angeles,,,0
+2454935,133,,Burton Dr. at Helen Power Dr. (Sam's Club),,38.36279098,-121.957239,,,0,,America/Los_Angeles,,,0
+2454936,134,,Burton Dr. at Helen Power Dr. (Walmart),,38.36223903,-121.957795,,,0,,America/Los_Angeles,,,0
+2454937,135,,Burton Dr. at Saratoga Apartments,,38.35942003,-121.95802,,,0,,America/Los_Angeles,,,0
+2454938,136,,Burton Dr. at Ulatis Dr.,,38.35783099,-121.958079,,,0,,America/Los_Angeles,,,0
+2454939,137,,Leisure Town Rd. at Quick Stop,,38.38404899,-121.93363,,,0,,America/Los_Angeles,,,0
+2454940,138,,Leisure Town Rd. at Orange Dr.,,38.38407498,-121.933869,,,0,,America/Los_Angeles,,,0
+2454941,200,,Elmira Rd. at Allison Dr.,,38.35269598,-121.966454,,,0,,America/Los_Angeles,,,0
+2454942,203,,Mason St. at Hawaiian Building,,38.355015,-121.987305,,,0,,America/Los_Angeles,,,0
+2454943,204,,Merchant St. at Cernon St. ,,38.3535974,-121.9914635,,,0,,America/Los_Angeles,,,0
+2454944,205,,Merchant St. at City Hall,,38.351456,-121.9934772,,,0,,America/Los_Angeles,,,0
+2454945,206,,Merchant St. at Orchard Ave.,,38.3489194,-121.9961671,,,0,,America/Los_Angeles,,,0
+2454946,210,,N. Orchard Ave. at Anita Ct. (Recycle),,38.3572284,-122.0047282,,,0,,America/Los_Angeles,,,0
+2454947,211,,Buck Ave. at Eldridge Ave.,,38.3567692,-122.0008904,,,0,,America/Los_Angeles,,,0
+2454948,212,,Buck Ave. at Buck Mansion,,38.3566529,-121.9938997,,,0,,America/Los_Angeles,,,0
+2454949,213,,Monte Vista at Boost Mobile,,38.35908903,-121.979203,,,0,,America/Los_Angeles,,,0
+2454950,214,,Brown St. at E. Monte Vista Ave.,,38.36078703,-121.977425,,,0,,America/Los_Angeles,,,0
+2454953,215,,Brown St. at Hazel St.,,38.363169,-121.978042,,,0,,America/Los_Angeles,,,0
+2454954,216,,Brown St. at Mobile Home Park,,38.3642171,-121.9779562,,,0,,America/Los_Angeles,,,0
+2454956,217,,Brown St. at Bennett Hill Dr.,,38.36593604,-121.977783,,,0,,America/Los_Angeles,,,0
+2454957,218,,Brown St. at School Bus Yard,,38.36720598,-121.977688,,,0,,America/Los_Angeles,,,0
+2454958,219,,Brown St. at Markham Ave. (Church),,38.3699991,-121.9774678,,,0,,America/Los_Angeles,,,0
+2454960,220,,Brown St. at Woodcrest Dr.,,38.37201199,-121.977351,,,0,,America/Los_Angeles,,,0
+2454961,221,,Browns Valley Rd. at Shannon Dr.,,38.37790104,-121.978003,,,0,,America/Los_Angeles,,,0
+2454962,222,,Tipperary Dr. at Longford Ln.,,38.38007597,-121.977097,,,0,,America/Los_Angeles,,,0
+2454963,223,,Tipperary Dr. at Wexford Ln.,,38.380685,-121.975664,,,0,,America/Los_Angeles,,,0
+2454964,224,,Tipperary Dr. at Waterford Dr.,,38.38429098,-121.97502,,,0,,America/Los_Angeles,,,0
+2454965,225,,Tipperary Dr. at Roscommon Pl.,,38.38605604,-121.973358,,,0,,America/Los_Angeles,,,0
+2454966,226,,Tipperary Dr. at Bantry Dr.,,38.388738,-121.974058,,,0,,America/Los_Angeles,,,0
+2454967,227,,Tipperary Dr. at Browns Valley Rd. ,,38.39098804,-121.976895,,,0,,America/Los_Angeles,,,0
+2454968,228,,Browns Valley Rd. at In-Shape,,38.38952397,-121.977605,,,0,,America/Los_Angeles,,,0
+2454969,229,,Glen Eagle Way at Browns Valley Rd.,,38.3869525,-121.9780737,,,0,,America/Los_Angeles,,,0
+2454970,230,,Glen Eagle Way at Silver Eagle,,38.386868,-121.981329,,,0,,America/Los_Angeles,,,0
+2454971,231,,Glen Eagle Way at Wrentham Dr.,,38.38713203,-121.983353,,,0,,America/Los_Angeles,,,0
+2454972,232,,Wrentham Dr. at Graylyn Ct.,,38.38573401,-121.983841,,,0,,America/Los_Angeles,,,0
+2454973,233,,Wrentham Dr. at Harwinton Ct.,,38.3833869,-121.9836119,,,0,,America/Los_Angeles,,,0
+2454974,234,,Wrentham Dr. at Wethersfield Dr.,,38.38215997,-121.983427,,,0,,America/Los_Angeles,,,0
+2454975,235,,Wrentham Dr. at Rollingwood Ct.,,38.37888197,-121.981391,,,0,,America/Los_Angeles,,,0
+2454976,236,,Wrentham Dr. at Browns Valley Rd.,,38.37751002,-121.978849,,,0,,America/Los_Angeles,,,0
+2454977,400,,Solano Community College,,38.39365197,-121.941764,,,0,,America/Los_Angeles,,,0
+2454978,403,,Kaiser Hospital,,38.3879642080381,-121.937491336563,,,0,,America/Los_Angeles,,,0
+2454979,404,,Orange Dr. at Gilley Way (Dodge),,38.382942,-121.938402,,,0,,America/Los_Angeles,,,0
+2454980,409,,Harbison Dr. at Nut Tree Pkwy. (Burlington Coat Factory),,38.36122599,-121.963463,,,0,,America/Los_Angeles,,,0
+2454981,410,,Orange Dr. at Nut Tree Rd.,,38.36938896,-121.955623,,,0,,America/Los_Angeles,,,0
+2454982,500,,Harbison Dr. at Safeway,,38.36196402,-121.963234,,,0,,America/Los_Angeles,,,0
+2454983,501,,Helen Power Dr. at Baskin Robins,,38.36426603,-121.960257,,,0,,America/Los_Angeles,,,0
+2454984,502,,Helen Power Dr. at Burton Dr. (Walmart),,38.36278402,-121.958484,,,0,,America/Los_Angeles,,,0
+2454985,503,,Nut Tree Rd. at Arcadia Dr. ,,38.3618268,-121.9499999,,,0,,America/Los_Angeles,,,0
+2454986,504,,Nut Tree Rd. at Ulatis Dr.,,38.35735297,-121.953155,,,0,,America/Los_Angeles,,,0
+2454987,505,,Nut Tree Rd. at North Bay Way,,38.35569,-121.95329,,,0,,America/Los_Angeles,,,0
+2454988,506,,Nut Tree Rd. at Elmira Rd.,,38.35245299,-121.953333,,,0,,America/Los_Angeles,,,0
+2454989,507,,Nut Tree Rd. at Vaca Pena Middle School,,38.34823497,-121.953322,,,0,,America/Los_Angeles,,,0
+2454990,508,,Nut Tree Rd. at Marshall Rd.,,38.34562903,-121.95334,,,0,,America/Los_Angeles,,,0
+2454991,509,,Nut Tree Rd. at Bel Air Dr. ,,38.34209799,-121.953362,,,0,,America/Los_Angeles,,,0
+2454992,510,,Nut Tree Rd. at Alamo Dr.,,38.33616201,-121.953425,,,0,,America/Los_Angeles,,,0
+2454993,511,,Alamo Dr. at Nut Tree Rd.,,38.3354672,-121.9550317,,,0,,America/Los_Angeles,,,0
+2454994,512,,Alamo Dr. at Bel Air Dr. ,,38.33546304,-121.95744,,,0,,America/Los_Angeles,,,0
+2454995,514,,Alamo Dr. at Peabody Rd. (Lucky Store),,38.33553898,-121.968868,,,0,,America/Los_Angeles,,,0
+2454996,515,,Alamo Dr. at Peabody Rd. (Chevron),,38.3355448,-121.9714003,,,0,,America/Los_Angeles,,,0
+2454997,516,,Alamo Dr. at Rosewood Ln.,,38.3355488,-121.9759304,,,0,,America/Los_Angeles,,,0
+2454998,517,,Alamo Dr. at Mariposa Ave.,,38.3355887,-121.9808817,,,0,,America/Los_Angeles,,,0
+2454999,518,,Alamo Dr. at Alamo Ln.,,38.3356048,-121.984243,,,0,,America/Los_Angeles,,,0
+2455000,519,,Alamo Dr. at Davis St. ,,38.3367409,-121.9866365,,,0,,America/Los_Angeles,,,0
+2455001,520,,Alamo Dr. at Whitehall Way,,38.33820996,-121.988572,,,0,,America/Los_Angeles,,,0
+2455002,521,,Alamo Dr. at La Cruz Ln.,,38.34020896,-121.99114,,,0,,America/Los_Angeles,,,0
+2455003,522,,Alamo Dr. at Marshall Rd.,,38.3420547,-121.993532,,,0,,America/Los_Angeles,,,0
+2455004,523,,Alamo Dr. at Butcher Rd.,,38.34345301,-121.995356,,,0,,America/Los_Angeles,,,0
+2455005,524,,Merchant St. at Alamo Dr.,,38.3483871,-121.9964895,,,0,,America/Los_Angeles,,,0
+2455006,525,,Merchant St. at Elm St. ,,38.35179702,-121.992925,,,0,,America/Los_Angeles,,,0
+2455007,526,,Merchant St. at Stevenson St. ,,38.35351196,-121.991309,,,0,,America/Los_Angeles,,,0
+2455008,527,,Dobbins St. at McBride Senior Center,,38.35781104,-121.988669,,,0,,America/Los_Angeles,,,0
+2455009,528,,Alamo Dr. at Butcher Rd.,,38.34317598,-121.995582,,,0,,America/Los_Angeles,,,0
+2455010,529,,Alamo Dr. at Marshall Rd. (3 Oaks),,38.34179699,-121.993575,,,0,,America/Los_Angeles,,,0
+2455011,530,,Alamo Dr. at Beythe Ln.,,38.33883097,-121.989679,,,0,,America/Los_Angeles,,,0
+2455012,531,,Alamo Dr. at Alamo Ct.,,38.3361982,-121.9863001,,,0,,America/Los_Angeles,,,0
+2455013,532,,Alamo Dr. at Alamo Ln.,,38.3354229,-121.983777,,,0,,America/Los_Angeles,,,0
+2455014,533,,Alamo Dr. at Mariposa Ave.,,38.3353935,-121.9800561,,,0,,America/Los_Angeles,,,0
+2455015,534,,Alamo Dr. at Fire House,,38.33534201,-121.974955,,,0,,America/Los_Angeles,,,0
+2455016,535,,Alamo Dr. at Wildwood Ln. (Rose Garden Apartments),,38.33531904,-121.97316,,,0,,America/Los_Angeles,,,0
+2455017,536,,Alamo Dr. at Peabody Rd. (Walgreens),,38.33533103,-121.968739,,,0,,America/Los_Angeles,,,0
+2455018,537,,Alamo Dr. at Marna Dr.,,38.33533304,-121.963012,,,0,,America/Los_Angeles,,,0
+2455019,538,,Alamo Dr. at Farmington Dr.,,38.3352886,-121.9587443,,,0,,America/Los_Angeles,,,0
+2455020,539,,Alamo Dr. at Needham Dr. ,,38.33529599,-121.954911,,,0,,America/Los_Angeles,,,0
+2455021,540,,Nut Tree Rd. at Alamo Dr. (Autumn Leaves),,38.33638304,-121.953186,,,0,,America/Los_Angeles,,,0
+2455022,541,,Nut Tree Rd. at Woodridge Dr.,,38.340216,-121.953163,,,0,,America/Los_Angeles,,,0
+2455023,542,,Nut Tree Rd. at Bel Air Dr. ,,38.342645,-121.9531435,,,0,,America/Los_Angeles,,,0
+2455024,543,,Nut Tree Rd. at Marshall Rd.,,38.34574403,-121.953142,,,0,,America/Los_Angeles,,,0
+2455025,544,,Nut Tree Rd. at Vaca Pena Middle School,,38.34838299,-121.953123,,,0,,America/Los_Angeles,,,0
+2455026,545,,Nut Tree Rd. at Elmira Rd.,,38.35227102,-121.952999,,,0,,America/Los_Angeles,,,0
+2455027,546,,Nut Tree Rd. at North Bay Way,,38.35464201,-121.953043,,,0,,America/Los_Angeles,,,0
+2455028,547,,Nut Tree Rd. at Yellowstone Dr.,,38.36188003,-121.949702,,,0,,America/Los_Angeles,,,0
+2455029,548,,Burton Dr. at Helen Power Dr. ,,38.36412697,-121.959823,,,0,,America/Los_Angeles,,,0
+2455030,602,,E. Monte Vista Ave. at Amici's Pizza,,38.3696995,-121.9602072,,,0,,America/Los_Angeles,,,0
+2455031,603,,E. Monte Vista Ave. at Best Buy,,38.36652,-121.963905,,,0,,America/Los_Angeles,,,0
+2455032,605,,E. Monte Vista Ave. at Allison Dr. (Goodwill),,38.36166697,-121.972671,,,0,,America/Los_Angeles,,,0
+2455033,606,,E. Monte Vista Ave. at Brown St.,,38.36022302,-121.976793,,,0,,America/Los_Angeles,,,0
+2455034,607,,Rocky Hill Rd. at Lomita Ave.,,38.36882997,-121.980189,,,0,,America/Los_Angeles,,,0
+2455036,608,,Rocky Hill Rd. at Novato Dr. ,,38.36737001,-121.980263,,,0,,America/Los_Angeles,,,0
+2455037,609,,Meadows Dr. at Rocky Hill Rd.. ,,38.3660977,-121.9806649,,,0,,America/Los_Angeles,,,0
+2455040,610,,Markham Ave. at Meadows Dr.,,38.3657981,-121.9828677,,,0,,America/Los_Angeles,,,0
+2455042,611,,Markham Ave. at Wesley Ave.,,38.3628542,-121.9810723,,,0,,America/Los_Angeles,,,0
+2455044,612,,Markham Ave. at E. Monte Vista Ave. (Lucky Store),,38.35967,-121.9819338,,,0,,America/Los_Angeles,,,0
+2455045,613,,Mason St. at Merchant St.,,38.35487,-121.989378,,,0,,America/Los_Angeles,,,0
+2455047,614,,Mason St. at  Wilson St. (Sutter Health),,38.354957,-121.984087,,,0,,America/Los_Angeles,,,0
+2455048,615,,Markham Ave. at Little Caesars Pizza,,38.36018002,-121.981617,,,0,,America/Los_Angeles,,,0
+2455049,616,,Markham Ave. at Rocky Hill Rd.,,38.3631528,-121.9810438,,,0,,America/Los_Angeles,,,0
+2455050,617,,Markham Ave. at Meadows Dr.,,38.366014,-121.9827372,,,0,,America/Los_Angeles,,,0
+2455051,618,,Meadows Dr. at Rocky Hill Rd.,,38.36599404,-121.980302,,,0,,America/Los_Angeles,,,0
+2455052,619,,Rocky Hill Rd. at Novato Dr.,,38.367324,-121.980135,,,0,,America/Los_Angeles,,,0
+2455053,620,,Rocky Hill Rd. at Manzanita Dr.,,38.36876401,-121.980056,,,0,,America/Los_Angeles,,,0
+2455054,621,,Markham Ave. at Markham Elementry School,,38.3708521,-121.9795414,,,0,,America/Los_Angeles,,,0
+2455055,623,,Brown St. at Markham Elementry School,,38.369949,-121.9777055,,,0,,America/Los_Angeles,,,0
+2455057,624,,Brown St. at Bennett Hill Dr.,,38.3660031,-121.9779248,,,0,,America/Los_Angeles,,,0
+2455058,625,,Brown St. at Rocky Hill Trail,,38.3642479,-121.9781169,,,0,,America/Los_Angeles,,,0
+2455059,626,,Brown St. at Hazel St. (Church),,38.36326296,-121.978173,,,0,,America/Los_Angeles,,,0
+2455060,627,,Brown St. at E. Monte Vista Ave.,,38.3606742,-121.9775603,,,0,,America/Los_Angeles,,,0
+2455061,628,,E. Monte Vista Ave. at Mexico Meat Market,,38.36009704,-121.976247,,,0,,America/Los_Angeles,,,0
+2455062,629,,E. Monte Vista Ave. at Allison Dr. ,,38.36192898,-121.971209,,,0,,America/Los_Angeles,,,0
+2455063,630,,E. Monte Vista Ave. at Browns Valley Pkwy.,,38.36330102,-121.967811,,,0,,America/Los_Angeles,,,0
+2455064,632,,E. Monte Vista Ave. at Bodin SF,,38.36689501,-121.963313,,,0,,America/Los_Angeles,,,0
+2455065,800,,Aegean Way at Meadowood Apartments,,38.35397104,-121.970996,,,0,,America/Los_Angeles,,,0
+2455066,801,,Aegean Way,,38.35426901,-121.972842,,,0,,America/Los_Angeles,,,0
+2455067,802,,Aegean Way at Mobile Home Park,,38.35449499,-121.974395,,,0,,America/Los_Angeles,,,0
+2455068,803,,Peabody Rd. at Elmira Rd. (Carl's Jr.),,38.35300997,-121.976315,,,0,,America/Los_Angeles,,,0
+2455069,804,,Peabody Rd. at Hume Way,,38.35007203,-121.976353,,,0,,America/Los_Angeles,,,0
+2455070,805,,Peabody Rd. at Marshall Rd.,,38.34573498,-121.973983,,,0,,America/Los_Angeles,,,0
+2455071,806,,Beelard Dr. at Peabody Rd.,,38.34179901,-121.970428,,,0,,America/Los_Angeles,,,0
+2455072,807,,Beelard Dr. at Tulare Dr.,,38.34364797,-121.966793,,,0,,America/Los_Angeles,,,0
+2455073,808,,Beelard Dr. at Beelard Park,,38.34417896,-121.959964,,,0,,America/Los_Angeles,,,0
+2455074,809,,Marshall Rd. at Hidden Creek Apartments,,38.34623798,-121.956125,,,0,,America/Los_Angeles,,,0
+2455075,810,,Marshall Rd. at Nut Tree Rd. (Nelson Park),,38.3456379,-121.951413,,,0,,America/Los_Angeles,,,0
+2455076,811,,Marshall Rd. at Dumbarton Dr.,,38.3449605,-121.9476118,,,0,,America/Los_Angeles,,,0
+2455077,812,,Vanden Rd. at Bluebird Dr.,,38.340201,-121.942954,,,0,,America/Los_Angeles,,,0
+2455078,813,,Vanden Rd. at Harvest Dr.,,38.33644104,-121.943111,,,0,,America/Los_Angeles,,,0
+2455079,814,,Alamo Dr. at Nut Tree Rd. (7 Flags),,38.33546204,-121.952218,,,0,,America/Los_Angeles,,,0
+2455080,815,,Nut Tree Rd. at Alamo Dr.,,38.33466701,-121.953432,,,0,,America/Los_Angeles,,,0
+2455081,816,,Nut Tree Rd. at Needham Dr.,,38.3316341,-121.9522319,,,0,,America/Los_Angeles,,,0
+2455082,817,,Youngsdale Dr. at Nut Tree Rd.,,38.3287242,-121.9523136,,,0,,America/Los_Angeles,,,0
+2455083,818,,Youngsdale Dr. at Ruby Dr.,,38.327296,-121.9565481,,,0,,America/Los_Angeles,,,0
+2455084,819,,Youngsdale Dr. at Marna Dr.,,38.3259871,-121.9602858,,,0,,America/Los_Angeles,,,0
+2455085,820,,Youngsdale Dr. at Morning Glory Dr.,,38.32518498,-121.962763,,,0,,America/Los_Angeles,,,0
+2455086,821,,Morning Glory Rd. at Peabody Rd.,,38.326424,-121.969048,,,0,,America/Los_Angeles,,,0
+2455087,822,,Peabody Rd. at California Dr.,,38.33283196,-121.970345,,,0,,America/Los_Angeles,,,0
+2455088,823,,Peabody Rd. at Alamo Dr.,,38.33392404,-121.97034,,,0,,America/Los_Angeles,,,0
+2455089,824,,Peabody Rd. at Alamo Dr. (Lucky Store),,38.33689199,-121.970261,,,0,,America/Los_Angeles,,,0
+2455090,825,,Peabody Rd. at Beelard Dr.,,38.34193999,-121.970978,,,0,,America/Los_Angeles,,,0
+2455091,351,,Peabody Rd. at 99 Cent Store,,38.34507197,-121.973214,,,0,,America/Los_Angeles,,,0
+2455092,827,,Will C. Wood High School,,38.345292,-121.976702,,,0,,America/Los_Angeles,,,0
+2455093,828,,Marshall Rd. at Dowline Dr.,,38.34261004,-121.979662,,,0,,America/Los_Angeles,,,0
+2455094,829,,Marshall Rd. at Aberdeen Way,,38.34292302,-121.984066,,,0,,America/Los_Angeles,,,0
+2455095,830,,Marshall Rd. at Davis St.,,38.3436955,-121.9857717,,,0,,America/Los_Angeles,,,0
+2455096,831,,Davis St. at Winco,,38.34690702,-121.986281,,,0,,America/Los_Angeles,,,0
+2455097,832,,Davis St. at Brenden Theaters,,38.352814,-121.986228,,,0,,America/Los_Angeles,,,0
+2455098,833,,Davis St. at Stevenson St.,,38.353734,-121.986481,,,0,,America/Los_Angeles,,,0
+2455099,834,,Davis St. Park & Ride,,38.35171396,-121.98637,,,0,,America/Los_Angeles,,,0
+2455100,835,,Davis St. at Self Storage,,38.34692596,-121.986515,,,0,,America/Los_Angeles,,,0
+2455101,836,,Davis St. at Kingman Dr.,,38.34420998,-121.986518,,,0,,America/Los_Angeles,,,0
+2455102,837,,Marshall Rd. at Davis St.,,38.34355501,-121.985893,,,0,,America/Los_Angeles,,,0
+2455103,838,,Marshall Rd. at Padan Park,,38.34233201,-121.983139,,,0,,America/Los_Angeles,,,0
+2455104,839,,Marshall Rd. at Bowline Dr.,,38.34283803,-121.978921,,,0,,America/Los_Angeles,,,0
+2455105,840,,Will C. Wood High School,,38.34513903,-121.976682,,,0,,America/Los_Angeles,,,0
+2455106,841,,Peabody Rd. at Prairie Ct. (Shell Station),,38.350801,-121.97601,,,0,,America/Los_Angeles,,,0
+2455107,842,,Elmira Rd. at Shasta Dr.,,38.352829,-121.969293,,,0,,America/Los_Angeles,,,0
+2455108,843,,Allison Dr. at Elmira Rd.,,38.3530983,-121.9644329,,,0,,America/Los_Angeles,,,0
+2455109,844,,Vanden Rd. at Marshall Rd.,,38.3445862,-121.9425582,,,0,,America/Los_Angeles,,,0
+2455110,238,,Brown St. at Markham Ave.,,38.3714402,-121.9775755,,,0,,America/Los_Angeles,,,0
+2455111,411,,Crescent Dr. at N. Village Apartments,,38.3978029,-121.9422058,,,0,,America/Los_Angeles,,,0
+2455112,413,,Crescent Dr. at Parkside Dr.,,38.39472603,-121.937097,,,0,,America/Los_Angeles,,,0
+2455113,414,,Crescent Dr. at Quinn Rd.,,38.3915021,-121.9368051,,,0,,America/Los_Angeles,,,0
+2455114,412,,Crescent Dr. at Stratton Ranch Rd.,,38.39669402,-121.940116,,,0,,America/Los_Angeles,,,0
+2455115,604,,E. Monte Vista Ave. at Browns Valley Pkwy. (Taco Bell),,38.36343496,-121.968126,,,0,,America/Los_Angeles,,,0
+2455116,243,,Elder St. at Jepson School,,38.36263399,-122.00789,,,0,,America/Los_Angeles,,,0
+2455117,239,,Eldridge Ave. at Buck Ave.,,38.3575432,-122.0012438,,,0,,America/Los_Angeles,,,0
+2455118,240,,Eldridge Ave. at Cottonwood St.,,38.36158801,-122.001494,,,0,,America/Los_Angeles,,,0
+2455119,241,,Hemlock St. at N. Orchard Ave. (Ball Field),,38.36457498,-122.00398,,,0,,America/Los_Angeles,,,0
+2455120,301,,Hume Way at Costco,,38.34961002,-121.979903,,,0,,America/Los_Angeles,,,0
+2455121,242,,N. Orchard Ave. at Acacia St.,,38.3602381,-122.0048478,,,0,,America/Los_Angeles,,,0
+2455122,244,,N. Orchard Ave. at FoodFair,,38.35848997,-122.004909,,,0,,America/Los_Angeles,,,0
+2455123,417,,Nut Tree Pkwy. at Grocery Outlet,,38.36682804,-121.95874,,,0,,America/Los_Angeles,,,0
+2455124,633,,Nut Tree Pkwy. at Outlets,,38.36640601,-121.959356,,,0,,America/Los_Angeles,,,0
+2455126,415,,Orange Dr. at Orange Tree Cir. (DMV),,38.37873998,-121.943869,,,0,,America/Los_Angeles,,,0
+2455127,416,,Orange Tree Cir. at Amethyst Dr. (Diamond Grove),,38.37335,-121.947448,,,0,,America/Los_Angeles,,,0
+2455128,002,,Vacaville Transit Plaza,,38.358607,-121.990566,,,0,,America/Los_Angeles,,,0
+2455129,001,,Vacaville Transportation Center,,38.3586293,-121.9650012,,,0,,America/Los_Angeles,,,0
