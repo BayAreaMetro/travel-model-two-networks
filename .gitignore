@@ -19,3 +19,4 @@ data/interim/step5_tidy_roadway/*.json
 *.ipynb
 *.twbr
 *.pyc
+data/interim/conflation_review_for_tableau.csv
