@@ -3,6 +3,7 @@ TPPL*
 vpr/*.net
 vpr/*.[0-9][0-9][0-9]
 .Rproj.user
+.Rhistory
 .DS_Store
 
 #folder
