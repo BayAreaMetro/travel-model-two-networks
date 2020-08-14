@@ -1,4 +1,4 @@
-project: Year 2015 Exclude Trucks
+project: Year 2015 Exclude Trucks on I-580
 tags:
   - 'Year 2015'
   - 'Exclude Trucks'
@@ -14,7 +14,6 @@ changes:
       - "2dce3e05c5d0932bf3032ee228127908"
       - "3cec5df45a9e2ed3f7e9e6b231a4dc9a"
       - "3fa5e04fc9157fee11c7e44954648e6c"
-      - "5cb208be89de29c545b615a215e3b03d"
       - "5de18532cc0dc26ae4891f3a67e1f029"
       - "5e213d0315376a9da76983d9e89344ff"
       - "6f64b7860f500dd7254e353235b4e8e4"
@@ -50,7 +49,6 @@ changes:
       - "db1836801d77b30ce744338df97d1c2d"
       - "dc0ac38f683acc8a8179b94fcfbe5432"
       - "e0b9a17eb9ef98abbd059b02503e0115"
-      - "e0f8a9be8f36933b93e37c4034dbb282"
       - "e1ac2989edcb22ea825da48cd5fa705c"
       - "e213ea002a04b9ce98de7aa59e83cebb"
       - "e412c72a6f78a16627c8d74bb8cec7fc"
