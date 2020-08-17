@@ -26,3 +26,5 @@ data/interim/step5_tidy_roadway/*.json
 *.pyc
 #data/interim/conflation_review_for_tableau.csv
 src/scripts/.Rhistory
+data/interim/facility-type-viewer.geojson
+data/interim/facility-type-viewer-residential.geojson
