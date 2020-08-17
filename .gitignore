@@ -11,6 +11,10 @@ data/external/tomtom
 data/interim/tomtom
 data/interim/step3_join_shst_extraction_with_osm
 data/interim/step4_conflate_with_tomtom
+data/external/TM2_Marin
+data/external/TM2_nonMarin
+data/interim/tm2_Marin
+data/interim/tm2_nonMarin
 
 #file
 data/interim/unmatched_tomtom.geojson
@@ -20,5 +24,5 @@ data/interim/step5_tidy_roadway/*.json
 *.ipynb
 *.twbr
 *.pyc
-data/interim/conflation_review_for_tableau.csv
+#data/interim/conflation_review_for_tableau.csv
 src/scripts/.Rhistory
