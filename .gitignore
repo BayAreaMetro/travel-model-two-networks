@@ -4,3 +4,9 @@ vpr/*.net
 vpr/*.[0-9][0-9][0-9]
 .Rproj.user
 .DS_Store
+data/external/tomtom/*
+notebooks/other/.ipynb_checkpoints/*
+data/interim/facility-type-viewer-residential.geojson
+data/interim/step5_tidy_roadway/link.json
+data/interim/step5_tidy_roadway/node.geojson
+data/interim/step5_tidy_roadway/shape.geojson
