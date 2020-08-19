@@ -7,3 +7,4 @@ Network_region.gdb.zip filter=lfs diff=lfs merge=lfs -text
 conflation_review_for_tableau.csv filter=lfs diff=lfs merge=lfs -text
 facility-type-viewer-residential.geojson filter=lfs diff=lfs merge=lfs -text
 facility-type-viewer.geojson filter=lfs diff=lfs merge=lfs -text
+link.feather filter=lfs diff=lfs merge=lfs -text
