@@ -1,0 +1,14 @@
+route_id,realtime_enabled,realtime_routename,realtime_routecode
+7,1,Route  1,1
+9,1,Route  2,2
+10,1,Route  3,3
+11,1,Route  4,4
+12,1,Route  5,5
+13,1,Route  6,6
+14,1,Route  7,7
+2,1,Route  8,8
+1,1,Route 10,10
+6,1,Route 11,11
+15,1,Route 21,21
+4,1,Route 25,25
+3,1,Route 29,29

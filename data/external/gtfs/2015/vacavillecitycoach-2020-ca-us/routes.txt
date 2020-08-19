@@ -1,0 +1,7 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color,route_sort_order,min_headway_minutes,eligibility_restricted,continuous_pickup,continuous_drop_off
+869,11092,1,Route 1,,3,,ff0000,ffffff,,60,0,1,1
+869,11095,2,Route 2,,3,,c45911,ffffff,,60,0,1,1
+869,11096,3,Route 3,,3,,ff00ff,ffffff,,60,0,1,1
+869,11097,4,Route 4,,3,,00b050,ffffff,,60,0,1,1
+869,11099,5,Route 5,,3,,0070c0,ffffff,,60,0,1,1
+869,11100,6,Route 6,,3,,663300,ffffff,,60,0,1,1

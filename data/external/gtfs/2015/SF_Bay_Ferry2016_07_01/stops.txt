@@ -1,0 +1,12 @@
+stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding
+12030041,,South San Francisco,,37.6626760,-122.3772450,,,0,,,
+12149044,,Vallejo Ferry Terminal,,38.1001490,-122.2625860,,,0,,,
+12030043,,Oakland Terminal,,37.7950320,-122.2797770,,,0,,,
+12030042,,Alameda Main St,,37.7906670,-122.2940580,,,0,,,
+12048536,,Harbor Bay Ferry Terminal,,37.7365280,-122.2569660,,,0,,,
+12030044,,Alameda Main  Street,,37.7906670,-122.2940580,,,0,,,
+12048537,,San Francisco Ferry Building [Arrive],,37.7959240,-122.3920660,,,0,,,
+12048538,,Pier 41,,37.8095940,-122.4122720,,,0,,,
+890004,,San Francisco Ferry Building,,37.7944020,-122.3930180,,,0,,,
+12048601,,Vallejo Ferry Terminal,,38.1001490,-122.2625860,,,0,,,
+890001,,San Francisco Ferry Building,,37.7959240,-122.3920660,,,0,,,

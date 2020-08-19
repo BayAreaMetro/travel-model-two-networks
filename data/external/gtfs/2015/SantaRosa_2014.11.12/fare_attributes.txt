@@ -1,0 +1,2 @@
+fare_id,price,currency_type,payment_method,transfers
+114433,1.50,USD,1,0

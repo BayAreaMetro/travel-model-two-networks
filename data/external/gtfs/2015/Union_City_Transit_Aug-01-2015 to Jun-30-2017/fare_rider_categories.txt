@@ -1,0 +1,5 @@
+fare_id,rider_category_id,price
+Reg,2,1
+Reg,3,0
+Reg,5,1.25
+Reg,6,1
