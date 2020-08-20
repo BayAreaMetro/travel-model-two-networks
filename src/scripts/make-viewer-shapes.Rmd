@@ -22,11 +22,14 @@ for (package in packages_vector) {
 
 # Remote I/O
 ```{r remote-io}
+external_dir <- "../../data/external/"
 interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
 links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
 shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
+
+county_shape_file_name <- paste0(external_dir, "county_boundaries/county.shp")
 
 output_file_name <- paste0(interim_dir, "facility-type-viewer.geojson")
 output_residential_file_name <- paste0(interim_dir, "facility-type-viewer-residential.geojson")
@@ -63,10 +66,20 @@ ft_dict_df <- tibble(code = seq(0, 7),
 ```{r read}
 shapes_sf <- st_read(shape_file_name)
 links_df <- read_feather(links_file_name)
+county_sf <- st_read(county_shape_file_name)
 ```
 
 # Reductions 
 ```{r reductions}
+county_join_sf <- county_sf %>%
+  select(name = NAME, geometry) %>%
+  st_transform(st_crs(shapes_sf))
+
+centroid_df <- st_centroid(shapes_sf) %>%
+  st_intersection(., county_join_sf) %>%
+  st_drop_geometry(.) %>%
+  select(shstGeometryId = id, county_name = name)
+
 osm_lanes_df <- head(links_df, 1000)  %>%
   filter(drive_access == 1) %>%
   select(shstReferenceId, lanes_str = lanes) %>%
@@ -170,7 +183,11 @@ output_residential_sf <- working_sf %>%
   filter(osm_ft %in% c("service", "residential"))
 
 output_bus_only_sf <- working_sf %>%
-  select(shstReferenceId, drive_access, geometry)
+  filter(!(osm_ft %in% c("primary", "secondary", "tertiary", "trunk"))) %>%
+  select(shstReferenceId, shstGeometryId, osm_ft, geometry) %>%
+  left_join(., centroid_df, by = c("shstGeometryId")) %>%
+  filter(county_name %in% c("San Francisco", "Marin", "Sonoma"))
+
 ```
 
 # Write
