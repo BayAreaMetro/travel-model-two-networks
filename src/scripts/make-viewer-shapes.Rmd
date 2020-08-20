@@ -3,10 +3,11 @@ title: "Make Facility Type Viewer"
 output: html_notebook
 ---
 
+
 # Overhead
 ```{r overhead, include = FALSE}
 packages_vector <- c("tidyverse",
-                     "jsonlite",
+                     "arrow",
                      "sf")
 
 need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
@@ -24,12 +25,12 @@ for (package in packages_vector) {
 interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
-links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.json")
+links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
 shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
-conflation_file_name <- paste0(interim_dir, "conflation_review_for_tableau.csv")
 
 output_file_name <- paste0(interim_dir, "facility-type-viewer.geojson")
 output_residential_file_name <- paste0(interim_dir, "facility-type-viewer-residential.geojson")
+output_bus_only_file_name <- paste0(interim_dir, "bus-only-viewer.geojson")
 ```
 
 # Parameters
@@ -61,19 +62,14 @@ ft_dict_df <- tibble(code = seq(0, 7),
 # Data Reads
 ```{r read}
 shapes_sf <- st_read(shape_file_name)
-links_df <- read_json(links_file_name, simplifyVector = TRUE)
-conflation_df <- read_csv(conflation_file_name, col_types = cols(.default = col_character()))
+links_df <- read_feather(links_file_name)
 ```
 
 # Reductions 
 ```{r reductions}
-osm_lanes_df <- links_df  %>%
+osm_lanes_df <- head(links_df, 1000)  %>%
   filter(drive_access == 1) %>%
-  select(shstReferenceId, lanes) %>%
-  rowwise() %>%
-  mutate(lanes_str = paste(unlist(lanes), collapse = "--")) %>%
-  ungroup() %>%
-  select(-lanes) %>%
+  select(shstReferenceId, lanes_str = lanes) %>%
   mutate(
     min_lanes = case_when (
       str_detect(lanes_str, "1") ~ 1L,
@@ -106,16 +102,15 @@ osm_lanes_df <- links_df  %>%
   mutate(max_lanes = if_else(str_detect(lanes_str, "12"), 12L, max_lanes)) %>%
   select(shstReferenceId, osm_min_lanes = min_lanes, osm_max_lanes = max_lanes)
 
-osm_names_df <- links_df  %>%
+osm_names_df <- links_df %>%
   filter(drive_access == 1) %>%
   select(shstReferenceId, name) %>%
-  rowwise() %>%
-  mutate(name_list = paste(unlist(name), collapse = "/")) %>%
-  ungroup() %>%
-  select(-name) %>%
-  separate(name_list, 
+  mutate(name = str_replace(name, "\\[", "")) %>%
+  mutate(name = str_replace(name, "\\]", "")) %>%
+  mutate(name = str_replace_all(name, "'", "")) %>%
+  separate(name, 
            into = sprintf("%02d", seq(1:5)), 
-           sep = "/",
+           sep = ",",
            remove = TRUE,
            extra = "drop",
            fill = "right") %>%
@@ -123,6 +118,7 @@ osm_names_df <- links_df  %>%
                names_to = "index",
                values_to = "name") %>%
   select(-index) %>%
+  mutate(name = trimws(name)) %>%
   filter(!is.na(name)) %>%
   filter(name != "nan") %>%
   filter(name != "") %>%
@@ -138,93 +134,50 @@ osm_names_df <- links_df  %>%
   mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
   select(shstReferenceId, name)
 
-join_df <- conflation_df %>%
+working_sf <- links_df %>%
   select(shstReferenceId, 
-         marin_ft = TM2Marin_FT,
-         marin_assign = TM2Marin_ASSIGNABLE,
-         marin_lanes = TM2Marin_LANES,
+         drive_access,
+         shstGeometryId,
+         osm_ft = roadway,
+         tom_lanes = tomtom_lanes,
+         tomtom_FRC,
+         tom_name = tomtom_name,
+         tom_shield = tomtom_shieldnum,
+         tom_rtedir = tomtom_rtedir,
          tm2_ft = TM2_FT,
          tm2_lanes = TM2_LANES,
-         tm2_assign = TM2_ASSIGNABLE,
-         sfcta_ft = sfcta_FT,
+         marin_ft = TM2Marin_FT,
+         marin_lanes = TM2Marin_LANES,
+         sfcta_name = sfcta_STREETNAME,
          sfcta_LANE_AM, 
          sfcta_LANE_OP, 
          sfcta_LANE_PM) %>%
-  mutate_at(., c("marin_ft", "marin_assign", "marin_lanes",
-                 "tm2_ft", "tm2_lanes", "tm2_assign",
-                 "sfcta_ft", "sfcta_LANE_AM", "sfcta_LANE_OP", "sfcta_LANE_PM"), as.integer) %>%
-  mutate(sfcta_min_lanes = if_else(is.na(sfcta_LANE_OP), as.integer(NA), pmin(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM))) %>%
-  mutate(sfcta_max_lanes = if_else(is.na(sfcta_LANE_OP), as.integer(NA), pmax(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM))) %>%
-  select(-sfcta_LANE_AM, -sfcta_LANE_OP, -sfcta_LANE_PM)
-
-output_sf <- links_df %>%
-  filter(drive_access == 1) %>%
-  filter(!(roadway %in% c("service", "residential"))) %>%
-  select(shstReferenceId, 
-         FRC, 
-         shstGeometryId, 
-         tom_lanes = LANES, 
-         osm_ft = roadway) %>%
-  mutate(tom_lanes = as.integer(tom_lanes)) %>%
+  mutate(sfcta_min_lanes = pmin(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM)) %>%
+  mutate(sfcta_max_lanes = pmax(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM)) %>%
+  select(-sfcta_LANE_AM, -sfcta_LANE_OP, -sfcta_LANE_PM) %>%
   left_join(., osm_lanes_df, by = c("shstReferenceId")) %>%
   left_join(., osm_names_df, by = c("shstReferenceId")) %>%
-  left_join(., frc_dict_df, by = c("FRC" = "code")) %>%
-  rename(tom_tom_ft = label) %>%
-  left_join(., join_df, by = c("shstReferenceId")) %>%
-  left_join(., shapes_sf, by = c("shstGeometryId" = "id")) %>%
-  select(shstReferenceId, 
-         name,
-         osm_ft, 
-         tom_tom_ft, 
-         marin_ft,
-         tm2_ft,
-         sfcta_ft,
-         osm_min_lanes, 
-         osm_max_lanes, 
-         tom_lanes,
-         marin_lanes,
-         tm2_lanes,
-         sfcta_min_lanes,
-         sfcta_max_lanes,
-         geometry)
+  left_join(., frc_dict_df, by = c("tomtom_FRC" = "code")) %>%
+  rename(tom_ft = label) %>%
+  left_join(., shapes_sf, by = c("shstGeometryId" = "id"))
 
-output_residential_sf <- links_df %>%
+output_sf <- working_sf %>%
   filter(drive_access == 1) %>%
-  filter(roadway %in% c("residential")) %>%
-  select(shstReferenceId, 
-         FRC, 
-         shstGeometryId, 
-         tom_lanes = LANES, 
-         osm_ft = roadway) %>%
-  mutate(tom_lanes = as.integer(tom_lanes)) %>%
-  left_join(., osm_lanes_df, by = c("shstReferenceId")) %>%
-  left_join(., osm_names_df, by = c("shstReferenceId")) %>%
-  left_join(., frc_dict_df, by = c("FRC" = "code")) %>%
-  rename(tom_tom_ft = label) %>%
-  left_join(., join_df, by = c("shstReferenceId")) %>%
-  left_join(., shapes_sf, by = c("shstGeometryId" = "id")) %>%
-  select(shstReferenceId, 
-         name,
-         osm_ft, 
-         tom_tom_ft, 
-         marin_ft,
-         tm2_ft,
-         sfcta_ft,
-         osm_min_lanes, 
-         osm_max_lanes, 
-         tom_lanes,
-         marin_lanes,
-         tm2_lanes,
-         sfcta_min_lanes,
-         sfcta_max_lanes,
-         geometry)
+  filter(!(osm_ft %in% c("service", "residential")))
 
+output_residential_sf <- working_sf %>%
+  filter(drive_access == 1) %>%
+  filter(osm_ft %in% c("service", "residential"))
+
+output_bus_only_sf <- working_sf %>%
+  select(shstReferenceId, drive_access, geometry)
 ```
 
 # Write
 ```{r write}
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
 st_write(output_residential_sf, output_residential_file_name, delete_dsn = TRUE)
+st_write(output_bus_only_sf, output_bus_only_file_name, delete_dsn = TRUE)
 ```
 
 
