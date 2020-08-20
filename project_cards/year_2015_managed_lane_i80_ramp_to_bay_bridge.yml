@@ -17,26 +17,21 @@ changes:
     - time:
       - '3:00'
       - '6:00'
-      existing: 1
-      set: 4
+      set: 1
     - time:
       - '6:00'
       - '10:00'
-      existing: 1
       set: 3
     - time:
       - '10:00'
       - '15:00'
-      existing: 1
-      set: 4
+      set: 1
     - time:
       - '15:00'
       - '19:00'
-      existing: 1
       set: 3
     - time:
       - '19:00'
       - '3:00'
-      existing: 1
-      set: 4
+      set: 1
 valid: false
