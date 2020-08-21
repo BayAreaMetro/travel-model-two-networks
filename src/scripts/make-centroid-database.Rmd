@@ -1,0 +1,61 @@
+---
+title: "Make Centroid Database"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow",
+                     "sf")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+external_dir <- "../../data/external/"
+interim_dir <- "../../data/interim/"
+
+shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
+county_shape_file_name <- paste0(external_dir, "county_boundaries/county.shp")
+
+output_file_name <- paste0(interim_dir, "shape_centroid.feather")
+```
+
+# Data Reads
+```{r read}
+shapes_sf <- st_read(shape_file_name)
+county_sf <- st_read(county_shape_file_name)
+```
+
+# Reductions 
+```{r reductions}
+working_shapes_sf <- shapes_sf %>%
+  select(shstGeometryId = id, geometry)
+
+county_join_sf <- county_sf %>%
+  select(name = NAME, geometry) %>%
+  st_transform(st_crs(working_shapes_sf))
+
+centroid_df <- st_centroid(working_shapes_sf) %>%
+  st_intersection(., county_join_sf) %>%
+  st_drop_geometry(.) %>%
+  select(shstGeometryId = id, county_name = name)
+
+```
+
+# Write
+```{r write}
+write_feather(centroid_df, output_file_name)
+```
+
+
