@@ -29,7 +29,7 @@ processed_dir <- "../../data/processed/"
 links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
 shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
 
-county_shape_file_name <- paste0(external_dir, "county_boundaries/county.shp")
+centroid_file_name <- paste0(interim_dir, "shape_centroid.feather")
 
 output_file_name <- paste0(interim_dir, "facility-type-viewer.geojson")
 output_residential_file_name <- paste0(interim_dir, "facility-type-viewer-residential.geojson")
@@ -66,21 +66,15 @@ ft_dict_df <- tibble(code = seq(0, 7),
 ```{r read}
 shapes_sf <- st_read(shape_file_name)
 links_df <- read_feather(links_file_name)
-county_sf <- st_read(county_shape_file_name)
+centroid_df <- read_feather(centroid_file_name)
 ```
 
 # Reductions 
 ```{r reductions}
-county_join_sf <- county_sf %>%
-  select(name = NAME, geometry) %>%
-  st_transform(st_crs(shapes_sf))
+join_shapes_sf <- shapes_sf %>%
+  select(shstGeometryId = id, geometry)
 
-centroid_df <- st_centroid(shapes_sf) %>%
-  st_intersection(., county_join_sf) %>%
-  st_drop_geometry(.) %>%
-  select(shstGeometryId = id, county_name = name)
-
-osm_lanes_df <- head(links_df, 1000)  %>%
+osm_lanes_df <- links_df %>%
   filter(drive_access == 1) %>%
   select(shstReferenceId, lanes_str = lanes) %>%
   mutate(
@@ -172,15 +166,18 @@ working_sf <- links_df %>%
   left_join(., osm_names_df, by = c("shstReferenceId")) %>%
   left_join(., frc_dict_df, by = c("tomtom_FRC" = "code")) %>%
   rename(tom_ft = label) %>%
-  left_join(., shapes_sf, by = c("shstGeometryId" = "id"))
+  left_join(., join_shapes_sf, by = c("shstGeometryId"))
 
 output_sf <- working_sf %>%
   filter(drive_access == 1) %>%
-  filter(!(osm_ft %in% c("service", "residential")))
+  filter(!(osm_ft %in% c("service", "residential"))) %>%
+  left_join(., centroid_df, by = c("shstGeometryId"))
 
 output_residential_sf <- working_sf %>%
   filter(drive_access == 1) %>%
-  filter(osm_ft %in% c("service", "residential"))
+  filter(osm_ft %in% c("service", "residential")) %>%
+  left_join(., centroid_df, by = c("shstGeometryId")) %>%
+  filter(county_name %in% c("Marin"))
 
 output_bus_only_sf <- working_sf %>%
   filter(!(osm_ft %in% c("primary", "secondary", "tertiary", "trunk"))) %>%
