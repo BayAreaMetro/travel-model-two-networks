@@ -27,7 +27,7 @@ interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
 links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
-shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
+shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 
 centroid_file_name <- paste0(interim_dir, "shape_centroid.feather")
 
@@ -64,7 +64,7 @@ ft_dict_df <- tibble(code = seq(0, 7),
 
 # Data Reads
 ```{r read}
-shapes_sf <- st_read(shape_file_name)
+shapes_sf <- readRDS(shape_file_name)
 links_df <- read_feather(links_file_name)
 centroid_df <- read_feather(centroid_file_name)
 ```
@@ -158,10 +158,28 @@ working_sf <- links_df %>%
          sfcta_name = sfcta_STREETNAME,
          sfcta_LANE_AM, 
          sfcta_LANE_OP, 
-         sfcta_LANE_PM) %>%
+         sfcta_LANE_PM,
+         pems_lanes_FF,
+         pems_lanes_FR,
+         pems_lanes_HV,
+         pems_lanes_ML,
+         pems_lanes_OR) %>%
   mutate(sfcta_min_lanes = pmin(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM)) %>%
   mutate(sfcta_max_lanes = pmax(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM)) %>%
   select(-sfcta_LANE_AM, -sfcta_LANE_OP, -sfcta_LANE_PM) %>%
+  mutate(pems_ft = as.character(NA)) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_FR), pems_ft, "Ramp")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_OR), pems_ft, "Ramp")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_FF), pems_ft, "Freeway-to-freeway")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_ML), pems_ft, "Freeway")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_HV), pems_ft, "Freeway")) %>%
+  mutate(pems_lanes = as.integer(NA)) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_FR), pems_lanes, as.integer(pems_lanes_FR))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_OR), pems_lanes, as.integer(pems_lanes_OR))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_FF), pems_lanes, as.integer(pems_lanes_FF))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_ML), pems_lanes, as.integer(pems_lanes_ML))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_HV), pems_lanes, as.integer(pems_lanes_HV) + pems_lanes)) %>%
+  select(-pems_lanes_FF, -pems_lanes_FR, -pems_lanes_HV, -pems_lanes_ML, -pems_lanes_OR) %>%
   left_join(., osm_lanes_df, by = c("shstReferenceId")) %>%
   left_join(., osm_names_df, by = c("shstReferenceId")) %>%
   left_join(., frc_dict_df, by = c("tomtom_FRC" = "code")) %>%
