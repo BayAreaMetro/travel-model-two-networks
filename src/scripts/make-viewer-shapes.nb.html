@@ -1758,13 +1758,13 @@ summary {
 <h1>Remote I/O</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXh0ZXJuYWxfZGlyIDwtIFwiLi4vLi4vZGF0YS9leHRlcm5hbC9cIlxuaW50ZXJpbV9kaXIgPC0gXCIuLi8uLi9kYXRhL2ludGVyaW0vXCJcbnByb2Nlc3NlZF9kaXIgPC0gXCIuLi8uLi9kYXRhL3Byb2Nlc3NlZC9cIiBcblxubGlua3NfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJzdGVwNV90aWR5X3JvYWR3YXkvbGluay5mZWF0aGVyXCIpXG5zaGFwZV9maWxlX25hbWUgPC0gcGFzdGUwKGludGVyaW1fZGlyLCBcInN0ZXA1X3RpZHlfcm9hZHdheS9zaGFwZS5nZW9qc29uXCIpXG5cbmNlbnRyb2lkX2ZpbGVfbmFtZSA8LSBwYXN0ZTAoaW50ZXJpbV9kaXIsIFwic2hhcGVfY2VudHJvaWQuZmVhdGhlclwiKVxuXG5vdXRwdXRfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJmYWNpbGl0eS10eXBlLXZpZXdlci5nZW9qc29uXCIpXG5vdXRwdXRfcmVzaWRlbnRpYWxfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJmYWNpbGl0eS10eXBlLXZpZXdlci1yZXNpZGVudGlhbC5nZW9qc29uXCIpXG5vdXRwdXRfYnVzX29ubHlfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJidXMtb25seS12aWV3ZXIuZ2VvanNvblwiKVxuYGBgIn0= -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuZXh0ZXJuYWxfZGlyIDwtIFwiLi4vLi4vZGF0YS9leHRlcm5hbC9cIlxuaW50ZXJpbV9kaXIgPC0gXCIuLi8uLi9kYXRhL2ludGVyaW0vXCJcbnByb2Nlc3NlZF9kaXIgPC0gXCIuLi8uLi9kYXRhL3Byb2Nlc3NlZC9cIiBcblxubGlua3NfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJzdGVwNV90aWR5X3JvYWR3YXkvbGluay5mZWF0aGVyXCIpXG5zaGFwZV9maWxlX25hbWUgPC0gcGFzdGUwKGludGVyaW1fZGlyLCBcInNpbXBsZV9zaGFwZS5SRFNcIilcblxuY2VudHJvaWRfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJzaGFwZV9jZW50cm9pZC5mZWF0aGVyXCIpXG5cbm91dHB1dF9maWxlX25hbWUgPC0gcGFzdGUwKGludGVyaW1fZGlyLCBcImZhY2lsaXR5LXR5cGUtdmlld2VyLmdlb2pzb25cIilcbm91dHB1dF9yZXNpZGVudGlhbF9maWxlX25hbWUgPC0gcGFzdGUwKGludGVyaW1fZGlyLCBcImZhY2lsaXR5LXR5cGUtdmlld2VyLXJlc2lkZW50aWFsLmdlb2pzb25cIilcbm91dHB1dF9idXNfb25seV9maWxlX25hbWUgPC0gcGFzdGUwKGludGVyaW1fZGlyLCBcImJ1cy1vbmx5LXZpZXdlci5nZW9qc29uXCIpXG5gYGAifQ== -->
 <pre class="r"><code>external_dir &lt;- &quot;../../data/external/&quot;
 interim_dir &lt;- &quot;../../data/interim/&quot;
 processed_dir &lt;- &quot;../../data/processed/&quot; 
 
 links_file_name &lt;- paste0(interim_dir, &quot;step5_tidy_roadway/link.feather&quot;)
-shape_file_name &lt;- paste0(interim_dir, &quot;step5_tidy_roadway/shape.geojson&quot;)
+shape_file_name &lt;- paste0(interim_dir, &quot;simple_shape.RDS&quot;)
 
 centroid_file_name &lt;- paste0(interim_dir, &quot;shape_centroid.feather&quot;)
 
@@ -1960,18 +1960,18 @@ working_sf &lt;- links_df %&gt;%
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3Rfd3JpdGUob3V0cHV0X3NmLCBvdXRwdXRfZmlsZV9uYW1lLCBkZWxldGVfZHNuID0gVFJVRSlcbmBgYCJ9 -->
 <pre class="r"><code>st_write(output_sf, output_file_name, delete_dsn = TRUE)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRGVsZXRpbmcgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXIuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyBsYXllciBgZmFjaWxpdHktdHlwZS12aWV3ZXInIHRvIGRhdGEgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXIuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyAyMDg2MTkgZmVhdHVyZXMgd2l0aCAyMSBmaWVsZHMgYW5kIGdlb21ldHJ5IHR5cGUgTGluZSBTdHJpbmcuXG4ifQ== -->
+<!-- rnb-output-begin eyJkYXRhIjoiRGVsZXRpbmcgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXIuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyBsYXllciBgZmFjaWxpdHktdHlwZS12aWV3ZXInIHRvIGRhdGEgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXIuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyAyMDg2MTkgZmVhdHVyZXMgd2l0aCAyMyBmaWVsZHMgYW5kIGdlb21ldHJ5IHR5cGUgTGluZSBTdHJpbmcuXG4ifQ== -->
 <pre><code>Deleting source `../../data/interim/facility-type-viewer.geojson&#39; using driver `GeoJSON&#39;
 Writing layer `facility-type-viewer&#39; to data source `../../data/interim/facility-type-viewer.geojson&#39; using driver `GeoJSON&#39;
-Writing 208619 features with 21 fields and geometry type Line String.</code></pre>
+Writing 208619 features with 23 fields and geometry type Line String.</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3Rfd3JpdGUob3V0cHV0X3Jlc2lkZW50aWFsX3NmLCBvdXRwdXRfcmVzaWRlbnRpYWxfZmlsZV9uYW1lLCBkZWxldGVfZHNuID0gVFJVRSlcbmBgYCJ9 -->
 <pre class="r"><code>st_write(output_residential_sf, output_residential_file_name, delete_dsn = TRUE)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiRGVsZXRpbmcgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXItcmVzaWRlbnRpYWwuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyBsYXllciBgZmFjaWxpdHktdHlwZS12aWV3ZXItcmVzaWRlbnRpYWwnIHRvIGRhdGEgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXItcmVzaWRlbnRpYWwuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyAzMDMyOSBmZWF0dXJlcyB3aXRoIDIxIGZpZWxkcyBhbmQgZ2VvbWV0cnkgdHlwZSBMaW5lIFN0cmluZy5cbiJ9 -->
+<!-- rnb-output-begin eyJkYXRhIjoiRGVsZXRpbmcgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXItcmVzaWRlbnRpYWwuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyBsYXllciBgZmFjaWxpdHktdHlwZS12aWV3ZXItcmVzaWRlbnRpYWwnIHRvIGRhdGEgc291cmNlIGAuLi8uLi9kYXRhL2ludGVyaW0vZmFjaWxpdHktdHlwZS12aWV3ZXItcmVzaWRlbnRpYWwuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuV3JpdGluZyAzMDMyOSBmZWF0dXJlcyB3aXRoIDIzIGZpZWxkcyBhbmQgZ2VvbWV0cnkgdHlwZSBMaW5lIFN0cmluZy5cbiJ9 -->
 <pre><code>Deleting source `../../data/interim/facility-type-viewer-residential.geojson&#39; using driver `GeoJSON&#39;
 Writing layer `facility-type-viewer-residential&#39; to data source `../../data/interim/facility-type-viewer-residential.geojson&#39; using driver `GeoJSON&#39;
-Writing 30329 features with 21 fields and geometry type Line String.</code></pre>
+Writing 30329 features with 23 fields and geometry type Line String.</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3Rfd3JpdGUob3V0cHV0X2J1c19vbmx5X3NmLCBvdXRwdXRfYnVzX29ubHlfZmlsZV9uYW1lLCBkZWxldGVfZHNuID0gVFJVRSlcbmBgYCJ9 -->
 <pre class="r"><code>st_write(output_bus_only_sf, output_bus_only_file_name, delete_dsn = TRUE)</code></pre>
