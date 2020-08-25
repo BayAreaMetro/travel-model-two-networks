@@ -1,0 +1,54 @@
+---
+title: "Add County to Conflation Review  Database"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+interim_dir <- "../../data/interim/"
+
+conflation_file_name <- paste0(interim_dir, "conflation_review_for_tableau.csv")
+county_file_name <- paste0(interim_dir, "shape_centroid.feather")
+links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
+
+county <- paste0(interim_dir, "shape_centroid.feather")
+```
+
+# Data Reads
+```{r read}
+conflation_df <- read_csv(conflation_file_name)
+county_df <- read_feather(county_file_name)
+links_df <- read_feather(links_file_name)
+```
+
+# Reductions 
+```{r reductions}
+output_df <- left_join(conflation_df,
+                       select(links_df, shstReferenceId, shstGeometryId),
+                       by = c("shstReferenceId")) %>%
+  left_join(., county_df, by = c("shstGeometryId"))
+
+```
+
+# Write
+```{r write}
+write_csv(output_df, path = conflation_file_name)
+```
+
+

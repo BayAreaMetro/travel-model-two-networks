@@ -35,9 +35,9 @@ changes:
   - property: bus_only
     set: 1
   - property: walk_access
-    set: 1
+    set: 0
   - property: transit_access
     set: 1
   - property: bike_access
-    set: 1
+    set: 0
 valid: false
