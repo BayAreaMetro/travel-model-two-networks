@@ -1,0 +1,18 @@
+route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+2, SRCityBus,1,1 Mendocino Ave,,3,,0DF7FF,FFFFFF
+3, SRCityBus,2,2 Bennett Valley,,3,,017811,FFFFFF
+4, SRCityBus,3,3 West Ninth St,,3,,FF370F,FFFFFF
+5, SRCityBus,4,4 Rincon Valley,,3,,E7FF0D,000000
+6, SRCityBus,5,5 Santa Rosa Ave,,3,,FF5274,FFFFFF
+7, SRCityBus,6,6 West Third St,,3,,B5572F,FFFFFF
+8, SRCityBus,7,7 Montgomery Village / Rincon Valley,,3,,FFDC2E,000000
+9, SRCityBus,8,8 Sonoma Ave,,3,,FF52EE,FFFFFF
+10, SRCityBus,9,9 Sebastopol Rd,,3,,FF6600,FFFFFF
+11, SRCityBus,10,10 Coddingtown,,3,,1921FF,FFFFFF
+12, SRCityBus,11,11 Fulton Rd,,3,,FF6363,FFFFFF
+13, SRCityBus,12,12 Roseland,,3,,9823A1,FFFFFF
+14, SRCityBus,14,14 County Center,,3,,AD6C17,FFFFFF
+15, SRCityBus,15,15 Stony Point Rd,,3,,1B196B,FFFFFF
+16, SRCityBus,17,17 Piner Rd,,3,,87FF69,FFFFFF
+17, SRCityBus,18,18 Southeast Circulator,,3,,000000,FFFFFF
+18, SRCityBus,19,19 South City Connector,,3,,A30041,FFFFFF

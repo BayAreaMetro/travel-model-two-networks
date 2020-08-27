@@ -1,0 +1,681 @@
+route_id,service_id,trip_id,trip_headsign,direction_id,block_id,shape_id
+2,2,t1-sl2-p1-r17,1 Mendocino Ave,1,17,Rt1_Mendocino_Ave
+2,2,t10-sl2-p1-r37,1 Mendocino Ave,1,37,Rt1_Mendocino_Ave
+2,2,t11-sl2-p1-r5,1 Mendocino Ave,1,5,Rt1_Mendocino_Ave
+2,2,t12-sl2-p1-r15,1 Mendocino Ave,1,15,Rt1_Mendocino_Ave
+2,2,t13-sl2-p1-r17,1 Mendocino Ave,1,17,Rt1_Mendocino_Ave
+2,2,t14-sl2-p1-r24,1 Mendocino Ave,1,24,Rt1_Mendocino_Ave
+2,2,t15-sl2-p1-r8,1 Mendocino Ave,1,8,Rt1_Mendocino_Ave
+2,2,t16-sl2-p1-r26,1 Mendocino Ave,1,26,Rt1_Mendocino_Ave
+2,2,t17-sl2-p1-r24,1 Mendocino Ave,1,24,Rt1_Mendocino_Ave
+2,2,t18-sl2-p1-r30,1 Mendocino Ave,1,30,Rt1_Mendocino_Ave
+2,2,t19-sl2-p1-r14,1 Mendocino Ave,1,14,Rt1_Mendocino_Ave
+2,2,t2-sl2-p1-r7,1 Mendocino Ave,1,7,Rt1_Mendocino_Ave
+2,2,t20-sl2-p1-r6,1 Mendocino Ave,1,6,Rt1_Mendocino_Ave
+2,2,t21-sl2-p1-r10,1 Mendocino Ave,1,10,Rt1_Mendocino_Ave
+2,2,t22-sl2-p1-r14,1 Mendocino Ave,1,14,Rt1_Mendocino_Ave
+2,2,t23-sl2-p1-r30,1 Mendocino Ave,1,30,Rt1_Mendocino_Ave
+2,2,t24-sl2-p1-r10,1 Mendocino Ave,1,10,Rt1_Mendocino_Ave
+2,2,t25-sl2-p1-r2,1 Mendocino Ave,1,2,Rt1_Mendocino_Ave
+2,2,t26-sl2-p1-r38,1 Mendocino Ave,1,38,Rt1_Mendocino_Ave
+2,2,t27-sl2-p1-r12,1 Mendocino Ave,1,12,Rt1_Mendocino_Ave
+2,2,t3-sl2-p1-r15,1 Mendocino Ave,1,15,Rt1_Mendocino_Ave
+2,2,t4-sl2-p1-r19,1 Mendocino Ave,1,19,Rt1_Mendocino_Ave
+2,2,t5-sl2-p1-r11,1 Mendocino Ave,1,11,Rt1_Mendocino_Ave
+2,2,t6-sl2-p1-r15,1 Mendocino Ave,1,15,Rt1_Mendocino_Ave
+2,2,t7-sl2-p1-r7,1 Mendocino Ave,1,7,Rt1_Mendocino_Ave
+2,2,t8-sl2-p1-r39,1 Mendocino Ave,1,39,Rt1_Mendocino_Ave
+2,2,t9-sl2-p1-r3,1 Mendocino Ave,1,3,Rt1_Mendocino_Ave
+2,3,t10-sl3-p2-r49,1 Mendocino Ave,1,605,Rt1_Mendocino_Ave
+2,3,t12-sl3-p2-r52,1 Mendocino Ave,1,608,Rt1_Mendocino_Ave
+2,3,t14-sl3-p2-r68,1 Mendocino Ave,1,624,Rt1_Mendocino_Ave
+2,3,t16-sl3-p2-r50,1 Mendocino Ave,1,606,Rt1_Mendocino_Ave
+2,3,t18-sl3-p2-r52,1 Mendocino Ave,1,608,Rt1_Mendocino_Ave
+2,3,t20-sl3-p2-r68,1 Mendocino Ave,1,624,Rt1_Mendocino_Ave
+2,3,t22-sl3-p2-r50,1 Mendocino Ave,1,606,Rt1_Mendocino_Ave
+2,3,t4-sl3-p2-r49,1 Mendocino Ave,1,605,Rt1_Mendocino_Ave
+2,3,t6-sl3-p2-r51,1 Mendocino Ave,1,607,Rt1_Mendocino_Ave
+2,3,t8-sl3-p2-r67,1 Mendocino Ave,1,623,Rt1_Mendocino_Ave
+3,2,t28-sl2-p3-r27,2 Bennett Vly,1,27,Rt2_Bennett_Valley
+3,2,t29-sl2-p95-r1,2 Bennett Vly,1,1,Rt2_Bennett_Valley
+3,2,t30-sl2-p95-r25,2 Bennett Vly,1,25,Rt2_Bennett_Valley
+3,2,t31-sl2-p95-r3,2 Bennett Vly,1,3,Rt2_Bennett_Valley
+3,2,t32-sl2-p95-r23,2 Bennett Vly,1,23,Rt2_Bennett_Valley
+3,2,t33-sl2-p95-r17,2 Bennett Vly,1,17,Rt2_Bennett_Valley
+3,2,t34-sl2-p95-r30,2 Bennett Vly,1,30,Rt2_Bennett_Valley
+3,2,t35-sl2-p96-r22,2 Bennett Vly,1,22,Rt2_Bennett_Valley
+3,2,t36-sl2-p96-r14,2 Bennett Vly,1,14,Rt2_Bennett_Valley
+3,2,t37-sl2-p96-r22,2 Bennett Vly,1,22,Rt2_Bennett_Valley
+3,2,t38-sl2-p96-r20,2 Bennett Vly,1,20,Rt2_Bennett_Valley
+3,2,t39-sl2-p95-r28,2 Bennett Vly,1,28,Rt2_Bennett_Valley
+3,2,t40-sl2-p95-r22,2 Bennett Vly,1,22,Rt2_Bennett_Valley
+3,2,t41-sl2-p95-r24,2 Bennett Vly,1,24,Rt2_Bennett_Valley
+3,3,t30-sl3-p99-r55,2 Bennett Vly,1,611,Rt2_Bennett_Valley
+3,3,t31-sl3-p99-r57,2 Bennett Vly,1,613,Rt2_Bennett_Valley
+3,3,t32-sl3-p99-r53,2 Bennett Vly,1,609,Rt2_Bennett_Valley
+3,3,t33-sl3-p99-r55,2 Bennett Vly,1,611,Rt2_Bennett_Valley
+3,3,t34-sl3-p99-r57,2 Bennett Vly,1,613,Rt2_Bennett_Valley
+3,3,t35-sl3-p99-r53,2 Bennett Vly,1,609,Rt2_Bennett_Valley
+3,3,t36-sl3-p99-r56,2 Bennett Vly,1,612,Rt2_Bennett_Valley
+3,3,t37-sl3-p99-r58,2 Bennett Vly,1,614,Rt2_Bennett_Valley
+3,3,t38-sl3-p99-r54,2 Bennett Vly,1,610,Rt2_Bennett_Valley
+3,3,t39-sl3-p99-r56,2 Bennett Vly,1,612,Rt2_Bennett_Valley
+3,3,t40-sl3-p99-r58,2 Bennett Vly,1,614,Rt2_Bennett_Valley
+3,3,t41-sl3-p99-r54,2 Bennett Vly,1,610,Rt2_Bennett_Valley
+3,3,t42-sl3-p4-r53,2 Bennett Vly,1,609,Rt2_Bennett_Valley
+3,4,t33-sl4-p97-r73,2 Bennett Vly,1,705,Rt2_Bennett_Valley
+3,4,t34-sl4-p97-r76,2 Bennett Vly,1,708,Rt2_Bennett_Valley
+3,4,t35-sl4-p97-r73,2 Bennett Vly,1,705,Rt2_Bennett_Valley
+3,4,t36-sl4-p97-r77,2 Bennett Vly,1,709,Rt2_Bennett_Valley
+3,4,t37-sl4-p97-r76,2 Bennett Vly,1,708,Rt2_Bennett_Valley
+3,4,t38-sl4-p97-r77,2 Bennett Vly,1,709,Rt2_Bennett_Valley
+3,4,t43-sl4-p5-r77,2 Bennett Vly,1,709,Rt2_Bennett_Valley
+4,2,t44-sl2-p6-r17,3 West 9th St,1,17,Rt3_West_Ninth_Street
+4,2,t45-sl2-p69-r13,3 West 9th St,1,13,Rt3_West_Ninth_Street
+4,2,t46-sl2-p69-r13,3 West 9th St,1,13,Rt3_West_Ninth_Street
+4,2,t47-sl2-p69-r39,3 West 9th St,1,39,Rt3_West_Ninth_Street
+4,2,t48-sl2-p69-r1,3 West 9th St,1,1,Rt3_West_Ninth_Street
+4,2,t49-sl2-p69-r39,3 West 9th St,1,39,Rt3_West_Ninth_Street
+4,2,t50-sl2-p69-r25,3 West 9th St,1,25,Rt3_West_Ninth_Street
+4,2,t51-sl2-p69-r37,3 West 9th St,1,37,Rt3_West_Ninth_Street
+4,2,t52-sl2-p69-r27,3 West 9th St,1,27,Rt3_West_Ninth_Street
+4,2,t53-sl2-p69-r37,3 West 9th St,1,37,Rt3_West_Ninth_Street
+4,2,t54-sl2-p69-r23,3 West 9th St,1,23,Rt3_West_Ninth_Street
+4,2,t55-sl2-p69-r23,3 West 9th St,1,23,Rt3_West_Ninth_Street
+4,2,t56-sl2-p69-r3,3 West 9th St,1,3,Rt3_West_Ninth_Street
+4,2,t57-sl2-p69-r23,3 West 9th St,1,23,Rt3_West_Ninth_Street
+4,2,t58-sl2-p69-r30,3 West 9th St,1,30,Rt3_West_Ninth_Street
+4,2,t59-sl2-p69-r16,3 West 9th St,1,16,Rt3_West_Ninth_Street
+4,2,t60-sl2-p69-r16,3 West 9th St,1,16,Rt3_West_Ninth_Street
+4,2,t61-sl2-p69-r16,3 West 9th St,1,16,Rt3_West_Ninth_Street
+4,2,t62-sl2-p69-r16,3 West 9th St,1,16,Rt3_West_Ninth_Street
+4,2,t63-sl2-p69-r16,3 West 9th St,1,16,Rt3_West_Ninth_Street
+4,2,t64-sl2-p69-r12,3 West 9th St,1,12,Rt3_West_Ninth_Street
+4,2,t65-sl2-p69-r12,3 West 9th St,1,12,Rt3_West_Ninth_Street
+4,2,t66-sl2-p69-r2,3 West 9th St,1,2,Rt3_West_Ninth_Street
+4,2,t67-sl2-p69-r12,3 West 9th St,1,12,Rt3_West_Ninth_Street
+4,2,t68-sl2-p69-r28,3 West 9th St,1,28,Rt3_West_Ninth_Street
+4,2,t69-sl2-p69-r16,3 West 9th St,1,16,Rt3_West_Ninth_Street
+4,2,t70-sl2-p69-r12,3 West 9th St,1,12,Rt3_West_Ninth_Street
+4,2,t71-sl2-p69-r6,3 West 9th St,1,6,Rt3_West_Ninth_Street
+4,3,t537-sl3-p7-r63,3 West 9th St,1,619,Rt3_West_Ninth_Street
+4,3,t538-sl3-p7-r63,3 West 9th St,1,619,Rt3_West_Ninth_Street
+4,3,t539-sl3-p7-r63,3 West 9th St,1,619,Rt3_West_Ninth_Street
+4,3,t540-sl3-p7-r63,3 West 9th St,1,619,Rt3_West_Ninth_Street
+4,3,t541-sl3-p7-r63,3 West 9th St,1,619,Rt3_West_Ninth_Street
+4,3,t542-sl3-p7-r63,3 West 9th St,1,619,Rt3_West_Ninth_Street
+4,3,t543-sl3-p7-r64,3 West 9th St,1,620,Rt3_West_Ninth_Street
+4,3,t544-sl3-p7-r64,3 West 9th St,1,620,Rt3_West_Ninth_Street
+4,3,t545-sl3-p7-r64,3 West 9th St,1,620,Rt3_West_Ninth_Street
+4,3,t546-sl3-p7-r64,3 West 9th St,1,620,Rt3_West_Ninth_Street
+4,3,t547-sl3-p7-r64,3 West 9th St,1,620,Rt3_West_Ninth_Street
+4,3,t548-sl3-p7-r64,3 West 9th St,1,620,Rt3_West_Ninth_Street
+4,4,t53-sl4-p8-r78,3 West 9th St,1,710,Rt3_West_Ninth_Street
+4,4,t55-sl4-p8-r71,3 West 9th St,1,703,Rt3_West_Ninth_Street
+4,4,t57-sl4-p8-r76,3 West 9th St,1,708,Rt3_West_Ninth_Street
+4,4,t59-sl4-p8-r78,3 West 9th St,1,710,Rt3_West_Ninth_Street
+4,4,t61-sl4-p8-r72,3 West 9th St,1,704,Rt3_West_Ninth_Street
+4,4,t63-sl4-p8-r73,3 West 9th St,1,705,Rt3_West_Ninth_Street
+4,4,t65-sl4-p8-r77,3 West 9th St,1,709,Rt3_West_Ninth_Street
+5,2,t84-sl2-p9-r9,4 Rincon Vly,1,9,Rt4_Roncon_Valley
+5,2,t85-sl2-p9-r5,4 Rincon Vly,1,5,Rt4_Roncon_Valley
+5,2,t86-sl2-p9-r9,4 Rincon Vly,1,9,Rt4_Roncon_Valley
+5,2,t87-sl2-p9-r9,4 Rincon Vly,1,9,Rt4_Roncon_Valley
+5,2,t88-sl2-p9-r19,4 Rincon Vly,1,19,Rt4_Roncon_Valley
+5,2,t89-sl2-p9-r9,4 Rincon Vly,1,9,Rt4_Roncon_Valley
+5,2,t90-sl2-p70-r27,4 Rincon Vly,1,27,Rt4_Roncon_Valley
+5,2,t91-sl2-p70-r38,4 Rincon Vly,1,38,Rt4_Roncon_Valley
+5,2,t92-sl2-p70-r4,4 Rincon Vly,1,4,Rt4_Roncon_Valley
+5,2,t93-sl2-p70-r4,4 Rincon Vly,1,4,Rt4_Roncon_Valley
+5,2,t94-sl2-p70-r38,4 Rincon Vly,1,38,Rt4_Roncon_Valley
+5,2,t95-sl2-p70-r4,4 Rincon Vly,1,4,Rt4_Roncon_Valley
+5,2,t96-sl2-p9-r4,4 Rincon Vly,1,4,Rt4_Roncon_Valley
+5,2,t97-sl2-p9-r28,4 Rincon Vly,1,28,Rt4_Roncon_Valley
+5,3,t87-sl3-p10-r65,4 Rincon Vly,1,621,Rt4_Roncon_Valley
+5,3,t89-sl3-p10-r65,4 Rincon Vly,1,621,Rt4_Roncon_Valley
+5,3,t91-sl3-p10-r65,4 Rincon Vly,1,621,Rt4_Roncon_Valley
+5,3,t93-sl3-p10-r66,4 Rincon Vly,1,622,Rt4_Roncon_Valley
+5,3,t95-sl3-p10-r66,4 Rincon Vly,1,622,Rt4_Roncon_Valley
+5,3,t97-sl3-p10-r64,4 Rincon Vly,1,620,Rt4_Roncon_Valley
+5,4,t100-sl4-p11-r70,4 Rincon Vly,1,702,Rt4_Roncon_Valley
+5,4,t98-sl4-p11-r70,4 Rincon Vly,1,702,Rt4_Roncon_Valley
+5,4,t99-sl4-p11-r70,4 Rincon Vly,1,702,Rt4_Roncon_Valley
+6,2,t101-sl2-p12-r15,5 Santa Rosa Av,1,15,Rt5_Santa_Rosa_Avenue
+6,2,t102-sl2-p71-r19,5 Santa Rosa Av,1,19,Rt5_Santa_Rosa_Avenue
+6,2,t103-sl2-p71-r3,5 Santa Rosa Av,1,3,Rt5_Santa_Rosa_Avenue
+6,2,t104-sl2-p71-r13,5 Santa Rosa Av,1,13,Rt5_Santa_Rosa_Avenue
+6,2,t105-sl2-p71-r37,5 Santa Rosa Av,1,37,Rt5_Santa_Rosa_Avenue
+6,2,t106-sl2-p71-r29,5 Santa Rosa Av,1,29,Rt5_Santa_Rosa_Avenue
+6,2,t107-sl2-p71-r23,5 Santa Rosa Av,1,23,Rt5_Santa_Rosa_Avenue
+6,2,t108-sl2-p71-r5,5 Santa Rosa Av,1,5,Rt5_Santa_Rosa_Avenue
+6,2,t109-sl2-p71-r11,5 Santa Rosa Av,1,11,Rt5_Santa_Rosa_Avenue
+6,2,t110-sl2-p71-r27,5 Santa Rosa Av,1,27,Rt5_Santa_Rosa_Avenue
+6,2,t111-sl2-p71-r7,5 Santa Rosa Av,1,7,Rt5_Santa_Rosa_Avenue
+6,2,t112-sl2-p71-r39,5 Santa Rosa Av,1,39,Rt5_Santa_Rosa_Avenue
+6,2,t113-sl2-p71-r1,5 Santa Rosa Av,1,1,Rt5_Santa_Rosa_Avenue
+6,2,t114-sl2-p71-r37,5 Santa Rosa Av,1,37,Rt5_Santa_Rosa_Avenue
+6,2,t115-sl2-p71-r6,5 Santa Rosa Av,1,6,Rt5_Santa_Rosa_Avenue
+6,2,t116-sl2-p71-r30,5 Santa Rosa Av,1,30,Rt5_Santa_Rosa_Avenue
+6,2,t117-sl2-p71-r40,5 Santa Rosa Av,1,40,Rt5_Santa_Rosa_Avenue
+6,2,t118-sl2-p71-r6,5 Santa Rosa Av,1,6,Rt5_Santa_Rosa_Avenue
+6,2,t119-sl2-p71-r18,5 Santa Rosa Av,1,18,Rt5_Santa_Rosa_Avenue
+6,2,t120-sl2-p71-r40,5 Santa Rosa Av,1,40,Rt5_Santa_Rosa_Avenue
+6,2,t121-sl2-p71-r16,5 Santa Rosa Av,1,16,Rt5_Santa_Rosa_Avenue
+6,2,t122-sl2-p71-r24,5 Santa Rosa Av,1,24,Rt5_Santa_Rosa_Avenue
+6,2,t123-sl2-p71-r8,5 Santa Rosa Av,1,8,Rt5_Santa_Rosa_Avenue
+6,2,t124-sl2-p71-r20,5 Santa Rosa Av,1,20,Rt5_Santa_Rosa_Avenue
+6,2,t125-sl2-p71-r40,5 Santa Rosa Av,1,40,Rt5_Santa_Rosa_Avenue
+6,2,t126-sl2-p71-r22,5 Santa Rosa Av,1,22,Rt5_Santa_Rosa_Avenue
+6,2,t127-sl2-p71-r18,5 Santa Rosa Av,1,18,Rt5_Santa_Rosa_Avenue
+6,2,t128-sl2-p71-r16,5 Santa Rosa Av,1,16,Rt5_Santa_Rosa_Avenue
+6,3,t104-sl3-p72-r51,5 Santa Rosa Av,1,607,Rt5_Santa_Rosa_Avenue
+6,3,t106-sl3-p72-r67,5 Santa Rosa Av,1,623,Rt5_Santa_Rosa_Avenue
+6,3,t108-sl3-p72-r49,5 Santa Rosa Av,1,605,Rt5_Santa_Rosa_Avenue
+6,3,t110-sl3-p72-r52,5 Santa Rosa Av,1,608,Rt5_Santa_Rosa_Avenue
+6,3,t112-sl3-p72-r67,5 Santa Rosa Av,1,623,Rt5_Santa_Rosa_Avenue
+6,3,t114-sl3-p72-r49,5 Santa Rosa Av,1,605,Rt5_Santa_Rosa_Avenue
+6,3,t116-sl3-p72-r52,5 Santa Rosa Av,1,608,Rt5_Santa_Rosa_Avenue
+6,3,t118-sl3-p72-r68,5 Santa Rosa Av,1,624,Rt5_Santa_Rosa_Avenue
+6,3,t120-sl3-p72-r50,5 Santa Rosa Av,1,606,Rt5_Santa_Rosa_Avenue
+6,3,t122-sl3-p72-r52,5 Santa Rosa Av,1,608,Rt5_Santa_Rosa_Avenue
+6,3,t124-sl3-p72-r68,5 Santa Rosa Av,1,624,Rt5_Santa_Rosa_Avenue
+6,3,t126-sl3-p72-r50,5 Santa Rosa Av,1,606,Rt5_Santa_Rosa_Avenue
+6,3,t129-sl3-p13-r49,5 Santa Rosa Av,1,605,Rt5_Santa_Rosa_Avenue
+6,4,t110-sl4-p14-r77,5 Santa Rosa Av,1,709,Rt5_Santa_Rosa_Avenue
+6,4,t112-sl4-p14-r73,5 Santa Rosa Av,1,705,Rt5_Santa_Rosa_Avenue
+6,4,t114-sl4-p14-r77,5 Santa Rosa Av,1,709,Rt5_Santa_Rosa_Avenue
+6,4,t116-sl4-p14-r73,5 Santa Rosa Av,1,705,Rt5_Santa_Rosa_Avenue
+6,4,t118-sl4-p14-r77,5 Santa Rosa Av,1,709,Rt5_Santa_Rosa_Avenue
+6,4,t120-sl4-p14-r76,5 Santa Rosa Av,1,708,Rt5_Santa_Rosa_Avenue
+6,4,t122-sl4-p14-r78,5 Santa Rosa Av,1,710,Rt5_Santa_Rosa_Avenue
+7,2,t130-sl2-p15-r29,6 West 3rd St,1,29,Rt6_WThird_St
+7,2,t131-sl2-p15-r37,6 West 3rd St,1,37,Rt6_WThird_St
+7,2,t132-sl2-p15-r19,6 West 3rd St,1,19,Rt6_WThird_St
+7,2,t133-sl2-p15-r17,6 West 3rd St,1,17,Rt6_WThird_St
+7,2,t134-sl2-p73-r7,6 West 3rd St,1,7,Rt6_WThird_St
+7,2,t135-sl2-p73-r29,6 West 3rd St,1,29,Rt6_WThird_St
+7,2,t136-sl2-p73-r29,6 West 3rd St,1,29,Rt6_WThird_St
+7,2,t137-sl2-p73-r15,6 West 3rd St,1,15,Rt6_WThird_St
+7,2,t138-sl2-p73-r19,6 West 3rd St,1,19,Rt6_WThird_St
+7,2,t139-sl2-p73-r19,6 West 3rd St,1,19,Rt6_WThird_St
+7,2,t140-sl2-p73-r1,6 West 3rd St,1,1,Rt6_WThird_St
+7,2,t141-sl2-p73-r28,6 West 3rd St,1,28,Rt6_WThird_St
+7,2,t142-sl2-p73-r28,6 West 3rd St,1,28,Rt6_WThird_St
+7,2,t143-sl2-p15-r14,6 West 3rd St,1,14,Rt6_WThird_St
+7,2,t144-sl2-p15-r26,6 West 3rd St,1,26,Rt6_WThird_St
+7,2,t145-sl2-p15-r40,6 West 3rd St,1,40,Rt6_WThird_St
+7,2,t146-sl2-p15-r26,6 West 3rd St,1,26,Rt6_WThird_St
+7,2,t147-sl2-p73-r6,6 West 3rd St,1,6,Rt6_WThird_St
+7,2,t148-sl2-p73-r20,6 West 3rd St,1,20,Rt6_WThird_St
+7,2,t149-sl2-p73-r20,6 West 3rd St,1,20,Rt6_WThird_St
+7,3,t134-sl3-p74-r49,6 West 3rd St,1,605,Rt6_WThird_St
+7,3,t137-sl3-p74-r67,6 West 3rd St,1,623,Rt6_WThird_St
+7,3,t140-sl3-p74-r52,6 West 3rd St,1,608,Rt6_WThird_St
+7,3,t143-sl3-p74-r50,6 West 3rd St,1,606,Rt6_WThird_St
+7,3,t147-sl3-p74-r50,6 West 3rd St,1,606,Rt6_WThird_St
+7,3,t150-sl3-p16-r51,6 West 3rd St,1,607,Rt6_WThird_St
+7,3,t151-sl3-p74-r67,6 West 3rd St,1,623,Rt6_WThird_St
+7,3,t152-sl3-p74-r51,6 West 3rd St,1,607,Rt6_WThird_St
+7,3,t152-sl3-p74-r52,6 West 3rd St,1,608,Rt6_WThird_St
+7,3,t153-sl3-p74-r49,6 West 3rd St,1,605,Rt6_WThird_St
+7,3,t154-sl3-p74-r68,6 West 3rd St,1,624,Rt6_WThird_St
+7,3,t155-sl3-p74-r52,6 West 3rd St,1,608,Rt6_WThird_St
+7,3,t156-sl3-p74-r68,6 West 3rd St,1,624,Rt6_WThird_St
+7,3,t157-sl3-p74-r68,6 West 3rd St,1,624,Rt6_WThird_St
+7,4,t136-sl4-p17-r76,6 West 3rd St,1,708,Rt6_WThird_St
+7,4,t158-sl4-p17-r78,6 West 3rd St,1,710,Rt6_WThird_St
+7,4,t159-sl4-p17-r72,6 West 3rd St,1,704,Rt6_WThird_St
+7,4,t160-sl4-p17-r76,6 West 3rd St,1,708,Rt6_WThird_St
+7,4,t161-sl4-p17-r78,6 West 3rd St,1,710,Rt6_WThird_St
+7,4,t162-sl4-p17-r72,6 West 3rd St,1,704,Rt6_WThird_St
+7,4,t163-sl4-p17-r73,6 West 3rd St,1,705,Rt6_WThird_St
+8,2,t164-sl2-p18-r25,7 Rincon Vly,1,25,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t165-sl2-p75-r21,7 Rincon Vly,1,21,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t166-sl2-p75-r21,7 Rincon Vly,1,21,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t167-sl2-p75-r21,7 Rincon Vly,1,21,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t168-sl2-p75-r21,7 Rincon Vly,1,21,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t169-sl2-p75-r21,7 Rincon Vly,1,21,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t170-sl2-p75-r11,7 Rincon Vly,1,11,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t171-sl2-p75-r14,7 Rincon Vly,1,14,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t172-sl2-p75-r20,7 Rincon Vly,1,20,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t173-sl2-p75-r20,7 Rincon Vly,1,20,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t174-sl2-p75-r28,7 Rincon Vly,1,28,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t175-sl2-p75-r22,7 Rincon Vly,1,22,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t176-sl2-p75-r26,7 Rincon Vly,1,26,Rt7_Montgomery_Village_Rincon_Valley
+8,2,t177-sl2-p75-r26,7 Rincon Vly,1,26,Rt7_Montgomery_Village_Rincon_Valley
+8,3,t178-sl3-p19-r65,7 Rincon Vly,1,621,Rt7_Montgomery_Village_Rincon_Valley
+8,3,t179-sl3-p19-r65,7 Rincon Vly,1,621,Rt7_Montgomery_Village_Rincon_Valley
+8,3,t180-sl3-p19-r65,7 Rincon Vly,1,621,Rt7_Montgomery_Village_Rincon_Valley
+8,3,t181-sl3-p19-r65,7 Rincon Vly,1,621,Rt7_Montgomery_Village_Rincon_Valley
+8,3,t182-sl3-p19-r66,7 Rincon Vly,1,622,Rt7_Montgomery_Village_Rincon_Valley
+8,3,t183-sl3-p19-r66,7 Rincon Vly,1,622,Rt7_Montgomery_Village_Rincon_Valley
+8,4,t184-sl4-p20-r70,7 Rincon Vly,1,702,Rt7_Montgomery_Village_Rincon_Valley
+8,4,t185-sl4-p20-r70,7 Rincon Vly,1,702,Rt7_Montgomery_Village_Rincon_Valley
+8,4,t186-sl4-p20-r70,7 Rincon Vly,1,702,Rt7_Montgomery_Village_Rincon_Valley
+8,4,t187-sl4-p20-r70,7 Rincon Vly,1,702,Rt7_Montgomery_Village_Rincon_Valley
+9,2,t188-sl2-p21-r13,8 Sonoma Ave,1,13,Rt8_Sonoma_Avenue
+9,2,t189-sl2-p76-r27,8 Sonoma Ave,1,27,Rt8_Sonoma_Avenue
+9,2,t190-sl2-p76-r39,8 Sonoma Ave,1,39,Rt8_Sonoma_Avenue
+9,2,t191-sl2-p76-r1,8 Sonoma Ave,1,1,Rt8_Sonoma_Avenue
+9,2,t192-sl2-p76-r39,8 Sonoma Ave,1,39,Rt8_Sonoma_Avenue
+9,2,t193-sl2-p76-r25,8 Sonoma Ave,1,25,Rt8_Sonoma_Avenue
+9,2,t194-sl2-p76-r39,8 Sonoma Ave,1,39,Rt8_Sonoma_Avenue
+9,2,t195-sl2-p76-r39,8 Sonoma Ave,1,39,Rt8_Sonoma_Avenue
+9,2,t196-sl2-p76-r37,8 Sonoma Ave,1,37,Rt8_Sonoma_Avenue
+9,2,t197-sl2-p76-r23,8 Sonoma Ave,1,23,Rt8_Sonoma_Avenue
+9,2,t198-sl2-p76-r13,8 Sonoma Ave,1,13,Rt8_Sonoma_Avenue
+9,2,t199-sl2-p76-r15,8 Sonoma Ave,1,15,Rt8_Sonoma_Avenue
+9,2,t200-sl2-p76-r23,8 Sonoma Ave,1,23,Rt8_Sonoma_Avenue
+9,2,t201-sl2-p76-r30,8 Sonoma Ave,1,30,Rt8_Sonoma_Avenue
+9,2,t202-sl2-p76-r26,8 Sonoma Ave,1,26,Rt8_Sonoma_Avenue
+9,2,t203-sl2-p76-r26,8 Sonoma Ave,1,26,Rt8_Sonoma_Avenue
+9,2,t204-sl2-p76-r12,8 Sonoma Ave,1,12,Rt8_Sonoma_Avenue
+9,2,t205-sl2-p77-r12,8 Sonoma Ave,1,12,Rt8_Sonoma_Avenue
+9,2,t206-sl2-p77-r12,8 Sonoma Ave,1,12,Rt8_Sonoma_Avenue
+9,2,t207-sl2-p76-r24,8 Sonoma Ave,1,24,Rt8_Sonoma_Avenue
+9,2,t208-sl2-p76-r2,8 Sonoma Ave,1,2,Rt8_Sonoma_Avenue
+9,2,t209-sl2-p76-r12,8 Sonoma Ave,1,12,Rt8_Sonoma_Avenue
+9,2,t210-sl2-p76-r28,8 Sonoma Ave,1,28,Rt8_Sonoma_Avenue
+9,2,t211-sl2-p76-r12,8 Sonoma Ave,1,12,Rt8_Sonoma_Avenue
+9,2,t212-sl2-p76-r12,8 Sonoma Ave,1,12,Rt8_Sonoma_Avenue
+9,2,t213-sl2-p76-r16,8 Sonoma Ave,1,16,Rt8_Sonoma_Avenue
+9,2,t214-sl2-p76-r40,8 Sonoma Ave,1,40,Rt8_Sonoma_Avenue
+9,3,t206-sl3-p101-r64,8 Sonoma Ave,1,620,Rt8_Sonoma_Avenue
+9,3,t228-sl3-p101-r63,8 Sonoma Ave,1,619,Rt8_Sonoma_Avenue
+9,3,t229-sl3-p101-r63,8 Sonoma Ave,1,619,Rt8_Sonoma_Avenue
+9,3,t230-sl3-p101-r64,8 Sonoma Ave,1,620,Rt8_Sonoma_Avenue
+9,3,t231-sl3-p101-r64,8 Sonoma Ave,1,620,Rt8_Sonoma_Avenue
+9,3,t232-sl3-p101-r64,8 Sonoma Ave,1,620,Rt8_Sonoma_Avenue
+9,3,t549-sl3-p22-r63,8 Sonoma Ave,1,619,Rt8_Sonoma_Avenue
+9,3,t550-sl3-p101-r63,8 Sonoma Ave,1,619,Rt8_Sonoma_Avenue
+9,3,t551-sl3-p101-r63,8 Sonoma Ave,1,619,Rt8_Sonoma_Avenue
+9,3,t552-sl3-p101-r63,8 Sonoma Ave,1,619,Rt8_Sonoma_Avenue
+9,3,t553-sl3-p101-r64,8 Sonoma Ave,1,620,Rt8_Sonoma_Avenue
+9,3,t554-sl3-p101-r64,8 Sonoma Ave,1,620,Rt8_Sonoma_Avenue
+9,4,t206-sl4-p78-r77,8 Sonoma Ave,1,709,Rt8_Sonoma_Avenue
+9,4,t227-sl4-p23-r73,8 Sonoma Ave,1,705,Rt8_Sonoma_Avenue
+9,4,t228-sl4-p78-r77,8 Sonoma Ave,1,709,Rt8_Sonoma_Avenue
+9,4,t229-sl4-p78-r73,8 Sonoma Ave,1,705,Rt8_Sonoma_Avenue
+9,4,t230-sl4-p78-r77,8 Sonoma Ave,1,709,Rt8_Sonoma_Avenue
+9,4,t231-sl4-p78-r73,8 Sonoma Ave,1,705,Rt8_Sonoma_Avenue
+9,4,t232-sl4-p78-r75,8 Sonoma Ave,1,707,Rt8_Sonoma_Avenue
+10,2,t233-sl2-p24-r11,9 Sebastopol Rd,1,11,Rt9_Sebastopol_Rd
+10,2,t234-sl2-p79-r23,9 Sebastopol Rd,1,23,Rt9_Sebastopol_Rd
+10,2,t235-sl2-p79-r27,9 Sebastopol Rd,1,27,Rt9_Sebastopol_Rd
+10,2,t236-sl2-p79-r23,9 Sebastopol Rd,1,23,Rt9_Sebastopol_Rd
+10,2,t237-sl2-p79-r7,9 Sebastopol Rd,1,7,Rt9_Sebastopol_Rd
+10,2,t238-sl2-p79-r27,9 Sebastopol Rd,1,27,Rt9_Sebastopol_Rd
+10,2,t239-sl2-p79-r17,9 Sebastopol Rd,1,17,Rt9_Sebastopol_Rd
+10,2,t240-sl2-p79-r19,9 Sebastopol Rd,1,19,Rt9_Sebastopol_Rd
+10,2,t241-sl2-p79-r17,9 Sebastopol Rd,1,17,Rt9_Sebastopol_Rd
+10,2,t242-sl2-p79-r1,9 Sebastopol Rd,1,1,Rt9_Sebastopol_Rd
+10,2,t243-sl2-p79-r29,9 Sebastopol Rd,1,29,Rt9_Sebastopol_Rd
+10,2,t244-sl2-p79-r25,9 Sebastopol Rd,1,25,Rt9_Sebastopol_Rd
+10,2,t245-sl2-p79-r21,9 Sebastopol Rd,1,21,Rt9_Sebastopol_Rd
+10,2,t246-sl2-p79-r3,9 Sebastopol Rd,1,3,Rt9_Sebastopol_Rd
+10,2,t247-sl2-p80-r12,9 Sebastopol Rd,1,12,Rt9_Sebastopol_Rd
+10,2,t249-sl2-p80-r18,9 Sebastopol Rd,1,18,Rt9_Sebastopol_Rd
+10,2,t250-sl2-p80-r2,9 Sebastopol Rd,1,2,Rt9_Sebastopol_Rd
+10,2,t251-sl2-p80-r8,9 Sebastopol Rd,1,8,Rt9_Sebastopol_Rd
+10,2,t252-sl2-p80-r10,9 Sebastopol Rd,1,10,Rt9_Sebastopol_Rd
+10,2,t253-sl2-p80-r8,9 Sebastopol Rd,1,8,Rt9_Sebastopol_Rd
+10,2,t254-sl2-p80-r30,9 Sebastopol Rd,1,30,Rt9_Sebastopol_Rd
+10,2,t255-sl2-p79-r40,9 Sebastopol Rd,1,40,Rt9_Sebastopol_Rd
+10,2,t256-sl2-p79-r18,9 Sebastopol Rd,1,18,Rt9_Sebastopol_Rd
+10,2,t257-sl2-p79-r24,9 Sebastopol Rd,1,24,Rt9_Sebastopol_Rd
+10,2,t258-sl2-p79-r28,9 Sebastopol Rd,1,28,Rt9_Sebastopol_Rd
+10,2,t259-sl2-p79-r10,9 Sebastopol Rd,1,10,Rt9_Sebastopol_Rd
+10,2,t260-sl2-p79-r8,9 Sebastopol Rd,1,8,Rt9_Sebastopol_Rd
+10,2,t262-sl2-p80-r2,9 Sebastopol Rd,1,2,Rt9_Sebastopol_Rd
+10,3,t236-sl3-p82-r53,9 Sebastopol Rd,1,609,Rt9_Sebastopol_Rd
+10,3,t237-sl3-p82-r57,9 Sebastopol Rd,1,613,Rt9_Sebastopol_Rd
+10,3,t238-sl3-p82-r55,9 Sebastopol Rd,1,611,Rt9_Sebastopol_Rd
+10,3,t239-sl3-p82-r53,9 Sebastopol Rd,1,609,Rt9_Sebastopol_Rd
+10,3,t240-sl3-p82-r57,9 Sebastopol Rd,1,613,Rt9_Sebastopol_Rd
+10,3,t241-sl3-p82-r55,9 Sebastopol Rd,1,611,Rt9_Sebastopol_Rd
+10,3,t242-sl3-p82-r53,9 Sebastopol Rd,1,609,Rt9_Sebastopol_Rd
+10,3,t243-sl3-p82-r57,9 Sebastopol Rd,1,613,Rt9_Sebastopol_Rd
+10,3,t244-sl3-p82-r56,9 Sebastopol Rd,1,612,Rt9_Sebastopol_Rd
+10,3,t245-sl3-p82-r53,9 Sebastopol Rd,1,609,Rt9_Sebastopol_Rd
+10,3,t246-sl3-p82-r57,9 Sebastopol Rd,1,613,Rt9_Sebastopol_Rd
+10,3,t247-sl3-p82-r56,9 Sebastopol Rd,1,612,Rt9_Sebastopol_Rd
+10,3,t249-sl3-p82-r57,9 Sebastopol Rd,1,613,Rt9_Sebastopol_Rd
+10,3,t250-sl3-p82-r56,9 Sebastopol Rd,1,612,Rt9_Sebastopol_Rd
+10,3,t251-sl3-p82-r54,9 Sebastopol Rd,1,610,Rt9_Sebastopol_Rd
+10,3,t252-sl3-p82-r58,9 Sebastopol Rd,1,614,Rt9_Sebastopol_Rd
+10,3,t253-sl3-p82-r56,9 Sebastopol Rd,1,612,Rt9_Sebastopol_Rd
+10,3,t254-sl3-p82-r54,9 Sebastopol Rd,1,610,Rt9_Sebastopol_Rd
+10,3,t255-sl3-p82-r58,9 Sebastopol Rd,1,614,Rt9_Sebastopol_Rd
+10,3,t256-sl3-p82-r56,9 Sebastopol Rd,1,612,Rt9_Sebastopol_Rd
+10,3,t257-sl3-p82-r54,9 Sebastopol Rd,1,610,Rt9_Sebastopol_Rd
+10,3,t258-sl3-p82-r58,9 Sebastopol Rd,1,614,Rt9_Sebastopol_Rd
+10,3,t261-sl3-p25-r55,9 Sebastopol Rd,1,611,Rt9_Sebastopol_Rd
+10,3,t262-sl3-p82-r53,9 Sebastopol Rd,1,609,Rt9_Sebastopol_Rd
+10,4,t263-sl4-p26-r72,9 Sebastopol Rd,1,704,Rt9_Sebastopol_Rd
+10,4,t264-sl4-p26-r72,9 Sebastopol Rd,1,704,Rt9_Sebastopol_Rd
+10,4,t265-sl4-p26-r71,9 Sebastopol Rd,1,703,Rt9_Sebastopol_Rd
+10,4,t266-sl4-p26-r75,9 Sebastopol Rd,1,707,Rt9_Sebastopol_Rd
+10,4,t267-sl4-p26-r74,9 Sebastopol Rd,1,706,Rt9_Sebastopol_Rd
+10,4,t268-sl4-p26-r71,9 Sebastopol Rd,1,703,Rt9_Sebastopol_Rd
+10,4,t269-sl4-p26-r76,9 Sebastopol Rd,1,708,Rt9_Sebastopol_Rd
+11,2,t270-sl2-p27-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t271-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t272-sl2-p98-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t273-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t274-sl2-p98-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t275-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t276-sl2-p98-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t277-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t278-sl2-p98-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t279-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t280-sl2-p98-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t281-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t282-sl2-p98-r31,10 Coddingtown,1,31,Rt10_Coddingtown
+11,2,t283-sl2-p98-r33,10 Coddingtown,1,33,Rt10_Coddingtown
+11,2,t284-sl2-p98-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t285-sl2-p98-r34,10 Coddingtown,1,34,Rt10_Coddingtown
+11,2,t286-sl2-p98-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t287-sl2-p98-r34,10 Coddingtown,1,34,Rt10_Coddingtown
+11,2,t288-sl2-p102-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t290-sl2-p102-r81,10 Coddingtown,1,45,Rt10_Coddingtown
+11,2,t292-sl2-p98-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t293-sl2-p98-r34,10 Coddingtown,1,34,Rt10_Coddingtown
+11,2,t294-sl2-p98-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t295-sl2-p98-r34,10 Coddingtown,1,34,Rt10_Coddingtown
+11,2,t296-sl2-p98-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t297-sl2-p27-r34,10 Coddingtown,1,34,Rt10_Coddingtown
+11,2,t557-sl2-p102-r81,10 Coddingtown,1,45,Rt10_Coddingtown
+11,2,t561-sl2-p102-r81,10 Coddingtown,1,45,Rt10_Coddingtown
+11,2,t562-sl2-p102-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t563-sl2-p102-r32,10 Coddingtown,1,32,Rt10_Coddingtown
+11,2,t564-sl2-p102-r81,10 Coddingtown,1,45,Rt10_Coddingtown
+11,3,t274-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t276-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t278-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t280-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t282-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t284-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t286-sl3-p28-r47,10 Coddingtown,1,603,Rt10_Coddingtown
+11,3,t288-sl3-p28-r48,10 Coddingtown,1,604,Rt10_Coddingtown
+11,3,t290-sl3-p28-r48,10 Coddingtown,1,604,Rt10_Coddingtown
+11,3,t292-sl3-p28-r48,10 Coddingtown,1,604,Rt10_Coddingtown
+11,3,t294-sl3-p28-r48,10 Coddingtown,1,604,Rt10_Coddingtown
+11,3,t296-sl3-p100-r48,,1,604,Rt10_Coddingtown
+11,4,t278-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+11,4,t280-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+11,4,t282-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+11,4,t284-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+11,4,t286-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+11,4,t288-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+11,4,t290-sl4-p30-r69,10 Coddingtown,1,701,Rt10_Coddingtown
+12,2,t298-sl2-p31-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t299-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t300-sl2-p83-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t301-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t302-sl2-p83-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t303-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t304-sl2-p83-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t305-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t306-sl2-p83-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t307-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t308-sl2-p83-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t309-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t310-sl2-p83-r33,11 Fulton Rd,1,33,Rt11_FultonRd
+12,2,t311-sl2-p83-r31,11 Fulton Rd,1,31,Rt11_FultonRd
+12,2,t312-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t313-sl2-p83-r32,11 Fulton Rd,1,32,Rt11_FultonRd
+12,2,t314-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t315-sl2-p83-r32,11 Fulton Rd,1,32,Rt11_FultonRd
+12,2,t316-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t317-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t318-sl2-p83-r36,11 Fulton Rd,1,36,Rt11_FultonRd
+12,2,t319-sl2-p83-r36,11 Fulton Rd,1,36,Rt11_FultonRd
+12,2,t320-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t321-sl2-p83-r32,11 Fulton Rd,1,32,Rt11_FultonRd
+12,2,t322-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t323-sl2-p83-r32,11 Fulton Rd,1,32,Rt11_FultonRd
+12,2,t324-sl2-p83-r34,11 Fulton Rd,1,34,Rt11_FultonRd
+12,2,t325-sl2-p103-r32,11 Fulton Rd,1,32,Rt11_FultonRd
+12,3,t303-sl3-p84-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,3,t305-sl3-p84-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,3,t307-sl3-p84-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,3,t309-sl3-p84-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,3,t311-sl3-p84-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,3,t313-sl3-p84-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,3,t315-sl3-p84-r48,11 Fulton Rd,1,604,Rt11_FultonRd
+12,3,t317-sl3-p84-r48,11 Fulton Rd,1,604,Rt11_FultonRd
+12,3,t319-sl3-p84-r48,11 Fulton Rd,1,604,Rt11_FultonRd
+12,3,t321-sl3-p84-r48,11 Fulton Rd,1,604,Rt11_FultonRd
+12,3,t323-sl3-p84-r48,11 Fulton Rd,1,604,Rt11_FultonRd
+12,3,t326-sl3-p32-r47,11 Fulton Rd,1,603,Rt11_FultonRd
+12,4,t307-sl4-p85-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+12,4,t309-sl4-p85-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+12,4,t311-sl4-p85-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+12,4,t313-sl4-p85-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+12,4,t315-sl4-p85-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+12,4,t317-sl4-p85-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+12,4,t327-sl4-p33-r69,11 Fulton Rd,1,701,Rt11_FultonRd
+13,2,t328-sl2-p34-r23,12 Roseland,1,23,Rt12_Roseland
+13,2,t329-sl2-p34-r7,12 Roseland,1,7,Rt12_Roseland
+13,2,t330-sl2-p86-r11,12 Roseland,1,11,Rt12_Roseland
+13,2,t331-sl2-p86-r37,12 Roseland,1,37,Rt12_Roseland
+13,2,t332-sl2-p86-r27,12 Roseland,1,27,Rt12_Roseland
+13,2,t333-sl2-p86-r23,12 Roseland,1,23,Rt12_Roseland
+13,2,t334-sl2-p86-r37,12 Roseland,1,37,Rt12_Roseland
+13,2,t335-sl2-p86-r27,12 Roseland,1,27,Rt12_Roseland
+13,2,t336-sl2-p86-r1,12 Roseland,1,1,Rt12_Roseland
+13,2,t337-sl2-p86-r13,12 Roseland,1,13,Rt12_Roseland
+13,2,t338-sl2-p86-r39,12 Roseland,1,39,Rt12_Roseland
+13,2,t339-sl2-p86-r1,12 Roseland,1,1,Rt12_Roseland
+13,2,t340-sl2-p86-r7,12 Roseland,1,7,Rt12_Roseland
+13,2,t341-sl2-p86-r25,12 Roseland,1,25,Rt12_Roseland
+13,2,t342-sl2-p86-r7,12 Roseland,1,7,Rt12_Roseland
+13,2,t343-sl2-p86-r40,12 Roseland,1,40,Rt12_Roseland
+13,2,t344-sl2-p86-r6,12 Roseland,1,6,Rt12_Roseland
+13,2,t345-sl2-p86-r8,12 Roseland,1,8,Rt12_Roseland
+13,2,t346-sl2-p86-r40,12 Roseland,1,40,Rt12_Roseland
+13,2,t347-sl2-p86-r6,12 Roseland,1,6,Rt12_Roseland
+13,2,t348-sl2-p86-r18,12 Roseland,1,18,Rt12_Roseland
+13,2,t349-sl2-p86-r26,12 Roseland,1,26,Rt12_Roseland
+13,2,t350-sl2-p86-r16,12 Roseland,1,16,Rt12_Roseland
+13,2,t351-sl2-p86-r24,12 Roseland,1,24,Rt12_Roseland
+13,2,t352-sl2-p86-r8,12 Roseland,1,8,Rt12_Roseland
+13,2,t353-sl2-p86-r38,12 Roseland,1,38,Rt12_Roseland
+13,2,t354-sl2-p86-r40,12 Roseland,1,40,Rt12_Roseland
+13,2,t355-sl2-p86-r4,12 Roseland,1,4,Rt12_Roseland
+13,3,t333-sl3-p35-r53,12 Roseland,1,609,Rt12_Roseland
+13,3,t335-sl3-p35-r55,12 Roseland,1,611,Rt12_Roseland
+13,3,t337-sl3-p35-r57,12 Roseland,1,613,Rt12_Roseland
+13,3,t339-sl3-p35-r53,12 Roseland,1,609,Rt12_Roseland
+13,3,t341-sl3-p35-r56,12 Roseland,1,612,Rt12_Roseland
+13,3,t343-sl3-p35-r57,12 Roseland,1,613,Rt12_Roseland
+13,3,t345-sl3-p35-r54,12 Roseland,1,610,Rt12_Roseland
+13,3,t347-sl3-p35-r56,12 Roseland,1,612,Rt12_Roseland
+13,3,t349-sl3-p35-r58,12 Roseland,1,614,Rt12_Roseland
+13,3,t351-sl3-p35-r54,12 Roseland,1,610,Rt12_Roseland
+13,3,t353-sl3-p35-r56,12 Roseland,1,612,Rt12_Roseland
+13,3,t356-sl3-p35-r57,12 Roseland,1,613,Rt12_Roseland
+13,4,t336-sl4-p36-r78,12 Roseland,1,710,Rt12_Roseland
+13,4,t338-sl4-p36-r71,12 Roseland,1,703,Rt12_Roseland
+13,4,t340-sl4-p36-r77,12 Roseland,1,709,Rt12_Roseland
+13,4,t342-sl4-p36-r78,12 Roseland,1,710,Rt12_Roseland
+13,4,t344-sl4-p36-r72,12 Roseland,1,704,Rt12_Roseland
+13,4,t346-sl4-p36-r73,12 Roseland,1,705,Rt12_Roseland
+13,4,t348-sl4-p36-r78,12 Roseland,1,710,Rt12_Roseland
+14,2,t357-sl2-p37-r21,14 County Ctr,1,21,Rt14_County_Center
+14,2,t358-sl2-p37-r5,14 County Ctr,1,5,Rt14_County_Center
+14,2,t359-sl2-p87-r25,14 County Ctr,1,25,Rt14_County_Center
+14,2,t360-sl2-p87-r9,14 County Ctr,1,9,Rt14_County_Center
+14,2,t361-sl2-p87-r3,14 County Ctr,1,3,Rt14_County_Center
+14,2,t362-sl2-p87-r13,14 County Ctr,1,13,Rt14_County_Center
+14,2,t363-sl2-p87-r1,14 County Ctr,1,1,Rt14_County_Center
+14,2,t364-sl2-p87-r13,14 County Ctr,1,13,Rt14_County_Center
+14,2,t365-sl2-p87-r15,14 County Ctr,1,15,Rt14_County_Center
+14,2,t366-sl2-p87-r9,14 County Ctr,1,9,Rt14_County_Center
+14,2,t367-sl2-p87-r11,14 County Ctr,1,11,Rt14_County_Center
+14,2,t368-sl2-p87-r27,14 County Ctr,1,27,Rt14_County_Center
+14,2,t369-sl2-p87-r13,14 County Ctr,1,13,Rt14_County_Center
+14,2,t370-sl2-p87-r39,14 County Ctr,1,39,Rt14_County_Center
+14,2,t371-sl2-p88-r20,14 County Ctr,1,20,Rt14_County_Center
+14,2,t372-sl2-p88-r4,14 County Ctr,1,4,Rt14_County_Center
+14,2,t373-sl2-p88-r22,14 County Ctr,1,22,Rt14_County_Center
+14,2,t374-sl2-p88-r38,14 County Ctr,1,38,Rt14_County_Center
+14,2,t375-sl2-p88-r28,14 County Ctr,1,28,Rt14_County_Center
+14,2,t376-sl2-p88-r38,14 County Ctr,1,38,Rt14_County_Center
+14,2,t377-sl2-p88-r22,14 County Ctr,1,22,Rt14_County_Center
+14,2,t378-sl2-p88-r4,14 County Ctr,1,4,Rt14_County_Center
+14,2,t379-sl2-p88-r6,14 County Ctr,1,6,Rt14_County_Center
+14,2,t380-sl2-p88-r38,14 County Ctr,1,38,Rt14_County_Center
+14,2,t381-sl2-p88-r14,14 County Ctr,1,14,Rt14_County_Center
+14,2,t382-sl2-p88-r30,14 County Ctr,1,30,Rt14_County_Center
+14,2,t383-sl2-p88-r14,14 County Ctr,1,14,Rt14_County_Center
+14,2,t384-sl2-p88-r2,14 County Ctr,1,2,Rt14_County_Center
+14,3,t385-sl3-p38-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t386-sl3-p89-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t387-sl3-p89-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t388-sl3-p89-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t389-sl3-p89-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t390-sl3-p89-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t391-sl3-p89-r61,14 County Ctr,1,617,Rt14_County_Center
+14,3,t392-sl3-p89-r62,14 County Ctr,1,618,Rt14_County_Center
+14,3,t393-sl3-p89-r62,14 County Ctr,1,618,Rt14_County_Center
+14,3,t394-sl3-p89-r62,14 County Ctr,1,618,Rt14_County_Center
+14,3,t395-sl3-p89-r62,14 County Ctr,1,618,Rt14_County_Center
+14,3,t396-sl3-p89-r62,14 County Ctr,1,618,Rt14_County_Center
+14,3,t397-sl3-p89-r62,14 County Ctr,1,618,Rt14_County_Center
+14,4,t398-sl4-p39-r75,14 County Ctr,1,707,Rt14_County_Center
+14,4,t399-sl4-p39-r74,14 County Ctr,1,706,Rt14_County_Center
+14,4,t400-sl4-p39-r74,14 County Ctr,1,706,Rt14_County_Center
+14,4,t401-sl4-p39-r71,14 County Ctr,1,703,Rt14_County_Center
+14,4,t402-sl4-p39-r75,14 County Ctr,1,707,Rt14_County_Center
+14,4,t403-sl4-p39-r74,14 County Ctr,1,706,Rt14_County_Center
+14,4,t404-sl4-p39-r71,14 County Ctr,1,703,Rt14_County_Center
+15,2,t405-sl2-p40-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t406-sl2-p90-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t407-sl2-p90-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t408-sl2-p90-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t409-sl2-p90-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t410-sl2-p90-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t411-sl2-p90-r35,15 Stony Pt Rd,1,35,Rt15_Stony_Point_Road
+15,2,t412-sl2-p90-r36,15 Stony Pt Rd,1,36,Rt15_Stony_Point_Road
+15,2,t413-sl2-p90-r36,15 Stony Pt Rd,1,36,Rt15_Stony_Point_Road
+15,2,t414-sl2-p90-r36,15 Stony Pt Rd,1,36,Rt15_Stony_Point_Road
+15,2,t415-sl2-p90-r34,15 Stony Pt Rd,1,34,Rt15_Stony_Point_Road
+15,2,t416-sl2-p90-r36,15 Stony Pt Rd,1,36,Rt15_Stony_Point_Road
+15,2,t417-sl2-p90-r36,15 Stony Pt Rd,1,36,Rt15_Stony_Point_Road
+15,2,t418-sl2-p90-r36,15 Stony Pt Rd,1,36,Rt15_Stony_Point_Road
+15,3,t408-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t409-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t410-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t412-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t413-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t414-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t415-sl3-p91-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+15,3,t419-sl3-p41-r45,15 Stony Pt Rd,1,601,Rt15_Stony_Point_Road
+16,2,t420-sl2-p43-r37,17 Piner Rd,1,37,Rt17_Piner_Road
+16,2,t421-sl2-p42-r29,17 Piner Rd,1,29,Rt17_Piner_Road
+16,2,t422-sl2-p42-r11,17 Piner Rd,1,11,Rt17_Piner_Road
+16,2,t423-sl2-p42-r5,17 Piner Rd,1,5,Rt17_Piner_Road
+16,2,t424-sl2-p42-r3,17 Piner Rd,1,3,Rt17_Piner_Road
+16,2,t425-sl2-p42-r5,17 Piner Rd,1,5,Rt17_Piner_Road
+16,2,t426-sl2-p42-r17,17 Piner Rd,1,17,Rt17_Piner_Road
+16,2,t427-sl2-p42-r9,17 Piner Rd,1,9,Rt17_Piner_Road
+16,2,t428-sl2-p42-r10,17 Piner Rd,1,10,Rt17_Piner_Road
+16,2,t429-sl2-p42-r10,17 Piner Rd,1,10,Rt17_Piner_Road
+16,2,t430-sl2-p42-r2,17 Piner Rd,1,2,Rt17_Piner_Road
+16,2,t431-sl2-p42-r18,17 Piner Rd,1,18,Rt17_Piner_Road
+16,2,t432-sl2-p42-r2,17 Piner Rd,1,2,Rt17_Piner_Road
+16,2,t433-sl2-p42-r6,17 Piner Rd,1,6,Rt17_Piner_Road
+16,2,t434-sl2-p44-r24,17 Piner Rd,1,24,Rt17_Piner_Road
+16,3,t422-sl3-p45-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,3,t423-sl3-p45-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,3,t424-sl3-p45-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,3,t425-sl3-p45-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,3,t426-sl3-p45-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,3,t427-sl3-p45-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,3,t427-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t428-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t429-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t430-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t431-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t432-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t433-sl3-p45-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t434-sl3-p47-r60,17 Piner Rd,1,616,Rt17_Piner_Road
+16,3,t435-sl3-p46-r59,17 Piner Rd,1,615,Rt17_Piner_Road
+16,4,t436-sl4-p49-r71,17 Piner Rd,1,703,Rt17_Piner_Road
+16,4,t437-sl4-p48-r71,17 Piner Rd,1,703,Rt17_Piner_Road
+16,4,t438-sl4-p48-r76,17 Piner Rd,1,708,Rt17_Piner_Road
+16,4,t439-sl4-p48-r78,17 Piner Rd,1,710,Rt17_Piner_Road
+16,4,t440-sl4-p48-r72,17 Piner Rd,1,704,Rt17_Piner_Road
+16,4,t441-sl4-p48-r76,17 Piner Rd,1,708,Rt17_Piner_Road
+16,4,t442-sl4-p48-r78,17 Piner Rd,1,710,Rt17_Piner_Road
+16,4,t443-sl4-p50-r72,17 Piner Rd,1,704,Rt17_Piner_Road
+17,2,t444-sl2-p51-r41,18 Se Circulator,1,41,Rt18_Southeast_Circulator
+17,2,t445-sl2-p51-r41,18 Se Circulator,1,41,Rt18_Southeast_Circulator
+17,2,t446-sl2-p51-r41,18 Se Circulator,1,41,Rt18_Southeast_Circulator
+17,2,t447-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,2,t448-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,2,t449-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,2,t450-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,2,t451-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,2,t452-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,2,t453-sl2-p51-r42,18 Se Circulator,1,42,Rt18_Southeast_Circulator
+17,3,t447-sl3-p92-r46,18 Se Circulator,1,602,Rt18_Southeast_Circulator
+17,3,t448-sl3-p92-r46,18 Se Circulator,1,602,Rt18_Southeast_Circulator
+17,3,t450-sl3-p92-r46,18 Se Circulator,1,602,Rt18_Southeast_Circulator
+17,3,t451-sl3-p92-r46,18 Se Circulator,1,602,Rt18_Southeast_Circulator
+17,3,t452-sl3-p92-r46,18 Se Circulator,1,602,Rt18_Southeast_Circulator
+17,3,t454-sl3-p52-r46,18 Se Circulator,1,602,Rt18_Southeast_Circulator
+17,4,t447-sl4-p93-r79,18 Se Circulator,1,711,Rt18_Southeast_Circulator
+17,4,t448-sl4-p93-r79,18 Se Circulator,1,711,Rt18_Southeast_Circulator
+17,4,t450-sl4-p93-r79,18 Se Circulator,1,711,Rt18_Southeast_Circulator
+17,4,t451-sl4-p93-r79,18 Se Circulator,1,711,Rt18_Southeast_Circulator
+17,4,t452-sl4-p93-r79,18 Se Circulator,1,711,Rt18_Southeast_Circulator
+17,4,t454-sl4-p53-r79,18 Se Circulator,1,711,Rt18_Southeast_Circulator
+18,2,t455-sl2-p54-r19,19 S Connector,1,19,Rt19_South_City_Connector
+18,2,t456-sl2-p54-r3,19 S Connector,1,3,Rt19_South_City_Connector
+18,2,t457-sl2-p94-r15,19 S Connector,1,15,Rt19_South_City_Connector
+18,2,t458-sl2-p94-r17,19 S Connector,1,17,Rt19_South_City_Connector
+18,2,t459-sl2-p94-r29,19 S Connector,1,29,Rt19_South_City_Connector
+18,2,t460-sl2-p94-r15,19 S Connector,1,15,Rt19_South_City_Connector
+18,2,t461-sl2-p94-r19,19 S Connector,1,19,Rt19_South_City_Connector
+18,2,t462-sl2-p94-r11,19 S Connector,1,11,Rt19_South_City_Connector
+18,2,t463-sl2-p94-r25,19 S Connector,1,25,Rt19_South_City_Connector
+18,2,t464-sl2-p94-r7,19 S Connector,1,7,Rt19_South_City_Connector
+18,2,t465-sl2-p94-r25,19 S Connector,1,25,Rt19_South_City_Connector
+18,2,t466-sl2-p94-r3,19 S Connector,1,3,Rt19_South_City_Connector
+18,2,t467-sl2-p94-r37,19 S Connector,1,37,Rt19_South_City_Connector
+18,2,t468-sl2-p94-r5,19 S Connector,1,5,Rt19_South_City_Connector
+18,2,t469-sl2-p94-r16,19 S Connector,1,16,Rt19_South_City_Connector
+18,2,t470-sl2-p94-r18,19 S Connector,1,18,Rt19_South_City_Connector
+18,2,t471-sl2-p94-r24,19 S Connector,1,24,Rt19_South_City_Connector
+18,2,t472-sl2-p94-r30,19 S Connector,1,30,Rt19_South_City_Connector
+18,2,t473-sl2-p94-r26,19 S Connector,1,26,Rt19_South_City_Connector
+18,2,t474-sl2-p94-r24,19 S Connector,1,24,Rt19_South_City_Connector
+18,2,t475-sl2-p94-r30,19 S Connector,1,30,Rt19_South_City_Connector
+18,2,t476-sl2-p94-r14,19 S Connector,1,14,Rt19_South_City_Connector
+18,2,t477-sl2-p94-r20,19 S Connector,1,20,Rt19_South_City_Connector
+18,2,t478-sl2-p94-r10,19 S Connector,1,10,Rt19_South_City_Connector
+18,2,t479-sl2-p94-r16,19 S Connector,1,16,Rt19_South_City_Connector
+18,2,t480-sl2-p94-r18,19 S Connector,1,18,Rt19_South_City_Connector
+18,2,t481-sl2-p94-r8,19 S Connector,1,8,Rt19_South_City_Connector
+18,2,t482-sl2-p94-r22,19 S Connector,1,22,Rt19_South_City_Connector
+18,3,t458-sl3-p55-r49,19 S Connector,1,605,Rt19_South_City_Connector
+18,3,t460-sl3-p55-r51,19 S Connector,1,607,Rt19_South_City_Connector
+18,3,t462-sl3-p55-r67,19 S Connector,1,623,Rt19_South_City_Connector
+18,3,t464-sl3-p55-r49,19 S Connector,1,605,Rt19_South_City_Connector
+18,3,t466-sl3-p55-r52,19 S Connector,1,608,Rt19_South_City_Connector
+18,3,t468-sl3-p55-r68,19 S Connector,1,624,Rt19_South_City_Connector
+18,3,t470-sl3-p55-r49,19 S Connector,1,605,Rt19_South_City_Connector
+18,3,t472-sl3-p55-r52,19 S Connector,1,608,Rt19_South_City_Connector
+18,3,t474-sl3-p55-r68,19 S Connector,1,624,Rt19_South_City_Connector
+18,3,t476-sl3-p55-r50,19 S Connector,1,606,Rt19_South_City_Connector
+18,3,t478-sl3-p55-r52,19 S Connector,1,608,Rt19_South_City_Connector
+18,3,t480-sl3-p55-r68,19 S Connector,1,624,Rt19_South_City_Connector
+18,4,t464-sl4-p56-r74,19 S Connector,1,706,Rt19_South_City_Connector
+18,4,t466-sl4-p56-r75,19 S Connector,1,707,Rt19_South_City_Connector
+18,4,t468-sl4-p56-r75,19 S Connector,1,707,Rt19_South_City_Connector
+18,4,t470-sl4-p56-r74,19 S Connector,1,706,Rt19_South_City_Connector
+18,4,t472-sl4-p56-r71,19 S Connector,1,703,Rt19_South_City_Connector
+18,4,t474-sl4-p56-r75,19 S Connector,1,707,Rt19_South_City_Connector
+18,4,t476-sl4-p56-r74,19 S Connector,1,706,Rt19_South_City_Connector
