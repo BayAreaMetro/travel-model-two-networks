@@ -1,4 +1,0 @@
-fare_id,price,currency_type,payment_method,transfers,transfer_duration
-200514,9.00,USD,1,0,
-200515,11.50,USD,1,0,
-200516,11.50,USD,1,0,
