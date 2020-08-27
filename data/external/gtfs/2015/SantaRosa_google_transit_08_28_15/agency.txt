@@ -1,0 +1,2 @@
+agency_id,agency_name,agency_url,agency_timezone,agency_lang,agency_phone,agency_fare_url
+ SRCityBus,Santa Rosa CityBus,http://ci.santa-rosa.ca.us/departments/transit/CityBus/Pages/default.aspx,America/Los_Angeles,en,707-543-3333,http://ci.santa-rosa.ca.us/departments/transit/citybus/Pages/Fares.aspx

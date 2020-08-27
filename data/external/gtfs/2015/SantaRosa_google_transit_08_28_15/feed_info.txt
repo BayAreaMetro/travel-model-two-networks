@@ -1,0 +1,2 @@
+feed_publisher_name,feed_publisher_url,feed_lang,feed_start_date,feed_end_date,feed_version
+Santa Rosa CityBus,http://ci.santa-rosa.ca.us/departments/transit/citybus/Pages/TripPlanner2.aspx,en,20150624,20160130,20150624

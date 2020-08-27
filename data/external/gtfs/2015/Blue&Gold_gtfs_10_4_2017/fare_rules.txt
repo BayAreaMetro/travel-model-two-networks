@@ -1,0 +1,4 @@
+fare_id,route_id
+245200,Angel Island
+245203,Sausalito
+245206,Tiburon
