@@ -6,7 +6,8 @@ output: html_notebook
 # Overhead
 ```{r overhead, include = FALSE}
 packages_vector <- c("tidyverse",
-                     "arrow")
+                     "arrow",
+                     "stringdist")
 
 need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
 
@@ -24,6 +25,8 @@ interim_dir <- "../../data/interim/"
 lasso_lookup_dir <- "../../../mtc-Lasso/mtc_data/lookups/"
 
 links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
+
+conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 
 output_legacy_tm2_file_name <- paste0(lasso_lookup_dir, "legacy_tm2_attributes.csv")
 output_tam_tm2_file_name <- paste0(lasso_lookup_dir, "tam_tm2_attributes.csv")
@@ -62,6 +65,7 @@ ft_dict_df <- tibble(code = seq(0, 7),
 # Data Reads
 ```{r read}
 links_df <- read_feather(links_file_name)
+conflation_df <- read_csv(conflation_file_name, col_types = cols(.default = col_character()))
 ```
 
 # Reductions 
@@ -101,37 +105,83 @@ osm_df <- links_df %>%
   mutate(max_lanes = if_else(str_detect(lanes_str, "12"), 12L, max_lanes)) %>%
   filter(!is.na(min_lanes)) %>%
   select(shstReferenceId, min_lanes, max_lanes)
+
+osm_names_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(shstReferenceId, name) %>%
+  mutate(name = str_replace(name, "\\[", "")) %>%
+  mutate(name = str_replace(name, "\\]", "")) %>%
+  mutate(name = str_replace_all(name, "'", "")) %>%
+  separate(name, 
+           into = sprintf("%02d", seq(1:5)), 
+           sep = ",",
+           remove = TRUE,
+           extra = "drop",
+           fill = "right") %>%
+  pivot_longer(cols = -c(shstReferenceId),
+               names_to = "index",
+               values_to = "name") %>%
+  select(-index) %>%
+  mutate(name = trimws(name)) %>%
+  filter(!is.na(name)) %>%
+  filter(name != "nan") %>%
+  filter(name != "") %>%
+  distinct(shstReferenceId, name) %>%
+  group_by(shstReferenceId) %>%
+  mutate(index = row_number()) %>%
+  ungroup() %>%
+  pivot_wider(id_cols = shstReferenceId,
+              names_prefix = "name_",
+              names_from = index,
+              values_from = name) %>%
+  mutate(name = if_else(is.na(name_2), name_1, paste0(name_1, "/", name_2))) %>%
+  mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
+  mutate(simple_name = str_replace(name, " Avenue", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Street", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Drive", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Boulevard", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Way", "")) %>%
+  select(shstReferenceId, name, simple_name)
   
-legacy_df <- links_df %>%
+legacy_df <- conflation_df %>%
   filter(!is.na(TM2_A)) %>%
   select(shstReferenceId, 
-         shstGeometryId,
          A_node = TM2_A,
          B_node = TM2_B,
          code = TM2_FT,
          lanes = TM2_LANES,
          assignable = TM2_ASSIGNABLE) %>%
+  mutate_at(vars(matches(c("A_node",
+                           "B_node",
+                           "code",
+                           "lanes",
+                           "assignable"))), 
+            as.integer) %>%
   left_join(., ft_dict_df, by = c("code")) %>%
   rename(ft = label) %>%
   select(-code)
 
-tam_df <- links_df %>%
+tam_df <- conflation_df %>%
   filter(!is.na(TM2Marin_A)) %>%
   select(shstReferenceId, 
-         shstGeometryId,
          A_node = TM2Marin_A,
          B_node = TM2Marin_B,
          code = TM2Marin_FT,
          lanes = TM2Marin_LANES,
          assignable = TM2Marin_ASSIGNABLE) %>%
+  mutate_at(vars(matches(c("A_node",
+                           "B_node",
+                           "code",
+                           "lanes",
+                           "assignable"))), 
+            as.integer) %>%
   left_join(., ft_dict_df, by = c("code")) %>%
   rename(ft = label) %>%
   select(-code)
 
 # TODO: add and filter PeMS id 
-pems_df <- links_df %>%
+pems_df <- conflation_df %>%
   select(shstReferenceId,
-         shstGeometryId,
          contains("pems")) %>%
   mutate(pems_ft = as.character(NA)) %>%
   mutate(pems_ft = if_else(is.na(pems_lanes_FR), pems_ft, "Ramp")) %>%
@@ -149,35 +199,45 @@ pems_df <- links_df %>%
   rename(ft = pems_ft, lanes = pems_lanes) %>%
   filter(!is.na(lanes))
   
-tom_df <- links_df %>%
-  filter(!is.na(TM2Marin_A)) %>%
+# TODO: add F_JNCTID and T_JNCTID
+tom_df <- conflation_df %>%
+  filter(!is.na(tomtom_unique_id)) %>%
   select(shstReferenceId, 
-         shstGeometryId,
          tom_id = tomtom_unique_id,
-         F_JNCTID,
-         T_JNCTID,
          code = tomtom_FRC,
          lanes = tomtom_lanes,
          tomtom_shieldnum,
          tomtom_rtedir) %>%
+    mutate_at(vars(matches(c("code","lanes"))), as.integer) %>%
   left_join(., frc_dict_df, by = c("code")) %>%
   rename(ft = label) %>%
   select(-code) %>%
   mutate(name = paste0(tomtom_shieldnum, " ", tomtom_rtedir)) %>%
   select(-tomtom_shieldnum, -tomtom_rtedir)
   
-sfcta_df <- links_df %>%
+sfcta_df <- conflation_df %>%
   filter(!is.na(sfcta_A)) %>%
   select(shstReferenceId, 
-         shstGeometryId,
          A_node = sfcta_A,
          B_node = sfcta_B,
          lanes_am = sfcta_LANE_AM,
          lanes_md = sfcta_LANE_OP,
          lanes_pm = sfcta_LANE_PM,
          name = sfcta_STREETNAME) %>%
+    mutate_at(vars(matches(c("A_node",
+                           "B_node",
+                           "lanes_am",
+                           "lanes_md",
+                           "lanes_pm"))), 
+            as.integer) %>%
   mutate(min_lanes = pmin(lanes_am, lanes_md, lanes_pm)) %>%
-  mutate(max_lanes = pmax(lanes_am, lanes_md, lanes_pm))
+  mutate(max_lanes = pmax(lanes_am, lanes_md, lanes_pm)) %>%
+  left_join(., select(osm_names_df, shstReferenceId, simple_name), by = c("shstReferenceId")) %>%
+  rowwise() %>%
+  mutate(osm_sfcta_names_dist = if_else(is.na(name), 100.0, stringdist(tolower(name), tolower(simple_name)))) %>%
+  ungroup() %>%
+  mutate(osm_sfcta_names_dist = replace_na(osm_sfcta_names_dist, 100.0)) %>%
+  select(-simple_name) 
   
 ```
 
