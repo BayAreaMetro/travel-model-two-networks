@@ -37,6 +37,7 @@ centroid_file_name <- paste0(interim_dir, "shape_centroid.feather")
 output_file_name <- paste0(interim_dir, "facility-type-viewer.geojson")
 output_residential_file_name <- paste0(interim_dir, "facility-type-viewer-residential.geojson")
 output_bus_only_file_name <- paste0(interim_dir, "bus-only-viewer.geojson")
+output_freeway_file_name <- paste0(interim_dir, "freeway-lane-viewer.geojson")
 ```
 
 # Parameters
@@ -228,6 +229,9 @@ output_sf <- working_sf %>%
   filter(!(osm_ft %in% c("service", "residential"))) %>%
   left_join(., centroid_df, by = c("shstGeometryId"))
 
+output_freeway_sf <- output_sf %>%
+  filter(osm_ft %in% c("motorway", "motorway_link"))
+
 output_residential_sf <- working_sf %>%
   filter(drive_access == 1) %>%
   filter(osm_ft %in% c("service", "residential")) %>%
@@ -245,8 +249,10 @@ output_bus_only_sf <- working_sf %>%
 # Write
 ```{r write}
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
+st_write(output_freeway_sf, output_freeway_file_name, delete_dsn = TRUE)
 st_write(output_residential_sf, output_residential_file_name, delete_dsn = TRUE)
 st_write(output_bus_only_sf, output_bus_only_file_name, delete_dsn = TRUE)
+
 ```
 
 
