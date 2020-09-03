@@ -1,0 +1,10 @@
+route_id,direction_id,direction
+11100,1,Outbound
+11100,0,Inbound
+11099,1,Outbound
+11099,0,Inbound
+11097,0,Loop
+11096,0,Loop
+11095,0,Loop
+11092,1,Outbound
+11092,0,Inbound

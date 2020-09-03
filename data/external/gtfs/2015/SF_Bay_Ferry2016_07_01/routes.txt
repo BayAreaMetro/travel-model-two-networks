@@ -1,0 +1,7 @@
+agency_id,route_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color
+SB,3,Vallejo Ferry,Vallejo - San Francisco,"Ferry service between Vallejo, the San Francisco Ferry Building, and Pier 41.",4,http://sanfranciscobayferry.com/route/vallejo/sffb,FFFFFF,000000
+SB,2,Harbor Bay Ferry,Harbor Bay - San Francisco Ferry Building,Ferry service between Harbor Bay and the San Francisco Ferry Building. Weekdays only.,4,http://sanfranciscobayferry.com/route/hbi/sffb,FFFFFF,000000
+SB,1,Alameda Oakland Ferry,Alameda - Oakland - San Francisco Ferry,"Ferry service between Alameda Main St, Oakland Jack London Square, the San Francisco Ferry Building, and Pier 41.",4,http://sanfranciscobayferry.com/route/alameda/sffb,FFFFFF,000000
+SB,200,Rt 200 Vallejo Bus,Rt 200 Bus (Vallejo ferry service),Supplemental bus service between Vallejo and the San Francisco Ferry Building (part of the Vallejo ferry service).,4,http://sanfranciscobayferry.com/route/vallejo/sffb,FFFFFF,000000
+SB,5,South SF - East Bay Ferry,South SF - Alameda - Oakland,"Ferry service between Alameda Main St, Oakland Jack London Square, and South San Francisco at Oyster Point.",4,http://sanfranciscobayferry.com/route/ssf/sffb,FFFFFF,000000
+SB,4,South SF - SF Ferry,South San Francisco - San Francisco Ferry Building,Ferry service between South San Francisco at Oyster Point and the San Francisco Ferry Building. Weekdays only.,4,http://sanfranciscobayferry.com/route/ssf/sffb,FFFFFF,000000

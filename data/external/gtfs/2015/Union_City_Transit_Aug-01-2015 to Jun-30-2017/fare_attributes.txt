@@ -1,0 +1,11 @@
+fare_id,price,currency_type,payment_method,transfers,transfer_duration
+<<<<<<< HEAD
+Reg,2,USD,0,1,5400
+=======
+<<<<<<< HEAD:data/external/gtfs/2015/SantaRosa_google_transit_08_28_15/fare_attributes.txt
+Adult,1.25,USD,0,,7200
+
+=======
+Reg,2,USD,0,1,5400
+>>>>>>> master:data/external/gtfs/2015/Union_City_Transit_Aug-01-2015 to Jun-30-2017/fare_attributes.txt
+>>>>>>> master

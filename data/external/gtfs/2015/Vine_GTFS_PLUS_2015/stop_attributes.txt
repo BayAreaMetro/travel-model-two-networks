@@ -1,0 +1,278 @@
+stop_id,accessibility_id,cardinal_direction,relative_position,stop_city
+89195,,,,Napa
+89196,,,,Napa
+89211,,,,Vallejo
+89213,,,,Vallejo
+89187,,,,Napa
+89140,,,,Napa
+89175,,,,Yountville
+89166,,,,St Helena
+89160,,,,Calistoga
+89151,,,,Napa
+89156,,,,Napa
+89264,,,,American Canyon
+89004,,,,Napa
+89006,,,,Napa
+89023,,,,Napa
+89019,,,,Napa
+89015,,,,Napa
+89082,,,,Napa
+89129,,,,Napa
+89139,,,,Napa
+89045,,,,Napa
+89220,,,,American Canyon
+89069,,,,Napa
+89065,,,,Napa
+89072,,,,Napa
+89056,,,,Napa
+89116,,,,Napa
+89163,,,,Calistoga
+89170,,,,Rutherford
+89171,,,,Oakville
+89248,,,,Yountville
+89225,,,,American Canyon
+89202,,,,American Canyon
+89051,,,,Napa
+89212,,,,Vallejo
+89269,,,,Sonoma
+89001,,,,Napa
+89014,,,,Napa
+89005,,,,Napa
+89002,,,,Napa
+89003,,,,Napa
+89016,,,,Napa
+89059,,,,Napa
+89018,,,,Napa
+89017,,,,Napa
+89060,,,,Napa
+89102,,,,Napa
+89265,,,,American Canyon
+89204,,,,American Canyon
+89130,,,,Napa
+89089,,,,Napa
+89258,,,,Calistoga
+89208,,,,Vallejo
+89010,,,,Napa
+89011,,,,Napa
+89007,,,,Napa
+89148,,,,Napa
+89150,,,,Napa
+89149,,,,Napa
+89147,,,,Napa
+89111,,,,Napa
+89110,,,,Napa
+89058,,,,Napa
+89057,,,,Napa
+89054,,,,Napa
+89055,,,,Napa
+89053,,,,Napa
+89229,,,,Napa
+89197,,,,Napa
+89198,,,,Napa
+89227,,,,Napa
+89228,,,,Napa
+89199,,,,Napa
+89223,,,,American Canyon
+89261,,,,Calistoga
+89081,,,,Napa
+89083,,,,Napa
+89101,,,,Napa
+89080,,,,Napa
+89079,,,,Napa
+89100,,,,Napa
+89267,,,,El Cerrito
+89203,,,,American Canyon
+89222,,,,American Canyon
+89206,,,,American Canyon
+89219,,,,Vallejo
+89028,,,,Napa
+89026,,,,Napa
+89027,,,,Napa
+89043,,,,Napa
+89044,,,,Napa
+89037,,,,Napa
+89050,,,,Napa
+89075,,,,Napa
+89031,,,,Napa
+89040,,,,Napa
+89164,,,,St Helena
+89168,,,,St Helena
+89253,,,,St Helena
+89161,,,,Calistoga
+89260,,,,Calistoga
+89257,,,,St Helena
+89162,,,,Calistoga
+89259,,,,Calistoga
+89165,,,,St Helena
+89167,,,,St Helena
+89169,,,,St Helena
+89262,,,,Calistoga
+89252,,,,St Helena
+89200,,,,American Canyon
+89068,,,,Napa
+89052,,,,Napa
+89049,,,,Napa
+89046,,,,Napa
+89048,,,,Napa
+89047,,,,Napa
+89268,,,,Napa
+89159,,,,Napa
+89119,,,,Napa
+89103,,,,Napa
+89104,,,,Napa
+89093,,,,Napa
+89105,,,,Napa
+89142,,,,Napa
+89158,,,,Napa
+89033,,,,Napa
+89118,,,,Napa
+89107,,,,Napa
+89106,,,,Napa
+89117,,,,Napa
+89154,,,,Napa
+89038,,,,Napa
+89039,,,,Napa
+89155,,,,Napa
+89095,,,,Napa
+89108,,,,Napa
+89153,,,,Napa
+89094,,,,Napa
+89109,,,,Napa
+89143,,,,Napa
+89157,,,,Napa
+89144,,,,Napa
+89124,,,,Napa
+89210,,,,Vallejo
+89214,,,,Vallejo
+89230,,,,Napa
+89073,,,,Napa
+89074,,,,Napa
+89021,,,,Napa
+89022,,,,Napa
+89020,,,,Napa
+89066,,,,Napa
+89025,,,,Napa
+89024,,,,Napa
+89086,,,,Napa
+89097,,,,Napa
+89098,,,,Napa
+89137,,,,Napa
+89084,,,,Napa
+89099,,,,Napa
+89085,,,,Napa
+89138,,,,Napa
+89127,,,,Napa
+89128,,,,Napa
+89126,,,,Napa
+89254,,,,St Helena
+89256,,,,St Helena
+89088,,,,Napa
+89087,,,,Napa
+89226,,,,American Canyon
+89250,,,,Oakville
+89042,,,,Napa
+89029,,,,Napa
+89032,,,,Napa
+89030,,,,Napa
+89041,,,,Napa
+89123,,,,Napa
+89121,,,,Napa
+89122,,,,Napa
+89090,,,,Napa
+89034,,,,Napa
+89035,,,,Napa
+89036,,,,Napa
+89131,,,,Napa
+89132,,,,Napa
+89133,,,,Napa
+89113,,,,Napa
+89120,,,,Napa
+89201,,,,American Canyon
+89224,,,,American Canyon
+89251,,,,Rutherford
+89152,,,,Napa
+89067,,,,Napa
+89064,,,,Napa
+89063,,,,Napa
+89181,,,,Napa
+89182,,,,Napa
+89241,,,,Napa
+89177,,,,Napa
+89136,,,,Napa
+89243,,,,Napa
+89178,,,,Napa
+89244,,,,Napa
+89176,,,,Napa
+89246,,,,Napa
+89134,,,,Napa
+89179,,,,Napa
+89135,,,,Napa
+89180,,,,Napa
+89242,,,,Napa
+89216,,,,Vallejo
+89189,,,,Napa
+89194,,,,Napa
+89235,,,,Napa
+89232,,,,Napa
+89237,,,,Napa
+89190,,,,Napa
+89233,,,,Napa
+89231,,,,Napa
+89192,,,,Napa
+89188,,,,Napa
+89236,,,,Napa
+89077,,,,Napa
+89193,,,,Napa
+89078,,,,Napa
+89234,,,,Napa
+89191,,,,Napa
+89076,,,,Napa
+89238,,,,Napa
+89255,,,,St Helena
+89061,,,,Napa
+89071,,,,Napa
+89070,,,,Napa
+89062,,,,Napa
+89112,,,,Napa
+89092,,,,Napa
+89185,,,,Napa
+89114,,,,Napa
+89184,,,,Napa
+89239,,,,Napa
+89186,,,,Napa
+89240,,,,Napa
+89183,,,,Napa
+89145,,,,Napa
+89146,,,,Napa
+89125,,,,Napa
+89209,,,,Vallejo
+89215,,,,Vallejo
+89091,,,,Napa
+89172,,,,Yountville
+89249,,,,Yountville
+89174,,,,Yountville
+89247,,,,Yountville
+89173,,,,Yountville
+89263,,,,Yountville
+89297,,,,Napa
+89294,,,,Napa
+89296,,,,Napa
+89300,,,,Napa
+89299,,,,Napa
+89013,,,,Napa
+89295,,,,Napa
+89304,,,,Napa
+89298,,,,Napa
+89301,,,,Napa
+89305,,,,Suisun City
+89306,,,,Fairfield
+89245,,,,Napa
+89307,,,,Napa
+89302,,,,St Helena
+89309,,,,
+89310,,,,
+89311,,,,
+89312,,,,
+89313,,,,
+89314,,,,
+89315,,,,

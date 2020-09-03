@@ -1,0 +1,88 @@
+timetable_id,route_id,direction_id,start_date,end_date,monday,tuesday,wednesday,thursday,friday,saturday,sunday,route_label,service_notes,direction_label
+1,2668,0,20150101,20160101,0,0,0,0,0,0,0,BayView - Richmond Parkway Transit Center,Modified Holiday Service,Northbound
+2,2668,0,20150101,20160101,1,1,1,1,1,0,0,BayView - Richmond Parkway Transit Center,Year Round Calendar,Northbound
+3,2668,1,20150101,20160101,0,0,0,0,0,0,0,BayView - Richmond Parkway Transit Center,Modified Holiday Service,Southbound
+4,2668,1,20150101,20160101,1,1,1,1,1,0,0,BayView - Richmond Parkway Transit Center,Year Round Calendar,Southbound
+5,2659,0,20150101,20160101,0,0,0,0,0,0,0,Crockett - Rodeo - Hercules,Modified Holiday Service,Eastbound
+6,2659,0,20150101,20160101,0,0,0,0,0,1,0,Crockett - Rodeo - Hercules,Routes 11 & 19 Saturday Service,Eastbound
+7,2659,0,20150101,20160101,1,1,1,1,1,0,0,Crockett - Rodeo - Hercules,Year Round Calendar,Eastbound
+8,2659,1,20150101,20160101,0,0,0,0,0,0,0,Crockett - Rodeo - Hercules,Modified Holiday Service,Westbound
+9,2659,1,20150101,20160101,0,0,0,0,0,1,0,Crockett - Rodeo - Hercules,Routes 11 & 19 Saturday Service,Westbound
+10,2659,1,20150101,20160101,1,1,1,1,1,0,0,Crockett - Rodeo - Hercules,Year Round Calendar,Westbound
+11,2655,0,20150101,20160101,0,0,0,0,0,0,0,Gems and Birds,Modified Holiday Service,No direction
+12,2655,0,20150101,20160101,1,1,1,1,1,0,0,Gems and Birds,Year Round Calendar,No direction
+13,2655,0,20150824,20151218,1,1,0,1,1,0,0,Gems and Birds,School Calendar,No direction
+14,2655,0,20150824,20151218,1,1,1,1,1,0,0,Gems and Birds,School Calendar,No direction
+15,2655,0,20160104,20160401,1,1,0,1,1,0,0,Gems and Birds,School Calendar,No direction
+16,2655,0,20160104,20160401,1,1,1,1,1,0,0,Gems and Birds,School Calendar,No direction
+17,2655,0,20160411,20160608,1,1,0,1,1,0,0,Gems and Birds,School Calendar,No direction
+18,2655,0,20160411,20160608,1,1,1,1,1,0,0,Gems and Birds,School Calendar,No direction
+19,2672,0,20150101,20160101,0,0,0,0,0,1,0,Hercules - Pinole - Richmond Parkway Transit Center - Hilltop Mall,Routes 11 & 19 Saturday Service,Northbound
+20,2672,1,20150101,20160101,0,0,0,0,0,1,0,Hercules - Pinole - Richmond Parkway Transit Center - Hilltop Mall,Routes 11 & 19 Saturday Service,Southbound
+21,2700,0,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - El Cerrito del Norte BART,Modified Holiday Service,Northbound
+22,2700,0,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - El Cerrito del Norte BART,JX Year Round Service,Northbound
+23,2700,1,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - El Cerrito del Norte BART,Modified Holiday Service,Southbound
+24,2700,1,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - El Cerrito del Norte BART,JX Year Round Service,Southbound
+25,2702,0,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - El Cerrito del Norte BART,Modified Holiday Service,Northbound
+26,2702,0,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - El Cerrito del Norte BART,Year Round Calendar,Northbound
+27,2702,1,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - El Cerrito del Norte BART,Modified Holiday Service,Southbound
+28,2702,1,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - El Cerrito del Norte BART,Year Round Calendar,Southbound
+29,2706,0,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - Martinez,Modified Holiday Service,Eastbound
+30,2706,0,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Martinez,Year Round Calendar,Eastbound
+31,2706,1,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - Martinez,Modified Holiday Service,Westbound
+32,2706,1,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Martinez,Year Round Calendar,Westbound
+33,2674,0,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - Pinole - Contra Costa College,Modified Holiday Service,Eastbound
+34,2674,0,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Contra Costa College,Year Round Calendar,Eastbound
+35,2674,1,20150101,20160101,0,0,0,0,0,0,0,Hercules Transit Center - Pinole - Contra Costa College,Modified Holiday Service,Westbound
+36,2674,1,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Contra Costa College,Year Round Calendar,Westbound
+37,2689,0,20150101,20160101,0,0,0,0,0,0,1,Hercules Transit Center - Pinole - Richmond - BART,Express J,Northbound
+38,2689,0,20150101,20160101,0,0,0,0,0,1,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Northbound
+39,2689,0,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Northbound
+40,2689,1,20150101,20160101,0,0,0,0,0,0,1,Hercules Transit Center - Pinole - Richmond - BART,Express J,Southbound
+41,2689,1,20150101,20160101,0,0,0,0,0,1,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Southbound
+42,2689,1,20150101,20160101,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Year Round Calendar,Southbound
+43,2689,1,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Southbound
+44,2696,0,20150101,20160101,0,0,0,0,0,0,1,Hercules Transit Center - Pinole - Richmond - BART,Express J,Northbound
+45,2696,0,20150101,20160101,0,0,0,0,0,1,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Northbound
+46,2696,0,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Northbound
+47,2696,1,20150101,20160101,0,0,0,0,0,0,1,Hercules Transit Center - Pinole - Richmond - BART,Express J,Southbound
+48,2696,1,20150101,20160101,0,0,0,0,0,1,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Southbound
+49,2696,1,20150101,20160101,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J,Southbound
+50,2689,0,20150824,20151218,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Northbound
+51,2696,0,20150824,20151218,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Northbound
+52,2696,1,20150824,20151218,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Southbound
+53,2696,0,20151219,20160103,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J Non-school day calendar,Northbound
+54,2689,0,20160104,20160401,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Northbound
+55,2696,0,20160104,20160401,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Northbound
+56,2696,1,20160104,20160401,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Southbound
+57,2696,0,20160402,20160410,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J Non-school day calendar,Northbound
+58,2689,0,20160411,20160608,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Northbound
+59,2696,0,20160411,20160608,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Northbound
+60,2696,1,20160411,20160608,1,1,0,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,School Calendar,Southbound
+61,2696,0,20160609,20160823,1,1,1,1,1,0,0,Hercules Transit Center - Pinole - Richmond - BART,Express J Non-school day calendar,Northbound
+62,2666,0,20150101,20160101,0,0,0,0,0,0,0,Pinole Valley - Old Town Pinole - Richmond Parkway Transit Center,Modified Holiday Service,Eastbound
+63,2666,0,20150101,20160101,1,1,1,1,1,0,0,Pinole Valley - Old Town Pinole - Richmond Parkway Transit Center,Year Round Calendar,Eastbound
+64,2666,1,20150101,20160101,0,0,0,0,0,0,0,Pinole Valley - Old Town Pinole - Richmond Parkway Transit Center,Modified Holiday Service,Westbound
+65,2666,1,20150101,20160101,1,1,1,1,1,0,0,Pinole Valley - Old Town Pinole - Richmond Parkway Transit Center,Year Round Calendar,Westbound
+66,2676,0,20150101,20160101,0,0,0,0,0,0,0,Rodeo-Hercules-San Francisco Transbay Terminal,Lynx Limited Service,Northbound
+67,2676,0,20150101,20160101,1,1,1,1,1,0,0,Rodeo-Hercules-San Francisco Transbay Terminal,Year Round Calendar,Northbound
+68,2676,1,20150101,20160101,0,0,0,0,0,0,0,Rodeo-Hercules-San Francisco Transbay Terminal,Lynx Limited Service,Southbound
+69,2676,1,20150101,20160101,1,1,1,1,1,0,0,Rodeo-Hercules-San Francisco Transbay Terminal,Year Round Calendar,Southbound
+70,2664,0,20150101,20160101,0,0,0,0,0,0,0,Rodeo - Hercules (Viewpointe-North Shore Business Park),Modified Holiday Service,Eastbound
+71,2664,0,20150101,20160101,1,1,1,1,1,0,0,Rodeo - Hercules (Viewpointe-North Shore Business Park),Year Round Calendar,Eastbound
+72,2664,1,20150101,20160101,0,0,0,0,0,0,0,Rodeo - Hercules (Viewpointe-North Shore Business Park),Modified Holiday Service,Westbound
+73,2664,1,20150101,20160101,1,1,1,1,1,0,0,Rodeo - Hercules (Viewpointe-North Shore Business Park),Year Round Calendar,Westbound
+74,2670,0,20150101,20160101,0,0,0,0,0,0,0,Tara Hills - Richmond Parkway Transit Center - Hilltop Mall,Modified Holiday Service,Northbound
+75,2670,0,20150101,20160101,1,1,1,1,1,0,0,Tara Hills - Richmond Parkway Transit Center - Hilltop Mall,Year Round Calendar,Northbound
+76,2670,1,20150101,20160101,0,0,0,0,0,0,0,Tara Hills - Richmond Parkway Transit Center - Hilltop Mall,Modified Holiday Service,Southbound
+77,2670,1,20150101,20160101,1,1,1,1,1,0,0,Tara Hills - Richmond Parkway Transit Center - Hilltop Mall,Year Round Calendar,Southbound
+78,2661,0,20150101,20160101,0,0,0,0,0,0,0,Trees and Flowers,Modified Holiday Service,Eastbound
+79,2661,0,20150101,20160101,1,1,1,1,1,0,0,Trees and Flowers,Year Round Calendar,Eastbound
+80,2661,1,20150101,20160101,0,0,0,0,0,0,0,Trees and Flowers,Modified Holiday Service,Westbound
+81,2661,1,20150101,20160101,1,1,1,1,1,0,0,Trees and Flowers,Year Round Calendar,Westbound
+82,2661,1,20150824,20151218,1,1,0,1,1,0,0,Trees and Flowers,School Calendar,Westbound
+83,2661,1,20150824,20151218,1,1,1,1,1,0,0,Trees and Flowers,School Calendar,Westbound
+84,2661,1,20160104,20160401,1,1,0,1,1,0,0,Trees and Flowers,School Calendar,Westbound
+85,2661,1,20160104,20160401,1,1,1,1,1,0,0,Trees and Flowers,School Calendar,Westbound
+86,2661,1,20160411,20160608,1,1,0,1,1,0,0,Trees and Flowers,School Calendar,Westbound
+87,2661,1,20160411,20160608,1,1,1,1,1,0,0,Trees and Flowers,School Calendar,Westbound
