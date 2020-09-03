@@ -1,0 +1,258 @@
+---
+title: "Make Facility Type Viewer"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "tidyselect",
+                     "arrow",
+                     "sf",
+                     "stringdist")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+external_dir <- "../../data/external/"
+interim_dir <- "../../data/interim/"
+processed_dir <- "../../data/processed/" 
+
+links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
+shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
+conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
+
+centroid_file_name <- paste0(interim_dir, "shape_centroid.feather")
+
+output_file_name <- paste0(interim_dir, "facility-type-viewer.geojson")
+output_residential_file_name <- paste0(interim_dir, "facility-type-viewer-residential.geojson")
+output_bus_only_file_name <- paste0(interim_dir, "bus-only-viewer.geojson")
+output_freeway_file_name <- paste0(interim_dir, "freeway-lane-viewer.geojson")
+```
+
+# Parameters
+```{r parameters}
+frc_dict_df <- tibble(code = seq(-1, 8),
+                      label = c("Not Applicable",
+                                "Motorway, Freeway, or Other Major Road",
+                                "Major Road Less Important than a Motorway",
+                                "Other Major Road",
+                                "Secondary Road",
+                                "Local Connecting Road",
+                                "Local Road of High Importance",
+                                "Local Road",
+                                "Local Road of Minor Importance",
+                                "Other Road"))
+
+ft_dict_df <- tibble(code = seq(0, 7),
+                     label = c("Connector",
+                               "Freeway to Freeway",
+                               "Freeway",
+                               "Expressway",
+                               "Collector",
+                               "Ramp",
+                               "Special Facility",
+                               "Major Arterial"))
+```
+
+
+# Data Reads
+```{r read}
+shapes_sf <- readRDS(shape_file_name)
+links_df <- read_feather(links_file_name)
+centroid_df <- read_feather(centroid_file_name)
+conflation_df <- read_csv(conflation_file_name, col_types = cols(.default = col_character()))
+```
+
+# Reductions 
+```{r reductions}
+osm_one_way_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(shstReferenceId, one_way_string = oneWay) %>%
+  mutate(one_way = !str_detect(tolower(one_way_string), "false")) %>%
+  select(shstReferenceId, one_way)
+  
+
+osm_lanes_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(shstReferenceId, lanes_str = lanes) %>%
+  mutate(
+    min_lanes = case_when (
+      str_detect(lanes_str, "1") ~ 1L,
+      str_detect(lanes_str, "2") ~ 2L,
+      str_detect(lanes_str, "3") ~ 3L,
+      str_detect(lanes_str, "4") ~ 4L,
+      str_detect(lanes_str, "5") ~ 5L,
+      str_detect(lanes_str, "6") ~ 6L,
+      str_detect(lanes_str, "7") ~ 7L,
+      str_detect(lanes_str, "8") ~ 8L,
+      str_detect(lanes_str, "9") ~ 9L,
+      str_detect(lanes_str, "10") ~ 10L,
+      str_detect(lanes_str, "11") ~ 11L,
+      str_detect(lanes_str, "12") ~ 12L,
+      TRUE ~ as.integer(NA)
+    )
+  ) %>%
+  mutate(max_lanes = as.integer(NA)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "1"), 1L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "2"), 2L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "3"), 3L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "4"), 4L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "5"), 5L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "6"), 6L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "7"), 7L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "8"), 8L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "9"), 9L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "10"), 10L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "11"), 11L, max_lanes)) %>%
+  mutate(max_lanes = if_else(str_detect(lanes_str, "12"), 12L, max_lanes)) %>%
+  select(shstReferenceId, osm_min_lanes = min_lanes, osm_max_lanes = max_lanes)
+
+osm_names_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(shstReferenceId, name) %>%
+  mutate(name = str_replace(name, "\\[", "")) %>%
+  mutate(name = str_replace(name, "\\]", "")) %>%
+  mutate(name = str_replace_all(name, "'", "")) %>%
+  separate(name, 
+           into = sprintf("%02d", seq(1:5)), 
+           sep = ",",
+           remove = TRUE,
+           extra = "drop",
+           fill = "right") %>%
+  pivot_longer(cols = -c(shstReferenceId),
+               names_to = "index",
+               values_to = "name") %>%
+  select(-index) %>%
+  mutate(name = trimws(name)) %>%
+  filter(!is.na(name)) %>%
+  filter(name != "nan") %>%
+  filter(name != "") %>%
+  distinct(shstReferenceId, name) %>%
+  group_by(shstReferenceId) %>%
+  mutate(index = row_number()) %>%
+  ungroup() %>%
+  pivot_wider(id_cols = shstReferenceId,
+              names_prefix = "name_",
+              names_from = index,
+              values_from = name) %>%
+  mutate(name = if_else(is.na(name_2), name_1, paste0(name_1, "/", name_2))) %>%
+  mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
+  mutate(simple_name = str_replace(name, " Avenue", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Street", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Drive", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Boulevard", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Way", "")) %>%
+  select(shstReferenceId, name, simple_name)
+
+conf_join_df <- conflation_df %>%
+  select(shstReferenceId, 
+         tom_lanes = tomtom_lanes,
+         tomtom_FRC,
+         tom_name = tomtom_name,
+         tom_shield = tomtom_shieldnum,
+         tom_rtedir = tomtom_rtedir,
+         tm2_ft = TM2_FT,
+         tm2_lanes = TM2_LANES,
+         marin_ft = TM2Marin_FT,
+         marin_lanes = TM2Marin_LANES,
+         sfcta_name = sfcta_STREETNAME,
+         sfcta_LANE_AM, 
+         sfcta_LANE_OP, 
+         sfcta_LANE_PM,
+         pems_lanes_FF,
+         pems_lanes_FR,
+         pems_lanes_HV,
+         pems_lanes_ML,
+         pems_lanes_OR) %>%
+  mutate_at(vars(matches(c("tom_lanes",
+                           "tom_FRC",
+                         "tm2_lanes",
+                         "tm2_ft",
+                         "marin_ft",
+                         "marin_lanes",
+                         "sfcta_LANE_AM",
+                         "sfcta_LANE_MD",
+                         "sfcta_LANE_OP",
+                         "pems_lanes_FF",
+                         "pems_lanes_FR",
+                         "pems_lanes_HV",
+                         "pems_lanes_ML",
+                         "pems_lanes_OR"))), as.integer)
+
+working_sf <- links_df %>%
+  select(shstReferenceId, 
+         drive_access,
+         shstGeometryId,
+         osm_ft = roadway) %>%
+  left_join(., conf_join_df, by = c("shstReferenceId")) %>%
+  mutate(sfcta_min_lanes = pmin(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM)) %>%
+  mutate(sfcta_max_lanes = pmax(sfcta_LANE_AM, sfcta_LANE_OP, sfcta_LANE_PM)) %>%
+  select(-sfcta_LANE_AM, -sfcta_LANE_OP, -sfcta_LANE_PM) %>%
+  mutate(pems_ft = as.character(NA)) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_FR), pems_ft, "Ramp")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_OR), pems_ft, "Ramp")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_FF), pems_ft, "Freeway-to-freeway")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_ML), pems_ft, "Freeway")) %>%
+  mutate(pems_ft = if_else(is.na(pems_lanes_HV), pems_ft, "Freeway")) %>%
+  mutate(pems_lanes = as.integer(NA)) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_FR), pems_lanes, as.integer(pems_lanes_FR))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_OR), pems_lanes, as.integer(pems_lanes_OR))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_FF), pems_lanes, as.integer(pems_lanes_FF))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_ML), pems_lanes, as.integer(pems_lanes_ML))) %>%
+  mutate(pems_lanes = if_else(is.na(pems_lanes_HV), pems_lanes, as.integer(pems_lanes_HV) + pems_lanes)) %>%
+  select(-pems_lanes_FF, -pems_lanes_FR, -pems_lanes_HV, -pems_lanes_ML, -pems_lanes_OR) %>%
+  left_join(., osm_lanes_df, by = c("shstReferenceId")) %>%
+  left_join(., osm_names_df, by = c("shstReferenceId")) %>%
+  left_join(., osm_one_way_df, by = c("shstReferenceId")) %>%
+  left_join(., frc_dict_df, by = c("tomtom_FRC" = "code")) %>%
+  rename(tom_ft = label) %>%
+  rowwise() %>%
+  mutate(osm_sfcta_names_dist = if_else(is.na(sfcta_name), 100.0, stringdist(tolower(sfcta_name), tolower(simple_name)))) %>%
+  ungroup() %>%
+  mutate(osm_sfcta_names_dist = replace_na(osm_sfcta_names_dist, 100.0)) %>%
+  select(-simple_name) %>%
+  left_join(., shapes_sf, by = c("shstGeometryId")) 
+
+output_sf <- working_sf %>%
+  filter(drive_access == 1) %>%
+  filter(!(osm_ft %in% c("service", "residential"))) %>%
+  left_join(., centroid_df, by = c("shstGeometryId"))
+
+output_freeway_sf <- output_sf %>%
+  filter(osm_ft %in% c("motorway", "motorway_link"))
+
+output_residential_sf <- working_sf %>%
+  filter(drive_access == 1) %>%
+  filter(osm_ft %in% c("service", "residential")) %>%
+  left_join(., centroid_df, by = c("shstGeometryId")) %>%
+  filter(county_name %in% c("Marin"))
+
+output_bus_only_sf <- working_sf %>%
+  filter(!(osm_ft %in% c("primary", "secondary", "tertiary", "trunk"))) %>%
+  select(shstReferenceId, shstGeometryId, osm_ft, geometry) %>%
+  left_join(., centroid_df, by = c("shstGeometryId")) %>%
+  filter(county_name %in% c("San Francisco", "Marin", "Sonoma"))
+
+```
+
+# Write
+```{r write}
+st_write(output_sf, output_file_name, delete_dsn = TRUE)
+st_write(output_freeway_sf, output_freeway_file_name, delete_dsn = TRUE)
+st_write(output_residential_sf, output_residential_file_name, delete_dsn = TRUE)
+st_write(output_bus_only_sf, output_bus_only_file_name, delete_dsn = TRUE)
+
+```
+
+

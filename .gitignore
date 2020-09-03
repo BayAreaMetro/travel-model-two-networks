@@ -4,6 +4,7 @@ vpr/*.net
 vpr/*.[0-9][0-9][0-9]
 .Rproj.user
 .Rhistory
+.Rprofile
 .DS_Store
 
 #folder
@@ -11,6 +12,13 @@ data/external/tomtom
 data/interim/tomtom
 data/interim/step3_join_shst_extraction_with_osm
 data/interim/step4_conflate_with_tomtom
+data/external/TM2_Marin
+data/external/TM2_nonMarin
+data/external/
+data/interim/tm2_Marin
+data/interim/tm2_nonMarin
+data/interim/sfcta
+data/interim/stclines
 
 #file
 data/interim/unmatched_tomtom.geojson
@@ -18,6 +26,13 @@ data/interim/link_not_conflated_with_tomtom.geojson
 data/interim/step5_tidy_roadway/*.geojson
 data/interim/step5_tidy_roadway/*.json
 *.ipynb
+!pems_conflation.ipynb
 *.twbr
 *.pyc
-data/interim/conflation_review_for_tableau.csv
+
+notebooks/other/.ipynb_checkpoints/*
+data/interim/facility-type-viewer-residential.geojson
+data/interim/step5_tidy_roadway/link.json
+data/interim/step5_tidy_roadway/node.geojson
+data/interim/step5_tidy_roadway/shape.geojson
+

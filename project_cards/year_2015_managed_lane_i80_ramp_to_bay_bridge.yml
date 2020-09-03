@@ -1,0 +1,37 @@
+project: Year 2015 Modify USE on I-80 WB to Bay Bridge Toll Plaza
+tags:
+  - 'Year 2015'
+  - 'Exclude Trucks'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - shStReferenceId:
+      - "5cb208be89de29c545b615a215e3b03d"
+      - "e0f8a9be8f36933b93e37c4034dbb282"
+  properties:
+  - property: use
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 1
+valid: false
