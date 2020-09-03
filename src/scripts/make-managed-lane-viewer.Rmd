@@ -1,0 +1,73 @@
+---
+title: "Make Facility Type Viewer"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "tidyselect",
+                     "arrow",
+                     "sf",
+                     "stringdist")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+external_dir <- "../../data/external/"
+interim_dir <- "../../data/interim/"
+processed_dir <- "../../data/processed/" 
+
+managed_file_name <- paste0(interim_dir, "Managed_Lanes_Database.csv")
+
+links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
+shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
+
+output_file_name <- paste0(interim_dir, "managed-lane-viewer.geojson")
+```
+
+# Parameters
+```{r parameters}
+
+```
+
+
+# Data Reads
+```{r read}
+shapes_sf <- readRDS(shape_file_name)
+links_df <- read_feather(links_file_name)
+managed_df <- read_csv(managed_file_name, col_types = cols(.default = col_character()))
+```
+
+# Reductions 
+```{r reductions}
+links_join_df <- links_df %>%
+  select(shstReferenceId = id, shstGeometryId, roadway) %>%
+  filter(roadway %in% c("motorway", "motorway_link", "trunk", "trunk_link")) 
+
+#TODO retain shstReferenceId
+output_sf <- managed_df %>%
+  select(shstGeometryId, corridor_name = roadName, managed_type = roadType, tom_rtedir = tomtom_rtedir) %>%
+  left_join(links_join_df, ., by = c("shstGeometryId")) %>%
+  left_join(., shapes_sf, by = c("shstGeometryId"))
+  
+
+
+```
+
+# Write
+```{r write}
+st_write(output_sf, output_file_name, delete_dsn = TRUE)
+```
+
+
