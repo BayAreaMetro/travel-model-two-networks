@@ -56,6 +56,9 @@ managed_out_df <- managed_df %>%
   filter(!(shstReferenceId == "7bb59b6716c8d22b38f90e1696461e5e" & roadType == "HOV_Lane")) %>%
   filter(!(shstReferenceId == "a1be9886a94386cc8d028bfd5a076ba4" & roadType == "HOV_Lane")) %>%
   filter(!(shstReferenceId == "d35424123c61127fcb906140f2e14b61" & roadType == "HOV_Lane")) %>%
+  filter(!(shstReferenceId == "42540cb7ed261fa5074bc659ba8caee2" & roadType == "HOV_Lane")) %>%
+  filter(!(shstReferenceId == "44745ac6ebae7a5b78ba6c4bccc43b68")) %>%
+  filter(!(shstReferenceId == "e5bab32b8697116f3e53cb25c1d897ac")) %>%
   filter(!(shstReferenceId == "9b89a5f78a4058d7c24bc96a351c5e60")) %>%
   filter(!(shstReferenceId == "1cbd597fa3a1fc54f1b4fb75986723f5")) %>%
   filter(!(shstReferenceId == "bf39e14aed29a2d0277570f83acd46ff")) %>%
@@ -74,7 +77,7 @@ managed_out_df <- managed_df %>%
   mutate(roadType = if_else(shstReferenceId == "541fc68091b15d8682c6b398e990af64", "Bridge_Pass", roadType)) %>%
   mutate(roadType = if_else(shstReferenceId == "f30dcff458c14bb7c63f6a6b7ecf4fb6", as.character(NA), roadType)) %>%
   mutate(bridge_detail = as.character(NA)) %>%
-  mutate(bridge_detail = if_else(shstReferenceId == "42540cb7ed261fa5074bc659ba8caee2", "Benicia HOV", bridge_detail)) %>%
+  mutate(bridge_detail = if_else(shstReferenceId == "42540cb7ed261fa5074bc659ba8caee2", "Benicia Bridge HOV", bridge_detail)) %>%
   mutate(bridge_detail = if_else(shstReferenceId == "217253518a29aa69c40a4114d557d24d", "Benicia General Purpose", bridge_detail)) %>%
   mutate(bridge_detail = if_else(shstReferenceId == "44e88bf3d040195167b31388d839122e", "Benicia Fastrak", bridge_detail)) %>%
   mutate(bridge_detail = if_else(shstReferenceId == "a1be9886a94386cc8d028bfd5a076ba4", "Bay Bridge HOV", bridge_detail)) %>%
@@ -84,15 +87,21 @@ managed_out_df <- managed_df %>%
             tibble(shstReferenceId = c("d35424123c61127fcb906140f2e14b61",
                                        "4e570e4d6b3e00ac9fb9af5808e8f2d3",
                                        "541fc68091b15d8682c6b398e990af64",
-                                       "e8a712ba58f30c910ff65a46eb6b605e"),
+                                       "e8a712ba58f30c910ff65a46eb6b605e",
+                                       "44745ac6ebae7a5b78ba6c4bccc43b68",
+                                       "e5bab32b8697116f3e53cb25c1d897ac"),
                    bridge_detail = c("Bay Bridge HOV",
                                      "Bay Bridge General Purpose",
                                      "Antioch Bridge",
-                                     "Richmond Bridge"),
+                                     "Richmond Bridge",
+                                     "Benicia Bridge HOV",
+                                     "Benicia Bridge HOV"),
                    roadType = c(as.character(NA),
                                 "Bridge_Pass",
                                 "Bridge_Pass",
-                                "Bridge_Pass")))
+                                "Bridge_Pass",
+                                as.character(NA),
+                                as.character(NA))))
   
 ```
 
