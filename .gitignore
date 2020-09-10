@@ -25,6 +25,8 @@ data/interim/unmatched_tomtom.geojson
 data/interim/link_not_conflated_with_tomtom.geojson
 data/interim/step5_tidy_roadway/*.geojson
 data/interim/step5_tidy_roadway/*.json
+data/interim/step6_gtfs/*.geojson
+data/interim/step6_gtfs/*.json
 *.ipynb
 !pems_conflation.ipynb
 *.twbr
