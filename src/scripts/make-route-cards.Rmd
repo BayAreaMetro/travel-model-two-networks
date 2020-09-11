@@ -36,8 +36,8 @@ VERSION <- "version_01"
 ```{r read}
 routes_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "routes.txt"), col_types = "ccccciccccccccci")
 freq_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "frequencies.txt"), col_types = "iitt")
-trips_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "trips.txt"), col_types = "cciciiccccccccccciii")
-stops_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "stops.txt"), col_types  = "icccddcccci")
+trips_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "trips.txt"), col_types = "ccncnncccccccccccciii")
+stops_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "stops.txt"), col_types  = "ccddccnccnccccinci")
 shapes_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "shapes.txt"), col_types = "iinci")
 stop_times_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "stop_times.txt"), col_types = "tticncddcccccccccccii")
 
