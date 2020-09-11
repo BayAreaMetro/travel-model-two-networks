@@ -1488,8 +1488,8 @@ fbe8347c3be05ffc8926dd171453b74c,0a88bf426efc45788a999d332c0fd7fb,US 101 SB,HOV_
 fce6561deeb6d38801dfad3c0f2173d5,14f4511952a8263b9af3e7997116c2a8,US 101 SB,HOV_Lane,South of Healdsburg,North of Petaluma,NB,9994,29994,motorway,3,True,nan,Redwood Highway,nan,3,US-101 N,N,nan,NA
 fec38c8d805250873dbbd1d22ab15645,083ed2ce62de5c9ae6f4f60fd77f1576,US 101 SB,HOV_Lane,South of Healdsburg,North of Petaluma,NB,9994,29994,"['motorway', 'motorway']","['3', '3']","[True, True]","['yes', 'nan']","['Redwood Highway', 'Redwood Highway']","['nan', 'nan']",4,US-101 N,N,nan,NA
 d35424123c61127fcb906140f2e14b61,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Bay Bridge HOV
-4e570e4d6b3e00ac9fb9af5808e8f2d3,NA,NA,Bridge_Pass,NA,NA,NA,NA,15,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Bay Bridge General Purpose
-541fc68091b15d8682c6b398e990af64,NA,NA,Bridge_Pass,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Antioch Bridge
+4e570e4d6b3e00ac9fb9af5808e8f2d3,NA,NA,Bridge_Pass,NA,NA,NA,15,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Bay Bridge General Purpose
+541fc68091b15d8682c6b398e990af64,NA,NA,Bridge_Pass,NA,NA,NA,8,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Antioch Bridge
 e8a712ba58f30c910ff65a46eb6b605e,NA,NA,Bridge_Pass,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Richmond Bridge
 44745ac6ebae7a5b78ba6c4bccc43b68,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Benicia Bridge HOV
 e5bab32b8697116f3e53cb25c1d897ac,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,NA,Benicia Bridge HOV
