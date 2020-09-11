@@ -53,10 +53,10 @@ managed_df <- read_csv(managed_file_name, col_types = cols(.default = col_charac
 # Edits to Managed Lane Database
 ```{r edits}
 managed_out_df <- managed_df %>%
-  filter(!(shstReferenceId == "7bb59b6716c8d22b38f90e1696461e5e" & roadType == "HOV_Lane")) %>%
-  filter(!(shstReferenceId == "a1be9886a94386cc8d028bfd5a076ba4" & roadType == "HOV_Lane")) %>%
-  filter(!(shstReferenceId == "d35424123c61127fcb906140f2e14b61" & roadType == "HOV_Lane")) %>%
-  filter(!(shstReferenceId == "42540cb7ed261fa5074bc659ba8caee2" & roadType == "HOV_Lane")) %>%
+  filter(!(shstReferenceId == "7bb59b6716c8d22b38f90e1696461e5e" & roadtype == "HOV_Lane")) %>%
+  filter(!(shstReferenceId == "a1be9886a94386cc8d028bfd5a076ba4" & roadtype == "HOV_Lane")) %>%
+  filter(!(shstReferenceId == "d35424123c61127fcb906140f2e14b61" & roadtype == "HOV_Lane")) %>%
+  filter(!(shstReferenceId == "42540cb7ed261fa5074bc659ba8caee2" & roadtype == "HOV_Lane")) %>%
   filter(!(shstReferenceId == "44745ac6ebae7a5b78ba6c4bccc43b68")) %>%
   filter(!(shstReferenceId == "e5bab32b8697116f3e53cb25c1d897ac")) %>%
   filter(!(shstReferenceId == "9b89a5f78a4058d7c24bc96a351c5e60")) %>%
@@ -73,9 +73,9 @@ managed_out_df <- managed_df %>%
   filter(!(shstReferenceId == "5cb208be89de29c545b615a215e3b03d")) %>%
   filter(!(shstReferenceId == "e0f8a9be8f36933b93e37c4034dbb282")) %>%
   filter(!(shstReferenceId == "14f8d24d1190890fbbdfe5c0a8bb35fe")) %>%
-  mutate(roadName = if_else(shstReferenceId == "541fc68091b15d8682c6b398e990af64", "Antioch Bridge", roadName)) %>%
-  mutate(roadType = if_else(shstReferenceId == "541fc68091b15d8682c6b398e990af64", "Bridge_Pass", roadType)) %>%
-  mutate(roadType = if_else(shstReferenceId == "f30dcff458c14bb7c63f6a6b7ecf4fb6", as.character(NA), roadType)) %>%
+  mutate(roadwaylongname = if_else(shstReferenceId == "541fc68091b15d8682c6b398e990af64", "Antioch Bridge", roadwaylongname)) %>%
+  mutate(roadtype = if_else(shstReferenceId == "541fc68091b15d8682c6b398e990af64", "Bridge_Pass", roadtype)) %>%
+  mutate(roadtype = if_else(shstReferenceId == "f30dcff458c14bb7c63f6a6b7ecf4fb6", as.character(NA), roadtype)) %>%
   mutate(bridge_detail = as.character(NA)) %>%
   mutate(bridge_detail = if_else(shstReferenceId == "42540cb7ed261fa5074bc659ba8caee2", "Benicia Bridge HOV", bridge_detail)) %>%
   mutate(bridge_detail = if_else(shstReferenceId == "217253518a29aa69c40a4114d557d24d", "Benicia General Purpose", bridge_detail)) %>%
@@ -96,12 +96,18 @@ managed_out_df <- managed_df %>%
                                      "Richmond Bridge",
                                      "Benicia Bridge HOV",
                                      "Benicia Bridge HOV"),
-                   roadType = c(as.character(NA),
+                   roadtype = c(as.character(NA),
                                 "Bridge_Pass",
                                 "Bridge_Pass",
                                 "Bridge_Pass",
                                 as.character(NA),
-                                as.character(NA))))
+                                as.character(NA)),
+                   tollclass_segid_new = c(as.character(NA),
+                                           "15",
+                                           as.character(NA),
+                                           as.character(NA),
+                                           as.character(NA),
+                                           as.character(NA))))
   
 ```
 
@@ -110,17 +116,19 @@ managed_out_df <- managed_df %>%
 ```{r reductions}
 managed_join_df <- select(managed_out_df, 
                           shstReferenceId, 
-                          roadType, 
+                          roadtype, 
                           tomtom_name,
-                          bridge_detail) %>%
-  mutate(make_parallel_hov = (roadType == "HOV_Lane")) %>%
-  mutate(pay_bridge_toll = (roadType == "Bridge_Pass")) %>%
-  mutate(make_parallel_express = (roadType == "Express_Lane")) %>%
+                          bridge_detail,
+                          tollclass_segid = tollclass_segid_new) %>%
+  mutate(make_parallel_hov = (roadtype == "HOV_Lane")) %>%
+  mutate(pay_bridge_toll = (roadtype == "Bridge_Pass")) %>%
+  mutate(make_parallel_express = (roadtype == "Express_Lane")) %>%
   group_by(shstReferenceId, tomtom_name) %>%
   summarise(pay_bridge_toll = max(pay_bridge_toll),
             make_parallel_hov = max(make_parallel_hov),
             make_parallel_express = max(make_parallel_express),
-            bridge_detail = max(bridge_detail)) %>%
+            bridge_detail = max(bridge_detail),
+            tollclass_segid = max(tollclass_segid)) %>%
   ungroup()
 
 output_sf <- links_df %>%
