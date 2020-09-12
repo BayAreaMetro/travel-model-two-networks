@@ -28,7 +28,7 @@ external_dir <- "../../data/external/"
 interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
-links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
+links_file_name <- paste0(interim_dir, "step6_gtfs/link.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 
@@ -38,6 +38,7 @@ output_file_name <- paste0(interim_dir, "facility-type-viewer.geojson")
 output_residential_file_name <- paste0(interim_dir, "facility-type-viewer-residential.geojson")
 output_bus_only_file_name <- paste0(interim_dir, "bus-only-viewer.geojson")
 output_freeway_file_name <- paste0(interim_dir, "freeway-lane-viewer.geojson")
+output_pedestrian_file_name <- paste0(interim_dir, "pedestrian-viewer.geojson")
 ```
 
 # Parameters
@@ -244,6 +245,13 @@ output_bus_only_sf <- working_sf %>%
   left_join(., centroid_df, by = c("shstGeometryId")) %>%
   filter(county_name %in% c("San Francisco", "Marin", "Sonoma"))
 
+output_pedestrian_sf <- links_df %>%
+  filter(walk_access == 1) %>%
+  filter(county %in% c("San Francisco", "Alameda", "Contra Costa")) %>%
+  select(model_link_id, shstReferenceId, shstGeometryId, name, length) %>%
+  left_join(., shapes_sf, by = c("shstGeometryId")) 
+  
+
 ```
 
 # Write
@@ -252,7 +260,7 @@ st_write(output_sf, output_file_name, delete_dsn = TRUE)
 st_write(output_freeway_sf, output_freeway_file_name, delete_dsn = TRUE)
 st_write(output_residential_sf, output_residential_file_name, delete_dsn = TRUE)
 st_write(output_bus_only_sf, output_bus_only_file_name, delete_dsn = TRUE)
-
+st_write(output_pedestrian_sf, output_pedestrian_file_name, delete_dsn = TRUE)
 ```
 
 
