@@ -36,3 +36,4 @@ data/interim/facility-type-viewer-residential.geojson
 data/interim/step5_tidy_roadway/link.json
 data/interim/step5_tidy_roadway/node.geojson
 data/interim/step5_tidy_roadway/shape.geojson
+data/interim/pedestrian-viewer.geojson
