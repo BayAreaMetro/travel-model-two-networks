@@ -1758,89 +1758,51 @@ summary {
 <h1>Remote I/O</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuaW50ZXJpbV9kaXIgPC0gXFwuLi8uLi9kYXRhL2ludGVyaW0vXFxcblxuc2hhcGVfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXFxzdGVwNV90aWR5X3JvYWR3YXkvc2hhcGUuZ2VvanNvblxcKVxuXG5vdXRwdXRfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXFxzaW1wbGVfc2hhcGUuUkRTXFwpXG5gYGBcbmBgYCJ9 -->
-<pre class="r"><code>```r
-interim_dir &lt;- \../../data/interim/\
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuaW50ZXJpbV9kaXIgPC0gXCIuLi8uLi9kYXRhL2ludGVyaW0vXCJcblxuc2hhcGVfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJzdGVwNl9ndGZzL3NoYXBlLmdlb2pzb25cIilcblxub3V0cHV0X2ZpbGVfbmFtZSA8LSBwYXN0ZTAoaW50ZXJpbV9kaXIsIFwic2ltcGxlX3NoYXBlLlJEU1wiKVxuYGBgIn0= -->
+<pre class="r"><code>interim_dir &lt;- &quot;../../data/interim/&quot;
 
-shape_file_name &lt;- paste0(interim_dir, \step5_tidy_roadway/shape.geojson\)
+shape_file_name &lt;- paste0(interim_dir, &quot;step6_gtfs/shape.geojson&quot;)
 
-output_file_name &lt;- paste0(interim_dir, \simple_shape.RDS\)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-# Data Reads
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc2hhcGVzX3NmIDwtIHN0X3JlYWQoc2hhcGVfZmlsZV9uYW1lKVxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-shapes_sf &lt;- st_read(shape_file_name)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgc2hhcGUnIGZyb20gZGF0YSBzb3VyY2UgYC9Vc2Vycy93c3AvRG9jdW1lbnRzL0dpdEh1Yi90cmF2ZWwtbW9kZWwtdHdvLW5ldHdvcmtzL2RhdGEvaW50ZXJpbS9zdGVwNV90aWR5X3JvYWR3YXkvc2hhcGUuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuU2ltcGxlIGZlYXR1cmUgY29sbGVjdGlvbiB3aXRoIDkwODI2NyBmZWF0dXJlcyBhbmQgNSBmaWVsZHNcbmdlb21ldHJ5IHR5cGU6ICBMSU5FU1RSSU5HXG5kaW1lbnNpb246ICAgICAgWFlcbmJib3g6ICAgICAgICAgICB4bWluOiAtMTIzLjU0NDcgeW1pbjogMzYuODcwOTcgeG1heDogLTEyMS4xMjcyIHltYXg6IDM4LjkxMDA4XG5DUlM6ICAgICAgICAgICAgNDMyNlxuIn0= --&gt;
-</code></pre>
-<p>Reading layer <code>shape&#39; from data source</code>/Users/wsp/Documents/GitHub/travel-model-two-networks/data/interim/step5_tidy_roadway/shape.geojson’ using driver `GeoJSON’ Simple feature collection with 908267 features and 5 fields geometry type: LINESTRING dimension: XY bbox: xmin: -123.5447 ymin: 36.87097 xmax: -121.1272 ymax: 38.91008 CRS: 4326</p>
-<pre><code>
-
-
-&lt;!-- rnb-output-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-# Reductions 
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxub3V0cHV0X3NmIDwtIHNoYXBlc19zZiAlPiVcbiAgc2VsZWN0KHNoc3RHZW9tZXRyeUlkID0gaWQsIGdlb21ldHJ5KVxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-output_sf &lt;- shapes_sf %&gt;%
+output_file_name &lt;- paste0(interim_dir, &quot;simple_shape.RDS&quot;)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="data-reads" class="section level1">
+<h1>Data Reads</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2hhcGVzX3NmIDwtIHN0X3JlYWQoc2hhcGVfZmlsZV9uYW1lKVxuYGBgIn0= -->
+<pre class="r"><code>shapes_sf &lt;- st_read(shape_file_name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgc2hhcGUnIGZyb20gZGF0YSBzb3VyY2UgYC9Vc2Vycy93c3AvRG9jdW1lbnRzL0dpdEh1Yi90cmF2ZWwtbW9kZWwtdHdvLW5ldHdvcmtzL2RhdGEvaW50ZXJpbS9zdGVwNl9ndGZzL3NoYXBlLmdlb2pzb24nIHVzaW5nIGRyaXZlciBgR2VvSlNPTidcblNpbXBsZSBmZWF0dXJlIGNvbGxlY3Rpb24gd2l0aCA4ODk1OTMgZmVhdHVyZXMgYW5kIDUgZmllbGRzXG5nZW9tZXRyeSB0eXBlOiAgTElORVNUUklOR1xuZGltZW5zaW9uOiAgICAgIFhZXG5iYm94OiAgICAgICAgICAgeG1pbjogLTEyMy41MzE1IHltaW46IDM2LjkwMDc4IHhtYXg6IC0xMjEuMjA5MyB5bWF4OiAzOC44NjAyMVxuZ2VvZ3JhcGhpYyBDUlM6IFdHUyA4NFxuIn0= -->
+<pre><code>Reading layer `shape&#39; from data source `/Users/wsp/Documents/GitHub/travel-model-two-networks/data/interim/step6_gtfs/shape.geojson&#39; using driver `GeoJSON&#39;
+Simple feature collection with 889593 features and 5 fields
+geometry type:  LINESTRING
+dimension:      XY
+bbox:           xmin: -123.5315 ymin: 36.90078 xmax: -121.2093 ymax: 38.86021
+geographic CRS: WGS 84</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="reductions" class="section level1">
+<h1>Reductions</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxub3V0cHV0X3NmIDwtIHNoYXBlc19zZiAlPiVcbiAgc2VsZWN0KHNoc3RHZW9tZXRyeUlkID0gaWQsIGdlb21ldHJ5KVxuYGBgIn0= -->
+<pre class="r"><code>output_sf &lt;- shapes_sf %&gt;%
   select(shstGeometryId = id, geometry)</code></pre>
-<pre><code>
-&lt;!-- rnb-source-end --&gt;
-
-&lt;!-- rnb-chunk-end --&gt;
-
-
-&lt;!-- rnb-text-begin --&gt;
-
-
-# Write
-
-&lt;!-- rnb-text-end --&gt;
-
-
-&lt;!-- rnb-chunk-begin --&gt;
-
-
-&lt;!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuYGBgclxuc2F2ZVJEUyhvdXRwdXRfc2YsIGZpbGUgPSBvdXRwdXRfZmlsZV9uYW1lKVxuYGBgXG5gYGAifQ== --&gt;
-
-```r
-```r
-saveRDS(output_sf, file = output_file_name)</code></pre>
-<p>```</p>
+<!-- rnb-source-end -->
+<!-- rnb-chunk-end -->
+<!-- rnb-text-begin -->
+</div>
+<div id="write" class="section level1">
+<h1>Write</h1>
+<!-- rnb-text-end -->
+<!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2F2ZVJEUyhvdXRwdXRfc2YsIGZpbGUgPSBvdXRwdXRfZmlsZV9uYW1lKVxuYGBgIn0= -->
+<pre class="r"><code>saveRDS(output_sf, file = output_file_name)</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
