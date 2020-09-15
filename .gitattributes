@@ -12,3 +12,4 @@ link.feather filter=lfs diff=lfs merge=lfs -text
 conflation_result.csv filter=lfs diff=lfs merge=lfs -text
 transit_for_tableau.csv filter=lfs diff=lfs merge=lfs -text
 transit_for_tableau.geojson filter=lfs diff=lfs merge=lfs -text
+simple_shape.rds filer=lfs diff=lfs merge=lfs -text
