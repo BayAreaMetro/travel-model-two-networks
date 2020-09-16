@@ -51,63 +51,19 @@ shapes_sf <- readRDS(shape_file_name)
 nodes_sf <- st_read(node_file_name)
 ```
 
-# Helpers for Part 1
+# Helpers
 ```{r helpers}
-shapes_as_sf <- function(df) {
-  # adapted from tidy transit
-  
-  list_of_line_tibbles <- split(df, df$shape_id)
-  list_of_linestrings <- lapply(list_of_line_tibbles, shape_as_sf_linestring)
-  
-  shape_linestrings <- sf::st_sfc(list_of_linestrings, crs = 4326)
-  
-  shapes_sf <- sf::st_sf(shape_id = names(list_of_line_tibbles), geometry = shape_linestrings)
-  shapes_sf$shape_id <- as.character(shapes_sf$shape_id)
-  
-  return(shapes_sf)
-}
-
 shape_as_sf_linestring <- function(df) {
   # as suggested by www.github.com/mdsumner via tidytransit
-
-  m <- as.matrix(df[order(df$stop_sequence),
-                    c("stop_lat", "stop_lon")])
+  
+  df <- df[[1]]
+  m <- as.matrix(df[order(df$shape_pt_sequence),
+                    c("lat", "lng")])
 
   return(sf::st_linestring(m))
 }
 ```
 
-# Make Stop-to-stop Line Strings
-```{r process-stops}
-working_stops_df <- select(routes_df, agency_id, agency_raw_name, route_id, 
-                          route_short_name, route_long_name) %>%
-  left_join(select(trips_df, route_id, service_id, trip_id, trip_headsign, direction_id, shape_id),
-            ., 
-            by = c("route_id")) %>%
-  left_join(., freq_df, by = c("trip_id")) %>%
-  left_join(select(stop_times_df, trip_id, stop_id, stop_sequence), ., by = c("trip_id")) %>%
-  left_join(., select(stops_df, stop_id, stop_name, stop_lat, stop_lon), by = c("stop_id")) %>%
-  mutate(time_period = case_when(
-    hour(start_time) == 3 ~ "Early Morning",
-    hour(start_time) == 6 ~ "Morning Commute",
-    hour(start_time) == 10 ~ "Midday",
-    hour(start_time) == 15 ~ "Evening Commute",
-    hour(start_time) == 19 ~ "Evening/Night",
-    TRUE ~ "Missing"
-  )) %>%
-  select(-start_time, -end_time) %>%
-  arrange(agency_id, service_id, route_id, time_period, direction_id, stop_sequence)
-
-working_shapes_sf <- shapes_as_sf(working_stops_df)
-
-output_stops_sf <- working_stops_df %>%
-  distinct(agency_id, agency_raw_name, route_id, route_short_name, route_long_name,
-           trip_id, service_id, trip_headsign, direction_id, shape_id,
-           time_period, headway_secs) %>%
-  mutate(summary = "stops") %>%
-  left_join(mutate(working_shapes_sf, shape_id = as.integer(shape_id)), ., by = c("shape_id"))
-
-```
 
 # Make True Shapes of Segments
 ```{r process-shapes}
@@ -115,7 +71,7 @@ join_link_shape_sf <- links_df %>%
   select(shstGeometryId, A, B) %>%
   left_join(., shapes_sf, by = c("shstGeometryId"))
 
-working_shapes_df <- select(routes_df, agency_id, agency_raw_name, route_id, 
+working_df <- select(routes_df, agency_id, agency_raw_name, route_id, 
                            route_short_name, route_long_name) %>%
   left_join(select(trips_df, route_id, service_id, trip_id, trip_headsign, direction_id, shape_id),
             ., by = c("route_id")) %>%
@@ -139,26 +95,53 @@ working_shapes_df <- select(routes_df, agency_id, agency_raw_name, route_id,
   )) %>%
   select(-start_time, -end_time)
 
-pretty_shapes_sf <- working_shapes_df %>%
-  st_as_sf(., crs = 4326)
-  
-working_shapes_sf <- working_shapes_df %>%
-  select(shape_id, geometry) %>%
+# make lat/lng for points
+working_points_sf <- working_df %>%
   st_as_sf(., crs = 4326) %>%
-  group_by(shape_id) %>%
-  summarise(geometry = st_combine(geometry))
+  st_cast(., to = "POINT", group_or_split = TRUE, do_split = TRUE, warn = FALSE)
 
-output_shapes_sf <- working_shapes_df %>%
-  distinct(agency_id, agency_raw_name, route_id, route_short_name, route_long_name,
+lat_lng_df <- as_tibble(st_coordinates(working_points_sf)) %>%
+  rename(lng = Y, lat = X)
+
+working_df <- working_points_sf %>%
+  select(agency_id, agency_raw_name, route_id, route_short_name, route_long_name,
            trip_id, service_id, trip_headsign, direction_id, shape_id,
            time_period, headway_secs) %>%
-  mutate(summary = "shape") %>%
-  left_join(mutate(working_shapes_sf, shape_id = as.integer(shape_id)), ., by = c("shape_id"))
+  bind_cols(., lat_lng_df) %>%
+  st_drop_geometry(.) %>%
+  group_by(agency_id, route_id, time_period, direction_id, shape_id) %>%
+  mutate(shape_pt_sequence = row_number()) %>%
+  ungroup() 
+
+for_shapes_df <- working_df %>%
+  mutate(unique_id = row_number()) %>%
+  select(unique_id, shape_id, shape_pt_sequence, lat, lng)
+
+list_of_line_tibbles <- split(for_shapes_df, for_shapes_df$shape_id)
+
+list_of_linestrings <- list()
+for (index in seq(1:length(list_of_line_tibbles))) {
+
+  line_tibble <- list_of_line_tibbles[index]
+  list_of_linestrings[[index]] <- shape_as_sf_linestring(line_tibble)
+  
+}
+
+shape_linestrings <- sf::st_sfc(list_of_linestrings, crs = 4326)
+shapes_sf <- sf::st_sf(shape_id = names(list_of_line_tibbles), geometry = shape_linestrings) %>%
+  mutate(shape_id = as.integer(shape_id))
+
+join_df <- working_df %>%
+  distinct(agency_id, agency_raw_name, route_id, route_short_name, route_long_name,
+           trip_id, service_id, trip_headsign, direction_id, shape_id,
+           time_period, headway_secs)
+
+output_sf <- left_join(shapes_sf, join_df, by = c("shape_id"))
 
 ```
 
 # Write
 ```{r write}
-st_write(pretty_shapes_sf, output_file_name, delete_dsn = TRUE)
+st_write(output_sf, output_file_name, delete_dsn = TRUE)
 ```
 
