@@ -16,7 +16,7 @@ See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sha
 I had trouble getting Docker to run on my Windows machine because of a BIOS update problem, but it was easy on my Mac.
 
 * Input: County boundaries, `../../data/external/county_boundaries/boundary_[1-14].json`
-* Output: Shared streets geojson files `[1-14].out.geojson`, log files
+* Output: Shared streets geojson files `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`, log files
 
 ### [Step 2: OSMnx SharedStreets extraction](step2_osmnx_extraction.ipynb)
 
@@ -27,3 +27,4 @@ TBD
   * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 
 * Output:
+  * OSM extract, `../../data/external/osmnx_extract/[link,node].geojson`
