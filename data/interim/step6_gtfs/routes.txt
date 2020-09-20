@@ -62,11 +62,6 @@ Lo-121,,,Local,,2,,,,Caltrain_2015_5_13,,,,,,195
 980,36,8,Cordelia Library/Oakbrook Dr,,3,http://www.fasttransit.org/schedules-maps/fixed-local-routes/route-8/,75488a,ffffff,Fairfield_2015_10_14,0,60,,,,220
 2720,36,9,Suisun Senior Center/Suisun City Walmart,,3,http://www.fasttransit.org/schedules-maps/fixed-local-routes/route-9/,A55828,ffffff,Fairfield_2015_10_14,0,30,,,,209
 259,36,90,FTC/El Cerrito Del Norte BART/Suisun City Amtrak,,3,http://www.fasttransit.org/schedules-maps/express-intercity-route-maps-and-schedules/route-90/,165ba2,ffffff,Fairfield_2015_10_14,0,60,,,,208
-South SF-East Bay,SB,South SF-East Bay,,,4,,,,GGFerries_2017_3_18,,,,,,223
-South SF-SF,SB,South SF-SF,,,4,,,,GGFerries_2017_3_18,,,,,,224
-Vallejo-SF,SB,Vallejo-SF,,,4,,,,GGFerries_2017_3_18,,,,,,225
-Harbor Bay-SF,SB,Harbor Bay-SF,,,4,,,,GGFerries_2017_3_18,,,,,,222
-Ala-Oak-SF,SB,Ala-Oak-SF,,,4,,,,GGFerries_2017_3_18,,,,,,221
 2-193,,2,Marin City - San Francisco,,3,http://goldengatetransit.org/schedules/current/route_2.php,CC3333,FFFFFF,GGTransit_2015_9_3,,,,,,231
 4-193,,4,Mill Valley - San Francisco,,3,http://goldengatetransit.org/schedules/current/route_4.php,CC3333,FFFFFF,GGTransit_2015_9_3,,,,,,243
 8-193,,8,Tiburon - San Francisco,,3,http://goldengatetransit.org/schedules/current/route_8.php,CC3333,FFFFFF,GGTransit_2015_9_3,,,,,,258
@@ -630,11 +625,15 @@ H-118,AC Transit,H,San Francisco - Richmond,,3,,,,ACTransit_2015_8_14,,,,,,132
 J-118,AC Transit,J,Berkeley - San Francisco,,3,,,,ACTransit_2015_8_14,,,,,,133
 L-118,AC Transit,L,San Francisco - El Sobrante,,3,,,,ACTransit_2015_8_14,,,,,,134
 LA-118,AC Transit,LA,San Francisco - El Sobrante,,3,,,,ACTransit_2015_8_14,,,,,,135
+LC-118,AC Transit,LC,SF/Hilltop Park & Ride (L/LA Sweeper),,3,,,,ACTransit_2015_8_14,,,,,,136
 M-118,AC Transit,M,Hayward BART- Hillsdale Mall- Oracle,,3,,,,ACTransit_2015_8_14,,,,,,137
 NL-118,AC Transit,NL,San Francisco - Eastmont T.C.,,3,,,,ACTransit_2015_8_14,,,,,,138
 NX-118,AC Transit,NX,East Oakland - San Francisco,,3,,,,ACTransit_2015_8_14,,,,,,139
+NX1-118,AC Transit,NX1,San Francisco - East Oakland,,3,,,,ACTransit_2015_8_14,,,,,,140
+NX2-118,AC Transit,NX2,San Francisco - East Oakland,,3,,,,ACTransit_2015_8_14,,,,,,141
 NX3-118,AC Transit,NX3,San Francisco - San Leandro,,3,,,,ACTransit_2015_8_14,,,,,,142
 NX4-118,AC Transit,NX4,San Francisco - Castro Valley,,3,,,,ACTransit_2015_8_14,,,,,,143
+NXC-118,AC Transit,NXC,SF - Oakland (N/NX Sweeper),,3,,,,ACTransit_2015_8_14,,,,,,144
 O-118,AC Transit,O,San Francisco - Alameda - Fruitvale Bart,,3,,,,ACTransit_2015_8_14,,,,,,145
 OX-118,AC Transit,OX,San Francisco - Alameda - Bay Farm Is.,,3,,,,ACTransit_2015_8_14,,,,,,146
 P-118,AC Transit,P,San Francisco - Piedmont,,3,,,,ACTransit_2015_8_14,,,,,,147

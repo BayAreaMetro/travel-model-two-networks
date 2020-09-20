@@ -404,22 +404,6 @@ CT-14OCT-Combo-Weekday-01,Gilroy Caltrain Station,1.0,,,,Caltrain_2015_5_13,156,
 127A2472,2 E HUNTINGTON CT,1.0,,,2.0,Fairfield_2015_10_14,,,,,,,,,,,,214,8824,535
 127A2472,2 E HUNTINGTON CT,1.0,,,2.0,Fairfield_2015_10_14,,,,,,,,,,,,214,8587,535
 127A2472,2 E HUNTINGTON CT,1.0,,,2.0,Fairfield_2015_10_14,,,,,,,,,,,,214,8705,535
-72855,South San Francisco,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,223,8886,543
-72855,Oakland Terminal,1.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,223,8889,545
-72855,Oakland Terminal,1.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,223,8897,545
-72855,San Francisco Ferry Building,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,224,8891,548
-72855,South San Francisco,1.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,224,8892,550
-72855,San Francisco Ferry Building,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,225,8911,546
-72855,San Francisco Ferry Building,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,225,8912,546
-72855,San Francisco Ferry Building,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,225,8920,546
-72855,Harbor Bay Ferry Terminal,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,222,8857,547
-72855,Harbor Bay Ferry Terminal,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,222,8860,547
-72855,Harbor Bay Ferry Terminal,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,222,8856,547
-72855,San Francisco Ferry Building,1.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,222,8866,551
-72855,San Francisco Ferry Building,1.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,222,8863,551
-72855,San Francisco Ferry Building,1.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,222,8862,551
-72855,San Francisco Ferry Building,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,221,8895,552
-72855,San Francisco Ferry Building,0.0,,,,GGFerries_2017_3_18,,,,,,,,,,,,221,8927,552
 15SEPT-01-WKDY-Weekday-02,East,0.0,1169035,,,GGTransit_2015_9_3,,,,,,,,,,,,244,8942,616
 15SEPT-01-WKDY-Weekday-02,East,0.0,1169033,,,GGTransit_2015_9_3,,,,,,,,,,,,244,8947,616
 15SEPT-01-WKDY-Weekday-02,West,1.0,1169034,,,GGTransit_2015_9_3,,,,,,,,,,,,244,8950,617
@@ -2717,6 +2701,7 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,659,32240,1995
 c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,659,32264,1995
 2555A3810,Hercules Transit Center,0.0,1070,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,669,32687,1996
+2376A3650,Victoria Cr. by the bay,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32794,2016
 2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,671,32568,2027
 2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32367,2047
 2376A3650,Hercules Transit Center,1.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32288,2048
@@ -2725,9 +2710,11 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,671,32563,2045
 2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32392,2002
 2555A3810,Hercules Transit Center,0.0,1079,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,670,32721,2003
+2376A3650,Victoria Cr. by the bay,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32790,2016
 2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32315,1998
 2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32485,2005
 2555A3810,Hercules Transit Center,0.0,1081,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,669,32739,1996
+2376A3650,Willow Ave. at I-80,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32805,2007
 2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32467,2009
 2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,672,32667,1999
 2376A3650,Richmond Parkway Transit Center,1.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32454,2010
@@ -2741,6 +2728,7 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 2376A3650,Richmond Parkway Transit Center,1.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32873,2010
 2376A3650,Amtrak Station,0.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,673,32604,2018
 2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,672,32654,2014
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32825,2019
 2555A3810,BART Del Norte Station,1.0,1071,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,670,32690,2011
 2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32500,2046
 2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32418,2010
@@ -2825,6 +2813,7 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,672,32583,2014
 2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,672,32653,1999
 2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32869,2008
+2376A3650,Willow Ave. at I-80,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32835,1997
 2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32490,2032
 2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32307,2035
 2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32295,2047
@@ -2843,7 +2832,9 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 67950b41-d4f0-43fa-929b-77eb21857210,South San Francisco,0.0,,0.0,0.0,SF_Bay_Ferry2016_07_01,,,,,,,,,,,,393,22945,1153
 1508FA-D2-Weekday-01,G SAN FRANCISCO,1.0,601820,,,ACTransit_2015_8_14,,,,,,,,,,,,131,9,359
 1508FA-D2-Weekday-01,G SAN FRANCISCO,1.0,601804,,,ACTransit_2015_8_14,,,,,,,,,,,,131,10,359
+1508FA-D2-Weekday-01,LA HILLTOP P & R,0.0,601870,,,ACTransit_2015_8_14,,,,,,,,,,,,135,11,370
 1508FA-D2-Weekday-01,LA SAN FRANCISCO,1.0,601827,,,ACTransit_2015_8_14,,,,,,,,,,,,135,20,369
+1508FA-D2-Weekday-01,Z WEST BERKELEY,0.0,601804,,,ACTransit_2015_8_14,,,,,,,,,,,,153,21,402
 1508FA-D2-Weekday-01,Z SAN FRANCISCO,1.0,601825,,,ACTransit_2015_8_14,,,,,,,,,,,,153,22,403
 1508FA-D2-Weekday-01,12 BERKELEY BART,0.0,601759,,,ACTransit_2015_8_14,,,,,,,,,,,,4,23,11
 1508FA-D2-Weekday-01,12 BERKELEY BART,0.0,601755,,,ACTransit_2015_8_14,,,,,,,,,,,,4,31,11
@@ -2870,16 +2861,25 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D2-Weekday-01,681 DE JEAN MDL SCl,0.0,601851,,,ACTransit_2015_8_14,,,,,,,,,,,,88,66,243
 1508FA-D2-Weekday-01,681 MACD & RICH. PKWY,1.0,601807,,,ACTransit_2015_8_14,,,,,,,,,,,,88,67,244
 1508FA-D2-Weekday-01,667 KOREMATSU MDL SCL,0.0,601847,,,ACTransit_2015_8_14,,,,,,,,,,,,78,69,218
+1508FA-D2-Weekday-01,FS NORTH BERKELEY,0.0,601876,,,ACTransit_2015_8_14,,,,,,,,,,,,130,74,357
+1508FA-D2-Weekday-01,FS NORTH BERKELEY,0.0,601922,,,ACTransit_2015_8_14,,,,,,,,,,,,130,75,357
 1508FA-D2-Weekday-01,FS SAN FRANCISCO,1.0,601811,,,ACTransit_2015_8_14,,,,,,,,,,,,130,78,358
+1508FA-D2-Weekday-01,LC HILLTOP PARK & RIDE,0.0,601818,,,ACTransit_2015_8_14,,,,,,,,,,,,136,80,373
 1508FA-D2-Weekday-01,L SAN FRANCISCO,1.0,601828,,,ACTransit_2015_8_14,,,,,,,,,,,,134,81,365
+1508FA-D2-Weekday-01,L RICHMOND,0.0,601825,,,ACTransit_2015_8_14,,,,,,,,,,,,134,83,366
 1508FA-D2-Weekday-01,L SAN FRANCISCO,1.0,601820,,,ACTransit_2015_8_14,,,,,,,,,,,,134,91,365
 1508FA-D2-Weekday-01,675 KOREMATSU MDL SCL,0.0,601849,,,ACTransit_2015_8_14,,,,,,,,,,,,84,92,234
 1508FA-D2-Weekday-01,672 CRESPI MDL SCL,0.0,601865,,,ACTransit_2015_8_14,,,,,,,,,,,,83,94,231
 1508FA-D2-Weekday-01,684 EL CERRITO HIGH,0.0,601852,,,ACTransit_2015_8_14,,,,,,,,,,,,90,95,247
 1508FA-D2-Weekday-01,684 RICHMOND BART,1.0,601807,,,ACTransit_2015_8_14,,,,,,,,,,,,90,96,248
 1508FA-D2-Weekday-01,684 RICHMOND BART,1.0,601803,,,ACTransit_2015_8_14,,,,,,,,,,,,90,97,248
+1508FA-D2-Weekday-01,L RICHMOND,0.0,601868,,,ACTransit_2015_8_14,,,,,,,,,,,,134,104,366
 1508FA-D2-Weekday-01,H SAN FRANCISCO,1.0,601813,,,ACTransit_2015_8_14,,,,,,,,,,,,132,106,361
+1508FA-D2-Weekday-01,H EL CERRITO,0.0,601809,,,ACTransit_2015_8_14,,,,,,,,,,,,132,108,362
+1508FA-D2-Weekday-01,H EL CERRITO,0.0,601815,,,ACTransit_2015_8_14,,,,,,,,,,,,132,114,362
 1508FA-D2-Weekday-01,376 DEL NORTE BART,0.0,601793,,,ACTransit_2015_8_14,,,,,,,,,,,,28,116,72
+1508FA-D2-Weekday-01,J BERKELEY,0.0,601945,,,ACTransit_2015_8_14,,,,,,,,,,,,133,120,364
+1508FA-D2-Weekday-01,J BERKELEY,0.0,607773,,,ACTransit_2015_8_14,,,,,,,,,,,,133,126,364
 1508FA-D2-Weekday-01,J SAN FRANCISCO,1.0,601800,,,ACTransit_2015_8_14,,,,,,,,,,,,133,127,363
 1508FA-D2-Weekday-01,J SAN FRANCISCO,1.0,601949,,,ACTransit_2015_8_14,,,,,,,,,,,,133,128,363
 1508FA-D2-Weekday-01,65 EUCLID,1.0,601785,,,ACTransit_2015_8_14,,,,,,,,,,,,66,139,182
@@ -3000,11 +3000,17 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D2-Weekday-01,800 RICHMOND BART,0.0,601853,,,ACTransit_2015_8_14,,,,,,,,,,,,104,1023,285
 1508FA-D2-Weekday-01-0000100,BSN BROADWAY SHUTTLE,0.0,601946,,,ACTransit_2015_8_14,,,,,,,,,,,,123,1036,337
 1508FA-D2-Weekday-01-0000100,BSN BROADWAY SHUTTLE,1.0,601951,,,ACTransit_2015_8_14,,,,,,,,,,,,123,1047,338
+1508FA-D2-Weekday-01,F BERKELEY,0.0,607785,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1071,353
+1508FA-D2-Weekday-01,F BERKELEY,0.0,607784,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1077,353
+1508FA-D2-Weekday-01,F BERKELEY BART,0.0,607785,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1087,354
+1508FA-D2-Weekday-01,F BERKELEY,0.0,607784,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1095,353
 1508FA-D2-Weekday-01,F SAN FRANCISCO,1.0,607785,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1104,356
 1508FA-D2-Weekday-01,F SAN FRANCISCO,1.0,607784,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1106,355
 1508FA-D2-Weekday-01,F SAN FRANCISCO,1.0,607785,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1115,356
 1508FA-D2-Weekday-01,F SAN FRANCISCO,1.0,607781,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1120,356
 1508FA-D2-Weekday-01,F SAN FRANCISCO,1.0,607785,,,ACTransit_2015_8_14,,,,,,,,,,,,129,1121,356
+1508FA-D2-Weekday-01,G EL CERRITO,0.0,601802,,,ACTransit_2015_8_14,,,,,,,,,,,,131,1150,360
+1508FA-D2-Weekday-01,G EL CERRITO,0.0,601803,,,ACTransit_2015_8_14,,,,,,,,,,,,131,1151,360
 1508FA-D2-Weekday-01,76 HILLTOP MALL,1.0,601875,,,ACTransit_2015_8_14,,,,,,,,,,,,103,1158,281
 1508FA-D2-Weekday-01,76 E C DEL NORTE BART,0.0,601875,,,ACTransit_2015_8_14,,,,,,,,,,,,103,1159,280
 1508FA-D2-Weekday-01,76 HILLTOP MALL,1.0,601875,,,ACTransit_2015_8_14,,,,,,,,,,,,103,1160,281
@@ -3075,11 +3081,20 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D2-Weekday-01,BSD BROADWAY SHUTTLE,0.0,601956,,,ACTransit_2015_8_14,,,,,,,,,,,,122,1816,335
 1508FA-D2-Weekday-01,BSD BROADWAY SHUTTLE,1.0,601956,,,ACTransit_2015_8_14,,,,,,,,,,,,122,1817,336
 1508FA-D2-Weekday-01,BSN BROADWAY SHUTTLE,0.0,601956,,,ACTransit_2015_8_14,,,,,,,,,,,,123,1828,337
+1508FA-D4-Weekday-04,B OAKLAND,0.0,604963,,,ACTransit_2015_8_14,,,,,,,,,,,,121,1940,331
+1508FA-D4-Weekday-04,C PIEDMONT,0.0,604965,,,ACTransit_2015_8_14,,,,,,,,,,,,124,1943,339
+1508FA-D4-Weekday-04,C PIEDMONT,0.0,605049,,,ACTransit_2015_8_14,,,,,,,,,,,,124,1944,339
+1508FA-D4-Weekday-04,C PIEDMONT,0.0,605049,,,ACTransit_2015_8_14,,,,,,,,,,,,124,1947,339
 1508FA-D4-Weekday-04,C SAN FRANCISCO,1.0,604965,,,ACTransit_2015_8_14,,,,,,,,,,,,124,1948,340
 1508FA-D4-Weekday-04,C SAN FRANCISCO,1.0,604966,,,ACTransit_2015_8_14,,,,,,,,,,,,124,1949,340
+1508FA-D4-Weekday-04,CB BROADWAY TERRACE,0.0,604990,,,ACTransit_2015_8_14,,,,,,,,,,,,125,1951,342
 1508FA-D4-Weekday-04,CB SAN FRANCISCO,1.0,604994,,,ACTransit_2015_8_14,,,,,,,,,,,,125,1953,341
 1508FA-D4-Weekday-04,E CALEDCOTT LANE,0.0,604974,,,ACTransit_2015_8_14,,,,,,,,,,,,128,1954,350
+1508FA-D4-Weekday-04,E CALEDCOTT LANE,0.0,604975,,,ACTransit_2015_8_14,,,,,,,,,,,,128,1956,349
+1508FA-D4-Weekday-04,E CALEDCOTT LANE,0.0,605084,,,ACTransit_2015_8_14,,,,,,,,,,,,128,1958,349
 1508FA-D4-Weekday-04,E SAN FRANCISCO,1.0,604974,,,ACTransit_2015_8_14,,,,,,,,,,,,128,1959,352
+1508FA-D4-Weekday-04,P PIEDMONT,0.0,604993,,,ACTransit_2015_8_14,,,,,,,,,,,,147,1962,390
+1508FA-D4-Weekday-04,P PIEDMONT,0.0,604999,,,ACTransit_2015_8_14,,,,,,,,,,,,147,1968,390
 1508FA-D4-Weekday-04,V SAN FRANCISCO,1.0,604569,,,ACTransit_2015_8_14,,,,,,,,,,,,151,1970,398
 1508FA-D4-Weekday-04,V SAN FRANCISCO,1.0,604572,,,ACTransit_2015_8_14,,,,,,,,,,,,151,1971,398
 1508FA-D4-Weekday-04,631 ENCINAL HIGH,0.0,604614,,,ACTransit_2015_8_14,,,,,,,,,,,,58,1973,144
@@ -3119,11 +3134,19 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D4-Weekday-04,658 SKYLINE HIGH,1.0,604968,,,ACTransit_2015_8_14,,,,,,,,,,,,74,2023,205
 1508FA-D4-Weekday-04,W SAN FRANCISCO,1.0,604570,,,ACTransit_2015_8_14,,,,,,,,,,,,152,2024,400
 1508FA-D4-Weekday-04,W SAN FRANCISCO,1.0,604571,,,ACTransit_2015_8_14,,,,,,,,,,,,152,2025,400
+1508FA-D4-Weekday-04,W ALAMEDA,0.0,604621,,,ACTransit_2015_8_14,,,,,,,,,,,,152,2030,401
+1508FA-D4-Weekday-04,W ALAMEDA,0.0,604607,,,ACTransit_2015_8_14,,,,,,,,,,,,152,2035,401
+1508FA-D4-Weekday-04,V MONTCLAIR,0.0,605125,,,ACTransit_2015_8_14,,,,,,,,,,,,151,2036,399
+1508FA-D4-Weekday-04,V MONTCLAIR,0.0,605125,,,ACTransit_2015_8_14,,,,,,,,,,,,151,2044,399
 1508FA-D4-Weekday-04,NX SAN FRANCISCO,1.0,604576,,,ACTransit_2015_8_14,,,,,,,,,,,,139,2048,378
 1508FA-D4-Weekday-04,NX3 SAN FRANCISCO,1.0,604577,,,ACTransit_2015_8_14,,,,,,,,,,,,142,2049,381
 1508FA-D4-Weekday-04,NX SAN FRANCISCO,1.0,604578,,,ACTransit_2015_8_14,,,,,,,,,,,,139,2050,378
 1508FA-D4-Weekday-04,NX4 SAN FRANCISCO,1.0,604579,,,ACTransit_2015_8_14,,,,,,,,,,,,143,2051,383
 1508FA-D4-Weekday-04,NX3 SAN FRANCISCO,1.0,604577,,,ACTransit_2015_8_14,,,,,,,,,,,,142,2053,381
+1508FA-D4-Weekday-04,NX3 MACARTHUR,0.0,604585,,,ACTransit_2015_8_14,,,,,,,,,,,,142,2059,382
+1508FA-D4-Weekday-04,NX2 MACARTHUR,0.0,604581,,,ACTransit_2015_8_14,,,,,,,,,,,,141,2060,380
+1508FA-D4-Weekday-04,NX4 CASTRO VALLEY,0.0,604613,,,ACTransit_2015_8_14,,,,,,,,,,,,143,2063,384
+1508FA-D4-Weekday-04,NX1 MACARTHUR,0.0,604593,,,ACTransit_2015_8_14,,,,,,,,,,,,140,2064,379
 1508FA-D4-Weekday-04,NX4 SAN FRANCISCO,1.0,604575,,,ACTransit_2015_8_14,,,,,,,,,,,,143,2065,383
 1508FA-D4-Weekday-04,642 SKYLINE & TUNNEL,1.0,604998,,,ACTransit_2015_8_14,,,,,,,,,,,,61,2077,155
 1508FA-D4-Weekday-04,642 MONTERA,0.0,604594,,,ACTransit_2015_8_14,,,,,,,,,,,,61,2079,152
@@ -3132,6 +3155,7 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D4-Weekday-04,643 DIMOND DISTRICT,1.0,605125,,,ACTransit_2015_8_14,,,,,,,,,,,,62,2084,159
 1508FA-D4-Weekday-04,643 SKYLINE,0.0,604987,,,ACTransit_2015_8_14,,,,,,,,,,,,62,2085,160
 1508FA-D4-Weekday-04,642 MONTCLAIR,0.0,604979,,,ACTransit_2015_8_14,,,,,,,,,,,,61,2090,153
+1508FA-D4-Weekday-04,B OAKLAND,0.0,605099,,,ACTransit_2015_8_14,,,,,,,,,,,,121,2093,332
 1508FA-D4-Weekday-04,NOT IN SERVICE,1.0,604596,,,ACTransit_2015_8_14,,,,,,,,,,,,71,2097,195
 1508FA-D4-Weekday-04,649 MONTERA MDL SCL,1.0,604588,,,ACTransit_2015_8_14,,,,,,,,,,,,65,2104,171
 1508FA-D4-Weekday-04,650 SKYLINE HIGH,1.0,605030,,,ACTransit_2015_8_14,,,,,,,,,,,,67,2105,177
@@ -3212,6 +3236,7 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D4-Weekday-04,73 EASTMONT,0.0,605045,,,ACTransit_2015_8_14,,,,,,,,,,,,100,2559,274
 1508FA-D4-Weekday-04,73 EASTMONT,0.0,605047,,,ACTransit_2015_8_14,,,,,,,,,,,,100,2576,274
 1508FA-D4-Weekday-04,73 EASTMONT,0.0,605046,,,ACTransit_2015_8_14,,,,,,,,,,,,100,2591,274
+1508FA-D4-Weekday-04,NXC CASTRO VALLEY,0.0,604623,,,ACTransit_2015_8_14,,,,,,,,,,,,144,2595,385
 1508FA-D4-Weekday-04,45 EASTMONT TRANST CTR,1.0,604636,,,ACTransit_2015_8_14,,,,,,,,,,,,31,2598,80
 1508FA-D4-Weekday-04,45 EASTMONT TRANST CTR,1.0,604630,,,ACTransit_2015_8_14,,,,,,,,,,,,31,2605,80
 1508FA-D4-Weekday-04,45 EASTMONT TRANST CTR,1.0,604634,,,ACTransit_2015_8_14,,,,,,,,,,,,31,2607,80
@@ -3286,21 +3311,31 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D4-Weekday-04,40 EASTMONT TRANSIT CTR,1.0,605035,,,ACTransit_2015_8_14,,,,,,,,,,,,30,3406,78
 1508FA-D4-Weekday-04,657 OAKLAND TECH,1.0,605053,,,ACTransit_2015_8_14,,,,,,,,,,,,73,3427,199
 1508FA-D4-Weekday-04,OX SAN FRANCISCO,1.0,605059,,,ACTransit_2015_8_14,,,,,,,,,,,,146,3429,388
+1508FA-D4-Weekday-04,OX ALAMEDA,0.0,605060,,,ACTransit_2015_8_14,,,,,,,,,,,,146,3433,389
 1508FA-D4-Weekday-04,OX SAN FRANCISCO,1.0,605061,,,ACTransit_2015_8_14,,,,,,,,,,,,146,3435,388
 1508FA-D4-Weekday-04,680 TO LAKESHORE AV,1.0,605068,,,ACTransit_2015_8_14,,,,,,,,,,,,87,3451,241
+1508FA-D4-Weekday-04,OX ALAMEDA,0.0,605073,,,ACTransit_2015_8_14,,,,,,,,,,,,146,3463,389
 1508FA-D4-Weekday-04,E TO HUDSON ST,1.0,605084,,,ACTransit_2015_8_14,,,,,,,,,,,,128,3477,351
 1508FA-D4-Weekday-04,E TO HUDSON ST,1.0,604597,,,ACTransit_2015_8_14,,,,,,,,,,,,128,3478,351
 1508FA-D4-Weekday-04,O SAN FRANCISCO,1.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3480,387
+1508FA-D4-Weekday-04,O FRUITVALE BART,0.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3481,386
 1508FA-D4-Weekday-04,O SAN FRANCISCO,1.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3482,387
+1508FA-D4-Weekday-04,O FRUITVALE BART,0.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3485,386
 1508FA-D4-Weekday-04,O SAN FRANCISCO,1.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3486,387
 1508FA-D4-Weekday-04,O SAN FRANCISCO,1.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3490,387
+1508FA-D4-Weekday-04,O FRUITVALE BART,0.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3491,386
 1508FA-D4-Weekday-04,O SAN FRANCISCO,1.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3494,387
+1508FA-D4-Weekday-04,O FRUITVALE BART,0.0,605085,,,ACTransit_2015_8_14,,,,,,,,,,,,145,3495,386
 1508FA-D4-Weekday-04,631 BAY FARM ISLAND,1.0,605098,,,ACTransit_2015_8_14,,,,,,,,,,,,58,3548,145
 1508FA-D4-Weekday-04,NL SAN FRANCISCO,1.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3556,376
+1508FA-D4-Weekday-04,NL EASTMONT TRANSIT CTR,0.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3557,377
 1508FA-D4-Weekday-04,NL SAN FRANCISCO,1.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3558,376
+1508FA-D4-Weekday-04,NL EASTMONT TRANSIT CTR,0.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3561,377
 1508FA-D4-Weekday-04,NL SAN FRANCISCO,1.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3562,376
 1508FA-D4-Weekday-04,NL SAN FRANCISCO,1.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3566,376
+1508FA-D4-Weekday-04,NL EASTMONT TRANSIT CTR,0.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3567,377
 1508FA-D4-Weekday-04,NL SAN FRANCISCO,1.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3570,376
+1508FA-D4-Weekday-04,NL EASTMONT TRANSIT CTR,0.0,605106,,,ACTransit_2015_8_14,,,,,,,,,,,,138,3571,377
 1508FA-D4-Weekday-04,641 FRICK MIDDLE SCL,0.0,605107,,,ACTransit_2015_8_14,,,,,,,,,,,,60,3591,150
 1508FA-D4-Weekday-04,NOT IN SERVICE,0.0,605124,,,ACTransit_2015_8_14,,,,,,,,,,,,76,3614,214
 1508FA-D4-Weekday-04,662 40TH & SAN PABLO,1.0,605124,,,ACTransit_2015_8_14,,,,,,,,,,,,76,3615,212
@@ -3370,6 +3405,7 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D6-Weekday-02,86 TO MACK ST ONLY,1.0,611105,,,ACTransit_2015_8_14,,,,,,,,,,,,112,4078,307
 1508FA-D6-Weekday-02,86 TO MACK ST ONLY,1.0,611107,,,ACTransit_2015_8_14,,,,,,,,,,,,112,4080,307
 1508FA-D6-Weekday-02,86 TO MACK ST ONLY,1.0,611107,,,ACTransit_2015_8_14,,,,,,,,,,,,112,4090,307
+1508FA-D6-Weekday-02,SB NEWARK,0.0,611113,,,ACTransit_2015_8_14,,,,,,,,,,,,149,4097,395
 1508FA-D6-Weekday-02,SB SAN FRANCISCO,1.0,611073,,,ACTransit_2015_8_14,,,,,,,,,,,,149,4101,394
 1508FA-D6-Weekday-02,SB SAN FRANCISCO,1.0,611072,,,ACTransit_2015_8_14,,,,,,,,,,,,149,4102,394
 1508FA-D6-Weekday-02,620 CEDAR BLVD,0.0,611086,,,ACTransit_2015_8_14,,,,,,,,,,,,50,4105,125
@@ -3401,6 +3437,8 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 1508FA-D6-Weekday-02,22 CLOCKWISE,0.0,611090,,,ACTransit_2015_8_14,,,,,,,,,,,,16,4241,45
 1508FA-D6-Weekday-02,22 CLOCKWISE,0.0,611090,,,ACTransit_2015_8_14,,,,,,,,,,,,16,4249,45
 1508FA-D6-Weekday-02,S SAN FRANCISCO,1.0,611088,,,ACTransit_2015_8_14,,,,,,,,,,,,148,4258,392
+1508FA-D6-Weekday-02,S HAYWARD,0.0,611130,,,ACTransit_2015_8_14,,,,,,,,,,,,148,4259,393
+1508FA-D6-Weekday-02,S HAYWARD,0.0,611082,,,ACTransit_2015_8_14,,,,,,,,,,,,148,4264,393
 1508FA-D6-Weekday-02,S SAN FRANCISCO,1.0,611085,,,ACTransit_2015_8_14,,,,,,,,,,,,148,4265,392
 1508FA-D6-Weekday-02,60 CSU EAST BAY,0.0,611078,,,ACTransit_2015_8_14,,,,,,,,,,,,43,4269,111
 1508FA-D6-Weekday-02,60 CSU EAST BAY,0.0,611079,,,ACTransit_2015_8_14,,,,,,,,,,,,43,4272,111
