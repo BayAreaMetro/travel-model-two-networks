@@ -1,0 +1,111 @@
+project: Year 2015 Modify USE on I-880 NB CA-237 to Dixon Road
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2058880
+      - 2221232
+    - shstReferenceId:
+      - "35f99c3c15e037978305aa0ed0629d6a"
+      - "cbaa8a43abdc4d20694cd217264bccb2"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

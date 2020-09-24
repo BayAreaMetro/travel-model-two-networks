@@ -1,0 +1,217 @@
+project: Year 2015 Modify USE on Lawrence Expressway SB US 101 to I-280
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2017761
+      - 2029146
+      - 2030031
+      - 2031831
+      - 2033352
+      - 2037288
+      - 2037997
+      - 2046402
+      - 2058568
+      - 2061108
+      - 2061733
+      - 2063300
+      - 2063542
+      - 2068554
+      - 2080093
+      - 2095123
+      - 2097539
+      - 2097789
+      - 2105746
+      - 2105963
+      - 2110494
+      - 2112876
+      - 2113511
+      - 2114341
+      - 2116423
+      - 2129699
+      - 2136717
+      - 2136832
+      - 2144912
+      - 2152344
+      - 2157623
+      - 2164755
+      - 2166848
+      - 2172534
+      - 2178367
+      - 2178583
+      - 2178750
+      - 2181799
+      - 2190486
+      - 2191224
+      - 2195301
+      - 2196254
+      - 2203812
+      - 2204194
+      - 2207418
+      - 2211945
+      - 2225460
+      - 2227502
+      - 2233579
+      - 2233720
+      - 2237573
+      - 2240706
+      - 2251177
+      - 2251881
+      - 2270243
+    - shstReferenceId:
+      - "1031bb168c352d4f5d3aae615068fb79"
+      - "1abf21c821f411780dfb85e372eb9c2d"
+      - "1b9409dad42e92d579799682cd3361fc"
+      - "1d2fe1cfd187aa963ff8e1acd9a2a35c"
+      - "1e92573ce0212f2bd5bf64c84e6dec45"
+      - "222834ff7b527b270c1e8abc6cfebc81"
+      - "22cd9bfdf5691ffe4d9650e1bd11212c"
+      - "2a9c58493164bde90e2016c4606a326e"
+      - "35b3db347effe9ad99550775e8ad26c4"
+      - "37ffc8cbb4b7795dc7a928b0a3a0450e"
+      - "388e2a13b6c223d76470af3d4c2df737"
+      - "39ffec068ee9827a348046362d0b9c4e"
+      - "3a3b9c8c56176745b11a943d0b05e93d"
+      - "3ef1d68037912276bac1b8ce3bc65a45"
+      - "4970d31ffcea3a351f05653de040c6ff"
+      - "57581dfa23bffb7ca7ac3739b0ea0350"
+      - "599378c73eeebd01ac1f9c9a27a2b1c8"
+      - "59d31edd3c2100d8e05b1c01aa8fd2da"
+      - "6116444c213b15b909f298b48e9a5a73"
+      - "6149ee05a014f1f7c3f510b343ac50ff"
+      - "6586a50a92d872756c75edac1639dac8"
+      - "67c15b7e18225365d6fcf9092615c47f"
+      - "684f6e053e9fe08ac221da8590343964"
+      - "691193e5672d6cf86c6ff944afaae60d"
+      - "6b02aeff8779da506a1510f1e6bbff93"
+      - "773ba323bef3af98140688297c702e02"
+      - "7db3f3b94e697c78a99d2884699d9e40"
+      - "7dcbe69325d78413bd94d0a113a25f2b"
+      - "8557c3516248756679a67e6ef64e9ccc"
+      - "8c1fe236e804a6af79921f741160b859"
+      - "90e18b7ede0784262df834f99e34f0c0"
+      - "977a5a44b82f25be46d29762efad2ea6"
+      - "996560ffd4ec1590acb1fea9b9e58af8"
+      - "9ea1246374488d0c9a671c53636660ad"
+      - "a40400416a106e508767270f6956bf0d"
+      - "a434ea668454f17e3bd9eb4a8a8de6c1"
+      - "a45f10394585a05c5d1a9a6449396b7d"
+      - "a739bd067bae3e208f782b9d95ee744f"
+      - "af48a0dd3d8b4e4277599f0a8850f531"
+      - "aff925393bbc7fa960e6ec7387fffcd9"
+      - "b3c2c066e946523d9828d9d5ab2d1301"
+      - "b4a03403e57fcfe76516ef766068549b"
+      - "bba049621ac258e16d877c061875f1ee"
+      - "bbffb55355f3a5986f9daac9bf833628"
+      - "beef1bd956e55b2b86c8055809b330a6"
+      - "c3194fbed565b13c5b8d57c4fb0c9b1c"
+      - "cf7d06b355c2b58dab303410c0f4d728"
+      - "d16c1e9c66681f41ac1cb0dc66f59755"
+      - "d717148ae2f869e92d81a28e7717077b"
+      - "d73647ca3616c21f98f87c3345eb85df"
+      - "dac5a3e6b4412dc9a7b44174383cae1c"
+      - "dda8b4ab2b3740d1d8414b809dddb823"
+      - "e75799444ec0556990be8c9de8ffaabc"
+      - "e7f8c4604df9e3b83f6a5a8729550ec6"
+      - "f8b7dcea6258c5874da3fc13bbc74235"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

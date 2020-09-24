@@ -1,0 +1,201 @@
+project: Year 2015 Modify USE on CA-85 NB US101 to US101
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2000020
+      - 2001286
+      - 2005470
+      - 2013491
+      - 2022042
+      - 2023656
+      - 2023848
+      - 2024178
+      - 2041221
+      - 2043269
+      - 2047574
+      - 2052896
+      - 2059245
+      - 2064939
+      - 2078478
+      - 2088399
+      - 2090150
+      - 2102888
+      - 2108853
+      - 2116251
+      - 2118196
+      - 2121005
+      - 2121555
+      - 2132349
+      - 2135192
+      - 2136926
+      - 2147530
+      - 2149506
+      - 2162803
+      - 2180279
+      - 2183117
+      - 2185803
+      - 2192466
+      - 2192649
+      - 2197576
+      - 2205006
+      - 2209271
+      - 2214692
+      - 2224975
+      - 2228032
+      - 2228562
+      - 2233577
+      - 2240130
+      - 2245285
+      - 2252000
+      - 2258437
+      - 2274701
+    - shstReferenceId:
+      - "000619909cfedfdc3ae846759247e09f"
+      - "01248bbf4c897c845921a9c93c8d609d"
+      - "05029675c0225b80a37278e13035dc9b"
+      - "0c5209f19692d3d61b32481247eec01d"
+      - "141f2a3235c7e1cf949a6280d1a49f56"
+      - "159bbbbd33f107dc1fc4050ad997dcdb"
+      - "15c76e84c0cd4758aa8288f0688d5850"
+      - "161a2d20bb34d784b59e1f80869eaf17"
+      - "25c7faf230acac5b95be6c406be9f4bb"
+      - "27b7bf5caaa7cf140f5884a0fa8c2ee3"
+      - "2bb14318145a1f20dce79d1240cef825"
+      - "3083571b723048cf79bbc8ac2ae47dcf"
+      - "364f8fa790c2826e903d1b3c357e127a"
+      - "3b8ebd7ac36488011c7407c0c07ab981"
+      - "47f0cf94ff462f60869c23a230bb3531"
+      - "5132af4cec827e1e335c151c32dba186"
+      - "52cdf5241cddd80098661c317187424e"
+      - "5e7660989cb3c3e5e7ce9464063992a4"
+      - "63fa3516a80ba069e5a789dadfa63946"
+      - "6adaa8f37958423ae3f7be8fe709d184"
+      - "6c9afb2ca10aeb4430b0f669634c9795"
+      - "6f267efdb97ea9e511652e2ffeb81eeb"
+      - "6faa1dc6e477badde317095fbb343708"
+      - "79b97df610fe4e919c9290b3aaf0b4d6"
+      - "7c5d176909d530c1efa119a9f7af281c"
+      - "7de3351c6597a1b3cced0171380f9ff9"
+      - "87b35ae5c8db5ba82ae233d566251984"
+      - "89856fbe58adbcf12c661f2e33fdbd3c"
+      - "959d67f15ff9257737554d5fdf846f1f"
+      - "a5c8d4241243ab59629826ea98b2c04e"
+      - "a876c8abae2afd0c2e7f8c22d7079169"
+      - "aaf42f40fdd693c1f13a4ca76a0e14b6"
+      - "b11de6291c9abf57ed7c903d4bb00881"
+      - "b14b6e8f67f71c22eb9f2c98dc080fef"
+      - "b5e400fd2aef3304af529fd427e01f84"
+      - "bcb662e7e8dfccb003dbb7596ace2f8d"
+      - "c0a3459385c9305501e0dc96433e2e5d"
+      - "c5a695a6f0e2091068be9a354c3282ca"
+      - "cf102c5b815e707a56d4e98b52be6fd9"
+      - "d1ec8094d02f2c00f53bc72d0c5f67b3"
+      - "d26b9197d367cd9e455a4c6dfefda8a9"
+      - "d7168400f4d2552053d3d512eb6a7f55"
+      - "dd2228ffb01763244fba726f4fc44c23"
+      - "e1e638e2fee634da31e4a8f06f35ef7e"
+      - "e81504d73a6462421495eb3ce67a295e"
+      - "ee16241ed18584ff20d9b1b207037d1b"
+      - "fccc06ed47eaaacea79cf47bc260880a"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

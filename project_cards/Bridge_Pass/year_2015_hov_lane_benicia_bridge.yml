@@ -1,0 +1,109 @@
+project: Benicia Bridge HOV
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: HOV Lane
+  facility:
+    link:
+    - model_link_id:
+      
+    - shstReferenceId:
+      - "44745ac6ebae7a5b78ba6c4bccc43b68"
+      - "e5bab32b8697116f3e53cb25c1d897ac"
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

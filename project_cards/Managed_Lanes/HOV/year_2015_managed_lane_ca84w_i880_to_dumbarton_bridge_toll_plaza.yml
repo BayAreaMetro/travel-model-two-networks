@@ -1,0 +1,124 @@
+project: Year 2015 Modify USE on CA-84 WB I-880 to Dumbarton Bridge Toll Plaza
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3029002
+      - 3091200
+      - 3101540
+      - 3129174
+      - 3135224
+      - 3158386
+      - 3160902
+      - 3161002
+      - 3170572
+    - shstReferenceId:
+      - "2abb410a0cf3abe04cb7c622077ea717"
+      - "865e574044e0b15911265c7004b8df08"
+      - "95696728191df060663dfd513e071c0a"
+      - "be0b25b3c93a1c072193df8ae693fd74"
+      - "c6d8e36fd51cc408065ace44ecc00525"
+      - "e8fdaaaf7b155fb57d54d26e27fcc615"
+      - "eca3180e1753369ad7f77d689bb3de25"
+      - "ecc73056a1a87c3ef5f4a40edfce6eeb"
+      - "fb48fcd7994805554b8e1e722ecbcf1e"
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false
