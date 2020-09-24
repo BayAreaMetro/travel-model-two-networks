@@ -1,0 +1,153 @@
+project: Year 2015 Modify USE on I-680 SB from Rudgear Road to Acosta Blvd
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 4004276
+      - 3009880
+      - 4009828
+      - 4010435
+      - 4027835
+      - 4031687
+      - 4036666
+      - 4037442
+      - 3059213
+      - 3067520
+      - 4055497
+      - 4071711
+      - 4082381
+      - 4092461
+      - 4095915
+      - 4096477
+      - 4100948
+      - 4101740
+      - 4102466
+      - 4107336
+      - 4108591
+      - 4119530
+      - 4129432
+    - shstReferenceId:
+      - "0857925213f8f49dcab09c65d1dbf102"
+      - "0e824623d4d63b4979b582a0c56bc101"
+      - "1333bce9382f9a1ce75a6f714ce53acf"
+      - "1467dd143b16455bd4533267598ef749"
+      - "368efdb25ae653e144c2fbbd87ea8cc4"
+      - "3e14c1518e2508dd1e98cd6772ba3c7b"
+      - "47fe6cec14753937ffd77eb03f49b8dc"
+      - "498cca260dc0b574fe619890a7caa025"
+      - "57199ef31e0a4ef45585a32bf2426368"
+      - "6354c728722ad860f80180cbf6b365c3"
+      - "6c8468b33ee28c64b012d4d1099410e7"
+      - "8c746553fe117d506ec8a1fa99af2ab0"
+      - "a174bcc09c501c9990b9217aa2dce4bc"
+      - "b5478787efcb588946ca14a6945e0d2f"
+      - "bc0833ec8395813474552bd5b50bb50d"
+      - "bd1af72bcec679ea5743bcd8c2d44108"
+      - "c5dfa8169203ae61a0de02526b799f01"
+      - "c773061dde7a4a73dcde55885c251e2b"
+      - "c8d4fa71f4d8a4b8bf4d01ed55f4869a"
+      - "d27bcae1d43073dafb465a02a7f275ca"
+      - "d4e03dc1e6301db158402713c50d90c6"
+      - "ea5c4c461c0391d117b46b54bc0d9f5c"
+      - "fda57e1eecaf849bbfe8f51cf60d9431"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

@@ -1,0 +1,193 @@
+project: Year 2015 Modify USE on US-101 SB from South of Healdsburg to North of Petaluma
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - "8000590"
+      - "8001088"
+      - "8002311"
+      - "8003354"
+      - "8003805"
+      - "8003889"
+      - "8004036"
+      - "8004415"
+      - "8004787"
+      - "8006211"
+      - "8007024"
+      - "8009555"
+      - "8009793"
+      - "8010352"
+      - "8011013"
+      - "8011227"
+      - "8011433"
+      - "8012877"
+      - "8013157"
+      - "8013471"
+      - "8013513"
+      - "8015232"
+      - "8016977"
+      - "8017602"
+      - "8018869"
+      - "8019846"
+      - "8020618"
+      - "8021350"
+      - "8021973"
+      - "8022862"
+      - "8026475"
+      - "8028501"
+      - "8028620"
+      - "8028765"
+      - "8028961"
+      - "8029582"
+      - "8030277"
+      - "8030402"
+      - "8030610"
+      - "8031215"
+      - "8031338"
+      - "8032100"
+      - "8033659"
+    - shStReferenceId:
+      - "0459d307126dbd9e70f67a56f612f218"
+      - "07c01a54ffc328e1ff290e91acd22e7e"
+      - "10db680d3ebbfbcfb69a55c17542ec87"
+      - "18cb795a20db9a40b8628511c392c60c"
+      - "1c3a34da87d91518d2bd83fc6af19164"
+      - "1cd812230f09f773e811f5b2626bac76"
+      - "1de4265d54f568cad50be81b956e515b"
+      - "2070e7bf946b909079c6aa3dae8ad03b"
+      - "232ffce9c871f1af20648c3179c88edd"
+      - "2da50caa08ca673ce1247f093cee4901"
+      - "3398a11763e877aff9139c482f809043"
+      - "46c7afa6f70a8de8aab56bb9498af718"
+      - "487c5f345fb6240ddabfdc742db437b9"
+      - "4caa7368df91416316dcc0bf0921d5a9"
+      - "51930a53fe8dab10013aef12f88cfb2c"
+      - "536c624da9a6c711a5a4054e2675f94a"
+      - "54f23b93fe1738e514d4058b00194771"
+      - "5f5de0dbe84498471fe2a26c7bfdf145"
+      - "6170d300822e8b6491aa349c0616080d"
+      - "63fbb28adfc6b0dedbec55c7d4ba1dca"
+      - "6431afbc8129b0c7714e219a753b39ef"
+      - "70e713119a0a682f609fedc8249ab3c1"
+      - "7dc1e1aa87c8428e219c54d30c6b7a1e"
+      - "82a74827e2fafe3201b4a36ac9aef31b"
+      - "8bfb3ec6152f866c6a744f7d52644dce"
+      - "92c170b301a437e4874a49497e6f5d25"
+      - "98ce27d88a814857efa19424f167c374"
+      - "9e399102196cec845bf2f0fe445922a3"
+      - "a2d6523a0cb3b4a00ecd77af7a6f57f4"
+      - "a9934caa2c51f211b44c55b5a2ce1ef3"
+      - "c37db5e2f64cf81bc1b76faf8a0df0cf"
+      - "d200cf31e765634714b5682e4f608765"
+      - "d2ffbd81fd1ea8393c754b366f69d94b"
+      - "d40979191ebdacbc403172ba8e794a25"
+      - "d5842ba3026c8e19e2faa3cd9f43539c"
+      - "da09568789e460a83f798e2ae437b0eb"
+      - "df209cac09d05a2f7e0a22dc8e931df8"
+      - "e01b689df5eff5aaeea6c47c689c5043"
+      - "e1a4440cfa68645ac6b191c8b171fd5a"
+      - "e63e4b69b2005d57c274ebe931191539"
+      - "e740277ff693a69e6200f6c102cb2691"
+      - "ed1d8e25639ba28fb269e3933a2df887"
+      - "f8ab20dba557b3cfce72a64c583d4692"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

@@ -1,0 +1,131 @@
+project: Year 2015 Modify USE on US 101 SB CA-85 to Oregon Expressway
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 1000516
+      - 1004793
+      - 1014273
+      - 1016275
+      - 1016959
+      - 1025600
+      - 1045424
+      - 1047916
+      - 1049569
+      - 1052566
+      - 1055475
+      - 1057172
+    - shstReferenceId:
+      - "01bd71dec90941ffd0ba8a8b81d42e24"
+      - "0fe6341e20240d4091831de1ddd5778a"
+      - "2f496579fd26999c8ba7405d8ff72a40"
+      - "3654b40dd2fb068207d17efab125b210"
+      - "388ca1f1ae8a4dccdf61b9686d0e8af2"
+      - "555596b2888a4bbfd0775882519992d0"
+      - "966d28a5b83aa4f098542c36ff2d8fa3"
+      - "9e4f1b5af1301ec7609b68e14284110d"
+      - "a3c0161c9bf01a79d5ae827f2e288ed2"
+      - "adafd5d1a07c472e9a4e0a02625d6fe3"
+      - "b734b5de97854d016e91f5a92b682287"
+      - "bce1468d62652d93b1109ec79d9d5eca"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

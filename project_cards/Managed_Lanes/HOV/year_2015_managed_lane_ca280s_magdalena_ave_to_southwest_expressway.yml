@@ -1,0 +1,145 @@
+project: Year 2015 Modify USE on CA-280 SB Magdalena Ave to Southwest Expressway
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2003348
+      - 2017123
+      - 2019654
+      - 2021581
+      - 2021894
+      - 2036618
+      - 2052730
+      - 2057065
+      - 2062265
+      - 2095425
+      - 2119518
+      - 2129425
+      - 2141871
+      - 2143969
+      - 2144646
+      - 2161934
+      - 2169290
+      - 2173057
+      - 2216710
+    - shstReferenceId:
+      - "0312663d6cb34795fc28290888130af9"
+      - "0f9a4b8584bbae459cc482ae3b62690f"
+      - "11ee80390539ab4c34e031a01456e0d1"
+      - "13b593b9a1f80c5aaa2c487ccbd0dd71"
+      - "13fbe0d75f54cb0b7047065393d66e57"
+      - "218ff7bd29a845b4867bed60ab98cac4"
+      - "305e8b350ce0c84ef611b7c1116157dd"
+      - "344e20d0c2bafab08587e6e4d1a888d6"
+      - "390f485ead7b0e463f286000836f7189"
+      - "579dea6f8d80d55188d59de9efd60fb6"
+      - "6dc8ba849db0978a4af1a7f1b87741a0"
+      - "76fec0c4d505f80f3c540ade2324af9f"
+      - "82819c17862c6a2cab3df9b874f7f9bb"
+      - "84781eb4154537a0e2cfd627a7ea3fd0"
+      - "85189aea7396b75e4b9a1dcda52e1336"
+      - "94da4feee32d592c7d96158c720a4afc"
+      - "9ba8b73546fe0b0a366178effc689364"
+      - "9f14cb24f2d53628b60e3d69fcbfb2fa"
+      - "c776a052af6605bfe2cc2d083871e50d"
+  properties:
+  - property: lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 0
+    - time:
+      - '10:00'
+      - '15:00'
+      set: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 0
+    - time:
+      - '19:00'
+      - '3:00'
+      set: -1
+  - property: ML_lanes
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+      - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: segment_id
+    set: 21
+  - property: USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0
+  - property: ML_USE
+    timeofday:
+    - time:
+      - '3:00'
+      - '6:00'
+      set: 0
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 3
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 0
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 3
+    - time:
+      - '19:00'
+      - '3:00'
+      set: 0  
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false
