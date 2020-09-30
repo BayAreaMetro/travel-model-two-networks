@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on CA-280 NB Bascom Ave to Magdalena Ave
+project: Year 2015 Modify HOV Lanes and USE on CA-280 NB Bascom Ave to Magdalena Ave
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,26 +8,26 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 2010395
-      - 2021879
-      - 2062130
-      - 2081906
-      - 2091909
-      - 2095439
-      - 2097607
-      - 2121493
-      - 2141741
-      - 2143650
-      - 2156102
-      - 2193049
-      - 2198488
-      - 2204086
-      - 2205634
-      - 2233505
-      - 2242365
-      - 2243563
-      - 2263959
-      - 2272998
+      - 2010212
+      - 2021491
+      - 2061036
+      - 2080471
+      - 2090321
+      - 2093779
+      - 2095925
+      - 2119425
+      - 2139319
+      - 2141190
+      - 2153430
+      - 2189752
+      - 2195073
+      - 2200582
+      - 2202112
+      - 2229490
+      - 2238191
+      - 2239368
+      - 2259400
+      - 2268315
     - shstReferenceId:
       - "0982eab09a68fb3793dd078cd3e6cce8"
       - "13f7086211ed6372c240ba1ad98e57d8"
@@ -51,95 +51,46 @@ changes:
       - "fb3761c7cb114cbeccc700693c51806f"
   properties:
   - property: lanes
+    set: 3
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 3
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 3
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 3
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 221
   - property: ML_USE
+    set: 2
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress
