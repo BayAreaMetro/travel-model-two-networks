@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on I-80 WB I-80 to Bay Bridge Toll Plaza
+project: Year 2015 Modify HOV Lanes and USE on I-80 WB I-80 to Bay Bridge Toll Plaza
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,109 +8,61 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3050620
-      - 3078088
-      - 3080240
-      - 3099835
-      - 3149859
-      - 3151569
+      - 3049524
+      - 3076359
+      - 3078461
+      - 3097617
+      - 3061568
+      - 3149471
     - shstReferenceId:
       - "4a5c5b58960183357a13230069d05ddc"
       - "731620b4e9b213e334f146b4c6844099"
       - "7629e3aa0e1b3bf0602b68674d514080"
       - "92df1697545013ebadf5ba7392217f12"
-      - "dc7e4e7834bd9f31807dbf6966b4c9f5"
-      - "df12b2e519f6a990ca137ba00f45e2b8"
+      - "5cb208be89de29c545b615a215e3b03d"
+      - "e0f8a9be8f36933b93e37c4034dbb282"
+  properties:
   - property: lanes
+    set: 3
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 5
+    - time: ['6:00', '10:00']
+      set: 4
+    - time: ['10:00', '15:00']
+      set: 5
+    - time: ['15:00', '19:00']
+      set: 4
+    - time: ['19:00', '3:00']
+      set: 5
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
+    set: 233
   - property: USE
+    set: 2
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
-  - property: ML_USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

@@ -8,12 +8,12 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3001372
-      - 3004508
-      - 3025129
-      - 3043653
-      - 3075358
-      - 3116027
+      - 3001335
+      - 3004406
+      - 3024600
+      - 3042719
+      - 3073690
+      - 3113462
     - shstReferenceId:
       - "02093cd3c7c5a65cb16a69e2e4351b3b"
       - "06990e6d7125eb5f90d40d8bea657cf7"
@@ -21,98 +21,51 @@ changes:
       - "4028462195030d6f304bac38441cff5c"
       - "6efbc4296c278e94b543481fbbf1ac3f"
       - "aad4c2ed80c5ecbbe145bf4070591772"
+  properties:
   - property: lanes
+    set: 4
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 4
+    - time: ['6:00', '10:00']
+      set: 3
+    - time: ['10:00', '15:00']
+      set: 4
+    - time: ['15:00', '19:00']
+      set: 3
+    - time: ['19:00', '3:00']
+      set: 4
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 236
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress
     set: 'all'  
 valid: false
+

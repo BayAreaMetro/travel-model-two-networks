@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on I-880 SB CA-237 to US 101
+project: Year 2015 Modify HOV Lanes and USE on I-880 SB CA-237 to US 101
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,15 +8,15 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 2016751
-      - 2051717
-      - 2067024
-      - 2069494
-      - 2099174
-      - 2132079
-      - 2167502
-      - 2176489
-      - 2244135
+      - 2016451
+      - 2050795
+      - 2065844
+      - 2068265
+      - 2097465
+      - 2129823
+      - 2164622
+      - 2173469
+      - 2239926
     - shstReferenceId:
       - "0f44c10881a147093ce6bd0e97e5323e"
       - "2f7967cee0c131a7f9c64bc376e4041e"
@@ -29,95 +29,46 @@ changes:
       - "e0db3e4a240b868c81c2174facdd5813"
   properties:
   - property: lanes
+    set: 4
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 4
+    - time: ['6:00', '10:00']
+      set: 3
+    - time: ['10:00', '15:00']
+      set: 4
+    - time: ['15:00', '19:00']
+      set: 3
+    - time: ['19:00', '3:00']
+      set: 4
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 228
   - property: ML_USE
+    set: 3
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

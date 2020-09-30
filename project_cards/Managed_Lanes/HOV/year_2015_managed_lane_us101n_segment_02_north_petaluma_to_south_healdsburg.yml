@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on US-101 NB from North of Petaluma to South of Healdsburg
+project: Year 2015 Modify HOV Lanes and USE on US-101 NB from North of Petaluma to South of Healdsburg
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,36 +8,36 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 7000783
-      - 7000860
-      - 7001558
-      - 7004177
-      - 7011276
-      - 7016731
-      - 7023801
-      - 7023968
-      - 7025788
-      - 7026790
-      - 7029716
-      - 7029774
-      - 7031911
-      - 7033227
-      - 7034444
-      - 7035408
-      - 7039621
-      - 7042364
-      - 7043246
-      - 7044035
-      - 7048107
-      - 7049393
-      - 7053029
-      - 7058215
-      - 7061165
-      - 7061833
-      - 7069696
-      - 7069999
-      - 7070556
-    - shStReferenceId:
+      - 7000765
+      - 7000841
+      - 7001524
+      - 7004061
+      - 7010951
+      - 7016245
+      - 7023101
+      - 7023266
+      - 7025020
+      - 7025987
+      - 7028810
+      - 7028865
+      - 7030930
+      - 7032197
+      - 7033362
+      - 7034302
+      - 7038372
+      - 7041030
+      - 7041887
+      - 7042646
+      - 7046593
+      - 7047836
+      - 7051369
+      - 7056409
+      - 7059272
+      - 7059916
+      - 7067545
+      - 7067839
+      - 7068386
+    - shstReferenceId:
       - "02b0be7186de823a19b1bbd0ae45ddec"
       - "02eff7da4c5bb9442a83936632004b95"
       - "0525f0f79ea98182a1242ff6ba9a6145"
@@ -69,95 +69,46 @@ changes:
       - "fec38c8d805250873dbbd1d22ab15645"
   properties:
   - property: lanes
+    set: 3
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 3
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 3
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 3
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 239
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

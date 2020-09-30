@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on CA-87 SB US 101 to CA-85
+project: Year 2015 Modify HOV Lanes and USE on CA-87 SB US 101 to CA-85
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,28 +8,28 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 2044468
-      - 2049526
-      - 2060317
-      - 2063098
-      - 2063450
-      - 2066776
-      - 2072671
-      - 2082583
-      - 2089094
-      - 2095097
-      - 2096171
-      - 2171136
-      - 2180038
-      - 2185782
-      - 2195482
-      - 2221725
-      - 2230894
-      - 2254244
-      - 2254824
-      - 2259608
-      - 2261984
-      - 2265590
+      - 2043682
+      - 2048647
+      - 2059253
+      - 2061985
+      - 2062332
+      - 2065599
+      - 2071387
+      - 2081136
+      - 2087550
+      - 2093444
+      - 2094505
+      - 2168198
+      - 2176972
+      - 2182605
+      - 2192139
+      - 2217894
+      - 2226922
+      - 2249852
+      - 2250422
+      - 2255119
+      - 2257456
+      - 2261009
     - shstReferenceId:
       - "28d4d956f75454a8c4ad2894336ebcee"
       - "2d7771d02a5627275acdeff5cd74d8c0"
@@ -53,99 +53,50 @@ changes:
       - "ef2bfb5b22e4208602b6e5c37c2f4ec5"
       - "f14d437f8b8a4d817257247c9fa77c3e"
       - "f4984a2b9e56ca4067c4891219025acf"
-  properties:
-  - property: lanes
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
-  - property: ML_lanes
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 1
-      - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
-  - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    properties:
+    - property: lanes
       set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+      timeofday:
+      - time: ['3:00', '6:00']
+        set: 3
+      - time: ['6:00', '10:00']
+        set: 2
+      - time: ['10:00', '15:00']
+        set: 3
+      - time: ['15:00', '19:00']
+        set: 2
+      - time: ['19:00', '3:00']
+        set: 3
+    - property: ML_lanes
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
-  - property: ML_USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
-  - property: ML_access
-    set: 'all'
-  - property: ML_egress
-    set: 'all'  
-valid: false
+      timeofday:
+      - time: ['3:00', '6:00']
+        set: 0
+      - time: ['6:00', '10:00']
+        set: 1
+      - time: ['10:00', '15:00']
+        set: 0
+      - time: ['15:00', '19:00']
+        set: 1
+      - time: ['19:00', '3:00']
+        set: 0     
+    - property: segment_id
+      set: 229
+    - property: ML_USE
+      set: 2
+      timeofday:
+      - time: ['3:00', '6:00']
+        set: 0
+      - time: ['6:00', '10:00']
+        set: 2
+      - time: ['10:00', '15:00']
+        set: 0
+      - time: ['15:00', '19:00']
+        set: 2
+      - time: ['19:00', '3:00']
+        set: 0     
+    - property: ML_access
+      set: 'all'
+    - property: ML_egress
+      set: 'all'  
+  valid: false
