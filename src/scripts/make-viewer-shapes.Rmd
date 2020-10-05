@@ -247,8 +247,8 @@ output_bus_only_sf <- working_sf %>%
 
 output_pedestrian_sf <- links_df %>%
   filter(walk_access == 1) %>%
-  filter(county %in% c("San Francisco", "Alameda", "Contra Costa")) %>%
-  select(model_link_id, shstReferenceId, shstGeometryId, name, length) %>%
+  filter(county %in% c("Alameda", "Contra Costa")) %>%
+  select(model_link_id, shstReferenceId, shstGeometryId, name, a_node_id = A, b_node_id = B, u, v, length) %>%
   left_join(., shapes_sf, by = c("shstGeometryId")) 
   
 

@@ -1,0 +1,18 @@
+﻿station,attribute,lat,lon,walk_time_to_platform_seconds
+Dublin/Pleasanton,Platform,37.701593,-121.899072,0
+Dublin/Pleasanton,Bus,37.702677,-121.899263,193
+Dublin/Pleasanton,Bike,37.701654,-121.897476,171
+Dublin/Pleasanton,Garage,37.702819,-121.89661,261
+Dublin/Pleasanton,Surface Lot,37.700544,-121.894907,261
+Dublin/Pleasanton,Kiss and ride drop off,37.702821,-121.899292,182
+West Dublin/Plesanton,Platform,37.699746,-121.928205,0
+West Dublin/Plesanton,Bus,37.700779,-121.92701,209
+West Dublin/Plesanton,Bike,37.700559,-121.927741,199
+West Dublin/Plesanton,Garage,37.701027,-121.927173,159
+West Dublin/Plesanton,Surface Lot,37.698675,-121.927818,159
+West Dublin/Plesanton,Kiss and ride drop off,37.700832,-121.927079,201
+BayFair,Platform,37.696941,-122.126486,0
+BayFair,Bus,37.696829,-122.125771,96
+BayFair,Bike,37.697487,-122.12652,117
+BayFair,Surface Lot,37.69782,-122.126549,133
+BayFair,Kiss and ride drop off,37.696936,-122.125678,97
