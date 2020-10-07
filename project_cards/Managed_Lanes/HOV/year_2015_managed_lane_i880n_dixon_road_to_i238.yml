@@ -4,7 +4,7 @@ tags:
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+- category: Roadway Property Change
   facility:
     link:
     - model_link_id:
@@ -103,18 +103,115 @@ changes:
       - "fee8b9b7450ac283217536c4c74f2535"
   properties:
   - property: lanes
-    set: 4
     timeofday:
     - time: ['3:00', '6:00']
-      set: 4
+      change: 0
     - time: ['6:00', '10:00']
-      set: 3
+      change: -1
     - time: ['10:00', '15:00']
-      set: 4
+      change: 0
     - time: ['15:00', '19:00']
-      set: 3
+      change: -1
     - time: ['19:00', '3:00']
-      set: 4
+      change: 0  
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3006224
+      - 3015407
+      - 3017390
+      - 3019250
+      - 3020364
+      - 3022060
+      - 3025615
+      - 3034163
+      - 3035345
+      - 3035565
+      - 3037870
+      - 3051261
+      - 3052883
+      - 3053248
+      - 3055218
+      - 3062102
+      - 3062193
+      - 3062877
+      - 2109531
+      - 2117225
+      - 3076045
+      - 3077176
+      - 3089687
+      - 3089691
+      - 3092326
+      - 3097926
+      - 3099252
+      - 3102681
+      - 3107745
+      - 3113758
+      - 3118079
+      - 3119458
+      - 3124424
+      - 2205653
+      - 3131135
+      - 3132925
+      - 2215453
+      - 3134250
+      - 3136237
+      - 3144105
+      - 3145138
+      - 3149313
+      - 2252329
+      - 3160856
+      - 3167386
+      - 3169202
+    - shstReferenceId:
+      - "0967cc37d084df1dcf9d72700731df9f"
+      - "1735a2b0ae3af924e382fc2646a52c88"
+      - "1a20055d9c41d9acabf571fcd25452db"
+      - "1cffe48cd2709bf4a5767763f16ffc04"
+      - "1ebf85f48c38e2e0dae3348465a9d1a4"
+      - "214b3f271ad07c216436eb88104720ee"
+      - "267ecfdfb2dc1a77326a71716ead9bac"
+      - "33536741d4e31541e3e29086a96e7813"
+      - "35133c984b29c30712fadc99eceedbc6"
+      - "355dfab578e420de7cac11dcf1a5ff85"
+      - "38f757ac31f38959612eac4e2ef1a538"
+      - "4cf8e37dbb6d14c8bb182e3183178ef7"
+      - "4f6d977b711e3d0a53f015ab3b19aa30"
+      - "50016eb703b539720ca92ccb44145d4d"
+      - "52ff46a5c7e454a11852414d056e4dbf"
+      - "5d81d42111bdbca9e8e9a1a8fbba81e8"
+      - "5da087a8220b394a08c15a51390fb22d"
+      - "5eaf1b5f2af318dba22becbafdb987c6"
+      - "66739f2efb440c511b02151c164934e0"
+      - "6d95698079f468036242a9ae2f3f6296"
+      - "729cf6dceeef499dbc645530ed645ac6"
+      - "7452bfeb33badc685ef9cdb09fcea3df"
+      - "87199e13f85987a08807bf6c2d2baaa0"
+      - "871c36daf3aa15d3706d9196641eda99"
+      - "8af7670c42ea8d1c7870cf195c63e36f"
+      - "935aedd4c5de8c1d2dbdad6288b7b9bb"
+      - "95613e1df4498a10ce064b979153a7e2"
+      - "9a83dfe7fbaf4a38ad479970620c9020"
+      - "a24bef10fa5554ab9afe9b548311701e"
+      - "ab478371c9bd1c20141f949a121f7c24"
+      - "b1ddeb3f75fb161799cd0c413dd0dabc"
+      - "b3e43fc1c38a7995bc0c4fac4c4ae676"
+      - "bb37f3451537eb6911e0ba347469a879"
+      - "c09d1be7fe16a1b4c6dd2297a0b595aa"
+      - "c53172138488b61cd039f26ef91c2e2a"
+      - "c7f2ab2872af9d39b726959f12a47fb7"
+      - "c9d176add6a59266b9833def079a50fc"
+      - "c9f6f87087d1c55cfb03b67d68f5a675"
+      - "ccdf155075928341cc46d6eda7ee4b2b"
+      - "d8e4ea1e55c7b931db08022c87d3699b"
+      - "da64b3f488b2646538220ca59a1bb2d2"
+      - "e0c1a04c0666191b9c20e85fe89ec664"
+      - "ec84506cf47da464b45a2d02b1aa381d"
+      - "f22cf196292ab39a49de3737e28f09ca"
+      - "fc4164e1c3843c0e09fe19596569adf8"
+      - "fee8b9b7450ac283217536c4c74f2535"
+  properties:
   - property: ML_lanes
     set: 0
     timeofday:
@@ -131,7 +228,7 @@ changes:
   - property: segment_id
     set: 213
   - property: ML_USE
-    set: 2
+    set: 0
     timeofday:
     - time: ['3:00', '6:00']
       set: 0

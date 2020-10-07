@@ -1,35 +1,35 @@
-project: Year 2015 Modify USE on Hwy 4 EB from Port Chicago Highway to Deer Valley Road
+project: Year 2015 Modify HOV Lanes and USE on Hwy 4 EB from Port Chicago Highway to Deer Valley Road
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+- category: Roadway Property Change
   facility:
     link:
     - model_link_id:
       - 4000067
-      - 4003222
-      - 4007713
-      - 4008040
-      - 4010080
-      - 4014508
-      - 4015868
-      - 4018777
-      - 4019702
-      - 4025420
-      - 4035050
-      - 4038589
-      - 4043813
-      - 4049492
-      - 4072652
-      - 4081235
-      - 4091631
-      - 4095745
-      - 4102619
-      - 4108164
-      - 4113712
-      - 4128277
+      - 4003124
+      - 4007500
+      - 4007823
+      - 4009813
+      - 4014130
+      - 4015455
+      - 4018271
+      - 4019165
+      - 4024722
+      - 4034115
+      - 4037566
+      - 4042653
+      - 4048183
+      - 4070724
+      - 4079076
+      - 4089176
+      - 4093163
+      - 4099843
+      - 4105233
+      - 4110612
+      - 4124779
     - shstReferenceId:
       - "001faa1f8bf0fafb4298b7438a83b506"
       - "063e8ee8aa84813a9e3b873ee4ba007a"
@@ -56,94 +56,94 @@ changes:
   properties:
   - property: lanes
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      change: 0
+    - time: ['6:00', '10:00']
+      change: 0
+    - time: ['10:00', '15:00']
+      change: 0
+    - time: ['15:00', '19:00']
+      change: -1
+    - time: ['19:00', '3:00']
+      change: 0
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 4000067
+      - 4003124
+      - 4007500
+      - 4007823
+      - 4009813
+      - 4014130
+      - 4015455
+      - 4018271
+      - 4019165
+      - 4024722
+      - 4034115
+      - 4037566
+      - 4042653
+      - 4048183
+      - 4070724
+      - 4079076
+      - 4089176
+      - 4093163
+      - 4099843
+      - 4105233
+      - 4110612
+      - 4124779
+    - shstReferenceId:
+      - "001faa1f8bf0fafb4298b7438a83b506"
+      - "063e8ee8aa84813a9e3b873ee4ba007a"
+      - "0f0802f52b6b8e9b759e27e49694e0c9"
+      - "0fa1835adfeab0e462025b4fc927b390"
+      - "13b2c45b12cc6724660aea57bd84bbfb"
+      - "1ca234d5c9234b2ea52c330721a48c48"
+      - "1f66329e56ec5db37a71a8ecda8f3e9c"
+      - "250c2e998580b1ecfd48c83aace1cafb"
+      - "26d12173e506be1d422f1e72f8c169de"
+      - "31dcf6d961e8d70a0aed5c02b695e7ba"
+      - "44df4cf2dcf91ffffdf118ad8e599d27"
+      - "4bbe4beeea78b40845292555acbd65f5"
+      - "55ec11b6b5dd32df0cef2740caf0c690"
+      - "60aa6788a6e195f5ee1d7df6ef23a404"
+      - "8e460334620be576997bab290deb0249"
+      - "9f2aa115f5eb181f4162e713089d2891"
+      - "b397c1130568a5c9e515c0f37c7feacd"
+      - "bbb39a745f0f97b88d92953f453091fc"
+      - "c928ce9dffc9cb55547832b0f1154587"
+      - "d41069cf1e32cc42da4158bee9f8975c"
+      - "dec89e1acd5149482244133351960c70"
+      - "fb66842d1cbf8dce0d3d51ed44b55b32"
+  properties:
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
+      set: 0
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 28
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress
