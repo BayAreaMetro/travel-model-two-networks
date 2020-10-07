@@ -4,7 +4,7 @@ tags:
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+- category: Roadway Property Change
   facility:
     link:
     - model_link_id:
@@ -133,18 +133,145 @@ changes:
       - "fe45b194eb8e38b3d3b62fffd6462a18"
   properties:
   - property: lanes
-    set: 4
     timeofday:
     - time: ['3:00', '6:00']
-      set: 4
+      change: 0
     - time: ['6:00', '10:00']
-      set: 3
+      change: -1
     - time: ['10:00', '15:00']
-      set: 4
+      change: 0
     - time: ['15:00', '19:00']
-      set: 3
+      change: -1
     - time: ['19:00', '3:00']
-      set: 4
+      change: 0
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3001150
+      - 3004982
+      - 3005324
+      - 3006323
+      - 3008208
+      - 3018559
+      - 3021201
+      - 3021842
+      - 3022967
+      - 3025549
+      - 3027904
+      - 3027923
+      - 3029508
+      - 3031088
+      - 3031207
+      - 3033253
+      - 3035752
+      - 3038781
+      - 3046843
+      - 2077390
+      - 3048813
+      - 3050780
+      - 3051245
+      - 3053901
+      - 3055731
+      - 3064238
+      - 3065468
+      - 3068866
+      - 3068897
+      - 3073865
+      - 3074718
+      - 3075777
+      - 2132163
+      - 3084513
+      - 3087174
+      - 3092425
+      - 3094586
+      - 2160274
+      - 3108003
+      - 3110285
+      - 3110578
+      - 3111133
+      - 3111287
+      - 3112698
+      - 3117162
+      - 3117607
+      - 3119599
+      - 3121055
+      - 3125844
+      - 3131892
+      - 3133175
+      - 3133219
+      - 3133394
+      - 3139672
+      - 2227066
+      - 2227797
+      - 3145988
+      - 3153032
+      - 3167814
+      - 3168274
+      - 3168757
+    - shstReferenceId:
+      - "01c09cf46e19ddc701a8281ec01396fc"
+      - "0775878f01bc7c63b1cd11325e82b78b"
+      - "07fbfc45f7052c4655e5efbb1ce671e0"
+      - "098dab157810523cd5be0074d408e28d"
+      - "0c548c449ebb74e2ea88fce40ccb0f4d"
+      - "1bf827925ebdb9ec93723a3f22d50b6b"
+      - "20010ec3b5f625f7c6ae444eb7874f83"
+      - "21004bb88e7c58e7cbe895400b1e9f0e"
+      - "22b50751b66dc75cb3a59e0c7599c17c"
+      - "266694ee2ab93093139026ef2d85ce48"
+      - "29f9cc82a78fc3a1309d5e1765ad2124"
+      - "2a0362c2b57338202d48db61ca53e5db"
+      - "2c650fda69270f09bacd9cc3c9f77d34"
+      - "2eb81403c864d7e0bc3692e2533bafd9"
+      - "2ee70d9fde6758f9f5b03b9071245b4a"
+      - "31fa49b4df8fd6f3f71a191a3b8372f6"
+      - "35a0eb77f49f4843b03838bc6703d60a"
+      - "3a52f59b24f9c13763a22fc225f02e0b"
+      - "4664a8df86638372f67f52838dd8b8bb"
+      - "4836096cba630f45a964a3254abe6481"
+      - "495627cc2bf4523909574a18972de568"
+      - "4c476428889aa6420244e9bbd900a2e1"
+      - "4cf2e817cdb5b13e94f6df231c179dfa"
+      - "510bdf2ee07622bb7fb818c7a37de54b"
+      - "53c367dfc97ef85c61d6e605bff683f3"
+      - "60a134c6b2745cf7b55c9f4d64b4a51a"
+      - "6275bdcffc3fbde8020f2449db6d3e7a"
+      - "6783f204dbf37aa29b6ab3a733d5a2ae"
+      - "678cc4467ce8fa6e1bbdd69feb1c6356"
+      - "6f385aad48606ab52e0842164b1e88ff"
+      - "70a1c1f9bbdc1a6f3ce844134aba4087"
+      - "722efaed901cafd12dd6f0e38ab52a49"
+      - "7bae975beb1da7f76e817fe4b65944ca"
+      - "7f509113f397e13a9b50b816586ca16a"
+      - "836745b782a394a5ff02059dddb8b2e0"
+      - "8b2089c944ff420a81830d9444a15091"
+      - "8e6e383d06999b4ed63fd9ebf4e6e345"
+      - "95da7a06617d2ae302a5adb4d7113ce7"
+      - "a2b8162d278faf5504be0ea4095b40e1"
+      - "a632381e90b74cb46d7558e965cac35f"
+      - "a6a0a7235d0680810f33098cd4a14450"
+      - "a76e5d7afe487513999d25dd5f29c474"
+      - "a7aa1f9c26a38e0797d508e12da7d62d"
+      - "a9b3c87f1d2fd574f9abd128969861bd"
+      - "b07480db7d7fb76d03db82a2d244b4f3"
+      - "b124e3c67a04d535d975dff2fb5692f4"
+      - "b417c83b9d17e5b4c8bd817e016abc87"
+      - "b63483032cbb110496be48018a382e32"
+      - "bd5a7ddc16f9d30f13f02f1a7db1a7e9"
+      - "c659aa218860318cbeaf80b605533ebd"
+      - "c84fe01cab07fc52faac7854b66cf94b"
+      - "c85dff9820c176ad891f9021244d8a95"
+      - "c89fb38e56ff967087d17fcb739d4c37"
+      - "d23e2bb329fa1c1b1e453a01b9360134"
+      - "d4c03df67d3d295a59c65e126c90b16b"
+      - "d56ad7be92599eb99d6c603318130f54"
+      - "dba700affd1323084470fcf877ed3d47"
+      - "e649e58bb96946b1baf9dcf4b9155c2d"
+      - "fce5a63583793410d3ef3711fe14958f"
+      - "fd8ded051694699febf295e72a6e77da"
+      - "fe45b194eb8e38b3d3b62fffd6462a18"
+  properties:
   - property: ML_lanes
     set: 0
     timeofday:
@@ -161,7 +288,7 @@ changes:
   - property: segment_id
     set: 214
   - property: ML_USE
-    set: 2
+    set: 0
     timeofday:
     - time: ['3:00', '6:00']
       set: 0

@@ -1,10 +1,10 @@
-project: Year 2015 Modify USE on US-101 SB (Segment 02) from South of Healdsburg to North of Petaluma
+project: Year 2015 Modify USE and HOV Lanes on US-101 SB (Segment 02) from South of Healdsburg to North of Petaluma
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+  - category: Roadway Property Change
   facility:
     link:
     - model_link_id:
@@ -71,18 +71,83 @@ changes:
       - "ed2d7ebc2d5349dadc257ce5b3717449"
   properties:
   - property: lanes
-    set: 3
     timeofday:
     - time: ['3:00', '6:00']
-      set: 3
+      change: 0
     - time: ['6:00', '10:00']
-      set: 2
+      change: -1
     - time: ['10:00', '15:00']
-      set: 3
+      change: 0
     - time: ['15:00', '19:00']
-      set: 2
+      change: -1
     - time: ['19:00', '3:00']
-      set: 3
+      change: 0
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 7000410
+      - 7000569
+      - 7000731
+      - 7002291
+      - 7006093
+      - 7010860
+      - 7013535
+      - 7013576
+      - 7019015
+      - 7020042
+      - 7024943
+      - 7028031
+      - 7030892
+      - 7031690
+      - 7035870
+      - 7036597
+      - 7037591
+      - 7038172
+      - 7038760
+      - 7043272
+      - 7043617
+      - 7043783
+      - 7045194
+      - 7047800
+      - 7049478
+      - 7052354
+      - 7055572
+      - 7056278
+      - 7060297
+      - 7063534
+    - shstReferenceId:
+      - "0167c71940194a800e0c35023a9933c6"
+      - "01fb45bb57686cc8b083368777119f3a"
+      - "02908c68fdb539accd7ec586c16d1dd4"
+      - "08134d2cca3273f0704b53b7f6a2489c"
+      - "166e2d09b352b9385543dc5965f1d044"
+      - "2854a17aa2cd305be59fc19ea17c71da"
+      - "3278e5e2b043dce823623307d080f955"
+      - "329eec8e8dc35bcd8d3ab65b0e363c3c"
+      - "46d88870c263911972904857afa44a42"
+      - "4aab3e31dbbac38aafdd85f6a8794fe1"
+      - "5cd74c20d60472d98f878634b1a05cf9"
+      - "68b5fd4b194f080f1fb38c2526d09113"
+      - "7395ca3464eeaebf300e1574c186d1dc"
+      - "76a0ac34f1bccf87e0d4957657c482fe"
+      - "86a9ebd98d189afad610581fcd8ef58c"
+      - "895b16d29efdd607ff080779b11be8f0"
+      - "8d2a58b477add8ba4fcaeb3ca8debb92"
+      - "8f4aeb4e2a3df6b008ceaab23985325a"
+      - "919659e6dbf5954af9e7c13b46ff8727"
+      - "a22a8826c443502968f7db8ad02b6590"
+      - "a3777c18a6562514d96d6eb9d5490b7b"
+      - "a40b3f7d91bf0d1b4ef6592745f170d6"
+      - "a94757dc7c78f6cf690a5131fdab1f96"
+      - "b2a90f8785ae79fab8f85c9bee6a8a0f"
+      - "b91c27297d4bb75388a8f631a65bbcc3"
+      - "c3c85aae82fe64fe570407102ba15976"
+      - "cfca7fb838e7ded1aab8c44997cfcaab"
+      - "d2342c3adc6757bb9a7190b1cf46a1c0"
+      - "e1287d67a02ac9d545721884aa23d15a"
+      - "ed2d7ebc2d5349dadc257ce5b3717449"
+  properties:
   - property: ML_lanes
     set: 0
     timeofday:

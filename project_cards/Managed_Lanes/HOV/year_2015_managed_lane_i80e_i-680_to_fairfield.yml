@@ -1,32 +1,32 @@
-project: Year 2015 Modify USE on I-80 EB from I-680 to Fairfield
+project: Year 2015 Modify HOV Lanes and USE on I-80 EB from I-680 to Fairfield
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+- category: Roadway Property Change
   facility:
     link:
     - model_link_id:
-      - "5001495"
-      - "5006564"
-      - "5006787"
-      - "5007939"
-      - "5009542"
-      - "5015637"
-      - "5017552"
-      - "5021406"
-      - "5022927"
-      - "5025072"
-      - "5030259"
-      - "5038269"
-      - "5042709"
-      - "5051211"
-      - "5056397"
-      - "5059812"
-      - "5060047"
-      - "5060904"
-    - shStReferenceId:
+      - 5001451
+      - 5006372
+      - 5006592
+      - 5007724
+      - 5009289
+      - 5015224
+      - 5017077
+      - 5020844
+      - 5022319
+      - 5024395
+      - 5029443
+      - 5037244
+      - 5041579
+      - 5049892
+      - 5054949
+      - 5058288
+      - 5058516
+      - 5059342
+    - shstReferenceId:
       - "05e2c8efdec030bf1e2a7a3cafb1e9c3"
       - "1ab6c3fcaec8b2e2f085201f195bfdca"
       - "1b97c42575f60e75f8fdd0dec0192d04"
@@ -48,94 +48,86 @@ changes:
   properties:
   - property: lanes
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      change: 0
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['10:00', '15:00']
+      change: 0
+    - time: ['15:00', '19:00']
+      change: -1
+    - time: ['19:00', '3:00']
+      change: 0
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 5001451
+      - 5006372
+      - 5006592
+      - 5007724
+      - 5009289
+      - 5015224
+      - 5017077
+      - 5020844
+      - 5022319
+      - 5024395
+      - 5029443
+      - 5037244
+      - 5041579
+      - 5049892
+      - 5054949
+      - 5058288
+      - 5058516
+      - 5059342
+    - shstReferenceId:
+      - "05e2c8efdec030bf1e2a7a3cafb1e9c3"
+      - "1ab6c3fcaec8b2e2f085201f195bfdca"
+      - "1b97c42575f60e75f8fdd0dec0192d04"
+      - "2060be40c87214af8efe3be5aa31fbe2"
+      - "26c77a840c6eff63fb6f7fbc2be86d14"
+      - "3f5ef0e4d77e0086824e2e9dd0464b28"
+      - "4712df136906fad88bbdc7d3f156cea7"
+      - "569cb61e157981b703b1473455911a87"
+      - "5d168d38ab3c7191adfbc48018f16a22"
+      - "65b70510a428279412452a5e0d054f4f"
+      - "7a975739f1d1956a7c4302576125c1b3"
+      - "9b2ec2c30aca3a1e26d5a935267a6665"
+      - "acea9873851820bb7545da6516fa1674"
+      - "cf4ecc84dfb32144690a88ef0fa02d50"
+      - "e4a8978f409f5a8d6f6653659a296b56"
+      - "f2529eeb1fc66ff783ca6e80f766a537"
+      - "f338d30105b25e1fc3061603fe486806"
+      - "f69cfeabf4e68bf2d62737c16740bd4e"
+  properties:
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00', '19:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 25
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

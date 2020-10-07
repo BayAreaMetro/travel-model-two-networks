@@ -1,39 +1,39 @@
-project: Year 2015 Modify USE on Hwy 4 WB from Deer Valley Road to Port Chicago Highway
+project: Year 2015 Modify HOV lanes and USE on Hwy 4 WB from Deer Valley Road to Port Chicago Highway
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+- category: Roadway Property Change
   facility:
     link:
     - model_link_id:
-      - "4001572"
-      - "4005014"
-      - "4006779"
-      - "4006863"
-      - "4026054"
-      - "4026469"
-      - "4045824"
-      - "4046479"
-      - "4055893"
-      - "4061926"
-      - "4064504"
-      - "4079198"
-      - "4086707"
-      - "4087340"
-      - "4092538"
-      - "4095429"
-      - "4104999"
-      - "4105195"
-      - "4105595"
-      - "4109414"
-      - "4109688"
-      - "4112555"
-      - "4114837"
-      - "4116214"
-      - "4130447"
-    - shStReferenceId:
+      - 4001533
+      - 4004870
+      - 4006591
+      - 4006672
+      - 4025335
+      - 4025744
+      - 4044614
+      - 4045253
+      - 4054432
+      - 4060322
+      - 4062826
+      - 4077091
+      - 4084389
+      - 4085008
+      - 4090054
+      - 4092854
+      - 4102154
+      - 4102345
+      - 4102727
+      - 4106448
+      - 4106713
+      - 4109492
+      - 4111708
+      - 4113044
+      - 4126894
+    - shstReferenceId:
       - "0321ddce9cc98ab88007331836b9ee88"
       - "09c8e6efcd72d6c6b22bc44147fae2e7"
       - "0d2ca7e4b03269ee6a7a3377b70c7bbc"
@@ -62,94 +62,100 @@ changes:
   properties:
   - property: lanes
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      change: 0
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['10:00', '15:00']
+      change: 0
+    - time: ['15:00', '19:00']
+      change: 0
+    - time: ['19:00', '3:00']
+      change: 0
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 4001533
+      - 4004870
+      - 4006591
+      - 4006672
+      - 4025335
+      - 4025744
+      - 4044614
+      - 4045253
+      - 4054432
+      - 4060322
+      - 4062826
+      - 4077091
+      - 4084389
+      - 4085008
+      - 4090054
+      - 4092854
+      - 4102154
+      - 4102345
+      - 4102727
+      - 4106448
+      - 4106713
+      - 4109492
+      - 4111708
+      - 4113044
+      - 4126894
+    - shstReferenceId:
+      - "0321ddce9cc98ab88007331836b9ee88"
+      - "09c8e6efcd72d6c6b22bc44147fae2e7"
+      - "0d2ca7e4b03269ee6a7a3377b70c7bbc"
+      - "0d5c419a8887293d4eb5e52a375a2ff5"
+      - "332537c68c2ac5a5ed30357aca820d90"
+      - "33eeb376201029b281dd5f0a371ff0a3"
+      - "59ad27182ed916ac707f8c5ce2172241"
+      - "5afe599c6138a294f61a277d4f9fba3a"
+      - "6d5762d71532e651625df10a62bf2999"
+      - "79281980a509d29eab53e36d316c43fa"
+      - "7e580712bb9e6b098c8acc02470f06b6"
+      - "9b1b365ed7085e303b9078134b37f8e0"
+      - "a9c5f25b5b7e1122a59203d8423105d5"
+      - "ab00daa54da80045705ade36bd115237"
+      - "b56ead840e04df3eb9318f74d882b1b0"
+      - "bb17d7ec990e235f2038d73d1bedb2b5"
+      - "cdd2510ad17fefba83e92b6ccf1ef4f8"
+      - "ce37d66c8dab70b54ddb763757c617af"
+      - "cefb3487f08218187039244bfd2743b5"
+      - "d686ea67cca935a98e0fe874992e2b11"
+      - "d70ee7337af15ce3dae1912999812c36"
+      - "dc7ef29ba15bf990b349e8874b7c73bb"
+      - "e11f158ab8e8b4ea9f9ff440aff53431"
+      - "e3efe0a1aa45db84f0b6589e50532d57"
+      - "ff9fb0954535136f65fa9fda0774b468"
+  properties:
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 1
-    - time:
-      - '19:00'
-      - '3:00'
+    - time: ['15:00', '19:00']
       set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 27
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
       set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

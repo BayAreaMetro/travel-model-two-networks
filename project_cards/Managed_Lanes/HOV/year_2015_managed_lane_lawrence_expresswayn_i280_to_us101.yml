@@ -1,10 +1,10 @@
-project: Year 2015 Modify USE on Lawrence Expressway NB I-280 to US 101
+project: Year 2015 Modify HOV Lanes and USE on Lawrence Expressway NB I-280 to US 101
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Parallel Managed lanes
+- category: Roadway Property Change
   facility:
     link:
     - model_link_id:
@@ -115,18 +115,127 @@ changes:
       - "fec507459c4ed250b6629d2e9f6c6fb8"
   properties:
   - property: lanes
-    set: 4
     timeofday:
     - time: ['3:00', '6:00']
-      set: 4
+      change: 0
     - time: ['6:00', '10:00']
-      set: 3
+      change: -1
     - time: ['10:00', '15:00']
-      set: 4
+      change: 0
     - time: ['15:00', '19:00']
-      set: 3
+      change: -1
     - time: ['19:00', '3:00']
-      set: 4
+      change: 0
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2000999
+      - 2012163
+      - 2019713
+      - 2038298
+      - 2052800
+      - 2067318
+      - 2075563
+      - 2080937
+      - 2081152
+      - 2082366
+      - 2084949
+      - 2086760
+      - 2091968
+      - 2093837
+      - 2099427
+      - 2108752
+      - 2112972
+      - 2116311
+      - 2117231
+      - 2126699
+      - 2132738
+      - 2138502
+      - 2144243
+      - 2151191
+      - 2155024
+      - 2158852
+      - 2165549
+      - 2170087
+      - 2173297
+      - 2173359
+      - 2176307
+      - 2177036
+      - 2178576
+      - 2178753
+      - 2180163
+      - 2181188
+      - 2196903
+      - 2203657
+      - 2205199
+      - 2207637
+      - 2215849
+      - 2217166
+      - 2228028
+      - 2235322
+      - 2237367
+      - 2237903
+      - 2238892
+      - 2253679
+      - 2254157
+      - 2255677
+      - 2266155
+      - 2272135
+    - shstReferenceId:
+      - "00e719ff0bee7025dd6a037d7e96c784"
+      - "0b5c29588677f73e8c00481d1a681f00"
+      - "124cd54c7175a5c91a8ac72ff12ecaa2"
+      - "23bf0ba61b1d1f87a1de1ebabecd42c9"
+      - "314dd5e8600a36777614084eba9aea68"
+      - "3eebe9540623b8fab635d4d9be27717a"
+      - "467ff1e645ba0b17c41408a6d8681f2e"
+      - "4b8f27a5e34923637ad93f70f0fb9687"
+      - "4bca0eedf8c2000a6f2c811489dc9133"
+      - "4cea3c9b5a046331c7a97e7741991cdd"
+      - "4f59fb5bcb70d4681538e617f695090b"
+      - "511dc5d2eafa5eb5b8f333422b1216f3"
+      - "55f4e76cbde07d08cb2dab8c381ed21f"
+      - "57ad0d826681fbe34339f8d9193ce5e4"
+      - "5cf751fbaca319c1f4b6b276cf27aa28"
+      - "65ad52126be5c664c1177390ce352ddf"
+      - "69ad6a060d2fab08787e4649a264c047"
+      - "6cbcfff416108ad62ff626570fbeea8c"
+      - "6d96021bc8f29a5fc6d60b25930751c2"
+      - "768239ce146f2ea57884d4bfd161c123"
+      - "7c3a62b996939d09af142c6a112f5551"
+      - "81a56c08f2819ed61c7e21d09e137fa4"
+      - "86ff88c09a572aa4cd9cfd9c87d7689e"
+      - "8d7e3b0aa5f9d61a677fcd0c223eb867"
+      - "90f835ab74fb95a5ba0cfcd7b1a3b897"
+      - "9491cb78a7d30f99f2bc59709a1048ad"
+      - "9ad6a1484ed37db1b15b8007a47c9f28"
+      - "9f149bbaf5dc833c97708aa73229bfb3"
+      - "a214d87d0fd5e3773412c8f72a8b9576"
+      - "a22426fbaf62d6b428ecb500066df430"
+      - "a4ef0dc8765c6a17cb04c9ee11ee7444"
+      - "a59c07e1a6009979610c048237481688"
+      - "a71e97e0a7035c47f2be9dd607be89ac"
+      - "a7486e8ccd7cc7c929c122d6ff1d77f7"
+      - "a8a3d058bbf7b791c5797b21d26c98a8"
+      - "a98e078e02627851b6f3ab00c11f9351"
+      - "b875887ed918dca3f6ec4edd0dd20bf8"
+      - "bebcadb4fa196f2da05539a366a37763"
+      - "c03366108360e9ff87c6f5eb577c91b8"
+      - "c270b6cc9f5d9df007e7cd9d7b989280"
+      - "ca379bc8dd4ee84405be4b5b875569eb"
+      - "cb6c4805af0127dccd5888d328d8c771"
+      - "d5a3a68a459f80ee0122aa5902262d27"
+      - "dc81b2eadb0ce74f27f962bfafdfed04"
+      - "de6d91aa7739a6a1856af14994429d49"
+      - "deeec4f97444e5167c80f245394bf6d8"
+      - "dfe4f36fee830605ee33a0ca36cfff30"
+      - "edccba3aabae3a48c2dce7fa50a91bbb"
+      - "ee47a9cdaf44706e35c91cd454ccbcd3"
+      - "efab39a913466aed9ee6369c65b28042"
+      - "f936f9bb8a8f5dd431185df26ea0af85"
+      - "fec507459c4ed250b6629d2e9f6c6fb8"
+  properties:
   - property: ML_lanes
     set: 0
     timeofday:
@@ -143,7 +252,7 @@ changes:
   - property: segment_id
     set: 223
   - property: ML_USE
-    set: 2
+    set: 0
     timeofday:
     - time: ['3:00', '6:00']
       set: 0
