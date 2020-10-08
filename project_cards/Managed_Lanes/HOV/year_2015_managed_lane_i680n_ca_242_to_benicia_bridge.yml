@@ -4,7 +4,7 @@ tags:
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Roadway Property Change
+- category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
@@ -44,35 +44,7 @@ changes:
     - time: ['15:00', '19:00']
       set: 87
     - time: ['19:00', '3:00']
-      set: 89
-- category: Parallel Managed lanes
-  facility:
-    link:
-    - model_link_id:
-      - 4012703
-      - 4014030
-      - 4015126
-      - 4063510
-      - 4072250
-      - 4072728
-      - 4094017
-      - 4105781
-      - 4107765
-      - 4107959
-      - 4110496
-    - shstReferenceId:
-      - "19c329223871ef5ae5ba74c17d05af42"
-      - "1c6c234afda5e92539a926e6d2513f2e"
-      - "1eb5280d00b9f7c20fb03ba826fe7606"
-      - "7fa923a502e78fe010f0ad0c97ffa2de"
-      - "91672db9bd46c82349a30838c9a748f8"
-      - "92506facf2da48147c8df33a6914802f"
-      - "bd5eda9935935684b3d0a9d13acb230f"
-      - "d52f531cd34ffa9b3ca345b0d34deed5"
-      - "d91d8183262712429f9cb4ddb8d51cd8"
-      - "d97d05223fa865e1b23ab16019e6c3db"
-      - "de88db51b70442c8c44114280d0b633f"
-  properties:
+      set: 89  
   - property: ML_lanes
     set: 0
     timeofday:
