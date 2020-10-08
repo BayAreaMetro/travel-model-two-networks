@@ -1,4 +1,4 @@
-project: Year 2015 Modify HOV Lanes and USE on US 101 SB CA-85 to Cochran Road
+project: Year 2015 Modify HOV Lanes and USE on US 101 SB CA-85 to Cochrane Road
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -161,17 +161,18 @@ changes:
       - "ff65a747a1564ff90aae42f7669f3caf"
   properties:
   - property: lanes
+    set: 89
     timeofday:
     - time: ['3:00', '6:00']
-      change: 0
+      set: 89
     - time: ['6:00', '10:00']
-      change: -1
+      set: 88
     - time: ['10:00', '15:00']
-      change: 0
+      set: 89
     - time: ['15:00', '19:00']
-      change: -1
+      set: 88
     - time: ['19:00', '3:00']
-      change: 0
+      set: 89
 - category: Parallel Managed lanes
   facility:
     link:

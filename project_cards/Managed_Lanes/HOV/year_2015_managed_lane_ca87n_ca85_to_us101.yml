@@ -51,17 +51,18 @@ changes:
       - "eea5289d3bb7fecdbeadd95cf40aba4a"
   properties:
   - property: lanes
+    set: 89
     timeofday:
     - time: ['3:00', '6:00']
-      change: 0
+      set: 89
     - time: ['6:00', '10:00']
-      change: -1
+      set: 88
     - time: ['10:00', '15:00']
-      change: 0
+      set: 89
     - time: ['15:00', '19:00']
-      change: -1
+      set: 88
     - time: ['19:00', '3:00']
-      change: 0
+      set: 89
 - category: Parallel Managed lanes
   facility:
     link:
