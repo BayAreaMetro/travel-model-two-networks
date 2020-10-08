@@ -4,7 +4,7 @@ tags:
   - 'Managed Lanes'
 dependencies: ''
 changes:
-- category: Roadway Property Change
+- category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
@@ -66,57 +66,7 @@ changes:
     - time: ['15:00', '19:00']
       set: 88
     - time: ['19:00', '3:00']
-      set: 89
-- category: Parallel Managed lanes
-  facility:
-    link:
-    - model_link_id:
-      - 2043682
-      - 2048647
-      - 2059253
-      - 2061985
-      - 2062332
-      - 2065599
-      - 2071387
-      - 2081136
-      - 2087550
-      - 2093444
-      - 2094505
-      - 2168198
-      - 2176972
-      - 2182605
-      - 2192139
-      - 2217894
-      - 2226922
-      - 2249852
-      - 2250422
-      - 2255119
-      - 2257456
-      - 2261009
-    - shstReferenceId:
-      - "28d4d956f75454a8c4ad2894336ebcee"
-      - "2d7771d02a5627275acdeff5cd74d8c0"
-      - "37484a80355bb7edc754519f2348ac38"
-      - "39cfab601c20912d36ccc7b555dc7226"
-      - "3a25288a330a4cee5b82c2e1124ea7ad"
-      - "3d4ba9ecfaa28bca61fa4316bfb798a1"
-      - "42b72bf74897f7de4a32a4b1cdd0f35e"
-      - "4bc5c34c8f6d6a180572cc1a8d55334c"
-      - "51d5da6b2a71e43ca85e8687b8f087ec"
-      - "5753305051b069ef255babea5393f89f"
-      - "584f08f335e32c73f29da15fbd15d2e6"
-      - "9d6d010119016398183de27d424a6437"
-      - "a58a4553e809acc91bd19248f346a14b"
-      - "aaf19d3510dd431ff15ef13a5c3aec28"
-      - "b3f0c929007a64a23689020fb619e8b7"
-      - "cc20df9cf3776aab953b0d896d0a4e1d"
-      - "d49b4c0be5171bf09ed203c603f95f33"
-      - "ea2c1342b54b25e9a71cc74d3708a1a1"
-      - "eab5cd73bfc142a314516915372d981d"
-      - "ef2bfb5b22e4208602b6e5c37c2f4ec5"
-      - "f14d437f8b8a4d817257247c9fa77c3e"
-      - "f4984a2b9e56ca4067c4891219025acf"
-    properties:
+      set: 89  
     - property: ML_lanes
       timeofday:
       - time: ['3:00', '6:00']
