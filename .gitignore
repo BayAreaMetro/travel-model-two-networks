@@ -26,12 +26,13 @@ data/interim/step5_tidy_roadway/*.geojson
 data/interim/step5_tidy_roadway/*.json
 data/interim/step6_gtfs/*.geojson
 data/interim/step6_gtfs/*.json
-*.ipynb
 !pems_conflation.ipynb
 *.twbr
 *.pyc
 
+notebooks/.ipynb_checkpoints/*
 notebooks/other/.ipynb_checkpoints/*
+notebooks/pipeline/.ipynb_checkpoints/*
 data/interim/facility-type-viewer-residential.geojson
 data/interim/step5_tidy_roadway/link.json
 data/interim/step5_tidy_roadway/node.geojson
