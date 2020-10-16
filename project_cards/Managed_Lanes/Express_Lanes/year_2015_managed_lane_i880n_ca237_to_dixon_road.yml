@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on I-880 NB CA-237 to Dixon Road
+project: Year 2015 Modify Express Lanes and USE on I-880 NB CA-237 to Dixon Road
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,102 +8,53 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 2058880
-      - 2221232
+      - 2217413
+      - 2057839
     - shstReferenceId:
-      - "35f99c3c15e037978305aa0ed0629d6a"
       - "cbaa8a43abdc4d20694cd217264bccb2"
+      - "35f99c3c15e037978305aa0ed0629d6a"
   properties:
   - property: lanes
+    set: 89
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 88
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['10:00', '15:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 36
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['10:00', '15:00']
       set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 3
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

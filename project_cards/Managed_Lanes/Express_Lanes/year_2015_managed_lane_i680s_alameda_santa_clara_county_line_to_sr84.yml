@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on I-680 SB Alameda/Santa Clara County Line to SR-84
+project: Year 2015 Modify Express Lanes and USE on I-680 SB Alameda/Santa Clara County Line to SR-84
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,132 +8,83 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3001281
-      - 2009238
-      - 3024361
-      - 3030569
-      - 3030655
-      - 2050349
-      - 3063727
-      - 3065942
-      - 3066686
-      - 3087968
-      - 3095575
-      - 3113580
-      - 3119264
-      - 3122841
-      - 3126083
-      - 3151023
-      - 3160760
+      - 3001245
+      - 3062326
+      - 2049448
+      - 3147664
+      - 3086017
+      - 3029924
+      - 3123283
+      - 3023846
+      - 3064500
+      - 3093454
+      - 3120126
+      - 3065220
+      - 3157167
+      - 3030010
+      - 3111078
+      - 3116621
+      - 2009073
     - shstReferenceId:
       - "01e1fac1a94909bfa0a325ca213dfbd6"
-      - "087e221162e741bb3bf5a508f48494a1"
-      - "23fdfd7bf3518e25698ef1630ac02f31"
-      - "2cf8f16b7810eb966dca71682f93e9e7"
-      - "2d162e6155ee42bdb79741cacd4390f7"
-      - "2e359258cbd7a4c2a34854bd2e90802c"
       - "5dd2aed813158c62392be446bad86482"
-      - "60ff0ed3950ba94a3ba6a912d0ab9bc2"
-      - "6219dc0755d904c0023f2acbebb4e185"
+      - "2e359258cbd7a4c2a34854bd2e90802c"
+      - "de41e763c4ddddfd17cb28f8f5a00406"
       - "81acc1ae1073bed8a72aa5d0412dd656"
+      - "2cf8f16b7810eb966dca71682f93e9e7"
+      - "b98a348d0ce38bf12626b524f6492e5b"
+      - "23fdfd7bf3518e25698ef1630ac02f31"
+      - "60ff0ed3950ba94a3ba6a912d0ab9bc2"
       - "8cb82c65915dfcaa72fe52cba554e0af"
+      - "b4d529a4bab12054ee26a7b2092dff02"
+      - "6219dc0755d904c0023f2acbebb4e185"
+      - "ec7018a4890d0f9343f7a14345a15460"
+      - "2d162e6155ee42bdb79741cacd4390f7"
       - "a75a389b2735fddd1486c46aab328961"
       - "afa405d8360cd781226a5414b7e58e24"
-      - "b4d529a4bab12054ee26a7b2092dff02"
-      - "b98a348d0ce38bf12626b524f6492e5b"
-      - "de41e763c4ddddfd17cb28f8f5a00406"
-      - "ec7018a4890d0f9343f7a14345a15460"
+      - "087e221162e741bb3bf5a508f48494a1"
   properties:
   - property: lanes
+    set: 89
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 88
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['10:00', '15:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 38
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['10:00', '15:00']
       set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 3
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: ML_access
     set: 'all'
   - property: ML_egress

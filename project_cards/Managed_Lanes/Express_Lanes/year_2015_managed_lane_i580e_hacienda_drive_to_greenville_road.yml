@@ -1,4 +1,4 @@
-project: Year 2015 Modify USE on I-580 EB Hacienda Drive to Greenville Road
+project: Year 2015 Modify Express Lanes and USE on I-580 EB Hacienda Drive to Greenville Road
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,138 +8,71 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3011025
-      - 3049117
-      - 3050523
-      - 3053076
-      - 3054547
-      - 3056255
-      - 3061219
-      - 3063679
-      - 3122870
-      - 3139370
-      - 3165587
-      - 3050975
-      - 3080683
-      - 3082780
-      - 3086982
-      - 3095047
-      - 3108253
-      - 3120390
-      - 3160509
-      - 3168582
-    - shStreferenceId:
-      - "10477b947616a3014c124be492bf622f"
-      - "48336daf4cb146ab09857067c79ff441"
-      - "4a347f9a0d03c1e9ce1993b666b277ba"
-      - "4df4ca973eece79f41adb93b14c1475f"
-      - "5025920e2723e5772cab4a26fe48dbe7"
-      - "52b2bfac7c4f55a3bc28633747e3ebde"
-      - "5a250b86da239ebc52d683861d4f18b6"
-      - "5dbf1c1e97f285fcb2185f8d45224b13"
-      - "b4e09eb18c43aee9f5d9ce4aea9914ea"
+      - 3136269
+      - 3120154
+      - 3010784
+      - 3053350
+      - 3062279
+      - 3055023
+      - 3049429
+      - 3059861
+      - 3048060
+      - 3051922
+      - 3161887
+    - shstReferenceId:
       - "cceb90413a9f52b28a70d968f4362e41"
+      - "b4e09eb18c43aee9f5d9ce4aea9914ea"
+      - "10477b947616a3014c124be492bf622f"
+      - "5025920e2723e5772cab4a26fe48dbe7"
+      - "5dbf1c1e97f285fcb2185f8d45224b13"
+      - "52b2bfac7c4f55a3bc28633747e3ebde"
+      - "4a347f9a0d03c1e9ce1993b666b277ba"
+      - "5a250b86da239ebc52d683861d4f18b6"
+      - "48336daf4cb146ab09857067c79ff441"
+      - "4df4ca973eece79f41adb93b14c1475f"
       - "f3c12a0e25207502176968adff57f6ba"
-      - "4adb195680ebf70c19a79893753d00a4"
-      - "76d1dafbfda8f0e000f8c90780ca152c"
-      - "79fe87bdf1f043fd3d0bb15427a802ba"
-      - "8031c3f28401577839f7baac98227db3"
-      - "8bed9b5fce914e0324ab29ea29d25ae7"
-      - "9f6166830b83cbce9108390c801b9e6f"
-      - "b1535f160632461e3236f2e1c8465c67"
-      - "ec0a43779245aed9558b850030607b3b"
-      - "f855ac9e8170c84c87c8be5453877210"
   properties:
   - property: lanes
+    set: 89
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: -1
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 0
-    - time:
-      - '10:00'
-      - '15:00'
-      set: -1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 0
-    - time:
-      - '19:00'
-      - '3:00'
-      set: -1
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 88
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
   - property: ML_lanes
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-      - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['10:00', '15:00']
       set: 1
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
   - property: segment_id
-    set: 21
-  - property: USE
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      set: 0
-    - time:
-      - '6:00'
-      - '10:00'
-      set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0
+    set: 32
   - property: ML_USE
+    set: 0
     timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
+    - time: ['3:00', '6:00']
       set: 0
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 3
-    - time:
-      - '10:00'
-      - '15:00'
-      set: 0
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['10:00', '15:00']
       set: 3
-    - time:
-      - '19:00'
-      - '3:00'
-      set: 0  
+    - time: ['15:00', '19:00']
+      set: 3
+    - time: ['19:00', '3:00']
+      set: 0      
   - property: ML_access
     set: 'all'
   - property: ML_egress
