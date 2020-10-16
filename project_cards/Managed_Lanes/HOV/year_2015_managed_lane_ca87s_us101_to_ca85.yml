@@ -53,8 +53,8 @@ changes:
       - "ef2bfb5b22e4208602b6e5c37c2f4ec5"
       - "2d7771d02a5627275acdeff5cd74d8c0"
       - "eab5cd73bfc142a314516915372d981d"
-    properties:
-    - property: lanes
+  properties:
+  - property: lanes
     set: 89
     timeofday:
     - time: ['3:00', '6:00']
@@ -66,37 +66,37 @@ changes:
     - time: ['15:00', '19:00']
       set: 88
     - time: ['19:00', '3:00']
-      set: 89  
-    - property: ML_lanes
+      set: 89      
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
       set: 0
-      timeofday:
-      - time: ['3:00', '6:00']
-        set: 0
-      - time: ['6:00', '10:00']
-        set: 1
-      - time: ['10:00', '15:00']
-        set: 0
-      - time: ['15:00', '19:00']
-        set: 1
-      - time: ['19:00', '3:00']
-        set: 0     
-    - property: segment_id
-      set: 229
-    - property: ML_USE
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
       set: 0
-      timeofday:
-      - time: ['3:00', '6:00']
-        set: 0
-      - time: ['6:00', '10:00']
-        set: 2
-      - time: ['10:00', '15:00']
-        set: 0
-      - time: ['15:00', '19:00']
-        set: 2
-      - time: ['19:00', '3:00']
-        set: 0     
-    - property: ML_access
-      set: 'all'
-    - property: ML_egress
-      set: 'all'  
-  valid: false
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 229
+  - property: ML_USE
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false    
