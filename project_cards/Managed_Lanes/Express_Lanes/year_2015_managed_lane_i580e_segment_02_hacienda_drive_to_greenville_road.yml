@@ -1,4 +1,4 @@
-project: Year 2015 Modify Express Lanes and USE on I-880 SB Dixon Road to CA-237
+project: Year 2015 Modify Express Lanes and USE on I-580 EB (segment 02) Hacienda Drive to Greenville Road
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -8,9 +8,25 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 2257070
+      - 3085048
+      - 3049870
+      - 3092941
+      - 3080940
+      - 3117728
+      - 3156921
+      - 3105865
+      - 3164800
+      - 3078894
     - shstReferenceId:
-      - "f0fb7f28f9d04fd5abf1396079292b31"
+      - "8031c3f28401577839f7baac98227db3"
+      - "4adb195680ebf70c19a79893753d00a4"
+      - "8bed9b5fce914e0324ab29ea29d25ae7"
+      - "79fe87bdf1f043fd3d0bb15427a802ba"
+      - "b1535f160632461e3236f2e1c8465c67"
+      - "ec0a43779245aed9558b850030607b3b"
+      - "9f6166830b83cbce9108390c801b9e6f"
+      - "f855ac9e8170c84c87c8be5453877210"
+      - "76d1dafbfda8f0e000f8c90780ca152c"
   properties:
   - property: lanes
     set: 89
@@ -18,11 +34,11 @@ changes:
     - time: ['3:00', '6:00']
       set: 89
     - time: ['6:00', '10:00']
-      set: 88
+      set: 87
     - time: ['10:00', '15:00']
-      set: 88
+      set: 87
     - time: ['15:00', '19:00']
-      set: 88
+      set: 87
     - time: ['19:00', '3:00']
       set: 89  
   - property: ML_lanes
@@ -31,15 +47,15 @@ changes:
     - time: ['3:00', '6:00']
       set: 0
     - time: ['6:00', '10:00']
-      set: 1
+      set: 2
     - time: ['10:00', '15:00']
-      set: 1
+      set: 2
     - time: ['15:00', '19:00']
-      set: 1
+      set: 2
     - time: ['19:00', '3:00']
       set: 0     
   - property: segment_id
-    set: 37
+    set: 33
   - property: ML_USE
     set: 0
     timeofday:
@@ -52,7 +68,7 @@ changes:
     - time: ['15:00', '19:00']
       set: 3
     - time: ['19:00', '3:00']
-      set: 0     
+      set: 0      
   - property: ML_access
     set: 'all'
   - property: ML_egress
