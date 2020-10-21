@@ -1,0 +1,215 @@
+project: Year 2015 Modify HOV Lanes and USE on US 101 NB Cochran Road to CA-85
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2166682
+      - 2063312
+      - 2127603
+      - 2204273
+      - 2032054
+      - 2162238
+      - 2257353
+      - 2071411
+      - 2081780
+      - 2162138
+      - 2079708
+      - 2231280
+      - 2264200
+      - 2151778
+      - 2216394
+      - 2005235
+      - 2198494
+      - 2196953
+      - 2149132
+      - 2117224
+      - 2031532
+      - 2095222
+      - 2112243
+      - 2196538
+      - 2208982
+      - 2030735
+      - 2249307
+      - 2187845
+      - 2226260
+      - 2131298
+      - 2020164
+      - 2176182
+      - 2187523
+      - 2188745
+      - 2155355
+      - 2206916
+      - 2049331
+      - 2201742
+      - 2156160
+      - 2186484
+      - 2132576
+      - 2154553
+      - 2247329
+      - 2079680
+      - 2265534
+      - 2105802
+      - 2087504
+      - 2169886
+      - 2139434
+      - 2090429
+      - 2113057
+      - 2144531
+      - 2143399
+      - 2212830
+      - 2256243
+      - 2091888
+      - 2232963
+      - 2053928
+      - 2125512
+      - 2067923
+      - 2046145
+      - 2103467
+      - 2256176
+      - 2140839
+      - 2206615
+      - 2228342
+      - 2177354
+      - 2070664
+      - 2136997
+      - 2124995
+      - 2171410
+      - 2062632
+      - 2072120
+      - 2115244
+      - 2236621
+      - 2261956
+      - 2251007
+      - 2246528
+    - shstReferenceId:
+      - "9bf597d445e0905067aba86f6314d837"
+      - "3b1c89163395398f39f7001eb91d2a7c"
+      - "7754af11033fa03a6e23fde3e1c344db"
+      - "bf550dcd389227bd61270dad86b304a1"
+      - "1de4f569aa6a3315045094f77f7927e0"
+      - "97c4bee7f937337363442dc13d5b689d"
+      - "f1363205d805e71d5b06b8d778d770bf"
+      - "42bd3a4546c145c3a9ad66ead0cf0658"
+      - "4c61beba317986702c1e9404dbc6c7e2"
+      - "97aa1166cc88781b266a927ed42316b4"
+      - "4a66e7a48a19a5d2a8def18192d291e0"
+      - "d8ac5bdc383a0c96b269208463bb3684"
+      - "f77bc829ed2281b29fee3b1997fc313f"
+      - "8e0bdeab101df8ca87c4c514c38505c0"
+      - "cab6424c75e590869d8f33ba4d77088e"
+      - "04dd18fe625b418696975f306bb2aa31"
+      - "b9f2ad7c1a70daa91156cf606deb7159"
+      - "b884a990917d6d09cb42cf2241b25fea"
+      - "8b97199f09e4e1d5d3f9bacb85d2cb40"
+      - "6d955fb9af064333ef92bc56ab1d26d5"
+      - "1d6c62f9d299b8d1df4c4d5c8f19cca1"
+      - "58fd6e7db30cc4e0f7b6f7c9cfdc3222"
+      - "68ee026e0e0528156812342ea93ebb76"
+      - "b81c50bb858214c2f212a33f7551d6db"
+      - "c3b87f9ecc8977fc97f0dc847fab4338"
+      - "1cb35ce1fb3899da4a43a9a265f68630"
+      - "e9a8236dfc258192090eb7930e280466"
+      - "afde35b5f03f38115144f90acd4bd40f"
+      - "d3fc59009f77228726620878d1db2ca2"
+      - "7adfe8d9fe5414dde97430222bf54628"
+      - "12b8a0e162fc53357072b12141cbd7ed"
+      - "a4d3c3e41fc3a1825e5058f51f54cdf5"
+      - "af91fdf413cb1fcc6aa080e7d8c7eea4"
+      - "b0bb12f4a40fe502acd019ed3e761888"
+      - "914993e3d7c0b5d15cf799f973a989fa"
+      - "c1d491b1841aec4d5d7e10b933817498"
+      - "2e19af560304be3944c9e8406558dde3"
+      - "bcf97c18d2eb6d0359a51801f6914e56"
+      - "920a9f7edf1b7a04c48d40fafb1a3ce8"
+      - "ae8f472c1d19abb72d21053fd307a55b"
+      - "7c123c09a75ce28e0614a2c0984a2ced"
+      - "9087de2556e8767be7650093dfff410d"
+      - "e7cc60a790f331315bdced2446a14b1d"
+      - "4a6140eace178c741f0f5ae3db505b0d"
+      - "f8aa899d0f0a4831dfb84ca5c7cd4d45"
+      - "62deaaf8ad76febffe344bd685f9b18f"
+      - "51cd19cd8846055b39b6922b69a1a666"
+      - "9ee8bdf8bfa4477f03731c433a709d3f"
+      - "827f3f8c4d8fbb4f62a29d0afd2eca39"
+      - "54804412c2f2ad9c728b7c503aeea61f"
+      - "69bfde08799c53345579e98cbd5a4c40"
+      - "87424d75a0b7f1c6df9a54d0164c12d9"
+      - "863ccab853b0d56fffe02fe173dbbfe9"
+      - "c750e8f86f626cb8d9f613ff539281e7"
+      - "f035562f5aa2d6f19f8f3bf3b5a17651"
+      - "55e5124d8785369f07b9eb78cb540f16"
+      - "da49e200d130ac0bcd84c0b507dbcaa9"
+      - "325f08e5f0dc33104999a21d4838b9b6"
+      - "756aa163af195f742159280363c79bde"
+      - "3f7cf84cffef1416b910ece89a906de9"
+      - "2b1f53c70de1d8f69778ebef6f3218e2"
+      - "60aeb0ee12bbb0dcf5099af4a5bddfb3"
+      - "f0249c3f54c88a482a62775940d8510c"
+      - "83dc49b6927ccb2cd57235b6e9c83947"
+      - "c18abffbab70283e8613688e276a29e3"
+      - "d5eddc04cc9431e3255a6343afbd52b6"
+      - "a5ebf2b8062811fdd3a953ad7a855cc2"
+      - "421088d635b765a94bf2e308993177f2"
+      - "8029c77c4fae50445ff3a854a287172b"
+      - "74e6c3fb8bb4fca0adc8271685ef0ed2"
+      - "a05ccd941f6e3b18e04b3288b2f14d7d"
+      - "3a750426931f4dded357473f49c48d6d"
+      - "43655ef563ceb468f556edf4c87d4cb5"
+      - "6bc0544675319d44e98963c95fdb9a5e"
+      - "ddb63b64eb32cb4ced71de215084de31"
+      - "f574142b5af7313b2abe16e9e9436802"
+      - "eb466db613f3953f720af08d85de4abb"
+      - "e7064e4a567d602c5b82fdf492395443"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 217
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

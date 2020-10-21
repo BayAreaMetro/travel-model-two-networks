@@ -1,0 +1,61 @@
+project: Year 2015 Modify HOV Lanes and USE on Golden Gate Bridge Toll Plaza on US101 SB - Bridge Pass
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'Bridge Pass'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 5007578
+    - shstReferenceId:
+      - "1fb8993130d2c5535812ede12d2d15c4"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 4
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

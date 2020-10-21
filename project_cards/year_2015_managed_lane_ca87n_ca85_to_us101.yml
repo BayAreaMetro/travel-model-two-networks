@@ -1,0 +1,99 @@
+project: Year 2015 Modify HOV Lanes and USE on CA 87 NB CA-85 to US 101
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2245594
+      - 2042388
+      - 2131799
+      - 2189891
+      - 2064560
+      - 2071859
+      - 2127649
+      - 2212826
+      - 2012177
+      - 2105379
+      - 2241182
+      - 2149634
+      - 2017800
+      - 2009697
+      - 2126016
+      - 2154681
+      - 2254557
+      - 2198279
+      - 2221672
+      - 2026044
+    - shstReferenceId:
+      - "e62998941c854644be75696ef68f1edd"
+      - "279a5e4b4e7fe204038c210b889264bf"
+      - "7b51318e6f375d903c38f1d07d7b3b95"
+      - "b1ca247b60a24e4678b3cb20b9f09825"
+      - "3c4cacfc4ef375be85f542bb2e7aeeff"
+      - "432b8254d5be437250e0305270ae0a4c"
+      - "7760605169f8f357662289487925e29d"
+      - "c74ffa92f95f2ece533f7666cf63a80c"
+      - "0b612c4cb50bc65e9357b837cd2d84b3"
+      - "6275189430e057eafad9a3283a66cb16"
+      - "e2040926aeada9bda1b5e097080d27e7"
+      - "8c0617a4577c387833bb197cc4a77214"
+      - "109008f26f2ae94e05fefd857138ddc9"
+      - "090ea244d31d7dc6a40d68bcc9edc600"
+      - "75e6c8475f2c5cdb4b5a00a50ab67be0"
+      - "90a9a6b588c638df7bec3bcbc0e68a98"
+      - "eea5289d3bb7fecdbeadd95cf40aba4a"
+      - "b9beef81fe92eace5090afc1bbdc5e7e"
+      - "cf9801d20339904e9d12ce8a90f12a10"
+      - "184c6901121a3a836c975a4adb102a8b"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 227
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

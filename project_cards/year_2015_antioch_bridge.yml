@@ -1,0 +1,61 @@
+project: Year 2015 Modify HOV Lanes-Fastrak Lanes and USE on Antioch Bridge NB on Route 160 - Bridge Pass
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'Bridge Pass'
+dependencies: ''
+changes:
+- category: Bridge Pass
+  facility:
+    link:
+    - model_link_id:
+      - 4041747
+    - shstReferenceId:
+      - "541fc68091b15d8682c6b398e990af64"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 8
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

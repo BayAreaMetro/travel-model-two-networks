@@ -1,0 +1,291 @@
+project: Year 2015 Modify HOV Lanes and USE on San Tomas Expressway NB Hwy 17 to I-880
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2012820
+      - 2194286
+      - 2111965
+      - 2155894
+      - 2173625
+      - 2135981
+      - 2006540
+      - 2179228
+      - 2114961
+      - 2264600
+      - 2098871
+      - 2254960
+      - 2175941
+      - 2009650
+      - 2049736
+      - 2238023
+      - 2189757
+      - 2200142
+      - 2064451
+      - 2030997
+      - 2032735
+      - 2101786
+      - 2267690
+      - 2225635
+      - 2216617
+      - 2121152
+      - 2061911
+      - 2188616
+      - 2238728
+      - 2113477
+      - 2094993
+      - 2262982
+      - 2062070
+      - 2194587
+      - 2256509
+      - 2084567
+      - 2079540
+      - 2073502
+      - 2074587
+      - 2018318
+      - 2073389
+      - 2059738
+      - 2189058
+      - 2021334
+      - 2150523
+      - 2125727
+      - 2006153
+      - 2255563
+      - 2240566
+      - 2168600
+      - 2180347
+      - 2160770
+      - 2093317
+      - 2202259
+      - 2253606
+      - 2208655
+      - 2089540
+      - 2188511
+      - 2214208
+      - 2105537
+      - 2021317
+      - 2200620
+      - 2160112
+      - 2093617
+      - 2268217
+      - 2197292
+      - 2236874
+      - 2157329
+      - 2222769
+      - 2172871
+      - 2193007
+      - 2170376
+      - 2067903
+      - 2063789
+      - 2141274
+      - 2168274
+      - 2006755
+      - 2225205
+      - 2246521
+      - 2273377
+      - 2251310
+      - 2008445
+      - 2103486
+      - 2042855
+      - 2063614
+      - 2027130
+      - 2066253
+      - 2103044
+      - 2009319
+      - 2004248
+      - 2124731
+      - 2171328
+      - 2153696
+      - 2047133
+      - 2128063
+      - 2263552
+      - 2010602
+      - 2110739
+      - 2032993
+      - 2126959
+      - 2263418
+      - 2090363
+      - 2175117
+      - 2128196
+      - 2241998
+      - 2124572
+      - 2120299
+      - 2014242
+      - 2098807
+      - 2259509
+      - 2003833
+      - 2022843
+      - 2152314
+      - 2154655
+      - 2090859
+      - 2053513
+    - shstReferenceId:
+      - "0bf0f82b5a32cdc8f24740dcdbb6fef9"
+      - "b5fb573c87f2aa8d320690599ee07778"
+      - "68a7b87106d9f0c01ffc81caaa030c8b"
+      - "91caadabd62e265b0a7007e89063b02b"
+      - "a264f03695ac3b0970310df2450a63a4"
+      - "7f3859d0a629121be62bd937f5901dba"
+      - "061af26dea20855b65b493d94708f963"
+      - "a7b60a54b3bb667e85aaba0226f11de2"
+      - "6b7e62ea21f3a7622689e124f0e1c33f"
+      - "f7da9fe23404262b5914344d2142f9f2"
+      - "5c73d64589949773b5f890c7d4ae0343"
+      - "ef071a300ab7788505f5121be6e3495a"
+      - "a49c9e435b8d9f708451c09bdf2ff16e"
+      - "0904557ceea07dda7fa9326cffd43970"
+      - "2e7a189d491c999f9bde6c7e0cef3f12"
+      - "df09a2f45cd6895d713e6e9d10dfbf18"
+      - "b1a9cfb4259533c8730bdf68c1f2ae3f"
+      - "bb7aea99ad22f5d0a9901f02eb2c4b81"
+      - "3c30a2b07ae3eb8a02dd6ee0a98ff455"
+      - "1cf0313d35a23ba69854ab9d390b986e"
+      - "1e83936ef882ef1830208c04ef7d4c48"
+      - "5f1acb3e07fcfccc07d459d616b2e88b"
+      - "faa373f5dc21b3c43b09c0c7ff435cd1"
+      - "d36b0e448a21b176f19a7b9b66025d10"
+      - "caed39cf5c09cb35f332803a64a2db74"
+      - "712ffcd7c9e05c964a8440c9e30b49bb"
+      - "39bdd843d4d577abca3e46c83fe4bbd3"
+      - "b09efe9d615757974e12c7b31e8af1a9"
+      - "dfb9d477fe031f78de9ede0fc5994416"
+      - "6a2960b94ec5edffde67b49fbadf4bee"
+      - "58c5748399db36e145bd8755da12c55e"
+      - "f657845d0a39a2b5fa9c9550f2e031c0"
+      - "39e4c6e8ae2b2e62506f54291deb06d7"
+      - "b63c64bd6ec759a325bfce21dcd41f28"
+      - "f070ddeafa4fa0013488097d0941254d"
+      - "4f0277ded4ae67e30eef2c201eee13b3"
+      - "4a424facc9bb97e985226ed1977ab114"
+      - "44a796728652c21b4e4ef504ae6adbe6"
+      - "459e0e9ea5a1e3664bfb20f07a19b8ee"
+      - "110660c503d17cbd44eb0219f9e8a5e9"
+      - "448eb516d1f3746145d4df16f5f1068e"
+      - "37b917a0efb4821f0572ee77cb105c74"
+      - "b101ff25bcd03946f53f3a0ddab36498"
+      - "13d767527c77c1fd649cae6f1f106d6f"
+      - "8cd6ac5fdcd8c6d92acbaee76883f902"
+      - "759eff12c2855a85d5583a2736eafd42"
+      - "05bcf93caa926e33091b499cdc02e8b3"
+      - "ef929c80de9823da05a93115022c75d3"
+      - "e16df2be1473c76698409fca3cebbd8f"
+      - "9dcad239d81106a6cbbefbe4b2e894f5"
+      - "a8cd26ca2f0a3fed4ae7c2c6750ed210"
+      - "9657419b6af52ce21b5ba860fc4b01c5"
+      - "5737f056df75c496fa7ee3e9ed16a2a3"
+      - "bd70e354d8af343406e14ce6d59c362b"
+      - "edba7c1782afaa2a61326b40788429a6"
+      - "c36e48a813df17f137308e2109fbacb0"
+      - "53acaca3ded052a091f902444523c2b8"
+      - "b08495052d1b65a690c865db9d8bfbef"
+      - "c89dc63aaab34781b6e6c873b0294f19"
+      - "629c28af04d75d02e220e652a2ed5be5"
+      - "13d21fdeb88721b49e3af9f2342375b8"
+      - "bbee622ba6f9fe20827aff2d83b7df50"
+      - "95b354472abcd88dd6d56fff6ea42a45"
+      - "5779e3021d7c453466a7d81a477d2721"
+      - "fb2134e72ec3a7e5aff4ac7c851cd1f5"
+      - "b8d4039be2128cd8859ba0c8ed9f7ba2"
+      - "ddef228b99ee4ec6df2e9e49c1285ce4"
+      - "9315d5b3cdd49e00c4fa1f98079431c2"
+      - "d0a05a398fb5174f6774fbbb5bf1023a"
+      - "a1b5bb25689d016dc732b4cfce72c69d"
+      - "b4ba26f213a703c4c52b1af406a75a3c"
+      - "9f5bc5faea936ae96ae9123c204bffbe"
+      - "3f78e237227d6d325586f779c68e5700"
+      - "3b8e780c881c277ab185f0134345ba27"
+      - "8441efd7a82f3effe20652abcace1e30"
+      - "9d7c2e91638f677c7d42f925bfc102ed"
+      - "064ede4f49bacb5ce248071d8ea2ea36"
+      - "d30534518f2f1956fe2cb7659837174f"
+      - "e704b05a108e021585d492e7fb578e21"
+      - "fff485031d3bcd4e6d768e523027d5d0"
+      - "eb8b2737e9113e57b026eb71df53f1e4"
+      - "07e7f0e24c08dac622a6200489999800"
+      - "60b21f87ac10a5eec0603982a3f2eb0f"
+      - "280f410e53dcb42a4fcc5631ad0c4359"
+      - "3b63f41cc7cb83bb1163a04385a14d90"
+      - "19513ba03d98d9d5a68c2d6f7acea179"
+      - "3dec70bb3eba978f1dd98acd678f4ca3"
+      - "6046166ca4ca49d862f2d3b855ad27e4"
+      - "08b664c6ee2c24fc48e7e04866e8d9d3"
+      - "03f3c950b7803276dba341c5a60b761b"
+      - "74a130d4f7673fc5d7c8becd55396b74"
+      - "a04938348d8d7589de3866e200f94601"
+      - "8fc656ab246d5bfa051cc311db1b6b85"
+      - "2c1684074f4ee951c7c88b36790cea8d"
+      - "77ca6b0874dc42cbc35ad93a72d76d8b"
+      - "f6e38eb6575472463f00c2c336df2dfe"
+      - "09dba6e0de733f94e007252b1040562c"
+      - "6791a4c1b588358dadf6dcb369eb0f9b"
+      - "1ec723416e021e1b026a555a27eabf37"
+      - "76c12f5786c90bdf4af85157bfce28d4"
+      - "f6c24d8559583c8484184e55ca36398e"
+      - "546e574a61df20b63080a727dd3d9d4b"
+      - "a3cfee81b5be824e5647e790a9c0f992"
+      - "77eb5d46f37b8e75ff854b6f17757ee2"
+      - "e2c3cbdd968e7d0af1ee3d5fccc0b8b3"
+      - "747968105f58508fabd2e4b28a90edf6"
+      - "70624c7d69737e91128e68a300acf837"
+      - "0d38641f1a8918ba345cfa10dd45a02f"
+      - "5c6399915c07d2ac3668c57a36697b11"
+      - "f3295be018598e3415966838cd8b8919"
+      - "03938aa36d4461050e01325f663c1d75"
+      - "153ebddbafc8011113fdd6771e88c0f9"
+      - "8e87f27234206abd4d5dc46c6817ee27"
+      - "90a3e6dceb53d7a4b21762e6dfdf81de"
+      - "54e790da2730c05fcd053f2e84574f92"
+      - "31f547c178b50bd47b5b07e1b067f67a"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 89
+    - time: ['19:00', '3:00']
+      set: 89    
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 225
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 0
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

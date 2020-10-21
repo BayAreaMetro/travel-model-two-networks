@@ -1,0 +1,117 @@
+project: Year 2015 Modify HOV Lanes and USE on US-101 NB from North of Petaluma to South of Healdsburg
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 7028810
+      - 7046593
+      - 7032197
+      - 7051369
+      - 7041030
+      - 7030930
+      - 7067839
+      - 7025987
+      - 7023101
+      - 7059272
+      - 7010951
+      - 7047836
+      - 7041887
+      - 7068386
+      - 7004061
+      - 7016245
+      - 7025020
+      - 7056409
+      - 7028865
+      - 7033362
+      - 7059916
+      - 7067545
+      - 7000841
+      - 7000765
+      - 7042646
+      - 7001524
+      - 7023266
+      - 7034302
+      - 7038372
+    - shstReferenceId:
+      - "6bbcd6868053ca2ff9fa0f51e5af2941"
+      - "ae3d1716f3a21c93e0b2d0ae14b3f505"
+      - "7898ee37a4b62f4e7692a3cabf830532"
+      - "c01d806967035a6c3d689dbdab351b22"
+      - "99f9a1882b0f8cdb9b8928f7a4971969"
+      - "73b97f84eb9b65c1f65c4980e15b9fff"
+      - "fce6561deeb6d38801dfad3c0f2173d5"
+      - "60c62c0a01a148b7cd85b2f8e25df1be"
+      - "55f79771137d1aa6cdd9e532c681eda9"
+      - "dd490622072650cf2837d36b126b4362"
+      - "28a5c06e9a86a09ac86129d617acaaa7"
+      - "b2caee6991b6de6eafeda77d563f2097"
+      - "9d15c7aac65697e8e0b4231d518d869d"
+      - "fec38c8d805250873dbbd1d22ab15645"
+      - "0eadd5ad07880f5af5414e6c5ef07cc0"
+      - "3c708bb767fa4d22216ac0f365f5745d"
+      - "5d2cfa71604614f9c9149d7604f12db2"
+      - "d298e028949a926e725e3c0a83468948"
+      - "6bf4cc0fc7bb5fd75cf34bd6d8f96da6"
+      - "7d0023cd6f2e6ba2336b9fd1bdbad029"
+      - "dfbb7a548c78b897377644e620e159a9"
+      - "fbe8347c3be05ffc8926dd171453b74c"
+      - "02eff7da4c5bb9442a83936632004b95"
+      - "02b0be7186de823a19b1bbd0ae45ddec"
+      - "9fe2f6e8ec3f6f8abc5c949863590ce0"
+      - "0525f0f79ea98182a1242ff6ba9a6145"
+      - "56878d6d43f2b34f1777e062eba2d59b"
+      - "809a9b7b68024b9d9d3eb9aecc91416c"
+      - "901498e08ef911340361bc20dabbae61"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+     - time: ['3:00', '6:00']
+       set: 89
+     - time: ['6:00', '10:00']
+       set: 88
+     - time: ['10:00', '15:00']
+       set: 89
+     - time: ['15:00', '19:00']
+       set: 88
+     - time: ['19:00', '3:00']
+       set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+     - time: ['3:00', '6:00']
+       set: 0
+     - time: ['6:00', '10:00']
+       set: 1
+     - time: ['10:00', '15:00']
+       set: 0
+     - time: ['15:00', '19:00']
+       set: 1
+     - time: ['19:00', '3:00']
+       set: 0
+  - property: segment_id
+    set: 9994
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+     - time: ['3:00', '6:00']
+       set: 0
+     - time: ['6:00', '10:00']
+       set: 2
+     - time: ['10:00', '15:00']
+       set: 0
+     - time: ['15:00', '19:00']
+       set: 2
+     - time: ['19:00', '3:00']
+       set: 0 
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

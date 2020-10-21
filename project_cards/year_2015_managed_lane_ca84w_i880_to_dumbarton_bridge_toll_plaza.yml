@@ -1,0 +1,77 @@
+project: Year 2015 Modify HOV Lanes and USE on CA-84 WB I-880 to Dumbarton Bridge Toll Plaza
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3089171
+      - 3166741
+      - 3157403
+      - 3157306
+      - 3132204
+      - 3154846
+      - 3099282
+      - 3028386
+      - 3126300
+    - shstReferenceId:
+      - "865e574044e0b15911265c7004b8df08"
+      - "fb48fcd7994805554b8e1e722ecbcf1e"
+      - "ecc73056a1a87c3ef5f4a40edfce6eeb"
+      - "eca3180e1753369ad7f77d689bb3de25"
+      - "c6d8e36fd51cc408065ace44ecc00525"
+      - "e8fdaaaf7b155fb57d54d26e27fcc615"
+      - "95696728191df060663dfd513e071c0a"
+      - "2abb410a0cf3abe04cb7c622077ea717"
+      - "be0b25b3c93a1c072193df8ae693fd74"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 237
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false

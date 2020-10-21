@@ -1,0 +1,103 @@
+project: Year 2015 Modify HOV Lanes and USE on I-680 NB from Acosta Blvd to Rudgear Road
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3036037
+      - 4026985
+      - 4120008
+      - 4020617
+      - 4033582
+      - 4025174
+      - 4055125
+      - 4064696
+      - 4095497
+      - 4049511
+      - 4079820
+      - 4052851
+      - 4024868
+      - 4112246
+      - 4074247
+      - 4084204
+      - 4109549
+      - 4042337
+      - 4066358
+      - 4102354
+      - 4056752
+      - 4062144
+    - shstReferenceId:
+      - "3613705b902e4f9d92aca02ebc941ca0"
+      - "365cd7f9dad7f91caeeff9c7c111a547"
+      - "f1c529d2b90c7f2a94f3bf2f6130c235"
+      - "29abac221c7717007705a5ba31626893"
+      - "43c8b0271968a33fd2f95500d7ad931b"
+      - "32d8ced62663b6ad645742b2588f7097"
+      - "6ec3da00d57c8970e1ca4c8f7d4c4bb5"
+      - "820caf33e463363d2091253c0bce0960"
+      - "c059cfe07172e5273baeead59fb18932"
+      - "634d62b619b639d7eb04375bf1bb2ce0"
+      - "a0b1025c719aaa4e0d1f7ff24d62a940"
+      - "6a1bb6ece25fcc7307453521d44dea3f"
+      - "3232df5c869f75ceef1681ef1dc3d260"
+      - "e25241623e5d1fa4c74aa32c7485a107"
+      - "954b252f9806229bea85cf67355e5b28"
+      - "a968ab2d8500f6991ec73db79fa5c077"
+      - "dc99d6217067b4ade6a1284280d2e1aa"
+      - "554fe72f0f6433417a0c6f156d72b7f8"
+      - "8586c0f7aafaa58d1c5afcd9c9da6b0d"
+      - "ce3cd21a791a9de6764dc4612016e1bd"
+      - "720df988997ba47ef80f1cb8a15d926e"
+      - "7cfe58a5722c54124c6c295dd8ebb967"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 88
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89   
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 211
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 2
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false
