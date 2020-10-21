@@ -1,0 +1,155 @@
+project: Year 2015 Modify HOV Lanes and USE on CA-85 SB US101 to US101
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2086408
+      - 2218710
+      - 2057168
+      - 2215300
+      - 2092956
+      - 2172467
+      - 2201033
+      - 2012287
+      - 2179734
+      - 2236900
+      - 2150794
+      - 2188445
+      - 2168383
+      - 2074108
+      - 2159125
+      - 2152814
+      - 2000544
+      - 2002283
+      - 2178705
+      - 2124446
+      - 2268416
+      - 2011350
+      - 2034500
+      - 2158008
+      - 2036543
+      - 2018831
+      - 2038685
+      - 2165242
+      - 2140746
+      - 2098977
+      - 2159210
+      - 2200181
+      - 2042065
+      - 2164992
+      - 2267768
+      - 2175467
+      - 2222812
+      - 2027001
+      - 2200034
+      - 2004450
+      - 2231196
+      - 2199587
+      - 2146507
+      - 2051033
+      - 2214852
+      - 2161968
+      - 2263700
+      - 2128868
+    - shstReferenceId:
+      - "50c173432bcffeee34a335a8453586cf"
+      - "cce132d29da82ed02716f43ab1415ab5"
+      - "35529267de09d52e7bad329705f99a09"
+      - "c9ae8ff8b3ed15bd8ded95ca5051d673"
+      - "56de56c559a2fc0f223896a8e3ad4d8d"
+      - "a15d726752bf3d0103c160984aab706b"
+      - "bc51d32907cc28471d9ff2fb31bb4bde"
+      - "0b795829c83f4f5d526c37a64a2c55af"
+      - "a838efb89f7bda8f7931767ec06ccebb"
+      - "ddf4b1a07fbd304a38bedf9a4e2dbae0"
+      - "8d162877cfd65a2584fe182eaba2e13a"
+      - "b07382ee6513e01ce5633ca5a269563d"
+      - "9d95dc99d1d5cf40c2e84c80c7eec028"
+      - "452dc069a369b2b38936c355e934bb47"
+      - "94d1204d5ee1b3a2cba2aa48e1134fe6"
+      - "8ef946fa1de6c6141a2611140db6068a"
+      - "007e4f6aa4d824b8e722f15b2a700c01"
+      - "0224135286a3e460ba45946c21e3ce98"
+      - "a73ab2696f284cd921845fe842b222b2"
+      - "74534a2e3ea7714a2a350f2f8f75458a"
+      - "fb5125d7cca8994607888330f9b34d34"
+      - "0a9859448e078a5bc2df5a32a1a539ad"
+      - "202740aecc1240e3ffcb343cc249dfc5"
+      - "93c203319bcae9e087ff7450bf28c5f6"
+      - "220e633fbd83b8b5ff1cc69f96a9e563"
+      - "1178f83ef0d76570da88b0a4c3de3abd"
+      - "241f019ec9ffed33c41e3284032ef5b5"
+      - "9a92fcd5ad76f0fd3e20e8a638d9b49e"
+      - "83c3ebbeda4ea8d30fdc2d045f81e018"
+      - "5c8d06f7da2f8c02ed1c37eafe7089b0"
+      - "94e52a6b3a080a7a8e0c0ddea41417a8"
+      - "bb83e6ad4bdeb71376a8f439ae701cb3"
+      - "274e4fee4d8c213db83655723183e02e"
+      - "9a55da0c87663217a0c7b95e5e5cbb7b"
+      - "fab50fb5e82f6e3ab0266159120dffb7"
+      - "a424b15c38541f28294bda067afdecb3"
+      - "d0acf1957db7b1d36cb021d138c2e17d"
+      - "193611b3ca0259cd54d21df768070361"
+      - "bb62606be53ee609901de5440b837020"
+      - "0421ad9408599798ad4e58bbee0643ed"
+      - "d898853c22bb681727d22eaafe72e5ad"
+      - "bafa87b24b37d066d1059e86cd947f4e"
+      - "8918d5f3278ec0b0aff78c352038b892"
+      - "2fb1f33100be494eaa8c8f94713fe0d0"
+      - "c93beb767e9b0df430cd3cefe697ab06"
+      - "97854169956e718361ff304e580d4a6a"
+      - "f70627e06fb7973698834463ad699aa4"
+      - "78906625752a655c7c8b7b203071fe55"
+  properties:
+  - property: lanes
+    set: 89
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 89
+    - time: ['6:00', '10:00']
+      set: 88
+    - time: ['10:00', '15:00']
+      set: 89
+    - time: ['15:00', '19:00']
+      set: 88
+    - time: ['19:00', '3:00']
+      set: 89  
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 1
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: segment_id
+    set: 220
+  - property: ML_USECLASS
+    set: 0
+    timeofday:
+    - time: ['3:00', '6:00']
+      set: 0
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 0
+    - time: ['15:00', '19:00']
+      set: 2
+    - time: ['19:00', '3:00']
+      set: 0     
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  
+valid: false
