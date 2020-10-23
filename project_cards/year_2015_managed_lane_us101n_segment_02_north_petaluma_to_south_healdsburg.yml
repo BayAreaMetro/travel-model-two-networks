@@ -1,4 +1,4 @@
-project: Year 2015 Modify HOV Lanes and USE on US-101 NB from North of Petaluma to South of Healdsburg
+project: Year 2015 Modify HOV Lanes and USE on US-101 NB (Segment 02) from North of Petaluma to South of Healdsburg
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -97,7 +97,7 @@ changes:
        set: 0
   - property: segment_id
     set: 9994
-  - property: ML_USECLASS
+  - property: ML_useclass
     set: 0
     timeofday:
      - time: ['3:00', '6:00']
