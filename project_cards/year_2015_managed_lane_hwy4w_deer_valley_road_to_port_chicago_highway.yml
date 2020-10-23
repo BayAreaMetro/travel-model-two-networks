@@ -89,7 +89,7 @@ changes:
       set: 0     
   - property: segment_id
     set: 27
-  - property: ML_USECLASS
+  - property: ML_useclass
     set: 0
     timeofday:
     - time: ['3:00', '6:00']
