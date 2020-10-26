@@ -38,3 +38,7 @@ data/interim/step5_tidy_roadway/link.json
 data/interim/step5_tidy_roadway/node.geojson
 data/interim/step5_tidy_roadway/shape.geojson
 data/interim/pedestrian-viewer.geojson
+data/interim/step8_standard_format/link.json
+data/interim/step8_standard_format/node.geojson
+data/interim/step8_standard_format/shape.geojson
+data/processed/version_02/working_scenario_00.pickle
