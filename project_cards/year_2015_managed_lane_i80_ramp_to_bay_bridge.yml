@@ -8,9 +8,6 @@ changes:
 - category: Roadway Property Change
   facility:
     link:
-    - shStReferenceId:
-      - 5cb208be89de29c545b615a215e3b03d
-      - e0f8a9be8f36933b93e37c4034dbb282
     - model_link_id:
       - 3061568
       - 3149471
