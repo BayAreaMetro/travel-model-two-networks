@@ -487,10 +487,8 @@ UCT9,UCT,9,Dyer Express,"Union Landing, Four Corners, Dyer & Union City Blvd, an
 2696,392,JR,Hercules Transit Center - Pinole - Richmond - BART,,3,http://www.westcat.org/schedules/routeJcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,665
 2700,392,JX,Hercules Transit Center - El Cerrito del Norte BART,,3,http://www.westcat.org/schedules/routeJPXcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,666
 2676,392,Lynx,Rodeo/Hercules/San Francisco Transbay Terminal,,3,http://www.westcat.org/schedules/routeLYNXcs.html,74262B,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,663
-3,SB,Vallejo Ferry,Vallejo - San Francisco,"Ferry service between Vallejo, the San Francisco Ferry Building, and Pier 41.",4,http://sanfranciscobayferry.com/route/vallejo/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,386
 2,SB,Harbor Bay Ferry,Harbor Bay - San Francisco Ferry Building,Ferry service between Harbor Bay and the San Francisco Ferry Building. Weekdays only.,4,http://sanfranciscobayferry.com/route/hbi/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,384
 1,SB,Alameda Oakland Ferry,Alameda - Oakland - San Francisco Ferry,"Ferry service between Alameda Main St, Oakland Jack London Square, the San Francisco Ferry Building, and Pier 41.",4,http://sanfranciscobayferry.com/route/alameda/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,383
-200,SB,Rt 200 Vallejo Bus,Rt 200 Bus (Vallejo ferry service),Supplemental bus service between Vallejo and the San Francisco Ferry Building (part of the Vallejo ferry service).,4,http://sanfranciscobayferry.com/route/vallejo/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,385
 5,SB,South SF - East Bay Ferry,South SF - Alameda - Oakland,"Ferry service between Alameda Main St, Oakland Jack London Square, and South San Francisco at Oyster Point.",4,http://sanfranciscobayferry.com/route/ssf/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,388
 4,SB,South SF - SF Ferry,South San Francisco - San Francisco Ferry Building,Ferry service between South San Francisco at Oyster Point and the San Francisco Ferry Building. Weekdays only.,4,http://sanfranciscobayferry.com/route/ssf/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,387
 1-118,AC Transit,1,Bayfair Bart- Dtn. Berkeley,,3,,,,ACTransit_2015_8_14,,,,,,2
@@ -649,7 +647,6 @@ Angel Island,BG,Angel Island,San Francisco - Angel Island Ferry,,4,,,,Blue&Gold_
 Sausalito,BG,Sausalito,San Francisco - Sausalito Ferry,,4,,,,Blue&Gold_gtfs_10_4_2017,,,,,,161
 Tiburon,BG,Tiburon,San Francisco - Tiburon Ferry,,4,,,,Blue&Gold_gtfs_10_4_2017,,,,,,162
 CC,AM,CC,,,2,,,,Capitol_2017_3_20,,,,,,196
-SF,AM,SF,,,2,,,,Capitol_2017_3_20,,,,,,197
 2,SRCityBus,1,1 Mendocino Ave,,3,,0DF7FF,FFFFFF,SantaRosa_google_transit_08_28_15,,,,,,473
 3,SRCityBus,2,2 Bennett Valley,,3,,017811,FFFFFF,SantaRosa_google_transit_08_28_15,,,,,,474
 4,SRCityBus,3,3 West Ninth St,,3,,FF370F,FFFFFF,SantaRosa_google_transit_08_28_15,,,,,,475
