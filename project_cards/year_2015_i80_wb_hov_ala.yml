@@ -10,10 +10,6 @@ changes:
 - category: Parallel Managed lanes
   facility:
     link:
-    - shStReferenceId:
-      - 7e7c2bd15e83faee157c20cd8bb37c84
-      - 870957b7cb96c96e87359694296e3494
-      - d66f03dd2d27fd3155c38801b521b1de
     - model_link_id:
       - 4062899
       - 4067125
