@@ -57,6 +57,5 @@ changes:
       - 3166909
       - 3169014
   properties:
-    property: useclass
+  - property: useclass
     set: 4
-valid: false
