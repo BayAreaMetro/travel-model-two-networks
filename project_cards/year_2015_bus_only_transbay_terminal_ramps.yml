@@ -1,34 +1,54 @@
 project: Year 2015 Bus Only Segments for Transbay Terminal Ramps
 tags:
-  - 'Year 2015'
-  - 'Bus Only'
+- Year 2015
+- Bus Only
 dependencies: ''
 changes:
 - category: Roadway Property Change
   facility:
     link:
     - shStReferenceId:
-      - "0ae155b7b483507e1f38376849e9dbdb"
-      - "1e23dc3dce4c3961dfc54fcf05f9f038"
-      - "2b625a39aa77a0870a98090d0bdde604"
-      - "4a1b379d0c179be3968356758cc6b469"
-      - "4da487b370aefb446e59602ec26a7c3c"
-      - "6b033d32fce65e1d1fb96ab7490cd777"
-      - "9fc6ae1f0b07c2488742933ce6c3be25"
-      - "65a2bb27ae9514171321c6e2b55a95eb"
-      - "518da54d198a20142fddf421781db0af"
-      - "913aade8c55e81dec27a4ff42f3f1e86"
-      - "2630a99ce8078e48eaa633eba4c1632f"
-      - "4404a553a2b51fd8efb247d8a69937b1"
-      - "7655f4b670a43a48ce09491389014226"
-      - "783645e4615580e8c79e1476a80fc8f2"
-      - "a43f37b125547fe05b199221a3dc9452"
-      - "aa654aa460971b1957c2d6df3d5fb8de"
-      - "bf5e9237c8fbb0e92d82f5accd53c182"
-      - "cb711b2cd73ebb6ac0548350ae9f226e"
-      - "ccc57d772b85d192f10f43fc99fc808b"
-      - "d26deeebe93b64192bc57bf87a914445"
-      - "febb16def7601a2c58fa9bdf1fd7643e"
+      - 0ae155b7b483507e1f38376849e9dbdb
+      - 1e23dc3dce4c3961dfc54fcf05f9f038
+      - 2b625a39aa77a0870a98090d0bdde604
+      - 4a1b379d0c179be3968356758cc6b469
+      - 4da487b370aefb446e59602ec26a7c3c
+      - 6b033d32fce65e1d1fb96ab7490cd777
+      - 9fc6ae1f0b07c2488742933ce6c3be25
+      - 65a2bb27ae9514171321c6e2b55a95eb
+      - 518da54d198a20142fddf421781db0af
+      - 913aade8c55e81dec27a4ff42f3f1e86
+      - 2630a99ce8078e48eaa633eba4c1632f
+      - 4404a553a2b51fd8efb247d8a69937b1
+      - 7655f4b670a43a48ce09491389014226
+      - 783645e4615580e8c79e1476a80fc8f2
+      - a43f37b125547fe05b199221a3dc9452
+      - aa654aa460971b1957c2d6df3d5fb8de
+      - bf5e9237c8fbb0e92d82f5accd53c182
+      - ccc57d772b85d192f10f43fc99fc808b
+      - d26deeebe93b64192bc57bf87a914445
+      - febb16def7601a2c58fa9bdf1fd7643e
+    - model_link_id:
+      - 42220
+      - 4819
+      - 6939
+      - 11914
+      - 12485
+      - 17246
+      - 61133
+      - 16416
+      - 13139
+      - 23294
+      - 6120
+      - 10894
+      - 55904
+      - 19357
+      - 26323
+      - 27296
+      - 65219
+      - 32723
+      - 33606
+      - 40612
   properties:
   - property: drive_access
     set: 0
