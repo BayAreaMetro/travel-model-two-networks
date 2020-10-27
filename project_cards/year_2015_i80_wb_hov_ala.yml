@@ -16,31 +16,21 @@ changes:
       - 5051527
   properties:
   - property: lanes
+    change: 0
     timeofday:
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00','10:00']
       change: -1
-    - time:
-      - '15:00'
-      - '19:00'
+    - time: ['15:00','19:00']
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time:
-      - '6:00'
-      - '10:00'
+    - time: ['6:00', '10:00']
       set: 1
-    - time:
-      - '15:00'
-      - '19:00'
-      set: 1
+#    - time:['15:00','19:00']
+#      set: 1
   - property: ML_access
     set: all
   - property: ML_egress
     set: all
-  - property: ML_HOV
-    set: 0
-  - property: HOV
-    set: 0
+
