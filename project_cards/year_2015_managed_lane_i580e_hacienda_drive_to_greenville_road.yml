@@ -34,48 +34,37 @@ changes:
       - "f3c12a0e25207502176968adff57f6ba"
   properties:
   - property: lanes
-    set: 89
+    change: 0
     timeofday:
-    - time: ['3:00', '6:00']
-      set: 89
     - time: ['6:00', '10:00']
-      set: 88
+      change: -1
     - time: ['10:00', '15:00']
-      set: 88
+      change: -1
     - time: ['15:00', '19:00']
-      set: 88
-    - time: ['19:00', '3:00']
-      set: 89  
+      change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['3:00', '6:00']
-      set: 0
     - time: ['6:00', '10:00']
       set: 1
     - time: ['10:00', '15:00']
       set: 1
     - time: ['15:00', '19:00']
       set: 1
-    - time: ['19:00', '3:00']
-      set: 0     
   - property: segment_id
+    set: 32
+  - property: tollseg
     set: 32
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['3:00', '6:00']
-      set: 0
     - time: ['6:00', '10:00']
       set: 4
     - time: ['10:00', '15:00']
       set: 4
     - time: ['15:00', '19:00']
       set: 4
-    - time: ['19:00', '3:00']
-      set: 0      
   - property: ML_access
     set: 'all'
   - property: ML_egress
-    set: 'all'  
-valid: false
+    set: 'all'
