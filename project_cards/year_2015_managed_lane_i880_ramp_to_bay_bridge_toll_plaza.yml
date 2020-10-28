@@ -1,4 +1,4 @@
-project: Year 2015 Modify HOV Lanes and USE on I-80 WB I-80 to Bay Bridge Toll Plaza
+project: Year 2015 Modify HOV Lanes and USE on Ramp Connecting I880 and Bay Bridge Plaza
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -9,8 +9,6 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3146527
-      - 3148196
       - 3076359
       - 3078461
       - 3049524
