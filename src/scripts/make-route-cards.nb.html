@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
 
 
@@ -1483,7 +1483,7 @@ window.initializeCodeFolding = function(show) {
 
     // create a collapsable div to wrap the code in
     var div = $('<div class="collapse r-code-collapse"></div>');
-    if (show)
+    if (show || $(this)[0].classList.contains('fold-show'))
       div.addClass('in');
     var id = 'rcode-643E0F36' + currentIndex++;
     div.attr('id', id);
@@ -1613,7 +1613,6 @@ code {
 }
 img {
   max-width:100%;
-  height: auto;
 }
 .tabbed-pane {
   padding-top: 12px;
@@ -1699,6 +1698,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -1711,28 +1711,10 @@ summary {
 }
 </style>
 
-<script>
-$(document).ready(function () {
-  window.buildTabsets("TOC");
-});
-
-$(document).ready(function () {
-  $('.tabset-dropdown > .nav-tabs > li').click(function () {
-    $(this).parent().toggleClass('nav-tabs-open')
-  });
-});
-</script>
-
 <!-- code folding -->
 <style type="text/css">
 .code-folding-btn { margin-bottom: 4px; }
 </style>
-<script>
-$(document).ready(function () {
-  window.initializeSourceEmbed("make-route-cards.Rmd");
-  window.initializeCodeFolding("show" === "show");
-});
-</script>
 
 
 
@@ -1789,8 +1771,8 @@ output_file_name &lt;- paste0(interim_dir, &quot;transit_for_tableau.csv&quot;)<
 <h1>Parameters</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVkVSU0lPTiA8LSBcInZlcnNpb25fMDFcIlxuYGBgIn0= -->
-<pre class="r"><code>VERSION &lt;- &quot;version_01&quot;</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuVkVSU0lPTiA8LSBcInZlcnNpb25fMDJcIlxuYGBgIn0= -->
+<pre class="r"><code>VERSION &lt;- &quot;version_02&quot;</code></pre>
 <!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1799,20 +1781,23 @@ output_file_name &lt;- paste0(interim_dir, &quot;transit_for_tableau.csv&quot;)<
 <h1>Data Reads</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc3RvcHNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKGludGVyaW1fZGlyLCBcInN0ZXA2X2d0ZnMvXCIsIFwic3RvcHMudHh0XCIpLCBjb2xfdHlwZXMgID0gXCJjY2RkY2NuY2NuY2NjY2lpY2lcIilcblxuYGBgIn0= -->
-<pre class="r"><code>stops_df &lt;- read_csv(paste0(interim_dir, &quot;step6_gtfs/&quot;, &quot;stops.txt&quot;), col_types  = &quot;ccddccnccncccciici&quot;)
-</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucm91dGVzX2RmIDwtIHJlYWRfY3N2KHBhc3RlMChwcm9jZXNzZWRfZGlyLCBWRVJTSU9OLCBcIi9yb3V0ZXMudHh0XCIpLCBjb2xfdHlwZXMgPSBcImNjY2NjaWNjY2NjY2NjY2lcIilcbmZyZXFfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sIFwiL2ZyZXF1ZW5jaWVzLnR4dFwiKSwgY29sX3R5cGVzID0gXCJpaXR0XCIpXG50cmlwc19kZiA8LSByZWFkX2NzdihwYXN0ZTAocHJvY2Vzc2VkX2RpciwgVkVSU0lPTiwgXCIvdHJpcHMudHh0XCIpLCBjb2xfdHlwZXMgPSBcImNjbmNubmNjY2NjY2NjY2NjY2lpaVwiKVxuc3RvcHNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sIFwiL3N0b3BzLnR4dFwiKSwgY29sX3R5cGVzICA9IFwiY2NkZGNjbmNjbmNjY2NpbmNpXCIpXG5zaGFwZXNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sIFwiL3NoYXBlcy50eHRcIiksIGNvbF90eXBlcyA9IFwiaWluY2lcIilcbnN0b3BfdGltZXNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sIFwiL3N0b3BfdGltZXMudHh0XCIpLCBjb2xfdHlwZXMgPSBcInR0aWNuY2RkY2NjY2NjY2NjY2NpaVwiKVxuXG5ub2Rlc19zZiA8LSBzdF9yZWFkKHBhc3RlMChwcm9jZXNzZWRfZGlyLCBWRVJTSU9OLCBcIi9ub2RlLmdlb2pzb25cIikpXG5gYGAifQ== -->
+<pre class="r"><code>routes_df &lt;- read_csv(paste0(processed_dir, VERSION, &quot;/routes.txt&quot;), col_types = &quot;ccccciccccccccci&quot;)
+freq_df &lt;- read_csv(paste0(processed_dir, VERSION, &quot;/frequencies.txt&quot;), col_types = &quot;iitt&quot;)
+trips_df &lt;- read_csv(paste0(processed_dir, VERSION, &quot;/trips.txt&quot;), col_types = &quot;ccncnncccccccccccciii&quot;)
+stops_df &lt;- read_csv(paste0(processed_dir, VERSION, &quot;/stops.txt&quot;), col_types  = &quot;ccddccnccnccccinci&quot;)
+shapes_df &lt;- read_csv(paste0(processed_dir, VERSION, &quot;/shapes.txt&quot;), col_types = &quot;iinci&quot;)
+stop_times_df &lt;- read_csv(paste0(processed_dir, VERSION, &quot;/stop_times.txt&quot;), col_types = &quot;tticncddcccccccccccii&quot;)
+
+nodes_sf &lt;- st_read(paste0(processed_dir, VERSION, &quot;/node.geojson&quot;))</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiNzM3NiBwYXJzaW5nIGZhaWx1cmVzLlxucm93ICAgICAgICAgY29sICAgZXhwZWN0ZWQgICAgIGFjdHVhbCAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgZmlsZVxuIDU5IG9zbV9ub2RlX2lkIGFuIGludGVnZXIgNDk1MjgxMzQyNSAnLi4vLi4vZGF0YS9pbnRlcmltL3N0ZXA2X2d0ZnMvc3RvcHMudHh0J1xuIDcwIG9zbV9ub2RlX2lkIGFuIGludGVnZXIgNTc3MjI0NjEwNCAnLi4vLi4vZGF0YS9pbnRlcmltL3N0ZXA2X2d0ZnMvc3RvcHMudHh0J1xuIDcxIG9zbV9ub2RlX2lkIGFuIGludGVnZXIgNDkxOTIxNzk3MyAnLi4vLi4vZGF0YS9pbnRlcmltL3N0ZXA2X2d0ZnMvc3RvcHMudHh0J1xuIDcyIG9zbV9ub2RlX2lkIGFuIGludGVnZXIgMjM4OTA4NDA3MyAnLi4vLi4vZGF0YS9pbnRlcmltL3N0ZXA2X2d0ZnMvc3RvcHMudHh0J1xuIDczIG9zbV9ub2RlX2lkIGFuIGludGVnZXIgNTc3MjI0NjE0NCAnLi4vLi4vZGF0YS9pbnRlcmltL3N0ZXA2X2d0ZnMvc3RvcHMudHh0J1xuLi4uIC4uLi4uLi4uLi4uIC4uLi4uLi4uLi4gLi4uLi4uLi4uLiAuLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLi4uLlxuU2VlIHByb2JsZW1zKC4uLikgZm9yIG1vcmUgZGV0YWlscy5cbiJ9 -->
-<pre><code>7376 parsing failures.
-row         col   expected     actual                                      file
- 59 osm_node_id an integer 4952813425 &#39;../../data/interim/step6_gtfs/stops.txt&#39;
- 70 osm_node_id an integer 5772246104 &#39;../../data/interim/step6_gtfs/stops.txt&#39;
- 71 osm_node_id an integer 4919217973 &#39;../../data/interim/step6_gtfs/stops.txt&#39;
- 72 osm_node_id an integer 2389084073 &#39;../../data/interim/step6_gtfs/stops.txt&#39;
- 73 osm_node_id an integer 5772246144 &#39;../../data/interim/step6_gtfs/stops.txt&#39;
-... ........... .......... .......... .........................................
-See problems(...) for more details.</code></pre>
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgbm9kZScgZnJvbSBkYXRhIHNvdXJjZSBgL1VzZXJzL3dzcC9Eb2N1bWVudHMvR2l0SHViL3RyYXZlbC1tb2RlbC10d28tbmV0d29ya3MvZGF0YS9wcm9jZXNzZWQvdmVyc2lvbl8wMi9ub2RlLmdlb2pzb24nIHVzaW5nIGRyaXZlciBgR2VvSlNPTidcblNpbXBsZSBmZWF0dXJlIGNvbGxlY3Rpb24gd2l0aCA2NDQ0NzUgZmVhdHVyZXMgYW5kIDEwIGZpZWxkc1xuZ2VvbWV0cnkgdHlwZTogIFBPSU5UXG5kaW1lbnNpb246ICAgICAgWFlcbmJib3g6ICAgICAgICAgICB4bWluOiAtMTIzLjUzMDggeW1pbjogMzYuOTAwNzggeG1heDogLTEyMS4yMDk0IHltYXg6IDM4Ljg2MDIxXG5nZW9ncmFwaGljIENSUzogV0dTIDg0XG4ifQ== -->
+<pre><code>Reading layer `node&#39; from data source `/Users/wsp/Documents/GitHub/travel-model-two-networks/data/processed/version_02/node.geojson&#39; using driver `GeoJSON&#39;
+Simple feature collection with 644475 features and 10 fields
+geometry type:  POINT
+dimension:      XY
+bbox:           xmin: -123.5308 ymin: 36.90078 xmax: -121.2094 ymax: 38.86021
+geographic CRS: WGS 84</code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
@@ -1828,13 +1813,10 @@ See problems(...) for more details.</code></pre>
 
 names(trips_df)</code></pre>
 <!-- rnb-source-end -->
-<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcInNlcnZpY2VfaWRcIiAgICAgICAgICAgICAgICAgIFwidHJpcF9oZWFkc2lnblwiICAgICAgICAgICAgICAgXCJkaXJlY3Rpb25faWRcIiAgICAgICAgICAgICAgIFxuIFs0XSBcImJsb2NrX2lkXCIgICAgICAgICAgICAgICAgICAgIFwid2hlZWxjaGFpcl9hY2Nlc3NpYmxlXCIgICAgICAgXCJiaWtlc19hbGxvd2VkXCIgICAgICAgICAgICAgIFxuIFs3XSBcImFnZW5jeV9yYXdfbmFtZVwiICAgICAgICAgICAgIFwidHJpcF9zaG9ydF9uYW1lXCIgICAgICAgICAgICAgXCJvcmlnaW5hbF90cmlwX2lkXCIgICAgICAgICAgIFxuWzEwXSBcInRyaXBfYmlrZXNfYWxsb3dlZFwiICAgICAgICAgIFwidHJpcF90eXBlXCIgICAgICAgICAgICAgICAgICAgXCJkcnRfbWF4X3RyYXZlbF90aW1lXCIgICAgICAgIFxuWzEzXSBcImRydF9hdmdfdHJhdmVsX3RpbWVcIiAgICAgICAgIFwiZHJ0X2FkdmFuY2VfYm9va19taW5cIiAgICAgICAgXCJkcnRfcGlja3VwX21lc3NhZ2VcIiAgICAgICAgIFxuWzE2XSBcImRydF9kcm9wX29mZl9tZXNzYWdlXCIgICAgICAgIFwiY29udGludW91c19waWNrdXBfbWVzc2FnZVwiICAgXCJjb250aW51b3VzX2Ryb3Bfb2ZmX21lc3NhZ2VcIlxuWzE5XSBcInJvdXRlX2lkXCIgICAgICAgICAgICAgICAgICAgIFwidHJpcF9pZFwiICAgICAgICAgICAgICAgICAgICAgXCJzaGFwZV9pZFwiICAgICAgICAgICAgICAgICAgIFxuIn0= -->
-<pre><code> [1] &quot;service_id&quot;                  &quot;trip_headsign&quot;               &quot;direction_id&quot;               
- [4] &quot;block_id&quot;                    &quot;wheelchair_accessible&quot;       &quot;bikes_allowed&quot;              
- [7] &quot;agency_raw_name&quot;             &quot;trip_short_name&quot;             &quot;original_trip_id&quot;           
-[10] &quot;trip_bikes_allowed&quot;          &quot;trip_type&quot;                   &quot;drt_max_travel_time&quot;        
-[13] &quot;drt_avg_travel_time&quot;         &quot;drt_advance_book_min&quot;        &quot;drt_pickup_message&quot;         
-[16] &quot;drt_drop_off_message&quot;        &quot;continuous_pickup_message&quot;   &quot;continuous_drop_off_message&quot;
+<!-- rnb-output-begin eyJkYXRhIjoiIFsxXSBcInNlcnZpY2VfaWRcIiAgICAgICAgICAgICAgICAgIFwidHJpcF9oZWFkc2lnblwiICAgICAgICAgICAgICAgXCJkaXJlY3Rpb25faWRcIiAgICAgICAgICAgICAgICBcImJsb2NrX2lkXCIgICAgICAgICAgICAgICAgICAgIFwid2hlZWxjaGFpcl9hY2Nlc3NpYmxlXCIgICAgICAgXCJiaWtlc19hbGxvd2VkXCIgICAgICAgICAgICAgIFxuIFs3XSBcImFnZW5jeV9yYXdfbmFtZVwiICAgICAgICAgICAgIFwidHJpcF9zaG9ydF9uYW1lXCIgICAgICAgICAgICAgXCJvcmlnaW5hbF90cmlwX2lkXCIgICAgICAgICAgICBcInRyaXBfYmlrZXNfYWxsb3dlZFwiICAgICAgICAgIFwidHJpcF90eXBlXCIgICAgICAgICAgICAgICAgICAgXCJkcnRfbWF4X3RyYXZlbF90aW1lXCIgICAgICAgIFxuWzEzXSBcImRydF9hdmdfdHJhdmVsX3RpbWVcIiAgICAgICAgIFwiZHJ0X2FkdmFuY2VfYm9va19taW5cIiAgICAgICAgXCJkcnRfcGlja3VwX21lc3NhZ2VcIiAgICAgICAgICBcImRydF9kcm9wX29mZl9tZXNzYWdlXCIgICAgICAgIFwiY29udGludW91c19waWNrdXBfbWVzc2FnZVwiICAgXCJjb250aW51b3VzX2Ryb3Bfb2ZmX21lc3NhZ2VcIlxuWzE5XSBcInJvdXRlX2lkXCIgICAgICAgICAgICAgICAgICAgIFwidHJpcF9pZFwiICAgICAgICAgICAgICAgICAgICAgXCJzaGFwZV9pZFwiICAgICAgICAgICAgICAgICAgIFxuIn0= -->
+<pre><code> [1] &quot;service_id&quot;                  &quot;trip_headsign&quot;               &quot;direction_id&quot;                &quot;block_id&quot;                    &quot;wheelchair_accessible&quot;       &quot;bikes_allowed&quot;              
+ [7] &quot;agency_raw_name&quot;             &quot;trip_short_name&quot;             &quot;original_trip_id&quot;            &quot;trip_bikes_allowed&quot;          &quot;trip_type&quot;                   &quot;drt_max_travel_time&quot;        
+[13] &quot;drt_avg_travel_time&quot;         &quot;drt_advance_book_min&quot;        &quot;drt_pickup_message&quot;          &quot;drt_drop_off_message&quot;        &quot;continuous_pickup_message&quot;   &quot;continuous_drop_off_message&quot;
 [19] &quot;route_id&quot;                    &quot;trip_id&quot;                     &quot;shape_id&quot;                   </code></pre>
 <!-- rnb-output-end -->
 <!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuICBcbm91dHB1dF9zdG9wc19kZiA8LSBzZWxlY3Qocm91dGVzX2RmLCByb3V0ZV9pZF9vcmlnaW5hbCwgcm91dGVfaWQsIGFnZW5jeV9pZCwgcm91dGVfc2hvcnRfbmFtZSwgcm91dGVfbG9uZ19uYW1lLCBhZ2VuY3lfcmF3X25hbWUpICU+JVxuICBsZWZ0X2pvaW4oc2VsZWN0KHRyaXBzX2RmLCByb3V0ZV9pZCwgc2VydmljZV9pZCwgdHJpcF9pZCwgdHJpcF9oZWFkc2lnbiwgZGlyZWN0aW9uX2lkLCBzaGFwZV9pZCksXG4gICAgICAgICAgICAuLCBieSA9IGMoXCJyb3V0ZV9pZFwiKSkgJT4lXG4gIGxlZnRfam9pbiguLCBmcmVxX2RmLCBieSA9IGMoXCJ0cmlwX2lkXCIpKSAlPiVcbiAgbGVmdF9qb2luKHNlbGVjdChzdG9wX3RpbWVzX2RmLCB0cmlwX2lkLCBzdG9wX2lkLCBzdG9wX3NlcXVlbmNlKSwgLiwgYnkgPSBjKFwidHJpcF9pZFwiKSkgJT4lXG4gIGxlZnRfam9pbiguLCBzZWxlY3Qoc3RvcHNfZGYsIHN0b3BfaWQsIHN0b3BfbmFtZSwgc3RvcF9sYXQsIHN0b3BfbG9uKSwgYnkgPSBjKFwic3RvcF9pZFwiKSkgJT4lXG4gIG11dGF0ZShzdW1tYXJ5ID0gXCJzdG9wc1wiKVxuXG5vdXRwdXRfc2hhcGVzX2RmIDwtIHNlbGVjdChyb3V0ZXNfZGYsIHJvdXRlX2lkX29yaWdpbmFsLCByb3V0ZV9pZCwgYWdlbmN5X2lkLCByb3V0ZV9zaG9ydF9uYW1lLCByb3V0ZV9sb25nX25hbWUsIGFnZW5jeV9yYXdfbmFtZSkgJT4lXG4gIGxlZnRfam9pbihzZWxlY3QodHJpcHNfZGYsIHJvdXRlX2lkLCBzZXJ2aWNlX2lkLCB0cmlwX2lkLCB0cmlwX2hlYWRzaWduLCBkaXJlY3Rpb25faWQsIHNoYXBlX2lkKSxcbiAgICAgICAgICAgIC4sIGJ5ID0gYyhcInJvdXRlX2lkXCIpKSAlPiVcbiAgbGVmdF9qb2luKC4sIGZyZXFfZGYsIGJ5ID0gYyhcInRyaXBfaWRcIikpICU+JVxuICBsZWZ0X2pvaW4oLiwgc2VsZWN0KHNoYXBlc19kZiwgc2hhcGVfaWQsIHNoYXBlX3B0X3NlcXVlbmNlLCBzaGFwZV9tb2RlbF9ub2RlX2lkKSwgYnkgPSBjKFwic2hhcGVfaWRcIikpICU+JVxuICBsZWZ0X2pvaW4oLiwgbm9kZXNfZGYsIGJ5ID0gYyhcInNoYXBlX21vZGVsX25vZGVfaWRcIiA9IFwibW9kZWxfbm9kZV9pZFwiKSkgJT4lXG4gIG11dGF0ZShzdW1tYXJ5ID0gXCJzaGFwZXNcIilcblxub3V0cHV0X2RmIDwtIGJpbmRfcm93cyhvdXRwdXRfc3RvcHNfZGYsIG91dHB1dF9zaGFwZXNfZGYpXG5cbmBgYCJ9 -->
@@ -1876,7 +1858,7 @@ output_df &lt;- bind_rows(output_stops_df, output_shapes_df)
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tDQp0aXRsZTogIkxvb2sgYXQgQWxsIE5ldHdvcmsiDQpvdXRwdXQ6IGh0bWxfbm90ZWJvb2sNCi0tLQ0KDQojIE92ZXJoZWFkDQpgYGB7ciBvdmVyaGVhZCwgaW5jbHVkZSA9IEZBTFNFfQ0KcGFja2FnZXNfdmVjdG9yIDwtIGMoInRpZHl2ZXJzZSIsDQogICAgICAgICAgICAgICAgICAgICAic2YiKQ0KDQpuZWVkX3RvX2luc3RhbGwgPC0gcGFja2FnZXNfdmVjdG9yWyEocGFja2FnZXNfdmVjdG9yICVpbiUgaW5zdGFsbGVkLnBhY2thZ2VzKClbLCJQYWNrYWdlIl0pXQ0KDQppZiAobGVuZ3RoKG5lZWRfdG9faW5zdGFsbCkpIGluc3RhbGwucGFja2FnZXMobmVlZF90b19pbnN0YWxsKQ0KDQpmb3IgKHBhY2thZ2UgaW4gcGFja2FnZXNfdmVjdG9yKSB7DQogIGxpYnJhcnkocGFja2FnZSwgY2hhcmFjdGVyLm9ubHkgPSBUUlVFKQ0KfQ0KDQpgYGANCg0KIyBSZW1vdGUgSS9PDQpgYGB7ciByZW1vdGUtaW99DQppbnRlcmltX2RpciA8LSAiLi4vLi4vZGF0YS9pbnRlcmltLyINCnByb2Nlc3NlZF9kaXIgPC0gIi4uLy4uL2RhdGEvcHJvY2Vzc2VkLyIgDQoNCm91dHB1dF9maWxlX25hbWUgPC0gcGFzdGUwKGludGVyaW1fZGlyLCAidHJhbnNpdF9mb3JfdGFibGVhdS5jc3YiKQ0KYGBgDQoNCiMgUGFyYW1ldGVycw0KYGBge3IgcGFyYW1ldGVyc30NClZFUlNJT04gPC0gInZlcnNpb25fMDEiDQpgYGANCg0KDQojIERhdGEgUmVhZHMNCmBgYHtyIHJlYWR9DQpyb3V0ZXNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKGludGVyaW1fZGlyLCAic3RlcDZfZ3Rmcy8iLCAicm91dGVzLnR4dCIpLCBjb2xfdHlwZXMgPSAiY2NjY2NpY2NjY2NjY2NjaSIpDQpmcmVxX2RmIDwtIHJlYWRfY3N2KHBhc3RlMChpbnRlcmltX2RpciwgInN0ZXA2X2d0ZnMvIiwgImZyZXF1ZW5jaWVzLnR4dCIpLCBjb2xfdHlwZXMgPSAiaWl0dCIpDQp0cmlwc19kZiA8LSByZWFkX2NzdihwYXN0ZTAoaW50ZXJpbV9kaXIsICJzdGVwNl9ndGZzLyIsICJ0cmlwcy50eHQiKSwgY29sX3R5cGVzID0gImNjbmNubmNjY2NjY2NjY2NjY2lpaSIpDQpzdG9wc19kZiA8LSByZWFkX2NzdihwYXN0ZTAoaW50ZXJpbV9kaXIsICJzdGVwNl9ndGZzLyIsICJzdG9wcy50eHQiKSwgY29sX3R5cGVzICA9ICJjY2RkY2NuY2NuY2NjY2luY2kiKQ0Kc2hhcGVzX2RmIDwtIHJlYWRfY3N2KHBhc3RlMChpbnRlcmltX2RpciwgInN0ZXA2X2d0ZnMvIiwgInNoYXBlcy50eHQiKSwgY29sX3R5cGVzID0gImlpbmNpIikNCnN0b3BfdGltZXNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKGludGVyaW1fZGlyLCAic3RlcDZfZ3Rmcy8iLCAic3RvcF90aW1lcy50eHQiKSwgY29sX3R5cGVzID0gInR0aWNuY2RkY2NjY2NjY2NjY2NpaSIpDQoNCm5vZGVzX3NmIDwtIHN0X3JlYWQocGFzdGUwKGludGVyaW1fZGlyLCAic3RlcDZfZ3Rmcy8iLCAibm9kZS5nZW9qc29uIikpDQpgYGANCg0KIyBSZWR1Y3Rpb25zIGZvciBUTSBOZXR3b3JrDQpgYGB7ciByZWR1Y3Rpb25zfQ0Kbm9kZXNfZGYgPC0gYmluZF9jb2xzKHRpYmJsZShtb2RlbF9ub2RlX2lkID0gbm9kZXNfc2YkbW9kZWxfbm9kZV9pZCksIGFzX3RpYmJsZShzdF9jb29yZGluYXRlcyhub2Rlc19zZikpKSAlPiUNCiAgI211dGF0ZShtb2RlbF9ub2RlX2lkID0gcGFzdGUwKG1vZGVsX25vZGVfaWQpKSAlPiUNCiAgcmVuYW1lKGxuZyA9IFgsIGxhdCA9IFkpDQoNCm5hbWVzKHRyaXBzX2RmKQ0KICANCm91dHB1dF9zdG9wc19kZiA8LSBzZWxlY3Qocm91dGVzX2RmLCByb3V0ZV9pZF9vcmlnaW5hbCwgcm91dGVfaWQsIGFnZW5jeV9pZCwgcm91dGVfc2hvcnRfbmFtZSwgcm91dGVfbG9uZ19uYW1lLCBhZ2VuY3lfcmF3X25hbWUpICU+JQ0KICBsZWZ0X2pvaW4oc2VsZWN0KHRyaXBzX2RmLCByb3V0ZV9pZCwgc2VydmljZV9pZCwgdHJpcF9pZCwgdHJpcF9oZWFkc2lnbiwgZGlyZWN0aW9uX2lkLCBzaGFwZV9pZCksDQogICAgICAgICAgICAuLCBieSA9IGMoInJvdXRlX2lkIikpICU+JQ0KICBsZWZ0X2pvaW4oLiwgZnJlcV9kZiwgYnkgPSBjKCJ0cmlwX2lkIikpICU+JQ0KICBsZWZ0X2pvaW4oc2VsZWN0KHN0b3BfdGltZXNfZGYsIHRyaXBfaWQsIHN0b3BfaWQsIHN0b3Bfc2VxdWVuY2UpLCAuLCBieSA9IGMoInRyaXBfaWQiKSkgJT4lDQogIGxlZnRfam9pbiguLCBzZWxlY3Qoc3RvcHNfZGYsIHN0b3BfaWQsIHN0b3BfbmFtZSwgc3RvcF9sYXQsIHN0b3BfbG9uKSwgYnkgPSBjKCJzdG9wX2lkIikpICU+JQ0KICBtdXRhdGUoc3VtbWFyeSA9ICJzdG9wcyIpDQoNCm91dHB1dF9zaGFwZXNfZGYgPC0gc2VsZWN0KHJvdXRlc19kZiwgcm91dGVfaWRfb3JpZ2luYWwsIHJvdXRlX2lkLCBhZ2VuY3lfaWQsIHJvdXRlX3Nob3J0X25hbWUsIHJvdXRlX2xvbmdfbmFtZSwgYWdlbmN5X3Jhd19uYW1lKSAlPiUNCiAgbGVmdF9qb2luKHNlbGVjdCh0cmlwc19kZiwgcm91dGVfaWQsIHNlcnZpY2VfaWQsIHRyaXBfaWQsIHRyaXBfaGVhZHNpZ24sIGRpcmVjdGlvbl9pZCwgc2hhcGVfaWQpLA0KICAgICAgICAgICAgLiwgYnkgPSBjKCJyb3V0ZV9pZCIpKSAlPiUNCiAgbGVmdF9qb2luKC4sIGZyZXFfZGYsIGJ5ID0gYygidHJpcF9pZCIpKSAlPiUNCiAgbGVmdF9qb2luKC4sIHNlbGVjdChzaGFwZXNfZGYsIHNoYXBlX2lkLCBzaGFwZV9wdF9zZXF1ZW5jZSwgc2hhcGVfbW9kZWxfbm9kZV9pZCksIGJ5ID0gYygic2hhcGVfaWQiKSkgJT4lDQogIGxlZnRfam9pbiguLCBub2Rlc19kZiwgYnkgPSBjKCJzaGFwZV9tb2RlbF9ub2RlX2lkIiA9ICJtb2RlbF9ub2RlX2lkIikpICU+JQ0KICBtdXRhdGUoc3VtbWFyeSA9ICJzaGFwZXMiKQ0KDQpvdXRwdXRfZGYgPC0gYmluZF9yb3dzKG91dHB1dF9zdG9wc19kZiwgb3V0cHV0X3NoYXBlc19kZikNCg0KYGBgDQoNCiMgUmVkdWN0aW9ucyBmb3IgR1RGUyBTaGFwZXMNCg0KIyBXcml0ZQ0KYGBge3Igd3JpdGV9DQp3cml0ZV9jc3Yob3V0cHV0X2RmLCBwYXRoID0gb3V0cHV0X2ZpbGVfbmFtZSwgbmEgPSAiIikNCmBgYA0KDQo=</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiTG9vayBhdCBBbGwgTmV0d29yayIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKIyBPdmVyaGVhZApgYGB7ciBvdmVyaGVhZCwgaW5jbHVkZSA9IEZBTFNFfQpwYWNrYWdlc192ZWN0b3IgPC0gYygidGlkeXZlcnNlIiwKICAgICAgICAgICAgICAgICAgICAgInNmIikKCm5lZWRfdG9faW5zdGFsbCA8LSBwYWNrYWdlc192ZWN0b3JbIShwYWNrYWdlc192ZWN0b3IgJWluJSBpbnN0YWxsZWQucGFja2FnZXMoKVssIlBhY2thZ2UiXSldCgppZiAobGVuZ3RoKG5lZWRfdG9faW5zdGFsbCkpIGluc3RhbGwucGFja2FnZXMobmVlZF90b19pbnN0YWxsKQoKZm9yIChwYWNrYWdlIGluIHBhY2thZ2VzX3ZlY3RvcikgewogIGxpYnJhcnkocGFja2FnZSwgY2hhcmFjdGVyLm9ubHkgPSBUUlVFKQp9CgpgYGAKCiMgUmVtb3RlIEkvTwpgYGB7ciByZW1vdGUtaW99CmludGVyaW1fZGlyIDwtICIuLi8uLi9kYXRhL2ludGVyaW0vIgpwcm9jZXNzZWRfZGlyIDwtICIuLi8uLi9kYXRhL3Byb2Nlc3NlZC8iIAoKb3V0cHV0X2ZpbGVfbmFtZSA8LSBwYXN0ZTAoaW50ZXJpbV9kaXIsICJ0cmFuc2l0X2Zvcl90YWJsZWF1LmNzdiIpCmBgYAoKIyBQYXJhbWV0ZXJzCmBgYHtyIHBhcmFtZXRlcnN9ClZFUlNJT04gPC0gInZlcnNpb25fMDIiCmBgYAoKCiMgRGF0YSBSZWFkcwpgYGB7ciByZWFkfQpyb3V0ZXNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sICIvcm91dGVzLnR4dCIpLCBjb2xfdHlwZXMgPSAiY2NjY2NpY2NjY2NjY2NjaSIpCmZyZXFfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sICIvZnJlcXVlbmNpZXMudHh0IiksIGNvbF90eXBlcyA9ICJpaXR0IikKdHJpcHNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sICIvdHJpcHMudHh0IiksIGNvbF90eXBlcyA9ICJjY25jbm5jY2NjY2NjY2NjY2NpaWkiKQpzdG9wc19kZiA8LSByZWFkX2NzdihwYXN0ZTAocHJvY2Vzc2VkX2RpciwgVkVSU0lPTiwgIi9zdG9wcy50eHQiKSwgY29sX3R5cGVzICA9ICJjY2RkY2NuY2NuY2NjY2luY2kiKQpzaGFwZXNfZGYgPC0gcmVhZF9jc3YocGFzdGUwKHByb2Nlc3NlZF9kaXIsIFZFUlNJT04sICIvc2hhcGVzLnR4dCIpLCBjb2xfdHlwZXMgPSAiaWluY2kiKQpzdG9wX3RpbWVzX2RmIDwtIHJlYWRfY3N2KHBhc3RlMChwcm9jZXNzZWRfZGlyLCBWRVJTSU9OLCAiL3N0b3BfdGltZXMudHh0IiksIGNvbF90eXBlcyA9ICJ0dGljbmNkZGNjY2NjY2NjY2NjaWkiKQoKbm9kZXNfc2YgPC0gc3RfcmVhZChwYXN0ZTAocHJvY2Vzc2VkX2RpciwgVkVSU0lPTiwgIi9ub2RlLmdlb2pzb24iKSkKYGBgCgojIFJlZHVjdGlvbnMgZm9yIFRNIE5ldHdvcmsKYGBge3IgcmVkdWN0aW9uc30Kbm9kZXNfZGYgPC0gYmluZF9jb2xzKHRpYmJsZShtb2RlbF9ub2RlX2lkID0gbm9kZXNfc2YkbW9kZWxfbm9kZV9pZCksIGFzX3RpYmJsZShzdF9jb29yZGluYXRlcyhub2Rlc19zZikpKSAlPiUKICAjbXV0YXRlKG1vZGVsX25vZGVfaWQgPSBwYXN0ZTAobW9kZWxfbm9kZV9pZCkpICU+JQogIHJlbmFtZShsbmcgPSBYLCBsYXQgPSBZKQoKbmFtZXModHJpcHNfZGYpCiAgCm91dHB1dF9zdG9wc19kZiA8LSBzZWxlY3Qocm91dGVzX2RmLCByb3V0ZV9pZF9vcmlnaW5hbCwgcm91dGVfaWQsIGFnZW5jeV9pZCwgcm91dGVfc2hvcnRfbmFtZSwgcm91dGVfbG9uZ19uYW1lLCBhZ2VuY3lfcmF3X25hbWUpICU+JQogIGxlZnRfam9pbihzZWxlY3QodHJpcHNfZGYsIHJvdXRlX2lkLCBzZXJ2aWNlX2lkLCB0cmlwX2lkLCB0cmlwX2hlYWRzaWduLCBkaXJlY3Rpb25faWQsIHNoYXBlX2lkKSwKICAgICAgICAgICAgLiwgYnkgPSBjKCJyb3V0ZV9pZCIpKSAlPiUKICBsZWZ0X2pvaW4oLiwgZnJlcV9kZiwgYnkgPSBjKCJ0cmlwX2lkIikpICU+JQogIGxlZnRfam9pbihzZWxlY3Qoc3RvcF90aW1lc19kZiwgdHJpcF9pZCwgc3RvcF9pZCwgc3RvcF9zZXF1ZW5jZSksIC4sIGJ5ID0gYygidHJpcF9pZCIpKSAlPiUKICBsZWZ0X2pvaW4oLiwgc2VsZWN0KHN0b3BzX2RmLCBzdG9wX2lkLCBzdG9wX25hbWUsIHN0b3BfbGF0LCBzdG9wX2xvbiksIGJ5ID0gYygic3RvcF9pZCIpKSAlPiUKICBtdXRhdGUoc3VtbWFyeSA9ICJzdG9wcyIpCgpvdXRwdXRfc2hhcGVzX2RmIDwtIHNlbGVjdChyb3V0ZXNfZGYsIHJvdXRlX2lkX29yaWdpbmFsLCByb3V0ZV9pZCwgYWdlbmN5X2lkLCByb3V0ZV9zaG9ydF9uYW1lLCByb3V0ZV9sb25nX25hbWUsIGFnZW5jeV9yYXdfbmFtZSkgJT4lCiAgbGVmdF9qb2luKHNlbGVjdCh0cmlwc19kZiwgcm91dGVfaWQsIHNlcnZpY2VfaWQsIHRyaXBfaWQsIHRyaXBfaGVhZHNpZ24sIGRpcmVjdGlvbl9pZCwgc2hhcGVfaWQpLAogICAgICAgICAgICAuLCBieSA9IGMoInJvdXRlX2lkIikpICU+JQogIGxlZnRfam9pbiguLCBmcmVxX2RmLCBieSA9IGMoInRyaXBfaWQiKSkgJT4lCiAgbGVmdF9qb2luKC4sIHNlbGVjdChzaGFwZXNfZGYsIHNoYXBlX2lkLCBzaGFwZV9wdF9zZXF1ZW5jZSwgc2hhcGVfbW9kZWxfbm9kZV9pZCksIGJ5ID0gYygic2hhcGVfaWQiKSkgJT4lCiAgbGVmdF9qb2luKC4sIG5vZGVzX2RmLCBieSA9IGMoInNoYXBlX21vZGVsX25vZGVfaWQiID0gIm1vZGVsX25vZGVfaWQiKSkgJT4lCiAgbXV0YXRlKHN1bW1hcnkgPSAic2hhcGVzIikKCm91dHB1dF9kZiA8LSBiaW5kX3Jvd3Mob3V0cHV0X3N0b3BzX2RmLCBvdXRwdXRfc2hhcGVzX2RmKQoKYGBgCgojIFJlZHVjdGlvbnMgZm9yIEdURlMgU2hhcGVzCgojIFdyaXRlCmBgYHtyIHdyaXRlfQp3cml0ZV9jc3Yob3V0cHV0X2RmLCBwYXRoID0gb3V0cHV0X2ZpbGVfbmFtZSwgbmEgPSAiIikKYGBgCgo=</div>
 
 
 
@@ -1905,6 +1887,29 @@ $(document).ready(function () {
 });
 
 </script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+<script>
+$(document).ready(function () {
+  window.initializeSourceEmbed("make-route-cards.Rmd");
+  window.initializeCodeFolding("show" === "show");
+});
+</script>
+
 
 <!-- dynamically load mathjax for compatibility with self-contained -->
 <script>
