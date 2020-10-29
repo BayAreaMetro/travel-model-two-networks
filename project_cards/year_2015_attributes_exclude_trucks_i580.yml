@@ -1,87 +1,61 @@
-project: Year 2015 Exclude Trucks on I-580
+project: Year 2015 Exclude Trucks on I580
 tags:
-  - 'Year 2015'
-  - 'Exclude Trucks'
+- Year 2015
+- Exclude Trucks
 dependencies: ''
 changes:
 - category: Roadway Property Change
   facility:
     link:
-    - shStReferenceId:
-      - "0f168798e8ea24ca5dc330b4ac5c2f50"
-      - "1a35c61e820c14df1431b2766bb5e42c"
-      - "2b75937d394e97cfe0e7b7f68081f23e"
-      - "2dce3e05c5d0932bf3032ee228127908"
-      - "3cec5df45a9e2ed3f7e9e6b231a4dc9a"
-      - "3fa5e04fc9157fee11c7e44954648e6c"
-      - "5de18532cc0dc26ae4891f3a67e1f029"
-      - "5e213d0315376a9da76983d9e89344ff"
-      - "6f64b7860f500dd7254e353235b4e8e4"
-      - "9f3ae340c8bb39dbdcc8f249d43bb01f"
-      - "28bb7d4054d4da2fda957bd8f7100811"
-      - "36f23dcfb2c3536397df5c70d21fbc21"
-      - "39d73b10c999788aee231339a89db6be"
-      - "47e77a8b53f76fe7e22033628218b0ec"
-      - "51b08958f7fb59daa836cdc3269ebf43"
-      - "54bd46eda020d5b4692d4c1faddc55c7"
-      - "65b80cd40696351d7f94dc8d79e50905"
-      - "81d5ede6cdf445955206b7c9c43537cd"
-      - "90aae18f19cb5c17d4dff3a6b7e24d5c"
-      - "90c443c959466537d061329dcdc55da4"
-      - "96a9058efd491c1faf2765aaf5902ae6"
-      - "046a716fd82418ee186cdd825465cf55"
-      - "204a12a93cbada9b94ac84d748d04cda"
-      - "386e9f69818c77fc9d21e283f2514e4a"
-      - "764b6cf659b00739033961c2c243febf"
-      - "804b3126960485317a184ff1d6247e07"
-      - "882f772b8b1862ed9610dccf11e4c24e"
-      - "1801f0b5d6c548dfeb1908daa09bc409"
-      - "6576c76c3022e2213ed1d40d94fa55c0"
-      - "65845a251c58cf9afeed00bf398b590f"
-      - "000707ebb3cad174d01130b84c5c79d6"
-      - "061874fa2e319e9508c5466b2feb5a6a"
-      - "5481921ce32c43b512c66e39bb1b4c54"
-      - "42771275b6d7aa93a2df1813ed8e9f32"
-      - "bf537b8f67dc0b0d680cf189d7a546d5"
-      - "bf9325e9a6b03c57b4c181bebaeffbe8"
-      - "c6ef2e69709a670dd846fc3236039d4a"
-      - "d57e74901fe1f0d5af58c04b4c454a43"
-      - "db1836801d77b30ce744338df97d1c2d"
-      - "dc0ac38f683acc8a8179b94fcfbe5432"
-      - "e0b9a17eb9ef98abbd059b02503e0115"
-      - "e1ac2989edcb22ea825da48cd5fa705c"
-      - "e213ea002a04b9ce98de7aa59e83cebb"
-      - "e412c72a6f78a16627c8d74bb8cec7fc"
-      - "f710fb11157b033b96de9b49d9e22d53"
-      - "fa19821fede6b6ce194ffacfa2b83e64"
-      - "fb89f5cf9f20f9c00b91cc37dd611f1a"
-      - "fea949aa6b09c8d952a7fa8869c7773f"
+    - model_link_id:
+      - 3010017
+      - 3017447
+      - 3028889
+      - 3030464
+      - 3040508
+      - 3042365
+      - 3062363
+      - 3062514
+      - 3073961
+      - 3105772
+      - 3027113
+      - 3036589
+      - 3038474
+      - 3047855
+      - 3054320
+      - 3056326
+      - 3067669
+      - 3086129
+      - 3096138
+      - 3096212
+      - 3100108
+      - 3002922
+      - 3021388
+      - 3037522
+      - 3078548
+      - 3085119
+      - 3090414
+      - 3015926
+      - 3067490
+      - 3067531
+      - 3000010
+      - 3004068
+      - 3056191
+      - 3044251
+      - 3127163
+      - 3127329
+      - 3132261
+      - 3141814
+      - 3145614
+      - 3146244
+      - 3149290
+      - 3149920
+      - 3150227
+      - 3151587
+      - 3163997
+      - 3165986
+      - 3166909
+      - 3169014
   properties:
-  - property: use
-    timeofday:
-    - time:
-      - '3:00'
-      - '6:00'
-      existing: 1
-      set: 4
-    - time:
-      - '6:00'
-      - '10:00'
-      existing: 1
-      set: 4
-    - time:
-      - '10:00'
-      - '15:00'
-      existing: 1
-      set: 4
-    - time:
-      - '15:00'
-      - '19:00'
-      existing: 1
-      set: 4
-    - time:
-      - '19:00'
-      - '3:00'
-      existing: 1
-      set: 4
-valid: false
+  - property: useclass
+    set: 4

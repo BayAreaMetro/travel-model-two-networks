@@ -1,0 +1,50 @@
+project: Year 2015 Modify HOV Lanes and USE on CA-92 WB Eden Landing Rd to San Mateo-Hayward Bridge Toll Plaza
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3113462
+      - 3004406
+      - 3024600
+      - 3001335
+      - 3042719
+    - shstReferenceId:
+      - "aad4c2ed80c5ecbbe145bf4070591772"
+      - "06990e6d7125eb5f90d40d8bea657cf7"
+      - "2508a02970593bbeaa9fbfd4b412fdcb"
+      - "02093cd3c7c5a65cb16a69e2e4351b3b"
+      - "4028462195030d6f304bac38441cff5c"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 236
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['15:00', '19:00']
+      set: 2
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'

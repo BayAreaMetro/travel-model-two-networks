@@ -1,0 +1,60 @@
+project: Year 2015 Modify Express Lanes and USE on CA-237 EB SR-262 Mission Blvd to I-880
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'Express Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2232504
+      - 2180364
+      - 2046554
+      - 2168765
+      - 2225072
+      - 2018544
+    - shstReferenceId:
+      - "d9daa4cc3505c5887d9bd72f7ed6f4b5"
+      - "a8d010d05cca85a68e9503bdfef355dc"
+      - "2b7e2d6c14d7eefc014fbde02050bd5c"
+      - "9df016b1895c68aab9e27fea53e8d665"
+      - "d2d9b754d6f83429f039ddb0278859a3"
+      - "1134b7ec747af1b0b6fff3bcc4ba89d4"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['10:00', '15:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 35
+  - property: tollseg
+    set: 35
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 4
+    - time: ['10:00', '15:00']
+      set: 4
+    - time: ['15:00', '19:00']
+      set: 4
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'  

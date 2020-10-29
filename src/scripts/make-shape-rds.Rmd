@@ -23,7 +23,7 @@ for (package in packages_vector) {
 ```{r remote-io}
 interim_dir <- "../../data/interim/"
 
-shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
+shape_file_name <- paste0(interim_dir, "step6_gtfs/shape.geojson")
 
 output_file_name <- paste0(interim_dir, "simple_shape.RDS")
 ```

@@ -1,0 +1,134 @@
+project: Year 2015 Modify HOV Lanes and USE on I-80 EB from Bay Bridge to Carquinez Bridge Toll Plaza
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 4097308
+      - 4089555
+      - 4005024
+      - 4097226
+      - 4063603
+      - 3145655
+      - 3043907
+      - 3101193
+      - 3054893
+      - 3161854
+      - 3138965
+      - 3149662
+      - 3101872
+      - 4032989
+      - 4010034
+      - 4103339
+      - 4056060
+      - 4090209
+      - 4061836
+      - 4015106
+      - 4029109
+      - 4115784
+      - 4087611
+      - 4075167
+      - 4028400
+      - 4007845
+      - 4122022
+      - 4108491
+      - 4089092
+      - 4014954
+      - 4086601
+      - 4054968
+      - 4057558
+      - 4012111
+      - 4050471
+      - 5051375
+      - 4125035
+      - 4041875
+      - 4086305
+      - 4034918
+      - 4063707
+      - 4094659
+      - 3091153
+      - 3156364
+      - 3107675
+      - 3146527
+      - 3148196
+    - shstReferenceId:
+      - "c40899543fd9c2fbb5b99ccb08d8deab"
+      - "b45936cc1a7339732450074ae6096e92"
+      - "0a156241983e4c8b817b1d773b8f6c1e"
+      - "c3d776f689a58245282db249d6c5b31a"
+      - "7fd7f8e275dbfef0fcebf3a3fb0df2ca"
+      - "db2c85d4c72f1067ea9553bab12c1b6a"
+      - "41fb39618114cb551150e571ddf246d8"
+      - "984447dd2048893830a0679f82b71eb2"
+      - "5282b78ba8ab58f32dde41cd7e58b968"
+      - "f3aa9b4e878adeb23c578774ea9ea831"
+      - "d11ea9e4b5c108bbe96ff03ce08d24f1"
+      - "e14342b729d1eed2980364a1b88cb566"
+      - "99562493587e28e7b04ec8264f00f665"
+      - "429ad1b953a519ba1a2760dab2bf1619"
+      - "14263cdabeeca02b5ac40c7e933987e1"
+      - "d0432a883b86f951be2772e14ab4963d"
+      - "70a7be8ad9aff976ad23443085e6b9be"
+      - "b5c33813f1d98789d9bf88ca7e20326a"
+      - "7c6654c36a4939dce965eef85711586a"
+      - "1eaba0fd38dff784c7f9d7c82d6fe4e9"
+      - "3a983e6e9345f7b477a89d0d22064661"
+      - "e965911d27cbb2b9c1367f9de837fe68"
+      - "b05e2aa5df740ef97ebb26fb26b5d305"
+      - "972a90b16856add368756c45e95529f6"
+      - "3946aed5adac87ffb7f6c4a4c2a696f9"
+      - "0fadc13d44eb79f75cebf2a2a10ef8d3"
+      - "f5c21773a5a10508d2488d55c85cf163"
+      - "da7bc0cab8fbe57044fcd2b8a9cf6aaa"
+      - "b366bebe886087f17d5e43a5d83edb4d"
+      - "1e6813c0643f0aadaeefcc6691b520cb"
+      - "ae4c1d844bc6731389dfdc523a7b85f3"
+      - "6e6ffb07cce3ceb9e67079ba89dcfc7f"
+      - "73a52ffdee1fc50afddf48421051f33b"
+      - "187ba28b079398c4bf0f231c781975b3"
+      - "653d9eb97fe4fec97526627d5065ad84"
+      - "d5b26aba8c0662fb51f8c95532d04666"
+      - "fbe357501dd5a3af4eb1a863fe5bd7ec"
+      - "5471f14ba73e1ba5ed31071b433972f6"
+      - "adadde19345cb70dbb98c14ffa93f0e7"
+      - "4672a47d8d03d400e57cf507dba04e0d"
+      - "800e69cfe21e15866102d91b8dcbe6d5"
+      - "beb13e6c284df8dd4e5d93d3b5af058e"
+      - "89484a50bb9bb4ae7a6f4143b6178fdd"
+      - "eb2cd28db36495a161d9e26baa88ac1c"
+      - "a22de57f56330cdf97aaad9a36328630"
+      - "dc7e4e7834bd9f31807dbf6966b4c9f5"
+      - "df12b2e519f6a990ca137ba00f45e2b8"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 22
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 3
+    - time: ['15:00', '19:00']
+      set: 3
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'
