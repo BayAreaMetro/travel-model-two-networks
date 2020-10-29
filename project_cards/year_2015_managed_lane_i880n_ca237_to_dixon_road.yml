@@ -1,0 +1,52 @@
+project: Year 2015 Modify Express Lanes and USE on I-880 NB CA-237 to Dixon Road
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'Express Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2217413
+      - 2057839
+    - shstReferenceId:
+      - "cbaa8a43abdc4d20694cd217264bccb2"
+      - "35f99c3c15e037978305aa0ed0629d6a"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['10:00', '15:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 36
+  - property: tollseg
+    set: 36
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 4
+    - time: ['10:00', '15:00']
+      set: 4
+    - time: ['15:00', '19:00']
+      set: 4
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'

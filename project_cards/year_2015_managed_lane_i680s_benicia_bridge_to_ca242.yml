@@ -1,0 +1,74 @@
+project: Year 2015 Modify HOV Lanes and USE on I-680 SB from Benicia Bridge to CA-242
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 4079823
+      - 4085747
+      - 4071228
+      - 4036430
+      - 4059935
+      - 4026562
+      - 4093385
+      - 4123296
+      - 4059973
+      - 4114612
+      - 4018369
+      - 4090312
+      - 4008949
+      - 4118223
+      - 4114714
+      - 4077454
+      - 4056861
+    - shstReferenceId:
+      - "a0b3569c8106cd53d755f37ea59fc350"
+      - "ac7e666abdf59d9ff65d39539e23d6bc"
+      - "8f50833cc8d5ca21a3fd967f1a645140"
+      - "4984b3afb4f8913ea3e7302c29e595d1"
+      - "786c2cd5feb731c625f5f75de1c6f5da"
+      - "3577b7543bc798cf24e923053e2d5a59"
+      - "bc249bda7a6e77446e3705362aafadfa"
+      - "f855cab15b0ef4431beba299aaecece5"
+      - "788143dd78c575dd32d14dcbe6be9e34"
+      - "e709d0778c016ab450cb6ebcdb5bd44c"
+      - "253e10d592c0a07904b3ab78fd08de67"
+      - "b5f9b226e96aca7e3ef673eb02f76b85"
+      - "11ffee4fd9762dff5268fe7af06daf48"
+      - "ee4e3e21032633b72e4cbd3521ed5145"
+      - "e747aa7545e3f988e3869b3d2c7e5217"
+      - "9be056a8ca27db5466a532ee6c2fef9b"
+      - "7256f8af7f4faf4ecf30e9dcc9d24f6a"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 210
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['15:00', '19:00']
+      set: 2
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'

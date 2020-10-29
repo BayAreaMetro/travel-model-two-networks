@@ -1,5 +1,5 @@
 ---
-title: "Look at SF Network"
+title: "Look at All Network"
 output: html_notebook
 ---
 
@@ -28,29 +28,31 @@ output_file_name <- paste0(interim_dir, "transit_for_tableau.csv")
 
 # Parameters
 ```{r parameters}
-VERSION <- "version_01"
+VERSION <- "version_02"
 ```
 
 
 # Data Reads
 ```{r read}
-routes_df <- read_csv(paste0(processed_dir, VERSION, "/", "routes.txt"), col_types = "icccciccc")
-freq_df <- read_csv(paste0(processed_dir, VERSION, "/", "frequencies.txt"), col_types = "iitt")
-trips_df <- read_csv(paste0(processed_dir, VERSION, "/", "trips.txt"), col_types = "iiiciii")
-stops_df <- read_csv(paste0(processed_dir, VERSION, "/", "stops.txt"), col_types  = "iccddicccc")
-shapes_df <- read_csv(paste0(processed_dir, VERSION, "/", "shapes.txt"), col_types = "iiccc")
-stop_times_df <- read_csv(paste0(processed_dir, VERSION, "/", "stop_times.txt"), col_types = "ittiicccn")
+routes_df <- read_csv(paste0(processed_dir, VERSION, "/routes.txt"), col_types = "ccccciccccccccci")
+freq_df <- read_csv(paste0(processed_dir, VERSION, "/frequencies.txt"), col_types = "iitt")
+trips_df <- read_csv(paste0(processed_dir, VERSION, "/trips.txt"), col_types = "ccncnncccccccccccciii")
+stops_df <- read_csv(paste0(processed_dir, VERSION, "/stops.txt"), col_types  = "ccddccnccnccccinci")
+shapes_df <- read_csv(paste0(processed_dir, VERSION, "/shapes.txt"), col_types = "iinci")
+stop_times_df <- read_csv(paste0(processed_dir, VERSION, "/stop_times.txt"), col_types = "tticncddcccccccccccii")
 
-nodes_sf <- st_read(paste0(transit_dir, "sf_node.geojson"))
+nodes_sf <- st_read(paste0(processed_dir, VERSION, "/node.geojson"))
 ```
 
 # Reductions for TM Network
 ```{r reductions}
 nodes_df <- bind_cols(tibble(model_node_id = nodes_sf$model_node_id), as_tibble(st_coordinates(nodes_sf))) %>%
-  mutate(model_node_id = paste0(model_node_id)) %>%
+  #mutate(model_node_id = paste0(model_node_id)) %>%
   rename(lng = X, lat = Y)
+
+names(trips_df)
   
-output_stops_df <- select(routes_df, route_id, agency_id, route_short_name, route_long_name) %>%
+output_stops_df <- select(routes_df, route_id_original, route_id, agency_id, route_short_name, route_long_name, agency_raw_name) %>%
   left_join(select(trips_df, route_id, service_id, trip_id, trip_headsign, direction_id, shape_id),
             ., by = c("route_id")) %>%
   left_join(., freq_df, by = c("trip_id")) %>%
@@ -58,7 +60,7 @@ output_stops_df <- select(routes_df, route_id, agency_id, route_short_name, rout
   left_join(., select(stops_df, stop_id, stop_name, stop_lat, stop_lon), by = c("stop_id")) %>%
   mutate(summary = "stops")
 
-output_shapes_df <- select(routes_df, route_id, agency_id, route_short_name, route_long_name) %>%
+output_shapes_df <- select(routes_df, route_id_original, route_id, agency_id, route_short_name, route_long_name, agency_raw_name) %>%
   left_join(select(trips_df, route_id, service_id, trip_id, trip_headsign, direction_id, shape_id),
             ., by = c("route_id")) %>%
   left_join(., freq_df, by = c("trip_id")) %>%
@@ -74,6 +76,6 @@ output_df <- bind_rows(output_stops_df, output_shapes_df)
 
 # Write
 ```{r write}
-write_csv(output_df, path = output_file_name)
+write_csv(output_df, path = output_file_name, na = "")
 ```
 

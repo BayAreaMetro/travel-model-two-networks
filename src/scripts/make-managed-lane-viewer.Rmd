@@ -102,9 +102,9 @@ managed_out_df <- managed_df %>%
                                 "Bridge_Pass",
                                 as.character(NA),
                                 as.character(NA)),
-                   tollclass_segid_new = c(as.character(NA),
+                   tollclass_segid_old = c(as.character(NA),
                                            "15",
-                                           as.character(NA),
+                                           "8",
                                            as.character(NA),
                                            as.character(NA),
                                            as.character(NA))))
@@ -119,7 +119,7 @@ managed_join_df <- select(managed_out_df,
                           roadtype, 
                           tomtom_name,
                           bridge_detail,
-                          tollclass_segid = tollclass_segid_new) %>%
+                          tollclass_segid = tollclass_segid_old) %>%
   mutate(make_parallel_hov = (roadtype == "HOV_Lane")) %>%
   mutate(pay_bridge_toll = (roadtype == "Bridge_Pass")) %>%
   mutate(make_parallel_express = (roadtype == "Express_Lane")) %>%

@@ -1,0 +1,132 @@
+project: Year 2015 Modify HOV Lanes and USE on I-880 NB from Dixon Road to I-238
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3119458
+      - 3160856
+      - 3169202
+      - 3132925
+      - 3055218
+      - 3020364
+      - 3144105
+      - 3118079
+      - 3015407
+      - 3037870
+      - 3107745
+      - 3089691
+      - 3051261
+      - 3062877
+      - 3097926
+      - 3131135
+      - 3113758
+      - 3052883
+      - 3035565
+      - 3035345
+      - 3124424
+      - 3053248
+      - 3022060
+      - 3092326
+      - 3006224
+      - 3017390
+      - 3167386
+      - 2117225
+      - 3077176
+      - 3099252
+      - 3062193
+      - 3134250
+      - 3019250
+      - 3062102
+      - 3145138
+      - 3089687
+      - 3149313
+      - 3102681
+      - 3136237
+      - 3034163
+      - 3025615
+      - 3076045
+      - 2215453
+      - 2109531
+      - 2252329
+      - 2205653
+    - shstReferenceId:
+      - "b3e43fc1c38a7995bc0c4fac4c4ae676"
+      - "f22cf196292ab39a49de3737e28f09ca"
+      - "fee8b9b7450ac283217536c4c74f2535"
+      - "c7f2ab2872af9d39b726959f12a47fb7"
+      - "52ff46a5c7e454a11852414d056e4dbf"
+      - "1ebf85f48c38e2e0dae3348465a9d1a4"
+      - "d8e4ea1e55c7b931db08022c87d3699b"
+      - "b1ddeb3f75fb161799cd0c413dd0dabc"
+      - "1735a2b0ae3af924e382fc2646a52c88"
+      - "38f757ac31f38959612eac4e2ef1a538"
+      - "a24bef10fa5554ab9afe9b548311701e"
+      - "871c36daf3aa15d3706d9196641eda99"
+      - "4cf8e37dbb6d14c8bb182e3183178ef7"
+      - "5eaf1b5f2af318dba22becbafdb987c6"
+      - "935aedd4c5de8c1d2dbdad6288b7b9bb"
+      - "c53172138488b61cd039f26ef91c2e2a"
+      - "ab478371c9bd1c20141f949a121f7c24"
+      - "4f6d977b711e3d0a53f015ab3b19aa30"
+      - "355dfab578e420de7cac11dcf1a5ff85"
+      - "35133c984b29c30712fadc99eceedbc6"
+      - "bb37f3451537eb6911e0ba347469a879"
+      - "50016eb703b539720ca92ccb44145d4d"
+      - "214b3f271ad07c216436eb88104720ee"
+      - "8af7670c42ea8d1c7870cf195c63e36f"
+      - "0967cc37d084df1dcf9d72700731df9f"
+      - "1a20055d9c41d9acabf571fcd25452db"
+      - "fc4164e1c3843c0e09fe19596569adf8"
+      - "6d95698079f468036242a9ae2f3f6296"
+      - "7452bfeb33badc685ef9cdb09fcea3df"
+      - "95613e1df4498a10ce064b979153a7e2"
+      - "5da087a8220b394a08c15a51390fb22d"
+      - "c9f6f87087d1c55cfb03b67d68f5a675"
+      - "1cffe48cd2709bf4a5767763f16ffc04"
+      - "5d81d42111bdbca9e8e9a1a8fbba81e8"
+      - "da64b3f488b2646538220ca59a1bb2d2"
+      - "87199e13f85987a08807bf6c2d2baaa0"
+      - "e0c1a04c0666191b9c20e85fe89ec664"
+      - "9a83dfe7fbaf4a38ad479970620c9020"
+      - "ccdf155075928341cc46d6eda7ee4b2b"
+      - "33536741d4e31541e3e29086a96e7813"
+      - "267ecfdfb2dc1a77326a71716ead9bac"
+      - "729cf6dceeef499dbc645530ed645ac6"
+      - "c9d176add6a59266b9833def079a50fc"
+      - "66739f2efb440c511b02151c164934e0"
+      - "ec84506cf47da464b45a2d02b1aa381d"
+      - "c09d1be7fe16a1b4c6dd2297a0b595aa"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 213
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['15:00', '19:00']
+      set: 2
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'
