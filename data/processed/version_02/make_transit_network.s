@@ -1,0 +1,12 @@
+RUN PGM = NETWORK
+FILEI NETI = "complete_network.net"
+FILEO NETO = "simple_transit_network.net"
+
+COUNTY = LTRIM(TRIM(COUNTY)) 
+CNTYPE = LTRIM(TRIM(CNTYPE))
+
+IF (DRIVE_ACCESS==0 && BUS_ONLY==0 && RAIL_ONLY==0) DELETE
+IF (FT>5 && BUS_ONLY==0 && RAIL_ONLY==0) DELETE
+
+
+ENDRUN
