@@ -22,10 +22,11 @@ for (package in packages_vector) {
 
 # Remote I/O
 ```{r remote-io}
+processed_dir <- "../../data/processed/"
 external_dir <- "../../data/external/"
 interim_dir <- "../../data/interim/"
 
-shape_file_name <- paste0(interim_dir, "step5_tidy_roadway/shape.geojson")
+shape_file_name <- paste0(processed_dir, "version_02/shape.geojson")
 county_shape_file_name <- paste0(external_dir, "county_boundaries/county.shp")
 
 output_file_name <- paste0(interim_dir, "shape_centroid.feather")
@@ -49,7 +50,7 @@ county_join_sf <- county_sf %>%
 centroid_df <- st_centroid(working_shapes_sf) %>%
   st_intersection(., county_join_sf) %>%
   st_drop_geometry(.) %>%
-  select(shstGeometryId = id, county_name = name)
+  select(shstGeometryId, county_name = name)
 
 ```
 

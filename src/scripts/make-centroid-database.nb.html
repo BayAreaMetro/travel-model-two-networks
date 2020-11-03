@@ -1758,6 +1758,16 @@ summary {
 <h1>Remote I/O</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxucHJvY2Vzc2VkX2RpciA8LSBcIi4uLy4uL2RhdGEvcHJvY2Vzc2VkL1wiXG5leHRlcm5hbF9kaXIgPC0gXCIuLi8uLi9kYXRhL2V4dGVybmFsL1wiXG5pbnRlcmltX2RpciA8LSBcIi4uLy4uL2RhdGEvaW50ZXJpbS9cIlxuXG5zaGFwZV9maWxlX25hbWUgPC0gcGFzdGUwKHByb2Nlc3NlZF9kaXIsIFwidmVyc2lvbl8wMi9zaGFwZS5nZW9qc29uXCIpXG5jb3VudHlfc2hhcGVfZmlsZV9uYW1lIDwtIHBhc3RlMChleHRlcm5hbF9kaXIsIFwiY291bnR5X2JvdW5kYXJpZXMvY291bnR5LnNocFwiKVxuXG5vdXRwdXRfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgXCJzaGFwZV9jZW50cm9pZC5mZWF0aGVyXCIpXG5gYGAifQ== -->
+<pre class="r"><code>processed_dir &lt;- &quot;../../data/processed/&quot;
+external_dir &lt;- &quot;../../data/external/&quot;
+interim_dir &lt;- &quot;../../data/interim/&quot;
+
+shape_file_name &lt;- paste0(processed_dir, &quot;version_02/shape.geojson&quot;)
+county_shape_file_name &lt;- paste0(external_dir, &quot;county_boundaries/county.shp&quot;)
+
+output_file_name &lt;- paste0(interim_dir, &quot;shape_centroid.feather&quot;)</code></pre>
+<!-- rnb-source-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1765,10 +1775,28 @@ summary {
 <h1>Data Reads</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2hhcGVzX3NmIDwtIHN0X3JlYWQoc2hhcGVfZmlsZV9uYW1lKVxuY291bnR5X3NmIDwtIHN0X3JlYWQoY291bnR5X3NoYXBlX2ZpbGVfbmFtZSlcbmBgYCJ9 -->
-<pre class="r"><code>shapes_sf &lt;- st_read(shape_file_name)
-county_sf &lt;- st_read(county_shape_file_name)</code></pre>
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuc2hhcGVzX3NmIDwtIHN0X3JlYWQoc2hhcGVfZmlsZV9uYW1lKVxuYGBgIn0= -->
+<pre class="r"><code>shapes_sf &lt;- st_read(shape_file_name)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgc2hhcGUnIGZyb20gZGF0YSBzb3VyY2UgYC9Vc2Vycy93c3AvRG9jdW1lbnRzL0dpdEh1Yi90cmF2ZWwtbW9kZWwtdHdvLW5ldHdvcmtzL2RhdGEvcHJvY2Vzc2VkL3ZlcnNpb25fMDIvc2hhcGUuZ2VvanNvbicgdXNpbmcgZHJpdmVyIGBHZW9KU09OJ1xuU2ltcGxlIGZlYXR1cmUgY29sbGVjdGlvbiB3aXRoIDg2OTk3MCBmZWF0dXJlcyBhbmQgNiBmaWVsZHNcbmdlb21ldHJ5IHR5cGU6ICBMSU5FU1RSSU5HXG5kaW1lbnNpb246ICAgICAgWFlcbmJib3g6ICAgICAgICAgICB4bWluOiAtMTIzLjUzMDggeW1pbjogMzYuOTAwNzggeG1heDogLTEyMS4yMDkzIHltYXg6IDM4Ljg2MDIxXG5nZW9ncmFwaGljIENSUzogV0dTIDg0XG4ifQ== -->
+<pre><code>Reading layer `shape&#39; from data source `/Users/wsp/Documents/GitHub/travel-model-two-networks/data/processed/version_02/shape.geojson&#39; using driver `GeoJSON&#39;
+Simple feature collection with 869970 features and 6 fields
+geometry type:  LINESTRING
+dimension:      XY
+bbox:           xmin: -123.5308 ymin: 36.90078 xmax: -121.2093 ymax: 38.86021
+geographic CRS: WGS 84</code></pre>
+<!-- rnb-output-end -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxuY291bnR5X3NmIDwtIHN0X3JlYWQoY291bnR5X3NoYXBlX2ZpbGVfbmFtZSlcbmBgYCJ9 -->
+<pre class="r"><code>county_sf &lt;- st_read(county_shape_file_name)</code></pre>
+<!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoiUmVhZGluZyBsYXllciBgY291bnR5JyBmcm9tIGRhdGEgc291cmNlIGAvVXNlcnMvd3NwL0RvY3VtZW50cy9HaXRIdWIvdHJhdmVsLW1vZGVsLXR3by1uZXR3b3Jrcy9kYXRhL2V4dGVybmFsL2NvdW50eV9ib3VuZGFyaWVzL2NvdW50eS5zaHAnIHVzaW5nIGRyaXZlciBgRVNSSSBTaGFwZWZpbGUnXG5TaW1wbGUgZmVhdHVyZSBjb2xsZWN0aW9uIHdpdGggOSBmZWF0dXJlcyBhbmQgOSBmaWVsZHNcbmdlb21ldHJ5IHR5cGU6ICBQT0xZR09OXG5kaW1lbnNpb246ICAgICAgWFlcbmJib3g6ICAgICAgICAgICB4bWluOiAtMTIzLjU0MDkgeW1pbjogMzYuODk5MTUgeG1heDogLTEyMS4yMTU0IHltYXg6IDM4Ljg2NDI0XG5nZW9ncmFwaGljIENSUzogTkFEODNcbiJ9 -->
+<pre><code>Reading layer `county&#39; from data source `/Users/wsp/Documents/GitHub/travel-model-two-networks/data/external/county_boundaries/county.shp&#39; using driver `ESRI Shapefile&#39;
+Simple feature collection with 9 features and 9 fields
+geometry type:  POLYGON
+dimension:      XY
+bbox:           xmin: -123.5409 ymin: 36.89915 xmax: -121.2154 ymax: 38.86424
+geographic CRS: NAD83</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1776,7 +1804,7 @@ county_sf &lt;- st_read(county_shape_file_name)</code></pre>
 <h1>Reductions</h1>
 <!-- rnb-text-end -->
 <!-- rnb-chunk-begin -->
-<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud29ya2luZ19zaGFwZXNfc2YgPC0gc2hhcGVzX3NmICU+JVxuICBzZWxlY3Qoc2hzdEdlb21ldHJ5SWQgPSBpZCwgZ2VvbWV0cnkpXG5cbmNvdW50eV9qb2luX3NmIDwtIGNvdW50eV9zZiAlPiVcbiAgc2VsZWN0KG5hbWUgPSBOQU1FLCBnZW9tZXRyeSkgJT4lXG4gIHN0X3RyYW5zZm9ybShzdF9jcnMod29ya2luZ19zaGFwZXNfc2YpKVxuXG5jZW50cm9pZF9kZiA8LSBzdF9jZW50cm9pZCh3b3JraW5nX3NoYXBlc19zZikgJT4lXG4gIHN0X2ludGVyc2VjdGlvbiguLCBjb3VudHlfam9pbl9zZikgJT4lXG4gIHN0X2Ryb3BfZ2VvbWV0cnkoLikgJT4lXG4gIHNlbGVjdChzaHN0R2VvbWV0cnlJZCA9IGlkLCBjb3VudHlfbmFtZSA9IG5hbWUpXG5cbmBgYCJ9 -->
+<!-- rnb-source-begin eyJkYXRhIjoiYGBgclxud29ya2luZ19zaGFwZXNfc2YgPC0gc2hhcGVzX3NmICU+JVxuICBzZWxlY3Qoc2hzdEdlb21ldHJ5SWQgPSBpZCwgZ2VvbWV0cnkpXG5cbmNvdW50eV9qb2luX3NmIDwtIGNvdW50eV9zZiAlPiVcbiAgc2VsZWN0KG5hbWUgPSBOQU1FLCBnZW9tZXRyeSkgJT4lXG4gIHN0X3RyYW5zZm9ybShzdF9jcnMod29ya2luZ19zaGFwZXNfc2YpKVxuXG5jZW50cm9pZF9kZiA8LSBzdF9jZW50cm9pZCh3b3JraW5nX3NoYXBlc19zZikgJT4lXG4gIHN0X2ludGVyc2VjdGlvbiguLCBjb3VudHlfam9pbl9zZikgJT4lXG4gIHN0X2Ryb3BfZ2VvbWV0cnkoLikgJT4lXG4gIHNlbGVjdChzaHN0R2VvbWV0cnlJZCwgY291bnR5X25hbWUgPSBuYW1lKVxuYGBgIn0= -->
 <pre class="r"><code>working_shapes_sf &lt;- shapes_sf %&gt;%
   select(shstGeometryId = id, geometry)
 
@@ -1787,9 +1815,12 @@ county_join_sf &lt;- county_sf %&gt;%
 centroid_df &lt;- st_centroid(working_shapes_sf) %&gt;%
   st_intersection(., county_join_sf) %&gt;%
   st_drop_geometry(.) %&gt;%
-  select(shstGeometryId = id, county_name = name)
-</code></pre>
+  select(shstGeometryId, county_name = name)</code></pre>
 <!-- rnb-source-end -->
+<!-- rnb-output-begin eyJkYXRhIjoic3RfY2VudHJvaWQgYXNzdW1lcyBhdHRyaWJ1dGVzIGFyZSBjb25zdGFudCBvdmVyIGdlb21ldHJpZXMgb2YgeHN0X2NlbnRyb2lkIGRvZXMgbm90IGdpdmUgY29ycmVjdCBjZW50cm9pZHMgZm9yIGxvbmdpdHVkZS9sYXRpdHVkZSBkYXRhYWx0aG91Z2ggY29vcmRpbmF0ZXMgYXJlIGxvbmdpdHVkZS9sYXRpdHVkZSwgc3RfaW50ZXJzZWN0aW9uIGFzc3VtZXMgdGhhdCB0aGV5IGFyZSBwbGFuYXJcbmF0dHJpYnV0ZSB2YXJpYWJsZXMgYXJlIGFzc3VtZWQgdG8gYmUgc3BhdGlhbGx5IGNvbnN0YW50IHRocm91Z2hvdXQgYWxsIGdlb21ldHJpZXNcbiJ9 -->
+<pre><code>st_centroid assumes attributes are constant over geometries of xst_centroid does not give correct centroids for longitude/latitude dataalthough coordinates are longitude/latitude, st_intersection assumes that they are planar
+attribute variables are assumed to be spatially constant throughout all geometries</code></pre>
+<!-- rnb-output-end -->
 <!-- rnb-chunk-end -->
 <!-- rnb-text-begin -->
 </div>
@@ -1805,7 +1836,7 @@ centroid_df &lt;- st_centroid(working_shapes_sf) %&gt;%
 <!-- rnb-text-end -->
 </div>
 
-<div id="rmd-source-code">LS0tCnRpdGxlOiAiTWFrZSBDZW50cm9pZCBEYXRhYmFzZSIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKCiMgT3ZlcmhlYWQKYGBge3Igb3ZlcmhlYWQsIGluY2x1ZGUgPSBGQUxTRX0KcGFja2FnZXNfdmVjdG9yIDwtIGMoInRpZHl2ZXJzZSIsCiAgICAgICAgICAgICAgICAgICAgICJhcnJvdyIsCiAgICAgICAgICAgICAgICAgICAgICJzZiIpCgpuZWVkX3RvX2luc3RhbGwgPC0gcGFja2FnZXNfdmVjdG9yWyEocGFja2FnZXNfdmVjdG9yICVpbiUgaW5zdGFsbGVkLnBhY2thZ2VzKClbLCJQYWNrYWdlIl0pXQoKaWYgKGxlbmd0aChuZWVkX3RvX2luc3RhbGwpKSBpbnN0YWxsLnBhY2thZ2VzKG5lZWRfdG9faW5zdGFsbCkKCmZvciAocGFja2FnZSBpbiBwYWNrYWdlc192ZWN0b3IpIHsKICBsaWJyYXJ5KHBhY2thZ2UsIGNoYXJhY3Rlci5vbmx5ID0gVFJVRSkKfQoKYGBgCgojIFJlbW90ZSBJL08KYGBge3IgcmVtb3RlLWlvfQpleHRlcm5hbF9kaXIgPC0gIi4uLy4uL2RhdGEvZXh0ZXJuYWwvIgppbnRlcmltX2RpciA8LSAiLi4vLi4vZGF0YS9pbnRlcmltLyIKCnNoYXBlX2ZpbGVfbmFtZSA8LSBwYXN0ZTAoaW50ZXJpbV9kaXIsICJzdGVwNV90aWR5X3JvYWR3YXkvc2hhcGUuZ2VvanNvbiIpCmNvdW50eV9zaGFwZV9maWxlX25hbWUgPC0gcGFzdGUwKGV4dGVybmFsX2RpciwgImNvdW50eV9ib3VuZGFyaWVzL2NvdW50eS5zaHAiKQoKb3V0cHV0X2ZpbGVfbmFtZSA8LSBwYXN0ZTAoaW50ZXJpbV9kaXIsICJzaGFwZV9jZW50cm9pZC5mZWF0aGVyIikKYGBgCgojIERhdGEgUmVhZHMKYGBge3IgcmVhZH0Kc2hhcGVzX3NmIDwtIHN0X3JlYWQoc2hhcGVfZmlsZV9uYW1lKQpjb3VudHlfc2YgPC0gc3RfcmVhZChjb3VudHlfc2hhcGVfZmlsZV9uYW1lKQpgYGAKCiMgUmVkdWN0aW9ucyAKYGBge3IgcmVkdWN0aW9uc30Kd29ya2luZ19zaGFwZXNfc2YgPC0gc2hhcGVzX3NmICU+JQogIHNlbGVjdChzaHN0R2VvbWV0cnlJZCA9IGlkLCBnZW9tZXRyeSkKCmNvdW50eV9qb2luX3NmIDwtIGNvdW50eV9zZiAlPiUKICBzZWxlY3QobmFtZSA9IE5BTUUsIGdlb21ldHJ5KSAlPiUKICBzdF90cmFuc2Zvcm0oc3RfY3JzKHdvcmtpbmdfc2hhcGVzX3NmKSkKCmNlbnRyb2lkX2RmIDwtIHN0X2NlbnRyb2lkKHdvcmtpbmdfc2hhcGVzX3NmKSAlPiUKICBzdF9pbnRlcnNlY3Rpb24oLiwgY291bnR5X2pvaW5fc2YpICU+JQogIHN0X2Ryb3BfZ2VvbWV0cnkoLikgJT4lCiAgc2VsZWN0KHNoc3RHZW9tZXRyeUlkID0gaWQsIGNvdW50eV9uYW1lID0gbmFtZSkKCmBgYAoKIyBXcml0ZQpgYGB7ciB3cml0ZX0Kd3JpdGVfZmVhdGhlcihjZW50cm9pZF9kZiwgb3V0cHV0X2ZpbGVfbmFtZSkKYGBgCgoK</div>
+<div id="rmd-source-code">LS0tCnRpdGxlOiAiTWFrZSBDZW50cm9pZCBEYXRhYmFzZSIKb3V0cHV0OiBodG1sX25vdGVib29rCi0tLQoKCiMgT3ZlcmhlYWQKYGBge3Igb3ZlcmhlYWQsIGluY2x1ZGUgPSBGQUxTRX0KcGFja2FnZXNfdmVjdG9yIDwtIGMoInRpZHl2ZXJzZSIsCiAgICAgICAgICAgICAgICAgICAgICJhcnJvdyIsCiAgICAgICAgICAgICAgICAgICAgICJzZiIpCgpuZWVkX3RvX2luc3RhbGwgPC0gcGFja2FnZXNfdmVjdG9yWyEocGFja2FnZXNfdmVjdG9yICVpbiUgaW5zdGFsbGVkLnBhY2thZ2VzKClbLCJQYWNrYWdlIl0pXQoKaWYgKGxlbmd0aChuZWVkX3RvX2luc3RhbGwpKSBpbnN0YWxsLnBhY2thZ2VzKG5lZWRfdG9faW5zdGFsbCkKCmZvciAocGFja2FnZSBpbiBwYWNrYWdlc192ZWN0b3IpIHsKICBsaWJyYXJ5KHBhY2thZ2UsIGNoYXJhY3Rlci5vbmx5ID0gVFJVRSkKfQoKYGBgCgojIFJlbW90ZSBJL08KYGBge3IgcmVtb3RlLWlvfQpwcm9jZXNzZWRfZGlyIDwtICIuLi8uLi9kYXRhL3Byb2Nlc3NlZC8iCmV4dGVybmFsX2RpciA8LSAiLi4vLi4vZGF0YS9leHRlcm5hbC8iCmludGVyaW1fZGlyIDwtICIuLi8uLi9kYXRhL2ludGVyaW0vIgoKc2hhcGVfZmlsZV9uYW1lIDwtIHBhc3RlMChwcm9jZXNzZWRfZGlyLCAidmVyc2lvbl8wMi9zaGFwZS5nZW9qc29uIikKY291bnR5X3NoYXBlX2ZpbGVfbmFtZSA8LSBwYXN0ZTAoZXh0ZXJuYWxfZGlyLCAiY291bnR5X2JvdW5kYXJpZXMvY291bnR5LnNocCIpCgpvdXRwdXRfZmlsZV9uYW1lIDwtIHBhc3RlMChpbnRlcmltX2RpciwgInNoYXBlX2NlbnRyb2lkLmZlYXRoZXIiKQpgYGAKCiMgRGF0YSBSZWFkcwpgYGB7ciByZWFkfQpzaGFwZXNfc2YgPC0gc3RfcmVhZChzaGFwZV9maWxlX25hbWUpCmNvdW50eV9zZiA8LSBzdF9yZWFkKGNvdW50eV9zaGFwZV9maWxlX25hbWUpCmBgYAoKIyBSZWR1Y3Rpb25zIApgYGB7ciByZWR1Y3Rpb25zfQp3b3JraW5nX3NoYXBlc19zZiA8LSBzaGFwZXNfc2YgJT4lCiAgc2VsZWN0KHNoc3RHZW9tZXRyeUlkID0gaWQsIGdlb21ldHJ5KQoKY291bnR5X2pvaW5fc2YgPC0gY291bnR5X3NmICU+JQogIHNlbGVjdChuYW1lID0gTkFNRSwgZ2VvbWV0cnkpICU+JQogIHN0X3RyYW5zZm9ybShzdF9jcnMod29ya2luZ19zaGFwZXNfc2YpKQoKY2VudHJvaWRfZGYgPC0gc3RfY2VudHJvaWQod29ya2luZ19zaGFwZXNfc2YpICU+JQogIHN0X2ludGVyc2VjdGlvbiguLCBjb3VudHlfam9pbl9zZikgJT4lCiAgc3RfZHJvcF9nZW9tZXRyeSguKSAlPiUKICBzZWxlY3Qoc2hzdEdlb21ldHJ5SWQsIGNvdW50eV9uYW1lID0gbmFtZSkKCmBgYAoKIyBXcml0ZQpgYGB7ciB3cml0ZX0Kd3JpdGVfZmVhdGhlcihjZW50cm9pZF9kZiwgb3V0cHV0X2ZpbGVfbmFtZSkKYGBgCgoK</div>
 
 
 

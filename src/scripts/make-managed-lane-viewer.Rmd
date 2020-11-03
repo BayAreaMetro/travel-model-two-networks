@@ -30,7 +30,7 @@ processed_dir <- "../../data/processed/"
 
 managed_file_name <- paste0(interim_dir, "Managed_Lanes_Database.csv")
 
-links_file_name <- paste0(interim_dir, "step5_tidy_roadway/link.feather")
+links_file_name <- paste0(processed_dir, "version_02/link.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 
 output_file_name <- paste0(interim_dir, "managed-lane-viewer.geojson")
@@ -115,15 +115,15 @@ managed_out_df <- managed_df %>%
 # Reductions 
 ```{r reductions}
 managed_join_df <- select(managed_out_df, 
-                          shstReferenceId, 
+                          shstReferenceId,
                           roadtype, 
-                          tomtom_name,
+                          roadwaylongname,
                           bridge_detail,
                           tollclass_segid = tollclass_segid_old) %>%
   mutate(make_parallel_hov = (roadtype == "HOV_Lane")) %>%
   mutate(pay_bridge_toll = (roadtype == "Bridge_Pass")) %>%
   mutate(make_parallel_express = (roadtype == "Express_Lane")) %>%
-  group_by(shstReferenceId, tomtom_name) %>%
+  group_by(shstReferenceId, roadwaylongname) %>%
   summarise(pay_bridge_toll = max(pay_bridge_toll),
             make_parallel_hov = max(make_parallel_hov),
             make_parallel_express = max(make_parallel_express),
@@ -132,7 +132,7 @@ managed_join_df <- select(managed_out_df,
   ungroup()
 
 output_sf <- links_df %>%
-  select(shstReferenceId, shstGeometryId, roadway) %>%
+  select(shstReferenceId, shstGeometryId, model_link_id, roadway) %>%
   filter(roadway %in% c("motorway", "motorway_link", "trunk", "trunk_link")) %>% 
   left_join(., managed_join_df, by = c("shstReferenceId")) %>%
   left_join(., shapes_sf, by = c("shstGeometryId"))
