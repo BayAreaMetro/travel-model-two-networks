@@ -28,7 +28,7 @@ external_dir <- "../../data/external/"
 interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
-links_file_name <- paste0(interim_dir, "step6_gtfs/link.feather")
+links_file_name <- paste0(processed_dir, "version_02/link.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 
@@ -192,7 +192,8 @@ conf_join_df <- conflation_df %>%
                          "pems_lanes_OR"))), as.integer)
 
 working_sf <- links_df %>%
-  select(shstReferenceId, 
+  select(shstReferenceId,
+         model_link_id,
          drive_access,
          shstGeometryId,
          osm_ft = roadway) %>%
@@ -245,13 +246,6 @@ output_bus_only_sf <- working_sf %>%
   left_join(., centroid_df, by = c("shstGeometryId")) %>%
   filter(county_name %in% c("San Francisco", "Marin", "Sonoma"))
 
-output_pedestrian_sf <- links_df %>%
-  filter(walk_access == 1) %>%
-  filter(county %in% c("Alameda", "Contra Costa")) %>%
-  select(model_link_id, shstReferenceId, shstGeometryId, name, a_node_id = A, b_node_id = B, u, v, length) %>%
-  left_join(., shapes_sf, by = c("shstGeometryId")) 
-  
-
 ```
 
 # Write
@@ -260,7 +254,6 @@ st_write(output_sf, output_file_name, delete_dsn = TRUE)
 st_write(output_freeway_sf, output_freeway_file_name, delete_dsn = TRUE)
 st_write(output_residential_sf, output_residential_file_name, delete_dsn = TRUE)
 st_write(output_bus_only_sf, output_bus_only_file_name, delete_dsn = TRUE)
-st_write(output_pedestrian_sf, output_pedestrian_file_name, delete_dsn = TRUE)
 ```
 
 
