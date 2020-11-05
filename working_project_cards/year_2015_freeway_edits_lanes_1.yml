@@ -1,0 +1,19 @@
+project: Year 2015 Correct Freeway Lane Errors to One Lane
+tags:
+  - 'Year 2015'
+  - 'Freeway Corrections'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 2046718
+      - 5758
+      - 4018032
+      - 4086790
+      - 2236739
+      - 2242504
+  properties:
+  - property: lanes
+    set: 1

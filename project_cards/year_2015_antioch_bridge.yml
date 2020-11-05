@@ -5,7 +5,7 @@ tags:
   - 'Bridge Pass'
 dependencies: ''
 changes:
-- category: Bridge Pass
+- category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
