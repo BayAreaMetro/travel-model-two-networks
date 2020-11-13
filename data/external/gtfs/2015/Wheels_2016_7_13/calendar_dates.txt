@@ -1,0 +1,11 @@
+service_id,date,exception_type
+wkdy,20160215,2
+SatPlus,20160215,1
+wkdy,20160530,2
+sun,20160530,1
+wkdy,20160704,2
+sun,20160704,1
+wkdy,20161124,2
+Holiday,20161124,1
+wkdy,20161125,2
+sun,20161125,1
