@@ -27,3 +27,4 @@ AC Transit,AC Transit,http://www.actransit.org,America/Los_Angeles,,ACTransit_20
 BG,Blue & Gold Fleet,http://www.blueandgoldfleet.com/,America/Los_Angeles,en,Blue&Gold_gtfs_10_4_2017,4157058200,,
 AM,Capitol Corridor,http://www.capitolcorridor.org,America/Los_Angeles,en,Capitol_2017_3_20,8779743322,,
 SRCityBus,Santa Rosa CityBus,http://ci.santa-rosa.ca.us/departments/transit/CityBus/Pages/default.aspx,America/Los_Angeles,en,SantaRosa_google_transit_08_28_15,707-543-3333,http://ci.santa-rosa.ca.us/departments/transit/citybus/Pages/Fares.aspx,
+LAVTA,Wheels Bus,http://wheelsbus.com/,America/Los_Angeles,en,Wheels_2016_7_13,(925) 455-7500,http://wheelsbus.com/index.aspx?page=198,

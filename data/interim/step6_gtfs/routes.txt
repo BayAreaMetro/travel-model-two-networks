@@ -458,35 +458,35 @@ UCT9,UCT,9,Dyer Express,"Union Landing, Four Corners, Dyer & Union City Blvd, an
 15,362,21,Route 21,,3,,,,Vine_GTFS_PLUS_2015,,,,,,633
 4,362,25,Route 25,,3,,,,Vine_GTFS_PLUS_2015,,,,,,636
 3,362,29,Route 29,,3,,,,Vine_GTFS_PLUS_2015,,,,,,635
-2034,267,1,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route1.pdf,89c867,000000,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,640
-2039,267,11,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route11.pdf,884b9d,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,645
-2036,267,2,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route2.pdf,ee1f23,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,642
-2040,267,24,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route24.pdf,f9a91b,000000,petalumatransit-petaluma-ca-us__11_12_15,0,75,,,,646
-2037,267,3,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,643
-2038,267,33,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,644
-2052,267,33M,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,650
-2051,267,33T,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,649
-2049,267,3S,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,648
-2048,267,3T,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,647
-2035,267,5,,"Route 5, formerly named Route 1T",3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route1.pdf,FF0000,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,641
-11095,869,2,Route 2,,3,,c45911,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,651
-11097,869,4,Route 4,,3,,00b050,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,652
-11099,869,5,Route 5,,3,,0070c0,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,653
-11100,869,6,Route 6,,3,,663300,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,654
-2655,392,10,Gems and Birds,,3,http://www.westcat.org/schedules/route10.html,F8C650,000000,westcat-ca-us_9_17_2015,0,,,,,655
-2659,392,11,Crockett - Rodeo - Hercules,,3,http://www.westcat.org/schedules/route11cs.html,916085,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,656
-2661,392,12,Trees and Flowers,,3,http://www.westcat.org/schedules/route12cs.html,789367,000000,westcat-ca-us_9_17_2015,0,,,,,657
-2664,392,15,Rodeo - Hercules (Viewpointe/North Shore Business Park),,3,http://www.westcat.org/schedules/route15cs.html,4B9168,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,658
-2666,392,16,Pinole Valley - Old Town Pinole - Richmond Parkway Transit Center,,3,http://www.westcat.org/schedules/route16cs.html,6C8FB8,000000,westcat-ca-us_9_17_2015,0,,,,,659
-2668,392,17,BayView - Richmond Parkway Transit Center,,3,http://www.westcat.org/schedules/route17cs.html,9D8176,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,660
-2670,392,18,Tara Hills - Richmond Parkway Transit Center - Hilltop Mall,,3,http://www.westcat.org/schedules/route18cs.html,4BADAD,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,661
-2706,392,30Z,Hercules Transit Center - Martinez,,3,http://www.westcat.org/schedules/route30Zcs.html,426656,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,668
-2674,392,C3,Hercules Transit Center - Pinole - Contra Costa College,,3,http://www.westcat.org/schedules/routeC3cs.html,183958,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,662
-2689,392,JL,Hercules Transit Center - Pinole - Richmond - BART,,3,http://www.westcat.org/schedules/routeJcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,664
-2702,392,JPX,Hercules Transit Center - El Cerrito del Norte BART,,3,http://www.westcat.org/schedules/routeJPXcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,667
-2696,392,JR,Hercules Transit Center - Pinole - Richmond - BART,,3,http://www.westcat.org/schedules/routeJcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,665
-2700,392,JX,Hercules Transit Center - El Cerrito del Norte BART,,3,http://www.westcat.org/schedules/routeJPXcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,666
-2676,392,Lynx,Rodeo/Hercules/San Francisco Transbay Terminal,,3,http://www.westcat.org/schedules/routeLYNXcs.html,74262B,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,663
+2034,267,1,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route1.pdf,89c867,000000,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,676
+2039,267,11,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route11.pdf,884b9d,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,681
+2036,267,2,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route2.pdf,ee1f23,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,678
+2040,267,24,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route24.pdf,f9a91b,000000,petalumatransit-petaluma-ca-us__11_12_15,0,75,,,,682
+2037,267,3,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,679
+2038,267,33,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,60,,,,680
+2052,267,33M,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,686
+2051,267,33T,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route33.pdf,1250a3,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,685
+2049,267,3S,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,684
+2048,267,3T,,,3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route3.pdf,36c3f2,000000,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,683
+2035,267,5,,"Route 5, formerly named Route 1T",3,http://cityofpetaluma.net/pubworks/pdf/transitpdf/route1.pdf,FF0000,ffffff,petalumatransit-petaluma-ca-us__11_12_15,0,,,,,677
+11095,869,2,Route 2,,3,,c45911,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,687
+11097,869,4,Route 4,,3,,00b050,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,688
+11099,869,5,Route 5,,3,,0070c0,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,689
+11100,869,6,Route 6,,3,,663300,ffffff,vacavillecitycoach-2020-ca-us,,60,0,1,1,690
+2655,392,10,Gems and Birds,,3,http://www.westcat.org/schedules/route10.html,F8C650,000000,westcat-ca-us_9_17_2015,0,,,,,691
+2659,392,11,Crockett - Rodeo - Hercules,,3,http://www.westcat.org/schedules/route11cs.html,916085,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,692
+2661,392,12,Trees and Flowers,,3,http://www.westcat.org/schedules/route12cs.html,789367,000000,westcat-ca-us_9_17_2015,0,,,,,693
+2664,392,15,Rodeo - Hercules (Viewpointe/North Shore Business Park),,3,http://www.westcat.org/schedules/route15cs.html,4B9168,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,694
+2666,392,16,Pinole Valley - Old Town Pinole - Richmond Parkway Transit Center,,3,http://www.westcat.org/schedules/route16cs.html,6C8FB8,000000,westcat-ca-us_9_17_2015,0,,,,,695
+2668,392,17,BayView - Richmond Parkway Transit Center,,3,http://www.westcat.org/schedules/route17cs.html,9D8176,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,696
+2670,392,18,Tara Hills - Richmond Parkway Transit Center - Hilltop Mall,,3,http://www.westcat.org/schedules/route18cs.html,4BADAD,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,697
+2706,392,30Z,Hercules Transit Center - Martinez,,3,http://www.westcat.org/schedules/route30Zcs.html,426656,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,704
+2674,392,C3,Hercules Transit Center - Pinole - Contra Costa College,,3,http://www.westcat.org/schedules/routeC3cs.html,183958,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,698
+2689,392,JL,Hercules Transit Center - Pinole - Richmond - BART,,3,http://www.westcat.org/schedules/routeJcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,700
+2702,392,JPX,Hercules Transit Center - El Cerrito del Norte BART,,3,http://www.westcat.org/schedules/routeJPXcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,703
+2696,392,JR,Hercules Transit Center - Pinole - Richmond - BART,,3,http://www.westcat.org/schedules/routeJcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,701
+2700,392,JX,Hercules Transit Center - El Cerrito del Norte BART,,3,http://www.westcat.org/schedules/routeJPXcs.html,CE413D,000000,westcat-ca-us_9_17_2015,0,,,,,702
+2676,392,Lynx,Rodeo/Hercules/San Francisco Transbay Terminal,,3,http://www.westcat.org/schedules/routeLYNXcs.html,74262B,FFFFFF,westcat-ca-us_9_17_2015,0,,,,,699
 2,SB,Harbor Bay Ferry,Harbor Bay - San Francisco Ferry Building,Ferry service between Harbor Bay and the San Francisco Ferry Building. Weekdays only.,4,http://sanfranciscobayferry.com/route/hbi/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,384
 1,SB,Alameda Oakland Ferry,Alameda - Oakland - San Francisco Ferry,"Ferry service between Alameda Main St, Oakland Jack London Square, the San Francisco Ferry Building, and Pier 41.",4,http://sanfranciscobayferry.com/route/alameda/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,383
 5,SB,South SF - East Bay Ferry,South SF - Alameda - Oakland,"Ferry service between Alameda Main St, Oakland Jack London Square, and South San Francisco at Oyster Point.",4,http://sanfranciscobayferry.com/route/ssf/sffb,FFFFFF,000000,SF_Bay_Ferry2016_07_01,,,,,,388
@@ -664,3 +664,39 @@ CC,AM,CC,,,2,,,,Capitol_2017_3_20,,,,,,196
 16,SRCityBus,17,17 Piner Rd,,3,,87FF69,FFFFFF,SantaRosa_google_transit_08_28_15,,,,,,470
 17,SRCityBus,18,18 Southeast Circulator,,3,,000000,FFFFFF,SantaRosa_google_transit_08_28_15,,,,,,471
 18,SRCityBus,19,19 South City Connector,,3,,A30041,FFFFFF,SantaRosa_google_transit_08_28_15,,,,,,472
+1,LAVTA,1,E. BART - E. Dublin - E. Bart,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2155,9999FF,FFFFFF,Wheels_2016_7_13,,,,,,640
+2,LAVTA,2,E. BART - Dublin Ranch - E. BART,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3219,FFFF00,000000,Wheels_2016_7_13,,,,,,647
+3,LAVTA,3,E. BART - Mall - West Dublin - E. BART,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3582,3399FF,FFFFFF,Wheels_2016_7_13,,,,,,649
+8A,LAVTA,8A,BART - Downtown -  BART via Hopyard,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3581,CC0066,FFFFFF,Wheels_2016_7_13,,,,,,672
+8B,LAVTA,8B,BART - Downtown -  BART via Santa Rita,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3581,FF00FF,FFFFFF,Wheels_2016_7_13,,,,,,673
+9,LAVTA,9,BART - California Center - Hacienda - BART,,3,http://www.lavta.org/Modules/ShowDocument.aspx?documentID=3218,33FF99,000000,Wheels_2016_7_13,,,,,,674
+10,LAVTA,10,E. BART - Pleasanton - Livermore,,3,http://www.lavta.org/Modules/ShowDocument.aspx?documentID=3217,FF0000,FFFFFF,Wheels_2016_7_13,,,,,,641
+11,LAVTA,11,Livermore Transit Center - Greenville  - Livermore Transit Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3215,FFCC00,000000,Wheels_2016_7_13,,,,,,642
+12,LAVTA,12,Livermore Transit Center - E. BART via College,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3216,0000FF,FFFFFF,Wheels_2016_7_13,,,,,,643
+12X,LAVTA,12X,Livermore Transit Center - E. BART via Kittyhawk,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3580,0000FF,FFFFFF,Wheels_2016_7_13,,,,,,644
+14,LAVTA,14,Livermore Transit Center - Downtown  - Livermore Transit Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2676,CCCC99,000000,Wheels_2016_7_13,,,,,,645
+15,LAVTA,15,Livermore Livermore Transit Center - Springtown - Livermore Livermore Transit Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3579,00FFFF,FFFFFF,Wheels_2016_7_13,,,,,,646
+20,LAVTA,20,E. BART - Vasco Road - Livermore Transit Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=1694,00CCFF,FFFFFF,Wheels_2016_7_13,,,,,,648
+RAPID,LAVTA,RAPID,Livermore - BART -  Mall,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3211,00CC00,FFFFFF,Wheels_2016_7_13,,,,,,675
+51,LAVTA,51,Livermore Transit Center - Civic Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2673,6600FF,FFFFFF,Wheels_2016_7_13,,,,,,656
+53,LAVTA,53,Pleasanton ACE Station - W.BART,,3,http://www.wheelsbus.com/Modules/ShowDocument.aspx?documentID=2672,3366CC,FFFFFF,Wheels_2016_7_13,,,,,,657
+54,LAVTA,54,Pleasanton ACE Station - Hacienda Business Park - E. BART,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3578,663300,FFFFFF,Wheels_2016_7_13,,,,,,658
+70X,LAVTA,70X,E BART - Pleasant Hill BART,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3213,336600,FFFFFF,Wheels_2016_7_13,,,,,,670
+70XV,LAVTA,70XV,Pleasant Hill BART - West Pleasanton BART,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=1690,336600,FFFFFF,Wheels_2016_7_13,,,,,,671
+401,LAVTA,401,Big Trees Park Area - Livermore Transit Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2668,FFCC33,000000,Wheels_2016_7_13,,,,,,650
+402,LAVTA,402,Airway Park & Ride - Junction Middle School,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2667,FFCC33,000000,Wheels_2016_7_13,,,,,,651
+403,LAVTA,403,Livermore Transit Center - Granada High - Livermore Transit Center,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3590,FFCC33,000000,Wheels_2016_7_13,,,,,,652
+501,LAVTA,501,E. Dublin -Village Parkway- Dublin High,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3589,FFCC33,000000,Wheels_2016_7_13,,,,,,653
+502,LAVTA,502,Dublin Ranch Village - Village Parkway- Dublin High,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2664,FFCC33,000000,Wheels_2016_7_13,,,,,,654
+503,LAVTA,503,West BART - Dublin High School - E. BART,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2663,FFCC33,000000,Wheels_2016_7_13,,,,,,655
+601,LAVTA,601,Ruby Hill - Pleasanton Middle - Case Avenue,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2662,FFCC33,000000,Wheels_2016_7_13,,,,,,659
+602,LAVTA,602,Del Prado Park - Hopyard - Foothill High,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3588,FFCC33,000000,Wheels_2016_7_13,,,,,,660
+603,LAVTA,603,Muirwood Park - Hart Middle School - Muirwood Park,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2660,FFCC33,000000,Wheels_2016_7_13,,,,,,661
+604,LAVTA,604,Fairlands - W. Las Positas -  Foothill High,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3587,FFCC33,000000,Wheels_2016_7_13,,,,,,662
+605,LAVTA,605,Fairlands - Santa Rita - Amador Valley High,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=3212,FFCC33,000000,Wheels_2016_7_13,,,,,,663
+606,LAVTA,606,Vintage Hills - Pleasanton Middle School - Vintage Hills,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2657,FFCC33,000000,Wheels_2016_7_13,,,,,,664
+607,LAVTA,607,Laguna Oaks - W. Las Positas - Hart Middle,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2656,FFCC33,000000,Wheels_2016_7_13,,,,,,665
+608,LAVTA,608,Kamp Drive - Santa Rita -Harvest Park Middle,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2655,FFCC33,000000,Wheels_2016_7_13,,,,,,666
+609,LAVTA,609,Del Prado - Hart Middle School,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2654,FFCC33,000000,Wheels_2016_7_13,,,,,,667
+610,LAVTA,610,Fairlands - W. Las Positas - Hart Middle,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2653,FFCC33,000000,Wheels_2016_7_13,,,,,,668
+611,LAVTA,611,Ruby Hill - Vintage Hills - Vineyard - Amador Valley High,,3,http://wheelsbus.com/modules/showdocument.aspx?documentid=2652,FFCC33,000000,Wheels_2016_7_13,,,,,,669

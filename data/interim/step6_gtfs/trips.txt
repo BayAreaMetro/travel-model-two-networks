@@ -2645,178 +2645,178 @@ WD,UCB & Rocklin,0.0,,1.0,1.0,Union_City_Transit_Aug-01-2015 to Jun-30-2017,,,,,
 2170,,1.0,38388,,,Vine_GTFS_PLUS_2015,,,,,,,,,,,,634,31943,1944
 2170,,1.0,38394,,,Vine_GTFS_PLUS_2015,,,,,,,,,,,,634,31949,1944
 2170,,1.0,38404,,,Vine_GTFS_PLUS_2015,,,,,,,,,,,,634,31959,1944
-1695A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,640,31972,1969
-1695A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,640,31973,1969
-1703A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,649,31984,1962
-1692A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,646,31978,1974
-1695A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,640,31967,1969
-1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,644,31976,1959
-1703A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,647,31987,1954
-1702A3015,(loop),0.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,641,31981,1953
-1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,647,31988,1955
-1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,649,31986,1958
-1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,650,31985,1957
-1703A3015,(loop),0.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,641,31991,1960
-1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,648,31975,1973
-1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,31994,1961
-1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32084,1961
-1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32136,1961
-1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32042,1961
-1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,643,31993,1963
-1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,643,32083,1963
-1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,643,32135,1963
-1692A3010,Downtown Petaluma,1.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,31999,1964
-1692A3010,Downtown Petaluma,1.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,32013,1964
-1692A3010,Downtown Petaluma,1.0,2/11 B,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,31998,1964
-1692A3010,Downtown Petaluma,1.0,2/11 B,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,32087,1964
-1692A3010,(loop),0.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,644,31996,1959
-1692A3010,(loop),0.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,644,32010,1959
-1692A3010,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,644,32057,1959
-1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,32005,1965
-1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,32092,1965
-1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,32144,1965
-1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,645,32045,1965
-1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32002,1966
-1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32090,1966
-1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32142,1966
-1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,642,32044,1966
-1692A3010,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,646,31992,1967
-1692A3010,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,646,32082,1967
-c_19530_b_25910_d_63,Loop,0.0,19684,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,651,32145,1975
-c_19530_b_25910_d_63,Loop,0.0,19684,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,651,32147,1975
-c_19530_b_25910_d_63,Loop,0.0,19684,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,651,32187,1975
-c_19530_b_25910_d_63,Loop,0.0,19686,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,652,32165,1977
-c_19530_b_25910_d_63,Loop,0.0,19686,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,652,32185,1977
-c_19530_b_25910_d_63,Loop,0.0,19686,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,652,32174,1977
-c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,653,32183,1979
-c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,653,32178,1979
-c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,653,32180,1979
-c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,653,32166,1978
-c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,653,32171,1978
-c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,653,32168,1978
-c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,654,32154,1980
-c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,654,32157,1980
-c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,654,32156,1980
-c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,654,32176,1981
-c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,654,32153,1981
-c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,654,32177,1981
-2555A3810,Hercules Transit Center,0.0,1070,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32600,1982
-2376A3650,Victoria Cr. by the bay,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32707,2002
-2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32481,2013
-2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32280,2033
-2376A3650,Hercules Transit Center,1.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32201,2034
-2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32554,2023
-2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32276,1984
-2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32476,2031
-2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32305,1988
-2555A3810,Hercules Transit Center,0.0,1079,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32634,1989
-2376A3650,Victoria Cr. by the bay,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32703,2002
-2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32228,1984
-2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32398,1991
-2555A3810,Hercules Transit Center,0.0,1081,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32652,1982
-2376A3650,Willow Ave. at I-80,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32718,1993
-2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,660,32380,1995
-2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32580,1985
-2376A3650,Richmond Parkway Transit Center,1.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32367,1996
-2555A3810,BART Del Norte Station,1.0,1080,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32639,1997
-2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32777,1994
-2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32527,1985
-2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32731,1998
-2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,655,32196,1999
-2376A3650,Simas/Pinole Valley,0.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32366,1992
-2555A3810,BART Del Norte Station,1.0,1089,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32693,2003
-2376A3650,Richmond Parkway Transit Center,1.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32786,1996
-2376A3650,Amtrak Station,0.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32517,2004
-2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32567,2000
-2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32738,2005
-2555A3810,BART Del Norte Station,1.0,1071,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32603,1997
-2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32413,2032
-2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32331,1996
-2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,655,32246,1999
-2376A3650,San Pablo Ave. and Tara Hills Dr.,0.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32381,2007
-2376A3650,Simas/Pinole Valley,0.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32783,2008
-2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32300,2009
-2555A3810,BART Del Norte Station,1.0,1086,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32672,1997
-2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32705,1986
-2376A3650,Hercules Transit Center,1.0,route 11b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32272,2034
-2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32429,2010
-2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32359,1996
-2555A3810,Hercules Transit Center,0.0,1088,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32684,1989
-2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32292,2033
-2555A3810,Hercules Transit Center,0.0,1070,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32596,2014
-2376A3650,Amtrak Station,0.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32540,2004
-2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32424,2010
-2376A3650,San Pablo Ave. and Tara Hills Dr.,0.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32409,2007
-2376A3650,Simas/Pinole Valley,0.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32338,1992
-2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32737,2017
-2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32471,2013
-2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32494,2031
-2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32543,2001
-2376A3650,Hercules Transit Center,1.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32545,2019
-2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32242,2009
-2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32249,2009
-2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32532,2000
-2376A3650,Amtrak Station,0.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32564,2004
-2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32449,2013
-2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32306,2009
-2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32515,1985
-2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32453,2013
-2555A3810,BART Del Norte Station,1.0,1085,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32661,2011
-2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32275,2033
-2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32452,2031
-2555A3810,BART Del Norte Station,1.0,1088,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32687,2011
-2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32252,1988
-2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32769,1994
-2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32563,2000
-2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32421,2032
-2555A3810,Hercules Transit Center,0.0,JLa,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32670,2024
-2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32763,1994
-2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,660,32392,1995
-2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32418,2010
-2376A3650,San Pablo Ave. and Tara Hills Dr.,0.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32397,2007
-2376A3650,Simas/Pinole Valley,0.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32370,1992
-2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,655,32309,1999
-2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,660,32391,2018
-2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32216,2033
-2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32432,2032
-2555A3810,BART Del Norte Station,1.0,1080,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32645,2011
-2376A3650,Hercules Transit Center,1.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32199,2034
-2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32772,1994
-2555A3810,Hercules Transit Center,0.0,1089,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32696,1987
-2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,666,32441,2031
-2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32310,1984
-2376A3650,Hercules Transit Center,1.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32583,2019
-2555A3810,Hercules Transit Center,0.0,1080,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32642,1982
-2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32710,1986
-2555A3810,BART Del Norte Station,1.0,1079,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32633,1997
-2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32265,1984
-2376A3650,Hercules Transit Center,1.0,route 11b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32288,2034
-2376A3650,Simas/Pinole Valley,0.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32364,1992
-2555A3810,Hercules Transit Center,0.0,1072,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32607,1989
-2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,655,32291,1999
-2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32193,2009
-2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32311,1988
-2555A3810,BART Del Norte Station,1.0,1074,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32613,2011
-2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32438,2032
-2555A3810,BART Del Norte Station,1.0,1071,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,664,32605,2011
-2555A3810,Hercules Transit Center,0.0,1073,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,665,32611,1989
-2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32386,1991
-2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32225,2016
-2376A3650,Hercules Transit Center,1.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32557,2019
-2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32378,1991
-2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,660,32404,1995
-2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,659,32365,1996
-2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,661,32406,1991
-2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,662,32437,2010
-2376A3650,Hercules Transit Center,1.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,668,32498,2019
-2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,660,32387,2018
-2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32496,2000
-2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,667,32566,1985
-2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,657,32782,1994
-2376A3650,Willow Ave. at I-80,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,663,32748,1983
-2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,660,32403,2018
-2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,658,32220,2021
-2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,656,32208,2033
+1695A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,676,32692,2058
+1695A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,676,32693,2058
+1703A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,685,32704,2051
+1692A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,682,32698,2063
+1695A3010,(loop),0.0,1/24,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,676,32687,2058
+1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,680,32696,2048
+1703A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,683,32707,2043
+1702A3015,(loop),0.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,677,32701,2042
+1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,683,32708,2044
+1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,685,32706,2047
+1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,686,32705,2046
+1703A3015,(loop),0.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,677,32711,2049
+1702A3015,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,684,32695,2062
+1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32714,2050
+1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32804,2050
+1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32856,2050
+1692A3010,N. McDowell - Old Redwood Hwy,0.0,2/11,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32762,2050
+1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,679,32713,2052
+1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,679,32803,2052
+1692A3010,(loop),0.0,3/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,679,32855,2052
+1692A3010,Downtown Petaluma,1.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32719,2053
+1692A3010,Downtown Petaluma,1.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32733,2053
+1692A3010,Downtown Petaluma,1.0,2/11 B,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32718,2053
+1692A3010,Downtown Petaluma,1.0,2/11 B,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32807,2053
+1692A3010,(loop),0.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,680,32716,2048
+1692A3010,(loop),0.0,11/33,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,680,32730,2048
+1692A3010,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,680,32777,2048
+1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32725,2054
+1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32812,2054
+1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32864,2054
+1692A3010,Eastside Transit Center,0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,681,32765,2054
+1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32722,2055
+1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32810,2055
+1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32862,2055
+1692A3010,Eastside Transit Center,1.0,,,2.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,678,32764,2055
+1692A3010,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,682,32712,2056
+1692A3010,(loop),0.0,,,0.0,petalumatransit-petaluma-ca-us__11_12_15,,,,,,,,,,,,682,32802,2056
+c_19530_b_25910_d_63,Loop,0.0,19684,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,687,32865,2064
+c_19530_b_25910_d_63,Loop,0.0,19684,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,687,32867,2064
+c_19530_b_25910_d_63,Loop,0.0,19684,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,687,32907,2064
+c_19530_b_25910_d_63,Loop,0.0,19686,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,688,32885,2066
+c_19530_b_25910_d_63,Loop,0.0,19686,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,688,32905,2066
+c_19530_b_25910_d_63,Loop,0.0,19686,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,688,32894,2066
+c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,689,32903,2068
+c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,689,32898,2068
+c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,689,32900,2068
+c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,689,32886,2067
+c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,689,32891,2067
+c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19688,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,689,32888,2067
+c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,690,32874,2069
+c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,690,32877,2069
+c_19530_b_25910_d_63,Vacaville Transportation Center,0.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,690,32876,2069
+c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,690,32896,2070
+c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,690,32873,2070
+c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020-ca-us,,,,,1.0t+0.00,1.0t+0.00,0.00,,,,,690,32897,2070
+2555A3810,Hercules Transit Center,0.0,1070,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33320,2071
+2376A3650,Victoria Cr. by the bay,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33427,2091
+2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33201,2102
+2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,33000,2122
+2376A3650,Hercules Transit Center,1.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,32921,2123
+2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33274,2112
+2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,32996,2073
+2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33196,2120
+2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,33025,2077
+2555A3810,Hercules Transit Center,0.0,1079,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33354,2078
+2376A3650,Victoria Cr. by the bay,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33423,2091
+2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,32948,2073
+2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33118,2080
+2555A3810,Hercules Transit Center,0.0,1081,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33372,2071
+2376A3650,Willow Ave. at I-80,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33438,2082
+2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,696,33100,2084
+2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33300,2074
+2376A3650,Richmond Parkway Transit Center,1.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33087,2085
+2555A3810,BART Del Norte Station,1.0,1080,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33359,2086
+2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33497,2083
+2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33247,2074
+2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33451,2087
+2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,691,32916,2088
+2376A3650,Simas/Pinole Valley,0.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33086,2081
+2555A3810,BART Del Norte Station,1.0,1089,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33413,2092
+2376A3650,Richmond Parkway Transit Center,1.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33506,2085
+2376A3650,Amtrak Station,0.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33237,2093
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33287,2089
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33458,2094
+2555A3810,BART Del Norte Station,1.0,1071,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33323,2086
+2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33133,2121
+2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33051,2085
+2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,691,32966,2088
+2376A3650,San Pablo Ave. and Tara Hills Dr.,0.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33101,2096
+2376A3650,Simas/Pinole Valley,0.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33503,2097
+2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33020,2098
+2555A3810,BART Del Norte Station,1.0,1086,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33392,2086
+2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33425,2075
+2376A3650,Hercules Transit Center,1.0,route 11b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,32992,2123
+2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33149,2099
+2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33079,2085
+2555A3810,Hercules Transit Center,0.0,1088,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33404,2078
+2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,33012,2122
+2555A3810,Hercules Transit Center,0.0,1070,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33316,2103
+2376A3650,Amtrak Station,0.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33260,2093
+2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33144,2099
+2376A3650,San Pablo Ave. and Tara Hills Dr.,0.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33129,2096
+2376A3650,Simas/Pinole Valley,0.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33058,2081
+2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33457,2106
+2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33191,2102
+2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33214,2120
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33263,2090
+2376A3650,Hercules Transit Center,1.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33265,2108
+2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,32962,2098
+2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,32969,2098
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33252,2089
+2376A3650,Amtrak Station,0.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33284,2093
+2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33169,2102
+2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33026,2098
+2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33235,2074
+2612A3865,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33173,2102
+2555A3810,BART Del Norte Station,1.0,1085,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33381,2100
+2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,32995,2122
+2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33172,2120
+2555A3810,BART Del Norte Station,1.0,1088,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33407,2100
+2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,32972,2077
+2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33489,2083
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33283,2089
+2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33141,2121
+2555A3810,Hercules Transit Center,0.0,JLa,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33390,2113
+2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33483,2083
+2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,696,33112,2084
+2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33138,2099
+2376A3650,San Pablo Ave. and Tara Hills Dr.,0.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33117,2096
+2376A3650,Simas/Pinole Valley,0.0,route 16b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33090,2081
+2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,691,33029,2088
+2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,696,33111,2107
+2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,32936,2122
+2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33152,2121
+2555A3810,BART Del Norte Station,1.0,1080,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33365,2100
+2376A3650,Hercules Transit Center,1.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,32919,2123
+2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33492,2083
+2555A3810,Hercules Transit Center,0.0,1089,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33416,2076
+2612A3865,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,702,33161,2120
+2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,33030,2073
+2376A3650,Hercules Transit Center,1.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33303,2108
+2555A3810,Hercules Transit Center,0.0,1080,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33362,2071
+2376A3650,San Fransisco Transbay Terminal,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33430,2075
+2555A3810,BART Del Norte Station,1.0,1079,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33353,2086
+2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,32985,2073
+2376A3650,Hercules Transit Center,1.0,route 11b,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,33008,2123
+2376A3650,Simas/Pinole Valley,0.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33084,2081
+2555A3810,Hercules Transit Center,0.0,1072,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33327,2078
+2376A3650,Loop Route,0.0,route 10,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,691,33011,2088
+2376A3650,Carson St.,0.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,32913,2098
+2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,33031,2077
+2555A3810,BART Del Norte Station,1.0,1074,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33333,2100
+2376A3650,Contra Costa College,1.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33158,2121
+2555A3810,BART Del Norte Station,1.0,1071,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,700,33325,2100
+2555A3810,Hercules Transit Center,0.0,1073,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,701,33331,2078
+2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33106,2080
+2376A3650,Hercules Transit Center,1.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,32945,2105
+2376A3650,Hercules Transit Center,1.0,route 30zb,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33277,2108
+2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33098,2080
+2376A3650,Richmond Parkway Transit Center,1.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,696,33124,2084
+2376A3650,Richmond Parkway Transit Center,1.0,route16a,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,695,33085,2085
+2376A3650,Richmond Parkway Transit Center,1.0,route 18,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,697,33126,2080
+2376A3650,Hercules Transit Center,0.0,route C3,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,698,33157,2099
+2376A3650,Hercules Transit Center,1.0,route 30Za,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,704,33218,2108
+2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,696,33107,2107
+2376A3650,Hercules Transit Center,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33216,2089
+2376A3650,BART Del Norte Station,1.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,703,33286,2074
+2376A3650,Hercules Transit Center,1.0,route 12,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,693,33502,2083
+2376A3650,Willow Ave. at I-80,0.0,,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,699,33468,2072
+2376A3650,Del Monte Dr. And San Pablo Ave.,0.0,route 17,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,696,33123,2107
+2376A3650,Viewpointe Blvd.,0.0,route 15,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,694,32940,2110
+2376A3650,Ponoma St.,0.0,route 11,,0.0,westcat-ca-us_9_17_2015,,,,,,,,,,,,692,32928,2122
 67950b41-d4f0-43fa-929b-77eb21857210,,0.0,,0.0,0.0,SF_Bay_Ferry2016_07_01,,,,,,,,,,,,383,22810,1141
 67950b41-d4f0-43fa-929b-77eb21857210,San Francisco Ferry Building,0.0,,0.0,0.0,SF_Bay_Ferry2016_07_01,,,,,,,,,,,,383,22848,1146
 67950b41-d4f0-43fa-929b-77eb21857210,Harbor Bay Ferry Terminal,0.0,,0.0,0.0,SF_Bay_Ferry2016_07_01,,,,,,,,,,,,384,22865,1137
@@ -3784,3 +3784,116 @@ c_19530_b_25910_d_63,Vacaville Transit Plaza,1.0,19690,,,vacavillecitycoach-2020
 2,19 S Connector,1.0,7,,,SantaRosa_google_transit_08_28_15,,,,,,,,,,,,472,25174,1404
 2,19 S Connector,1.0,24,,,SantaRosa_google_transit_08_28_15,,,,,,,,,,,,472,25185,1404
 2,19 S Connector,1.0,22,,,SantaRosa_google_transit_08_28_15,,,,,,,,,,,,472,25194,1404
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32461,1966
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32469,1966
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32478,1966
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32485,1966
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32458,1967
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32459,1967
+wed,Rose Pavilion - Santa  Rita Jail- East Dublin BART,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,640,32460,1967
+wed,Transit Center,1.0,173,,,Wheels_2016_7_13,,,,,,,,,,,,641,32316,2036
+wed,Transit Center,1.0,174,,,Wheels_2016_7_13,,,,,,,,,,,,641,32317,2036
+wed,Transit Center,1.0,180,,,Wheels_2016_7_13,,,,,,,,,,,,641,32187,2032
+wed,Transit Center,1.0,188,,,Wheels_2016_7_13,,,,,,,,,,,,641,32195,2032
+wed,Transit Center,1.0,198,,,Wheels_2016_7_13,,,,,,,,,,,,641,32205,2032
+wed,Transit Center,0.0,208,,,Wheels_2016_7_13,,,,,,,,,,,,641,32244,2034
+wed,Transit Center,0.0,211,,,Wheels_2016_7_13,,,,,,,,,,,,641,32247,2034
+wed,Transit Center,0.0,219,,,Wheels_2016_7_13,,,,,,,,,,,,641,32255,2034
+wed,Transit Center,0.0,229,,,Wheels_2016_7_13,,,,,,,,,,,,641,32265,2034
+wed,Transit Center,0.0,237,,,Wheels_2016_7_13,,,,,,,,,,,,641,32301,2035
+wed,Greenville Road - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,642,32336,2040
+wed,Greenville Road - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,642,32339,2040
+wed,Transit Center,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32357,1955
+wed,Transit Center,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32363,1955
+wed,Transit Center,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32369,1955
+wed,Transit Center,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32376,1955
+wed,BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32382,1956
+wed,BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32388,1956
+wed,BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32393,1956
+wed,BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,643,32399,1956
+wed,Transit Center,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,644,32346,1960
+wed,Park n Ride,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,644,32344,1959
+wed,BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,644,32350,1957
+wed,BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,644,32354,1957
+wed,Downtown - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,645,32406,1963
+wed,Downtown - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,645,32411,1963
+wed,Downtown - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,645,32420,1963
+wed,Downtown - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,645,32426,1963
+wed,Springtown Area - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,646,32428,1965
+wed,Springtown Area - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,646,32430,1965
+wed,Springtown Area - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,646,32437,1965
+wed,Springtown Area - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,646,32444,1965
+wed,Springtown Area - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,646,32452,1965
+wed,Dublin Ranch - East BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,647,32504,1974
+wed,Dublin Ranch - East BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,647,32507,1974
+wed,Dublin Ranch - East BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,647,32508,1974
+wed,BART,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,647,32503,1973
+wed,LLNL,1.0,249,,,Wheels_2016_7_13,,,,,,,,,,,,648,32490,1971
+wed,LLNL,0.0,252,,,Wheels_2016_7_13,,,,,,,,,,,,648,32498,1972
+wed,Village Parkway - East BART,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,649,32521,1975
+wed,Village Parkway - East BART,1.0,,,,Wheels_2016_7_13,,,,,,,,,,,,649,32522,1975
+wed,Johnson Drive- Mall - West Dublin BART,0.0,254,,,Wheels_2016_7_13,,,,,,,,,,,,649,32511,1977
+wed,West.Dublin - West Dublin BART,0.0,272,,,Wheels_2016_7_13,,,,,,,,,,,,649,32523,1976
+wed,West.Dublin - West Dublin BART,0.0,278,,,Wheels_2016_7_13,,,,,,,,,,,,649,32529,1976
+wed,Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,650,32539,1978
+wed,Big Trees Park,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,650,32541,1979
+wed,Big Trees Park,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,650,32543,1979
+wed,Junction Middle School - Hagemann Park - BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,651,32544,1958
+wed,Granada - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,652,32545,1980
+wed,Granada - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,652,32547,1981
+wed,Granada - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,652,32548,1981
+wed,Dublin High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,653,32549,1982
+wed,East Dublin,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,653,32551,1983
+wed,Dublin High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,654,32553,1984
+wed,Dublin Ranch Village,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,654,32554,1985
+wed,Shannon Park -  Dublin High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,655,32561,1986
+wed,Shannon Park - West Dublin BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,655,32557,1988
+wed,Dublin High School - Wells Middle School,0.0,292,,,Wheels_2016_7_13,,,,,,,,,,,,655,32555,1987
+wed,Civic Center - Transit Center,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,656,32562,1989
+wed,Mall - ACE,0.0,300,,,Wheels_2016_7_13,,,,,,,,,,,,657,32571,1992
+wed,Mall - ACE,0.0,301,,,Wheels_2016_7_13,,,,,,,,,,,,657,32572,1992
+wed,Mall - ACE,0.0,304,,,Wheels_2016_7_13,,,,,,,,,,,,657,32577,1993
+wed,Mall - ACE,0.0,306,,,Wheels_2016_7_13,,,,,,,,,,,,657,32582,1993
+wed,Hacienda Business Park - East BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,658,32585,1994
+wed,East BART - Hacienda Business Park - ACE,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,658,32588,1996
+wed,Pleasanton Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,659,32590,1998
+wed,Ruby Hill,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,659,32591,1999
+wed,Foothill High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,660,32593,2000
+wed,Del Prado Park via Parkside,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,660,32594,2001
+wed,Hart Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,661,32596,2003
+wed,Muirwood Park,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,661,32597,2004
+wed,Foothill High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,662,32598,2005
+wed,Fairlands,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,662,32599,2006
+wed,Amador Valley High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,663,32601,2007
+wed,Fairlands,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,663,32602,2008
+wed,Pleasanton Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,664,32603,2009
+wed,Vintage Hills,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,664,32604,2010
+wed,Hart Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,665,32605,2011
+wed,Laguna Oaks,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,665,32606,2012
+wed,Harvest Park Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,666,32607,2013
+wed,Kamp Drive - Dennis,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,666,32608,2014
+wed,Hart Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,667,32610,2016
+wed,Del Prado Park,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,667,32611,2017
+wed,Hart Middle School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,668,32612,2018
+wed,Fairlands,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,668,32613,2019
+wed,Amador Valley High School,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,669,32614,2020
+wed,Vintage Hills - Ruby Hill,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,669,32615,2021
+wed,Walnut Creek BART - East Dublin  BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,670,32636,2025
+wed,Pleasant Hill BART,0.0,316,,,Wheels_2016_7_13,,,,,,,,,,,,670,32630,2024
+wed,Walnut Creek BART - Pleasant Hill BART,0.0,319,,,Wheels_2016_7_13,,,,,,,,,,,,670,32622,2026
+wed,Walnut Creek BART - Stoneridge Mall,0.0,323,,,Wheels_2016_7_13,,,,,,,,,,,,671,32616,2022
+wed,Johnson Drive - Stoneridge Mall,0.0,324,,,Wheels_2016_7_13,,,,,,,,,,,,671,32618,2023
+wed,Downtown Pleasanton via Valley,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,672,32639,2028
+wed,Downtown Pleasanton via Valley,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,672,32643,2028
+wed,Downtown Pleasanton via Valley,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,672,32648,2028
+wed,Downtown Pleasanton via Santa Rita,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,673,32652,2029
+wed,Downtown Pleasanton via Santa Rita,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,673,32656,2029
+wed,Downtown Pleasanton via Santa Rita,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,673,32661,2029
+wed,Downtown Pleasanton via Santa Rita,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,673,32665,2029
+wed,Hacienda Business Park - California Center - East BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,674,32676,2031
+wed,California Center - Hacienda Business Park - East BART,0.0,,,,Wheels_2016_7_13,,,,,,,,,,,,674,32666,2030
+wed,Eastbound,0.0,437,,,Wheels_2016_7_13,,,,,,,,,,,,675,31969,2038
+wed,Eastbound,0.0,453,,,Wheels_2016_7_13,,,,,,,,,,,,675,31985,2038
+wed,Eastbound,0.0,473,,,Wheels_2016_7_13,,,,,,,,,,,,675,32005,2038
+wed,Eastbound,0.0,489,,,Wheels_2016_7_13,,,,,,,,,,,,675,32021,2038
+wed,Westbound,0.0,490,,,Wheels_2016_7_13,,,,,,,,,,,,675,32077,2039
