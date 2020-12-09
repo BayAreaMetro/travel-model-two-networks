@@ -15,6 +15,9 @@ data/interim/step3_join_shst_extraction_with_osm
 data/interim/step4_conflate_with_tomtom
 data/external/TM2_Marin
 data/external/TM2_nonMarin
+data/external/sfcta
+data/external/stclines
+data/external/mtc
 data/interim/tm2_Marin
 data/interim/tm2_nonMarin
 data/interim/sfcta
