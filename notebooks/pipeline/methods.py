@@ -5,6 +5,9 @@ import glob
 from shapely.geometry import Point
 import osmnx as ox
 import math
+from shapely.geometry import Point, shape, LineString
+from scipy.spatial import cKDTree
+import json
 
 shst_link_df_list = []
 
@@ -553,20 +556,41 @@ def find_new_load_point(abm_load_ref_df, all_node):
     
     all_node_gdf = all_node.copy()
     
-    inventory_node_ref = all_node_gdf[["X", "Y"]].values
-    tree = cKDTree(inventory_node_ref)
+    all_node_gdf = all_node_gdf.to_crs(epsg = 26915)
+    all_node_gdf["X"] = all_node_gdf["geometry"].apply(lambda g: g.x)
+    all_node_gdf["Y"] = all_node_gdf["geometry"].apply(lambda g: g.y)
+    
+    inventory_node_df = all_node_gdf.copy()
+    inventory_node_ref = inventory_node_df[["X", "Y"]].values
+    tree_default = cKDTree(inventory_node_ref)
     
     new_load_point_gdf = gpd.GeoDataFrame()
     
     for i in range(len(abm_load_ref_df)):
+  
         point = abm_load_ref_df.iloc[i][['X', 'Y']].values
+        c_id = abm_load_ref_df.iloc[i]['c']
         n_neigh = abm_load_ref_df.iloc[i]['osm_num_load']
+        
+        if "c" in all_node_gdf.columns:
+            inventory_node_df = all_node_gdf[all_node_gdf.c == c_id].copy().reset_index()
+            if len(inventory_node_df) == 0:
+                continue
+            else:
+                inventory_node_ref = inventory_node_df[["X", "Y"]].values
+                tree = cKDTree(inventory_node_ref)
+           
+        else:
+            inventory_node_df = all_node_gdf.copy()
+            tree = tree_default
+         
+        
         dd, ii = tree.query(point, k = n_neigh)
         if n_neigh == 1:
-            add_gdf = gpd.GeoDataFrame(all_node_gdf[['osm_node_id', "shst_node_id", "model_node_id", 'geometry']].iloc[ii])\
+            add_gdf = gpd.GeoDataFrame(inventory_node_df[['osm_node_id', "shst_node_id", "model_node_id", 'geometry']].iloc[ii])\
                             .transpose().reset_index(drop = True)
         else:
-            add_gdf = gpd.GeoDataFrame(all_node_gdf[['osm_node_id', "shst_node_id", "model_node_id", 'geometry']].iloc[ii])\
+            add_gdf = gpd.GeoDataFrame(inventory_node_df[['osm_node_id', "shst_node_id", "model_node_id", 'geometry']].iloc[ii])\
                             .reset_index(drop = True)
         add_gdf['c'] = int(abm_load_ref_df.iloc[i]['c'])
         if i == 0:
@@ -796,3 +820,116 @@ def buffer1(polygon):
 
 def buffer2(polygon):
     return polygon.minimum_rotated_rectangle
+
+def getAngle(a, b, c):
+    ang = math.degrees(math.atan2(c[1]-b[1], c[0]-b[0]) - math.atan2(a[1]-b[1], a[0]-b[0]))
+    return ang + 360 if ang < 0 else ang
+
+def isDuplicate(a, b, zoneUnique):
+    length = len(zoneUnique)
+    #print("    unique zone unique length {}".format(length))
+    for i in range(length):
+        #print("           compare {} with zone unique {}".format(a, zoneUnique[i]))
+        ang = getAngle(a, b, zoneUnique[i])
+        
+        if (ang < 45) | (ang > 315):
+            return None
+            
+    zoneUnique += [a]
+    
+
+def get_non_near_connectors(all_cc):
+    
+    all_cc_link_gdf = all_cc.copy()
+    
+    all_cc_link_gdf = all_cc_link_gdf[all_cc_link_gdf.B.isin(taz_N_list + maz_N_list)].copy()
+    
+    all_cc_link_gdf = all_cc_link_gdf[["A", "B", "id", "geometry"]]
+    
+    all_cc_link_gdf["ld_point"] = all_cc_link_gdf["geometry"].apply(lambda x: list(x.coords)[0])
+    all_cc_link_gdf["c_point"] = all_cc_link_gdf["geometry"].apply(lambda x: list(x.coords)[1])
+    
+    all_cc_link_gdf["ld_point_tuple"] = all_cc_link_gdf["ld_point"].apply(lambda x: tuple(x))
+    
+    all_cc_link_gdf["good_point"] = np.where(all_cc_link_gdf.A.isin(node_two_geometry_id_list),
+                                            1,
+                                            0)
+    
+    keep_cc_gdf = pd.DataFrame()
+    
+    for c in all_cc_link_gdf.B.unique():
+        
+        zone_cc_gdf = all_cc_link_gdf[all_cc_link_gdf.B == c].copy()
+        
+        centroid = zone_cc_gdf.c_point.iloc[0]
+        
+        # if the zone has less than 4 cc, keep all
+        if len(zone_cc_gdf) <= 4:
+            keep_cc_gdf = keep_cc_gdf.append(zone_cc_gdf, sort = False, ignore_index = True)
+    
+        # if the zone has more than 4 cc
+        else:
+            
+            zoneUnique = []
+                
+            zoneCandidate = zone_cc_gdf["ld_point"].to_list()
+            #print("zone candidate {}".format(zoneCandidate))
+            for point in zoneCandidate:
+                #print("evaluate: {}".format(point))
+                if len(zoneUnique) == 0:
+                    zoneUnique += [point]
+                else:
+                    isDuplicate(point, centroid, zoneUnique)
+                #print("zone unique {}".format(zoneUnique))
+                if len(zoneUnique) == 4:
+                    break
+                
+            zone_cc_gdf = zone_cc_gdf[zone_cc_gdf.ld_point_tuple.isin([tuple(z) for z in zoneUnique])]
+                
+            keep_cc_gdf = keep_cc_gdf.append(zone_cc_gdf, sort = False, ignore_index = True)
+            """
+            ## if more than 4 good cc, apply non-near method
+            if zone_cc_gdf.good_point.sum() > 4:
+                
+                zone_cc_gdf = zone_cc_gdf[zone_cc_gdf.good_point == 1].copy()
+                
+                zoneUnique = []
+                
+                zoneCandidate = zone_cc_gdf["B_point"].to_list()
+                #print("zone candidate {}".format(zoneCandidate))
+                for point in zoneCandidate:
+                    #print("evaluate: {}".format(point))
+                    if len(zoneUnique) == 0:
+                        zoneUnique += [point]
+                    else:
+                        isDuplicate(point, centroid, zoneUnique)
+                    #print("zone unique {}".format(zoneUnique))
+                    if len(zoneUnique) == 4:
+                        break
+                
+                zone_cc_gdf = zone_cc_gdf[zone_cc_gdf.B_point_tuple.isin([tuple(z) for z in zoneUnique])]
+                
+                keep_cc_gdf = keep_cc_gdf.append(zone_cc_gdf, sort = False, ignore_index = True)
+    
+            ## if less than 4 good cc, keep good cc, apply non-near to pick additional connectors
+            else:
+                non_near_zone_cc_gdf = zone_cc_gdf[zone_cc_gdf.good_point == 1].copy()
+                
+                ## keep good cc, get non near based on good cc
+                
+                zoneUnique = non_near_zone_cc_gdf["B_point"].to_list()
+                
+                zoneCandidate = zone_cc_gdf[zone_cc_gdf.good_point == 0]["B_point"].to_list()
+                
+                for point in zoneCandidate:
+                    #print("evaluate: {}".format(point))
+                    isDuplicate(point, centroid, zoneUnique)
+                    #print("zone unique {}".format(zoneUnique))
+                    if len(zoneUnique) == 4:
+                        break
+                        
+                zone_cc_gdf = zone_cc_gdf[zone_cc_gdf.B_point_tuple.isin([tuple(z) for z in zoneUnique])]
+                
+                keep_cc_gdf = keep_cc_gdf.append(zone_cc_gdf, ignore_index = True)
+            """    
+    return keep_cc_gdf
