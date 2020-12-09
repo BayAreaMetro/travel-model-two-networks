@@ -42,4 +42,8 @@ data/interim/step8_standard_format/link.json
 data/interim/step8_standard_format/node.geojson
 data/interim/step8_standard_format/shape.geojson
 data/processed/version_02/working_scenario_00.pickle
+data/processed/version_02/working_scenario_01.pickle
 data/processed/version_03/working_scenario_00.pickle
+data/processed/version_03/working_scenario_01.pickle
+data/processed/version_03/links.txt
+data/processed/version_03/nodes.txt

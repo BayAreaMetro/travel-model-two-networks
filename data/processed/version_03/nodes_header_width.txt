@@ -1,0 +1,10 @@
+header,width
+osm_node_id,12
+county,13
+drive_access,1
+walk_access,1
+bike_access,1
+N,7
+rail_only,1
+X,18
+Y,18
