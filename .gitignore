@@ -9,6 +9,7 @@ vpr/*.[0-9][0-9][0-9]
 
 #folder
 data/external/tomtom
+data/external/county_boundaries
 data/interim/tomtom
 data/interim/step3_join_shst_extraction_with_osm
 data/interim/step4_conflate_with_tomtom
@@ -29,6 +30,9 @@ data/interim/step6_gtfs/*.json
 !pems_conflation.ipynb
 *.twbr
 *.pyc
+*.transit.geojson
+data/interim/step7_centroid_connector
+!data/interim/step7_centroid_connector/*.pickle
 
 notebooks/.ipynb_checkpoints/*
 notebooks/other/.ipynb_checkpoints/*
@@ -47,3 +51,7 @@ data/processed/version_03/working_scenario_00.pickle
 data/processed/version_03/working_scenario_01.pickle
 data/processed/version_03/links.txt
 data/processed/version_03/nodes.txt
+data/processed/version_03/*.json
+data/processed/version_03/*.geojson
+data/processed/version_02/*.json
+data/processed/version_02/*.geojson
