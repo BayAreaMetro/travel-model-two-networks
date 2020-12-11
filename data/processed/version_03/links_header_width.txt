@@ -5,6 +5,7 @@ assignable,1
 bike_access,1
 bus_only,1
 county,13
+distance,22
 drive_access,1
 ft,2
 managed,1
