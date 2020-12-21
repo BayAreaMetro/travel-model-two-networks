@@ -28,7 +28,7 @@ external_dir <- "../../data/external/"
 interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
-links_file_name <- paste0(processed_dir, "version_02/link.feather")
+links_file_name <- paste0(processed_dir, "version_03/link.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 

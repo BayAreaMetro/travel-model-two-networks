@@ -1,0 +1,117 @@
+---
+title: "Make Arterial Viewer Shape"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow",
+                     "sf")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+external_dir <- "../../data/external/"
+interim_dir <- "../../data/interim/"
+processed_dir <- "../../data/processed/" 
+
+links_file_name <- paste0(processed_dir, "version_03/v03_link.feather")
+shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
+
+
+output_file_name <- paste0(interim_dir, "arterial-viewer.geojson")
+```
+
+# Parameters
+```{r parameters}
+facility_type_dict_df <- tibble(ft = c(seq(from = 0, to = 8), 99),
+                                facility_type = c("Not a road",
+                                                  "Freeway",
+                                                  "Expressway",
+                                                  "Ramp",
+                                                  "Divided Arterial",
+                                                  "Undivided Arterial",
+                                                  "Collector",
+                                                  "Local",
+                                                  "Centroid Connector",
+                                                  "Not a road"))
+
+ft_to_keep_vector <- c("Expressway", "Divided Arterial", "Undivided Arterial", "Collector")
+
+bad_geom_vector <- c(7017855, 7080687)
+```
+
+
+# Data Reads
+```{r read}
+shapes_sf <- readRDS(shape_file_name)
+links_df <- read_feather(links_file_name)
+```
+
+# Reductions 
+```{r reductions}
+osm_names_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(model_link_id, name) %>%
+  mutate(name = str_replace(name, "\\[", "")) %>%
+  mutate(name = str_replace(name, "\\]", "")) %>%
+  mutate(name = str_replace_all(name, "'", "")) %>%
+  separate(name, 
+           into = sprintf("%02d", seq(1:5)), 
+           sep = ",",
+           remove = TRUE,
+           extra = "drop",
+           fill = "right") %>%
+  pivot_longer(cols = -c(model_link_id),
+               names_to = "index",
+               values_to = "name") %>%
+  select(-index) %>%
+  mutate(name = trimws(name)) %>%
+  filter(!is.na(name)) %>%
+  filter(name != "nan") %>%
+  filter(name != "") %>%
+  distinct(model_link_id, name) %>%
+  group_by(model_link_id) %>%
+  mutate(index = row_number()) %>%
+  ungroup() %>%
+  pivot_wider(id_cols = model_link_id,
+              names_prefix = "name_",
+              names_from = index,
+              values_from = name) %>%
+  mutate(name = if_else(is.na(name_2), name_1, paste0(name_1, "/", name_2))) %>%
+  mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
+  mutate(simple_name = str_replace(name, " Avenue", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Street", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Drive", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Boulevard", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Way", "")) %>%
+  select(model_link_id, name, simple_name)
+
+output_sf <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(-name) %>%
+  left_join(., osm_names_df, by = c("model_link_id")) %>%
+  left_join(., facility_type_dict_df, by = c("ft")) %>%
+  filter(managed == 0) %>%
+  filter(facility_type %in% ft_to_keep_vector) %>% 
+  mutate(lanes = (lanes_EA + lanes_AM + lanes_MD + lanes_PM + lanes_EV)/5.0) %>%
+  left_join(., shapes_sf, by = c("shstGeometryId"))
+  
+```
+
+# Write
+```{r write}
+st_write(output_sf, output_file_name, delete_dsn = TRUE)
+```
+
+
