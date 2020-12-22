@@ -1,0 +1,21 @@
+project: Year 2015 Modify Lanes to 6 Lanes
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'update lanes'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 2050687
+      - 2077376
+      - 2255343
+    - shstReferenceId:
+      - "2f5e3bc85cf39360e8205d5175612c1b"
+      - "483268fcf092599b4b8d7678123aa860"
+      - "ef5dd1b35b06571d26e590ccd7466a42"
+  properties:    
+  - property: lanes
+    set: 6

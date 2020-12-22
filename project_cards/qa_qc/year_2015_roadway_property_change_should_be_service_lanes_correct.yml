@@ -1,0 +1,19 @@
+project: Year 2015 Modify Facility Type to Service
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'facility type service'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 5001470
+      - 5011985
+    - shstReferenceId:
+      - "05ee9d0847db20d5b79903b2e5d4796f"
+      - "31decaf49d06d27589241e2912ac56ee"
+  properties:
+  - property: roadway
+    set: 'service'   

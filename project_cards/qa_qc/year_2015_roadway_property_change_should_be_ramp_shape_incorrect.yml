@@ -1,0 +1,18 @@
+project: Year 2015 Modify Facility Type to Ramp shape incorrect
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'facility type ramp'
+  - 'update lanes'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 2093577
+    - shstReferenceId:
+      - "5772865b7260c3da214b18e066dcb846"
+  properties:
+  - property: roadway
+    set: 'motorway_link'   
