@@ -3,6 +3,7 @@ tags:
   - 'Year 2015'
   - 'Roadway Property Change'
   - 'facility type ramp'
+  - 'highway review'
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -108,4 +109,8 @@ changes:
       - "3816ecc5bf88b84de783f021dafb349c"
   properties:
   - property: roadway
-    set: 'motorway_link'   
+    set: 'motorway_link'
+  - property: ft
+    set: 3  
+  - property: walk_access
+    set: 1 

@@ -3,6 +3,7 @@ tags:
   - 'Year 2015'
   - 'Roadway Property Change'
   - 'facility type service'
+  - 'highway review'
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -16,4 +17,6 @@ changes:
       - "31decaf49d06d27589241e2912ac56ee"
   properties:
   - property: roadway
-    set: 'service'   
+    set: 'service'
+  - property: ft
+    set: 99   

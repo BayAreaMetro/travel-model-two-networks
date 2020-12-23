@@ -3,6 +3,7 @@ tags:
   - 'Year 2015'
   - 'Roadway Property Change'
   - 'bus only'
+  - 'highway review'
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -19,3 +20,10 @@ changes:
   properties:    
   - property: bus_only
     set: 1
+  - property: ft
+    set: 99
+  - property: transit
+    set: 1
+  - property: drive_access
+    set: 0
+
