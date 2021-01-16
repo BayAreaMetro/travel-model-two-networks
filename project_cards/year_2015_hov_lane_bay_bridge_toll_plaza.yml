@@ -29,8 +29,6 @@ changes:
       set: 1
   - property: segment_id
     set: 5
-  - property: tollbooth
-    set: 5
   - property: ML_useclass
     set: 0
     timeofday:

@@ -9,11 +9,9 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 4032858
       - 4033903
       - 4113965
     - shstReferenceId:
-      - "42540cb7ed261fa5074bc659ba8caee2"
       - "44745ac6ebae7a5b78ba6c4bccc43b68"
       - "e5bab32b8697116f3e53cb25c1d897ac"
   properties:
@@ -32,8 +30,6 @@ changes:
     - time: ['15:00', '19:00']
       set: 1
   - property: segment_id
-    set: 1
-  - property: tollboth
     set: 1
   - property: ML_useclass
     set: 0

@@ -31,6 +31,8 @@ changes:
     set: 3
   - property: tollbooth
     set: 3
+  - property: ML_tollbooth
+    set: 3
   - property: ML_useclass
     set: 0
     timeofday:

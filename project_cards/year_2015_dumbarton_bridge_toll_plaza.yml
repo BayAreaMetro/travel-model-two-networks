@@ -33,6 +33,8 @@ changes:
     set: 7
   - property: tollbooth
     set: 7
+  - property: ML_tollbooth
+    set: 7
   - property: ML_useclass
     set: 0
     timeofday:

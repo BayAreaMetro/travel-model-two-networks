@@ -1,17 +1,18 @@
-project: Year 2015 Modify HOV Lanes and USE on Carquinez Bridge Toll Plaza on I-80 NB - Bridge Pass
+project: Year 2015 Modify HOV Lanes-Fastrak Lanes and USE on San Francisco-Oakland Bay Bridge WB Toll Plaza segment 02 - Bridge Pass
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
   - 'Bridge Pass'
+  - 'bridge toll review'
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
-      - 5007578
+      - 3107408
     - shstReferenceId:
-      - "1fb8993130d2c5535812ede12d2d15c4"
+      - "a1be9886a94386cc8d028bfd5a076ba4"
   properties:
   - property: lanes
     change: 0
@@ -28,18 +29,18 @@ changes:
     - time: ['15:00', '19:00']
       set: 1
   - property: segment_id
-    set: 2
+    set: 5
   - property: tollbooth
-    set: 2
+    set: 5
   - property: ML_tollbooth
-    set: 2
+    set: 5
   - property: ML_useclass
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 2
+      set: 3
     - time: ['15:00', '19:00']
-      set: 2
+      set: 3
   - property: ML_access
     set: 'all'
   - property: ML_egress

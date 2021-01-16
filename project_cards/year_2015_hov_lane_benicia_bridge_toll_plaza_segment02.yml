@@ -1,7 +1,8 @@
-project: Year 2015 Modify HOV Lanes and USE on Carquinez Bridge Toll Plaza on I-80 NB - Bridge Pass
+project: Year 2015 Modify HOV Lanes and USE on Benicia Bridge Toll Plaza - Segment 02 - Bridge Pass
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
+  - 'bridge toll review'
   - 'Bridge Pass'
 dependencies: ''
 changes:
@@ -9,9 +10,9 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 5007578
+      - 4032858
     - shstReferenceId:
-      - "1fb8993130d2c5535812ede12d2d15c4"
+      - "42540cb7ed261fa5074bc659ba8caee2"
   properties:
   - property: lanes
     change: 0
@@ -28,11 +29,11 @@ changes:
     - time: ['15:00', '19:00']
       set: 1
   - property: segment_id
-    set: 2
+    set: 1
   - property: tollbooth
-    set: 2
+    set: 1
   - property: ML_tollbooth
-    set: 2
+    set: 1  
   - property: ML_useclass
     set: 0
     timeofday:
