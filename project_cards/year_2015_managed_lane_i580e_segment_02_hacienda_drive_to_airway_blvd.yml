@@ -1,4 +1,4 @@
-project: Year 2015 Modify Express Lanes and USE on CA-237 WB I-880 to CA-262 Mission Blvd
+project: Year 2015 Modify Express Lanes and USE on I-580 EB (segment 02) Hacienda Drive to Airway Blvd
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
@@ -10,17 +10,22 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 2139185
-      - 2251571
-      - 2101822
-      - 2244507
-      - 2029841
+      - 3136269
+      - 3120154
+      - 3010784
+      - 3053350
+      - 3059861
+      - 3051922
+      - 3161887
     - shstReferenceId:
-      - "8248a8b5c33c19058e722304b9e87dc0"
-      - "ebd26d59b6230f37066c1469aa744486"
-      - "5f1fc75b1b97af03030c1bc6209cf515"
-      - "e52858ab0b4682b2d7e0afa9a3898c24"
-      - "1be04b92f79c191d50da317210c87f0b"
+      - "cceb90413a9f52b28a70d968f4362e41"
+      - "b4e09eb18c43aee9f5d9ce4aea9914ea"
+      - "10477b947616a3014c124be492bf622f"
+      - "5025920e2723e5772cab4a26fe48dbe7"
+      - "5a250b86da239ebc52d683861d4f18b6"
+      - "48336daf4cb146ab09857067c79ff441"
+      - "4df4ca973eece79f41adb93b14c1475f"
+      - "f3c12a0e25207502176968adff57f6ba"
   properties:
   - property: lanes
     change: 0
@@ -39,13 +44,13 @@ changes:
     - time: ['10:00', '15:00']
       set: 1
     - time: ['15:00', '19:00']
-      set: 1 
+      set: 1
   - property: segment_id
-    set: 31
+    set: 28
   - property: ML_tollseg
     set: 1
   - property: ML_tollbooth
-    set: 31 
+    set: 28   
   - property: ML_useclass
     set: 0
     timeofday:

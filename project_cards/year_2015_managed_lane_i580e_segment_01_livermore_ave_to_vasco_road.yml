@@ -1,8 +1,8 @@
-project: Year 2015 Modify HOV Lanes-Fastrak Lanes and USE on San Francisco-Oakland Bay Bridge WB Toll Plaza segment 02 - Bridge Pass
+project: Year 2015 Modify Express Lanes and USE on I-580 EB (segment 01) Livermore Ave to Vasco Road
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
-  - 'Bridge Pass'
+  - 'Express Lanes'
   - 'toll review'
 dependencies: ''
 changes:
@@ -10,37 +10,45 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3107408
+      - 3105865
+      - 3078894
     - shstReferenceId:
-      - "a1be9886a94386cc8d028bfd5a076ba4"
+      - "9f6166830b83cbce9108390c801b9e6f"
+      - "76d1dafbfda8f0e000f8c90780ca152c"
   properties:
   - property: lanes
     change: 0
     timeofday:
     - time: ['6:00', '10:00']
-      change: -1
+      change: -2
+    - time: ['10:00', '15:00']
+      change: -2
     - time: ['15:00', '19:00']
-      change: -1
+      change: -2
   - property: ML_lanes
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 1
+      set: 2
+    - time: ['10:00', '15:00']
+      set: 2
     - time: ['15:00', '19:00']
-      set: 1
+      set: 2    
   - property: segment_id
-    set: 5
-  - property: tollbooth
-    set: 5
+    set: 28
+  - property: ML_tollseg
+    set: 3
   - property: ML_tollbooth
-    set: 5
+    set: 28   
   - property: ML_useclass
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 3
+      set: 4
+    - time: ['10:00', '15:00']
+      set: 4
     - time: ['15:00', '19:00']
-      set: 3
+      set: 4
   - property: ML_access
     set: 'all'
   - property: ML_egress

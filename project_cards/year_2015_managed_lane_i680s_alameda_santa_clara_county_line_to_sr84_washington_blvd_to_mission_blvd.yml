@@ -1,8 +1,8 @@
-project: Year 2015 Modify HOV Lanes-Fastrak Lanes and USE on San Francisco-Oakland Bay Bridge WB Toll Plaza segment 02 - Bridge Pass
+project: Year 2015 Modify Express Lanes and USE on I-680 SB Washington Blvd to Mission Blvd
 tags:
   - 'Year 2015'
   - 'Managed Lanes'
-  - 'Bridge Pass'
+  - 'Express Lanes'
   - 'toll review'
 dependencies: ''
 changes:
@@ -10,14 +10,22 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3107408
+      - 3062326
+      - 3120126
+      - 3065220
+      - 3157167
     - shstReferenceId:
-      - "a1be9886a94386cc8d028bfd5a076ba4"
+      - "5dd2aed813158c62392be446bad86482"
+      - "b4d529a4bab12054ee26a7b2092dff02"
+      - "6219dc0755d904c0023f2acbebb4e185"
+      - "ec7018a4890d0f9343f7a14345a15460"
   properties:
   - property: lanes
     change: 0
     timeofday:
     - time: ['6:00', '10:00']
+      change: -1
+    - time: ['10:00', '15:00']
       change: -1
     - time: ['15:00', '19:00']
       change: -1
@@ -26,22 +34,26 @@ changes:
     timeofday:
     - time: ['6:00', '10:00']
       set: 1
+    - time: ['10:00', '15:00']
+      set: 1
     - time: ['15:00', '19:00']
       set: 1
   - property: segment_id
-    set: 5
-  - property: tollbooth
-    set: 5
+    set: 25
+  - property: ML_tollseg
+    set: 2
   - property: ML_tollbooth
-    set: 5
+    set: 25    
   - property: ML_useclass
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 3
+      set: 4
+    - time: ['10:00', '15:00']
+      set: 4
     - time: ['15:00', '19:00']
-      set: 3
+      set: 4
   - property: ML_access
     set: 'all'
   - property: ML_egress
-    set: 'all'
+    set: 'all'  
