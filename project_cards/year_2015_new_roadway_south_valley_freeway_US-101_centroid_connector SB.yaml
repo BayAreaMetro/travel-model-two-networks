@@ -1,0 +1,17 @@
+project: Year 2015 Add centroid connector at External Station connecting South Valley Freeway US-101 SB
+tags:
+  - 'Year 2015'
+  - 'External Stations Review'
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 2112813
+    B: 900017
+    model_link_id: 26067345
+    lanes: 1
+    ft: 8
+    bike_access: 0
+    drive_access: 1
+    cntype: 'TAZ'
+    walk_access: 0

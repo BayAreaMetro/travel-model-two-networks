@@ -1,0 +1,17 @@
+project: Year 2015 Add centroid connector at External Station connecting William Elton Brown Freeway I-580 SB
+tags:
+  - 'Year 2015'
+  - 'External Stations Review'
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 2587614
+    B: 900013
+    model_link_id: 26067349
+    lanes: 1
+    ft: 8
+    bike_access: 0
+    drive_access: 1
+    cntype: 'TAZ'
+    walk_access: 0

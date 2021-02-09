@@ -1,0 +1,17 @@
+project: Year 2015 Add centroid connector at External Station connecting Geysers Road NB
+tags:
+  - 'Year 2015'
+  - 'External Stations Review'
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 4556142
+    B: 900003
+    model_link_id: 26067356
+    lanes: 1
+    ft: 8
+    bike_access: 0
+    drive_access: 1
+    cntype: 'TAZ'
+    walk_access: 0
