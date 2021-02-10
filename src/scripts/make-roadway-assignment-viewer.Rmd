@@ -1,0 +1,102 @@
+---
+title: "Make Facility Type Viewer"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow",
+                     "sf")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+data_dir <- "../../data/"
+external_dir <- paste0(data_dir, "external/")
+interim_dir <- paste0(data_dir, "interim/")
+processed_dir <- paste0(data_dir, "processed/") 
+
+links_file_name <- paste0(processed_dir, "version_03/link.feather")
+shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
+assignment_file_name_prefix <- paste0(interim_dir, "load_")
+
+output_file_name <- paste0(interim_dir, "roadway-assignment-viewer.geojson")
+```
+
+# Parameters
+```{r parameters}
+ft_dict_df <- tibble(code = seq(0, 8),
+                     label = c("Missing",
+                               "Freeway",
+                               "Expressway",
+                               "Ramp",
+                               "Divided Arterial",
+                               "Undivided Arterial",
+                               "Collector",
+                               "Local",
+                               "Centroid Connector"))
+
+PERIOD_HOURS <- 4L
+```
+
+
+# Data Reads
+```{r read}
+shapes_sf <- readRDS(shape_file_name)
+links_df <- read_feather(links_file_name)
+
+loaded_df <- tibble()
+for (period in c("AM", "PM")) {
+  filename <- paste0(assignment_file_name_prefix, period, ".csv")
+  df <- read_csv(filename, col_types = cols(.default = col_double(), model_link_id = col_integer()))
+  df <- mutate(df, time_period = period) %>%
+    mutate(vphpl = if_else(lanes > 0, volume / lanes / PERIOD_HOURS, 0.0))
+  loaded_df <- bind_rows(loaded_df, df)
+}
+
+```
+
+# Reductions 
+```{r reductions}
+working_df <- loaded_df %>%
+  pivot_longer(., cols = -c(model_link_id, time_period)) %>%
+  mutate(name = paste0(time_period, "_", name)) %>%
+  select(-time_period) %>%
+  pivot_wider(., id_cols = model_link_id) %>%
+  left_join(., ft_dict_df, by = c("AM_ft" = "code")) %>%
+  rename(AM_ft_label = label) %>%
+  left_join(., ft_dict_df, by = c("PM_ft" = "code")) %>%
+  rename(PM_ft_label = label)
+
+ft_to_keep_vector <- c("Freeway", "Expressway", "Ramp", "Divided Arterial", "Undivided Arterial")
+output_sf <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(shstGeometryId, lanes, model_link_id, name, county) %>%
+  left_join(., working_df, by = c("model_link_id")) %>%
+  left_join(., shapes_sf, by = c("shstGeometryId")) %>%
+  filter(AM_ft %in% ft_to_keep_vector | 
+           PM_ft %in% ft_to_keep_vector |
+           AM_vc_ratio > 0.75 |
+           PM_vc_ratio > 0.75 | 
+           AM_volume > 1000.0 |
+           PM_volume > 1000.0)
+
+```
+
+# Write
+```{r write}
+st_write(output_sf, output_file_name, delete_dsn = TRUE)
+```
+
+
