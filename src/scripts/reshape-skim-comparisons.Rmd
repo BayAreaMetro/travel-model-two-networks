@@ -1,0 +1,118 @@
+---
+title: "Reshape Skim Comparisons"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse")
+
+need_to_install <-
+  packages_vector[!(packages_vector %in% installed.packages()[, "Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+interim_dir <- "../../data/interim/"
+
+input_file_name_prefix <- paste0(interim_dir, "skim_comparisons/walk_trn_AM_set")
+output_file_name <- paste0(interim_dir, "skim_comparisons/for-tableau.csv")
+
+```
+
+# Parameters
+```{r parameters}
+LEGACY_PREFIX <- "mtc_"
+REBUILT_PREFIX <- "new_"
+```
+
+# Data Reads
+```{r data-reads}
+input_df <- tibble()
+for (set in seq(1:3)) {
+  
+  file_name <- paste0(input_file_name_prefix, set, "_db.csv")
+  df <- read_csv(file_name, col_types = cols(.default = col_double(),
+                                             period = col_character()))
+  
+  input_df <- bind_rows(input_df, df)
+  
+}
+
+```
+
+# Reductions
+```{r reductions}
+working_df <- input_df %>%
+  mutate(trip_id = row_number()) %>%
+  rename(orig_maz = maz_o, dest_maz = maz_d) %>%
+  mutate(mtc_ivtt = 0.0) %>%
+  mutate(mtc_ivtt = if_else(is.na(mtc_lb_time), mtc_ivtt, mtc_ivtt + mtc_lb_time)) %>%
+  mutate(mtc_ivtt = if_else(is.na(mtc_eb_time), mtc_ivtt, mtc_ivtt + mtc_eb_time)) %>%
+  mutate(mtc_ivtt = if_else(is.na(mtc_fr_time), mtc_ivtt, mtc_ivtt + mtc_fr_time)) %>%
+  mutate(mtc_ivtt = if_else(is.na(mtc_lr_time), mtc_ivtt, mtc_ivtt + mtc_lr_time)) %>%
+  mutate(mtc_ivtt = if_else(is.na(mtc_hr_time), mtc_ivtt, mtc_ivtt + mtc_hr_time)) %>%
+  mutate(mtc_ivtt = if_else(is.na(mtc_cr_time), mtc_ivtt, mtc_ivtt + mtc_cr_time)) %>%
+  mutate(new_ivtt = 0.0) %>%
+  mutate(new_ivtt = if_else(is.na(new_lb_time), new_ivtt, new_ivtt + new_lb_time)) %>%
+  mutate(new_ivtt = if_else(is.na(new_eb_time), new_ivtt, new_ivtt + new_eb_time)) %>%
+  mutate(new_ivtt = if_else(is.na(new_fr_time), new_ivtt, new_ivtt + new_fr_time)) %>%
+  mutate(new_ivtt = if_else(is.na(new_lr_time), new_ivtt, new_ivtt + new_lr_time)) %>%
+  mutate(new_ivtt = if_else(is.na(new_hr_time), new_ivtt, new_ivtt + new_hr_time)) %>%
+  mutate(new_ivtt = if_else(is.na(new_cr_time), new_ivtt, new_ivtt + new_cr_time)) %>%
+  mutate(new_ivtt = if_else(new_ivtt < 0.01, as.numeric(NA), new_ivtt)) %>%
+  pivot_longer(., cols = -c(trip_id, orig_maz, dest_maz, period, skim_set)) %>%
+  mutate(source = if_else(str_detect(name, LEGACY_PREFIX), "Legacy", "Rebuilt")) %>%
+  mutate(name = str_remove(name, LEGACY_PREFIX)) %>%
+  mutate(name = str_remove(name, REBUILT_PREFIX)) %>%
+  rename(skim = name) %>%
+  filter(!is.na(value))
+
+mtc_df <- working_df %>%
+  filter(source == "Legacy") %>%
+  rename(legacy_value = value) %>%
+  select(-source)
+
+new_df <- working_df %>%
+  filter(source == "Rebuilt") %>%
+  rename(rebuilt_value = value) %>%
+  select(-source)
+
+joined_df <- left_join(mtc_df, 
+                       new_df, 
+                       by = c("trip_id", "orig_maz", "dest_maz", "period", "skim_set", "skim")) %>%
+  filter(!(skim == "tap_o")) %>%
+  filter(!(skim == "tap_d"))
+
+transfer_df <- joined_df %>%
+  filter(skim == "xfers") %>%
+  mutate(number_transfers = -9) %>%
+  mutate(number_transfers = if_else(!is.na(rebuilt_value) & legacy_value == rebuilt_value, legacy_value, number_transfers)) %>%
+  select(trip_id, orig_maz, dest_maz, period, skim_set, number_transfers)
+
+output_df <- joined_df %>%
+  left_join(., transfer_df, by = c("trip_id", "orig_maz", "dest_maz", "period", "skim_set")) %>%
+  mutate(number_transfers = replace_na(number_transfers, 0L))
+
+
+
+```
+
+# Write to Disk
+```{r data-write}
+write_csv(output_df, path = output_file_name)
+```
+
+```{r}
+df <- output_df %>%
+  filter(skim == "ivtt")
+```
+
+

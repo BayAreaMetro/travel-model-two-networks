@@ -1,0 +1,150 @@
+---
+title: "Reshape Skim Comparisons"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("arrow",
+                     "stringdist",
+                     "tidyverse")
+
+need_to_install <-
+  packages_vector[!(packages_vector %in% installed.packages()[, "Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+interim_dir <- "../../data/interim/"
+
+input_survey_file_name <- paste0(interim_dir, "onboard-survey-trip-list.feather")
+input_file_name_prefix <- paste0(interim_dir, "survey_")
+output_file_name <- paste0(interim_dir, "on-board-survey-comparison-tableau.csv")
+
+```
+
+# Parameters
+```{r parameters}
+
+```
+
+# Data Reads
+```{r data-reads}
+survey_df <- read_feather(input_survey_file_name)
+
+input_df <- tibble()
+for (access_egress in c("wtw", "dtw", "wtd")) {
+  for (time_period in c("EA", "AM", "MD", "PM", "EV")) {
+    for (set in seq(1:3)) {
+      
+      file_name <- paste0(input_file_name_prefix, access_egress, "_", time_period, "_set", set, "_db.csv")
+      df <- read_csv(file_name, col_types = cols(.default = col_double(),
+                                                 Unique_ID = col_character(),
+                                                 npath = col_integer(),
+                                                 maz_o = col_integer(),
+                                                 maz_d = col_integer(),
+                                                 tap_o = col_integer(),
+                                                 tap_d = col_integer(),
+                                                 period = col_character(),
+                                                 skim_set = col_integer())) %>%
+        mutate(access_egress_path = access_egress)
+      
+      input_df <- bind_rows(input_df, df)
+      
+    }
+  }
+}
+
+```
+
+# Reductions
+```{r reductions}
+working_df <- input_df %>%
+  mutate(lb_time = replace_na(lb_time, 0.0)) %>%
+  mutate(eb_time = replace_na(eb_time, 0.0)) %>%
+  mutate(fr_time = replace_na(fr_time, 0.0)) %>%
+  mutate(hr_time = replace_na(hr_time, 0.0)) %>%
+  mutate(lr_time = replace_na(lr_time, 0.0)) %>%
+  mutate(cr_time = replace_na(cr_time, 0.0)) %>%
+  mutate(network_path_string = if_else(lb_time > 0.0, "LB-", "XX-")) %>%
+  mutate(network_path_string = if_else(eb_time > 0.0, paste0(network_path_string, "EB-"), paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(fr_time > 0.0, paste0(network_path_string, "FR-"), paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(hr_time > 0.0, paste0(network_path_string, "HR-"), paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(lr_time > 0.0, paste0(network_path_string, "LR-"), paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(cr_time > 0.0, paste0(network_path_string, "CR"), paste0(network_path_string, "XX"))) %>%
+  mutate(network_boardings = if_else(is.na(xfers), 1L, as.integer(xfers) + 1L)) %>%
+  select(survey_id = Unique_ID,
+         orig_maz = maz_o, 
+         dest_maz = maz_d,
+         path_number = npath,
+         access_egress_path,
+         boarding_tap = tap_o,
+         alighting_tap = tap_d,
+         time_of_day = period, 
+         network_boardings,
+         skim_set,
+         network_path_string) 
+
+survey_join_df <- survey_df %>%
+  mutate(time_of_day = case_when(
+    day_part == "EARLY AM" ~ "EA",
+    day_part == "AM PEAK" ~ "AM",
+    day_part == "MIDDAY" ~ "MD",
+    day_part == "PM PEAK" ~ "PM",
+    day_part == "EVENING" ~ "NT",
+    day_part == "NIGHT" ~ "NT",
+    TRUE ~ as.character(NA),
+  )) %>%
+  mutate(survey_path_string = if_else(local_bus_in_path == 1, "LB-", "XX-")) %>%
+  mutate(survey_path_string = if_else(express_bus_in_path == 1, paste0(survey_path_string, "EB-"), paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(ferry_in_path == 1, paste0(survey_path_string, "FR-"), paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(heavy_rail_in_path == 1, paste0(survey_path_string, "HR-"), paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(light_rail_in_path == 1, paste0(survey_path_string, "LR-"), paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(commuter_rail_in_path == 1, paste0(survey_path_string, "CR"), paste0(survey_path_string, "XX"))) %>%
+  select(survey_id = Unique_ID,
+         operator, 
+         route,
+         survey_path_string,
+         survey_boardings = boardings,
+         boarding_weight,
+         trip_weight)
+
+all_df <- left_join(working_df, survey_join_df, by = c("survey_id")) %>%
+  mutate(path_difference = stringdist(network_path_string, survey_path_string)/2.0) %>%
+  mutate(path_match = if_else(path_difference == 0, 1L, 0L)) %>%
+  mutate(boardings_difference = abs(network_boardings - survey_boardings)/10.0) %>%
+  mutate(decimal_path_diff = path_difference + boardings_difference) %>%
+  group_by(survey_id) %>%
+  mutate(simulated_path_count = n(), 
+         path_matches = sum(path_match),
+         minimum_path_difference = min(path_difference),
+         minimum_decimal_path_difference = min(decimal_path_diff)) %>%
+  mutate(at_least_one_path_match = sum(path_match) > 0L) %>%
+  ungroup() 
+
+best_df <- all_df %>%
+  filter(decimal_path_diff >= minimum_decimal_path_difference) %>%
+  group_by(survey_id) %>%
+  mutate(min_path_number = min(path_number)) %>%
+  ungroup() %>%
+  filter(path_number == min_path_number) %>%
+  select(survey_id, path_number) %>%
+  mutate(best_match = TRUE)
+  
+output_df <- left_join(all_df, best_df, by = c("survey_id", "path_number")) %>%
+  mutate(best_match = replace_na(best_match, FALSE))
+```
+
+# Write to Disk
+```{r data-write}
+write_csv(output_df, path = output_file_name)
+```
+
+
