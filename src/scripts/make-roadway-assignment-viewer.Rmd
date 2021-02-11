@@ -48,6 +48,8 @@ ft_dict_df <- tibble(code = seq(0, 8),
                                "Centroid Connector"))
 
 PERIOD_HOURS <- 4L
+
+MANAGED_LANE_ID_OFFSET <- 10000000
 ```
 
 
@@ -69,16 +71,32 @@ for (period in c("AM", "PM")) {
 
 # Reductions 
 ```{r reductions}
+managed_df <- loaded_df %>%
+  filter(managed == 1) %>%
+  mutate(model_link_id = model_link_id - MANAGED_LANE_ID_OFFSET) %>%
+  select(model_link_id,
+         time_period,
+         segment_id,
+         number_of_managed_lanes = lanes,
+         managed_lane_volume = volume,
+         managed_lane_time = time,
+         managed_lane_vc_ratio = vc_ratio,
+         managed_lane_congested_speed = congested_speed)
+
 working_df <- loaded_df %>%
-  pivot_longer(., cols = -c(model_link_id, time_period)) %>%
+  filter(managed == 0) %>%
+  left_join(., managed_df, by = c("model_link_id", "segment_id", "time_period")) %>%
+  mutate(volume = if_else(is.na(managed_lane_volume), volume, volume + managed_lane_volume)) %>%
+  mutate(lanes = if_else(is.na(number_of_managed_lanes), lanes, lanes + number_of_managed_lanes)) %>%
+  pivot_longer(., cols = -c(model_link_id, time_period, segment_id)) %>%
   mutate(name = paste0(time_period, "_", name)) %>%
   select(-time_period) %>%
-  pivot_wider(., id_cols = model_link_id) %>%
+  pivot_wider(., id_cols = c(model_link_id, segment_id)) %>%
   left_join(., ft_dict_df, by = c("AM_ft" = "code")) %>%
   rename(AM_ft_label = label) %>%
   left_join(., ft_dict_df, by = c("PM_ft" = "code")) %>%
   rename(PM_ft_label = label)
-
+  
 ft_to_keep_vector <- c("Freeway", "Expressway", "Ramp", "Divided Arterial", "Undivided Arterial")
 output_sf <- links_df %>%
   filter(drive_access == 1) %>%
