@@ -13,5 +13,5 @@ changes:
     ft: 8
     bike_access: 0
     drive_access: 1
-    cntype: 'TAZ'
+    roadway: 'taz'
     walk_access: 0
