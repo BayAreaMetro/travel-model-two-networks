@@ -3,5 +3,5 @@ project: year 2015 golden gate reversible lanes
 category: Calculated Roadway
 ---
 
-self.links_df.loc[self.links_df['model_link_id'] == 8016300, 'lanes'] = [{'default': 3, 'timeofday': [{'time': (54000, 68400), 'value': 1}]}]
+self.links_df.loc[self.links_df['model_link_id'] == 8016300, 'lanes'] = [{'default': 3, 'timeofday': [{'time': (21600, 36000), 'value': 4}, {'time': (54000, 68400), 'value': 2}]}]
 self.links_df.loc[self.links_df['model_link_id'] == 8009897, 'lanes'] = [{'default': 3, 'timeofday': [{'time': (21600, 36000), 'value': 2}, {'time': (54000, 68400), 'value': 4}]}]
