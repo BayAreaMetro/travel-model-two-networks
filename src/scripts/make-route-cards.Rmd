@@ -28,7 +28,7 @@ output_file_name <- paste0(interim_dir, "transit_for_tableau.csv")
 
 # Parameters
 ```{r parameters}
-VERSION <- "version_02"
+VERSION <- "version_03"
 ```
 
 
@@ -71,8 +71,6 @@ output_shapes_df <- select(routes_df, route_id_original, route_id, agency_id, ro
 output_df <- bind_rows(output_stops_df, output_shapes_df)
 
 ```
-
-# Reductions for GTFS Shapes
 
 # Write
 ```{r write}
