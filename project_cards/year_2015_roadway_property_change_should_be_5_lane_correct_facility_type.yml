@@ -1,0 +1,17 @@
+project: Year 2015 Should be 5 Lane correct facility type
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'Major Arterial Review'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 5035518 
+  properties:
+  - property: lanes
+    set: 5
+  - property: ft
+    change: 0

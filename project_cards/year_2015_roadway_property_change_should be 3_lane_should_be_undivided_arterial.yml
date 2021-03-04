@@ -1,0 +1,32 @@
+project: Year 2015 Should be 3 Lane should be Undivided Arterial
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'Major Arterial Review'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 1005141
+      - 1008320
+      - 1017070
+      - 1029031
+      - 1031594
+      - 1043205
+      - 1048046
+      - 1052710
+      - 1054646
+      - 1069899
+      - 1115589
+      - 1116281
+      - 1120982
+      - 1129950
+      - 2328447
+      - 3016642
+  properties:
+  - property: lanes
+    set: 3
+  - property: ft
+    set: 5

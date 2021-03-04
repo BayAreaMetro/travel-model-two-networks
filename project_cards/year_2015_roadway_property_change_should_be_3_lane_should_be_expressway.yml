@@ -1,0 +1,22 @@
+project: Year 2015 Should be 3 Lane should be Expressway
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'Major Arterial Review'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 2007887
+      - 2219738
+      - 2235542
+      - 3010418
+      - 3089171
+      - 3147617
+  properties:
+  - property: lanes
+    set: 3
+  - property: ft
+    set: 2
