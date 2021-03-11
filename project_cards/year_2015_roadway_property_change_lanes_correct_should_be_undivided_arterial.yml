@@ -180,7 +180,5 @@ changes:
       - 8061406
       - 8063080
   properties:
-  - property: lanes
-    change: 0
   - property: ft
     set: 5
