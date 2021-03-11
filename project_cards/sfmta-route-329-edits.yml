@@ -1,0 +1,211 @@
+project: SFMTA Route 329 Edits
+tags: 'Minor Transit'
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route_id: '329'
+    direction_id: 0
+    start_time: 03:00
+    end_time: 06:00
+  properties:
+  - property: routing
+    existing:
+    - -1015135
+    - -1023201
+    - -1021803
+    - -1007769
+    - -1009432
+    - -1017749
+    - -1023022
+    set:
+    - -1015135
+    - -1023201
+    - -1023022
+  facility:
+    route_id: '329'
+    direction_id: 0
+    start_time: 06:00
+    end_time: '10:00'
+  properties:
+  - property: routing
+    existing:
+    - -1015135
+    - -1023201
+    - -1021803
+    - -1007769
+    - -1009432
+    - -1017749
+    - -1023022
+    set:
+    - -1015135
+    - -1023201
+    - -1023022
+  facility:
+    route_id: '329'
+    direction_id: 0
+    start_time: '10:00'
+    end_time: '15:00'
+  properties:
+  - property: routing
+    existing:
+    - -1015135
+    - -1023201
+    - -1021803
+    - -1007769
+    - -1009432
+    - -1017749
+    - -1023022
+    set:
+    - -1015135
+    - -1023201
+    - -1023022
+  facility:
+    route_id: '329'
+    direction_id: 0
+    start_time: '15:00'
+    end_time: '19:00'
+  properties:
+  - property: routing
+    existing:
+    - -1015135
+    - -1023201
+    - -1021803
+    - -1007769
+    - -1009432
+    - -1017749
+    - -1023022
+    set:
+    - -1015135
+    - -1023201
+    - -1023022
+  facility:
+    route_id: '329'
+    direction_id: 0
+    start_time: '19:00'
+    end_time: 03:00
+  properties:
+  - property: routing
+    existing:
+    - -1015135
+    - -1023201
+    - -1021803
+    - -1007769
+    - -1009432
+    - -1017749
+    - -1023022
+    set:
+    - -1015135
+    - -1023201
+    - -1023022
+  facility:
+    route_id: '329'
+    direction_id: 1
+    start_time: 03:00
+    end_time: 06:00
+  properties:
+  - property: routing
+    existing:
+    - -1008624
+    - -1014985
+    - -1001040
+    - -1001229
+    - -1002613
+    - -1007217
+    - -1015810
+    - -1022650
+    - -1003773
+    - -1008738
+    - -1014985
+    set:
+    - -1008624
+    - -1014985
+  facility:
+    route_id: '329'
+    direction_id: 1
+    start_time: 06:00
+    end_time: '10:00'
+  properties:
+  - property: routing
+    existing:
+    - -1008624
+    - -1014985
+    - -1001040
+    - -1001229
+    - -1002613
+    - -1007217
+    - -1015810
+    - -1022650
+    - -1003773
+    - -1008738
+    - -1014985
+    set:
+    - -1008624
+    - -1014985
+  facility:
+    route_id: '329'
+    direction_id: 1
+    start_time: '10:00'
+    end_time: '15:00'
+  properties:
+  - property: routing
+    existing:
+    - -1008624
+    - -1014985
+    - -1001040
+    - -1001229
+    - -1002613
+    - -1007217
+    - -1015810
+    - -1022650
+    - -1003773
+    - -1008738
+    - -1014985
+    set:
+    - -1008624
+    - -1014985
+  facility:
+    route_id: '329'
+    direction_id: 1
+    start_time: '15:00'
+    end_time: '19:00'
+  properties:
+  - property: routing
+    existing:
+    - -1008624
+    - -1014985
+    - -1001040
+    - -1001229
+    - -1002613
+    - -1007217
+    - -1015810
+    - -1022650
+    - -1003773
+    - -1008738
+    - -1014985
+    set:
+    - -1008624
+    - -1014985
+  facility:
+    route_id: '329'
+    direction_id: 1
+    start_time: '19:00'
+    end_time: 03:00
+  properties:
+  - property: routing
+    existing:
+    - -1008624
+    - -1014985
+    - -1001040
+    - -1001229
+    - -1002613
+    - -1007217
+    - -1015810
+    - -1022650
+    - -1003773
+    - -1008738
+    - -1014985
+    set:
+    - -1008624
+    - -1014985
+valid: false
