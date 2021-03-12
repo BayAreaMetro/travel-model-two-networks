@@ -11,10 +11,8 @@ changes:
     link:
     - model_link_id:
       - 3028386
-      - 3126300
     - shstReferenceId:
       - "2abb410a0cf3abe04cb7c622077ea717"
-      - "be0b25b3c93a1c072193df8ae693fd74"
   properties:
   - property: lanes
     change: 0
