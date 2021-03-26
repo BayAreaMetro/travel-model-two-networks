@@ -29,7 +29,7 @@ processed_dir <- paste0(data_dir, "processed/")
 
 links_file_name <- paste0(processed_dir, "version_03/link.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
-assignment_file_name_prefix <- paste0(interim_dir, "load_")
+assigned_csv_prefix <- paste0(interim_dir, "load")
 
 output_file_name <- paste0(interim_dir, "roadway-assignment-viewer.geojson")
 ```
@@ -47,7 +47,8 @@ ft_dict_df <- tibble(code = seq(0, 8),
                                "Local",
                                "Centroid Connector"))
 
-PERIOD_HOURS <- 4L
+period_hours_df <- tibble(time_period = c("AM", "MD", "PM"),
+                          hours = c(4L, 5L, 4L))
 
 MANAGED_LANE_ID_OFFSET <- 10000000
 ```
@@ -59,18 +60,40 @@ shapes_sf <- readRDS(shape_file_name)
 links_df <- read_feather(links_file_name)
 
 loaded_df <- tibble()
-for (period in c("AM", "PM")) {
-  filename <- paste0(assignment_file_name_prefix, period, ".csv")
-  df <- read_csv(filename, col_types = cols(.default = col_double(), model_link_id = col_integer()))
-  df <- mutate(df, time_period = period) %>%
-    mutate(vphpl = if_else(lanes > 0, volume / lanes / PERIOD_HOURS, 0.0))
-  loaded_df <- bind_rows(loaded_df, df)
+for (period in c("AM", "MD", "PM")) {
+  filename <- paste0(assigned_csv_prefix, period, ".csv")
+  df <- read_csv(filename, col_types = cols(.default = col_double(),
+                                            COUNTY = col_character(),
+                                            SHSTGEOMETRYID = col_character(),
+                                            CNTYPE = col_character()))
+  
+  period_hours <- filter(period_hours_df, time_period == period)$hours
+  
+  a_df <- df %>%
+    rename(ml_lanes = matches(paste0("ML_LANES_", period))) %>%
+    rename(lanes = matches(paste0("LANES_", period))) %>%
+    select(model_link_id = MODEL_LINK_ID,
+           lanes,
+           ft = FT,
+           managed = MANAGED,
+           segment_id = SEGMENT_ID,
+           time = TIME_1,
+           vc_ratio = VC_1,
+           congested_speed = CSPD_1,
+           volume = V_1) %>%
+    mutate(time_period = period) %>%
+    mutate(vphpl = if_else(lanes > 0, volume / lanes / period_hours, 0.0))
+  
+  loaded_df <- bind_rows(loaded_df, a_df)
 }
 
 ```
 
+
+
 # Reductions 
 ```{r reductions}
+
 managed_df <- loaded_df %>%
   filter(managed == 1) %>%
   mutate(model_link_id = model_link_id - MANAGED_LANE_ID_OFFSET) %>%
@@ -94,6 +117,8 @@ working_df <- loaded_df %>%
   pivot_wider(., id_cols = c(model_link_id, segment_id)) %>%
   left_join(., ft_dict_df, by = c("AM_ft" = "code")) %>%
   rename(AM_ft_label = label) %>%
+  left_join(., ft_dict_df, by = c("MD_ft" = "code")) %>%
+  rename(MD_ft_label = label) %>%
   left_join(., ft_dict_df, by = c("PM_ft" = "code")) %>%
   rename(PM_ft_label = label)
   
