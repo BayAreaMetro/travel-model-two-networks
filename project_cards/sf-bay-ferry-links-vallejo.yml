@@ -1,0 +1,39 @@
+project: sf bay ferry vallejo missing link
+tags:
+  - 'Year 2015'
+  - "Add Transit"
+  - "sf bay ferry Vallejo Ferry"
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 3541176
+    B: 1028038
+    model_link_id: 26067373
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1028038
+    B: 3541176
+    model_link_id: 26067374
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1028038
+    B: 1028039
+    model_link_id: 26067375
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1028039
+    B: 3541176
+    model_link_id: 26067376
+    lanes: 1
+    ft: 99
+    rail_only: 1

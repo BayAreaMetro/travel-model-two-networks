@@ -1,0 +1,192 @@
+---
+project: sf bay ferry vallejo
+category: Add Transit
+tags:
+  - "sf bay ferry Vallejo Ferry"
+  - "Add Transit"
+---
+
+# Vallejo Ferry
+# add direction 0
+
+# route
+add_d0_routes_df = pd.DataFrame(
+  {"route_id" : ["386"],
+   "route_id_original" : ["3"],
+   "agency_id" : ["SB"],
+   "route_short_name" : ["Vallejo Ferry"],
+   "route_long_name" : ["Vallejo - San Francisco"],
+   "route_type" : [4],
+   "agency_raw_name" : ["SF_Bay_Ferry2016_07_01"]
+  }
+)
+
+self.feed.routes = self.feed.routes.append(
+  add_d0_routes_df,
+  sort = False,
+  ignore_index = True
+)
+
+# trip
+add_d0_trips_df = pd.DataFrame(
+  {"route_id" : "386",
+   "direction_id" : 0,
+   "trip_id" : ["22915", "22908", "22910", "22892"],
+   "shape_id" : ["1151","101151","1151","1151"],
+   "agency_raw_name" : "SF_Bay_Ferry2016_07_01"
+  }
+)
+
+self.feed.trips = self.feed.trips.append(
+  add_d0_trips_df,
+  sort = False,
+  ignore_index = True
+)
+
+# stop
+add_d0_stops_df = pd.DataFrame(
+  {"stop_id" : ["11942"],
+   "stop_name" : ["Vallejo Ferry Terminal"],
+   "stop_lat" : [38.100149],
+   "stop_lon" : [-122.262586],
+   "model_node_id" : ["3541176"]
+  }
+)
+
+self.feed.stops = self.feed.stops.append(
+  add_d0_stops_df,
+  sort = False,
+  ignore_index = True
+)
+
+# stop_time
+add_d0_stop_times_df = pd.DataFrame(
+  {"trip_id" : ["22915", "22915","22915","22915",
+                "22908", "22908",
+                "22910","22910","22910","22910",
+                "22892", "22892", "22892", "22892"],
+   "stop_sequence" : [1,2,3,4,
+                      1,2,
+                      1,2,3,4,
+                      1,2,3,4],
+   "arrival_time" : [0,3600,3900,7500,
+                     0,4200,
+                     0,3600,4200,7800,
+                     0,3600,4200,7800],
+   "departure_time" : [0,3600,3900,7500,
+                     0,4200,
+                     0,3600,4200,7800,
+                     0,3600,4200,7800],
+   "stop_id" : ["11942","11944","11944","11942",
+                "11942","11944",
+                "11942","11944","11944","11942",
+                "11942","11944","11944","11942"]
+  }
+)
+
+self.feed.stop_times = self.feed.stop_times.append(
+  add_d0_stop_times_df,
+  sort = False,
+  ignore_index = True
+)
+
+# shape
+add_d0_shapes_df = pd.DataFrame(
+  {"shape_id" : ["1151","1151","1151","1151", "101151","101151"],
+   "shape_pt_sequence" : [1,2,3,4,
+                          1,2],
+   "shape_model_node_id" : ["3541176","1028038","1028038","3541176",
+                            "3541176","1028038"],
+  }
+)
+
+self.feed.shapes = self.feed.shapes.append(
+  add_d0_shapes_df,
+  sort = False,
+  ignore_index = True
+)
+
+# frequency
+add_d0_freqs_df = pd.DataFrame(
+  {"trip_id" : ["22915", "22908", "22910", "22892"],
+   "headway_secs" : [3600, 3600, 6000, 1800],
+   "start_time" : [10800, 21600, 36000, 54000],
+   "end_time" : [21600, 36000, 54000, 68400]
+  }
+)
+
+self.feed.frequencies = self.feed.frequencies.append(
+  add_d0_freqs_df,
+  sort = False,
+  ignore_index = True
+)
+
+
+# Vallejo Ferry
+# add direction 1
+
+# trip
+add_d1_trips_df = pd.DataFrame(
+  {"route_id" : "386",
+   "direction_id" : 1,
+   "trip_id" : ["22909", "22889"],
+   "shape_id" : "1152",
+   "agency_raw_name" : "SF_Bay_Ferry2016_07_01"
+  }
+)
+
+self.feed.trips = self.feed.trips.append(
+  add_d1_trips_df,
+  sort = False,
+  ignore_index = True
+)
+
+# stop_time
+add_d1_stop_times_df = pd.DataFrame(
+  {"trip_id" : ["22909", "22909","22909","22909", "22909","22909",
+                "22889", "22889", "22889","22889", "22889", "22889"],
+   "stop_sequence" : [1,2,3,4,5,6,
+                      1,2,3,4,5,6],
+   "arrival_time" : [0,3600,4200,4800,5400,9000,
+                     0,3600,4200,4800,5400,9000],
+   "departure_time" : [0,3600,4200,4800,5400,9000,
+                     0,3600,4200,4800,5400,9000],
+   "stop_id" : ["11942","11944","11944","11941","11941","11942",
+                "11942","11944","11944","11941","11941","11942"]
+  }
+)
+
+self.feed.stop_times = self.feed.stop_times.append(
+  add_d1_stop_times_df,
+  sort = False,
+  ignore_index = True
+)
+
+# shape
+add_d1_shapes_df = pd.DataFrame(
+  {"shape_id" : "1152",
+   "shape_pt_sequence" : [1,2,3,4,5,6],
+   "shape_model_node_id" : ["3541176","1028038","1028038","1028039","1028039","3541176"],
+  }
+)
+
+self.feed.shapes = self.feed.shapes.append(
+  add_d1_shapes_df,
+  sort = False,
+  ignore_index = True
+)
+
+# frequency
+add_d1_freqs_df = pd.DataFrame(
+  {"trip_id" : ["22909", "22889"],
+   "headway_secs" : [14400, 9000],
+   "start_time" : [21600, 36000],
+   "end_time" : [36000, 54000]
+  }
+)
+
+self.feed.frequencies = self.feed.frequencies.append(
+  add_d1_freqs_df,
+  sort = False,
+  ignore_index = True
+)

@@ -1,0 +1,155 @@
+---
+project: sf bay ferry al-ok-sf
+category: Add Transit
+tags:
+  - "sf bay ferry Alameda - Oakland - San Francisco Ferry"
+  - "Add Transit"
+---
+
+# Alameda - Oakland - San Francisco Ferry
+# add stop time for EV
+self.feed.stop_times.loc[self.feed.stop_times.trip_id == "22810", "arrival_time"] = [0,900,2400]
+self.feed.stop_times.loc[self.feed.stop_times.trip_id == "22810", "departure_time"] = [0,900,2400]
+
+# Alameda - Oakland - San Francisco Ferry
+# add direction 0 AM and MD
+
+# trip
+add_alo_d0_trips_df = self.feed.trips[
+  (self.feed.trips.route_id.isin(["383"])) &
+  (self.feed.trips.trip_id.isin(["22810", "22848"]))
+].copy()
+
+add_alo_d0_trips_df.loc[add_alo_d0_trips_df.trip_id == "22810", "trip_id"] = "22896"
+add_alo_d0_trips_df.loc[add_alo_d0_trips_df.trip_id == "22848", "trip_id"] = "22894"
+
+self.feed.trips = self.feed.trips.append(
+  add_alo_d0_trips_df,
+  sort = False,
+  ignore_index = True
+)
+
+# stop
+
+# stop_time
+add_alo_d0_stop_times_df = self.feed.stop_times[
+  self.feed.stop_times.trip_id.isin(["22810", "22848"])
+].copy()
+
+add_alo_d0_stop_times_df.loc[add_alo_d0_stop_times_df.trip_id == "22810", "trip_id"] = "22896"
+add_alo_d0_stop_times_df.loc[add_alo_d0_stop_times_df.trip_id == "22848", "trip_id"] = "22894"
+
+self.feed.stop_times = self.feed.stop_times.append(
+  add_alo_d0_stop_times_df,
+  sort = False,
+  ignore_index = True
+)
+# shape
+
+# frequency
+add_alo_d0_freqs_df = self.feed.frequencies[
+  self.feed.frequencies.trip_id.isin(["22810", "22848"])
+].copy()
+
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22810", "trip_id"] = "22896"
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22848", "trip_id"] = "22894"
+
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22896", "headway_secs"] = 2000
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22894", "headway_secs"] = 1800
+
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22896", "start_time"] = 36000
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22894", "start_time"] = 21600
+
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22896", "end_time"] = 54000
+add_alo_d0_freqs_df.loc[add_alo_d0_freqs_df.trip_id == "22894", "end_time"] = 36000
+
+self.feed.frequencies = self.feed.frequencies.append(
+  add_alo_d0_freqs_df,
+  sort = False,
+  ignore_index = True
+)
+
+# Alameda - Oakland - San Francisco Ferry
+# add direction 1 AM, MD, PM, EV
+
+# trip
+add_alo_d1_trips_df = pd.DataFrame(
+  {"route_id" : "383",
+   "direction_id" : 1,
+   "trip_id" : ["22898", "22899", "22900", "22838"],
+   "shape_id" : ["101148", "101149", "101150", "101150"],
+   "agency_raw_name" : "SF_Bay_Ferry2016_07_01"
+  }
+)
+
+self.feed.trips = self.feed.trips.append(
+  add_alo_d1_trips_df,
+  sort = False,
+  ignore_index = True
+)
+
+# stop_time
+add_alo_d1_stop_times_df = pd.DataFrame(
+  {"trip_id" : ["22838", "22838","22838",
+                "22898", "22898", "22898",
+                "22899", "22899", "22899", "22899",
+                "22900", "22900", "22900"],
+   "stop_sequence" : [1,2,3,
+                      1,2,3,
+                      1,2,3,4,
+                      1,2,3],
+   "arrival_time" : [0,1200,1800,
+                     0,2100,2700,
+                     0,900,2100,2700,
+                     0,1800,2400],
+   "departure_time" : [0,1200,1800,
+                     0,2100,2700,
+                     0,900,2100,2700,
+                     0,1800,2400],
+   "stop_id" : ["11944","11936","11937",
+                "11944","11937","11938",
+                "11941","11944","11936","11937",
+                "11944","11936","11937"]
+  }
+)
+
+self.feed.stop_times = self.feed.stop_times.append(
+  add_alo_d1_stop_times_df,
+  sort = False,
+  ignore_index = True
+)
+
+# shape
+add_alo_d1_shapes_df = pd.DataFrame(
+  {"shape_id" : ["101150", "101150","101150",
+                 "101148", "101148", "101148",
+                 "101149", "101149", "101149", "101149"],
+   "shape_pt_sequence" : [1,2,3,
+                          1,2,3,
+                          1,2,3,4],
+   "shape_model_node_id" : ["1028038","2598644","2625964",
+                            "1028038","2625964","2625965",
+                            "1028039","1028038","2598644","2625964"],
+  }
+)
+
+self.feed.shapes = self.feed.shapes.append(
+  add_alo_d1_shapes_df,
+  sort = False,
+  ignore_index = True
+)
+
+# frequency
+add_alo_d1_freqs_df = pd.DataFrame(
+  {"trip_id" : ["22898", "22899", "22900", "22838"],
+   "headway_secs" : [1800, 2000, 1200, 3600],
+   "start_time" : [21600, 36000, 54000, 68400],
+   "end_time" : [36000, 54000, 68400, 10800]
+  }
+)
+
+self.feed.frequencies = self.feed.frequencies.append(
+  add_alo_d1_freqs_df,
+  sort = False,
+  ignore_index = True
+)
