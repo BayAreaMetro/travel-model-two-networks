@@ -1,0 +1,132 @@
+project: move street rail to street connector links
+tags:
+  - 'Year 2015'
+  - "Major Transit links"
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 74689
+      - 74753
+      - 23293
+      - 74231
+      - 74247
+      - 74718
+      - 73950
+  properties:
+  - property: drive_access
+    set: 1
+- category: Add New Roadway
+  links:
+  - A: 1027969
+    B: 1009869
+    model_link_id: 26067378
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027970
+    B: 1003537
+    model_link_id: 26067379
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1009896
+    B: 1028036
+    model_link_id: 26067381
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1002433
+    B: 1027908
+    model_link_id: 26067382
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027826
+    B: 1002433
+    model_link_id: 26067383
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1010580
+    B: 1027905
+    model_link_id: 26067386
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027829
+    B: 1012791
+    model_link_id: 26067387
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027955
+    B: 1015862
+    model_link_id: 26067389
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027951
+    B: 1011387
+    model_link_id: 26067390
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1011914
+    B: 1027952
+    model_link_id: 26067391
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1013049
+    B: 1028006
+    model_link_id: 26067392
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1028010
+    B: 1009043
+    model_link_id: 26067394
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1014376
+    B: 1027665
+    model_link_id: 26067395
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027646
+    B: 1011164
+    model_link_id: 26067396
+    lanes: 1
+    ft: 99
+    rail_only: 1
