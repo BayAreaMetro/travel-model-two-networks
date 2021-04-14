@@ -1,4 +1,4 @@
-project: Add San Mateo Bridge Toll Plaza
+project: Add Golden Gate Bridge Toll Plaza
 tags:
   - 'Year 2015'
   - 'Toll Plaza'
@@ -7,40 +7,40 @@ changes:
 - category: Roadway Deletion
   links:
     model_link_id:
-    - 3073690
+    - 8016300
 - category: Add New Roadway
   links:
-  - A: 2562924
-    B: 5030000
+  - A: 5013515
+    B: 5030001
     bike_access: 0
-    county: 'Alameda'
+    county: 'Marin'
     drive_access: 1
-    model_link_id: 3315451
+    model_link_id: 8063197
     rail_only: 0
     shstGeometryId: ''
     walk_access: 0
     tollbooth: 0
     ft: 1
     lanes: 4
-  - A: 5030000
-    B: 2535792
+  - A: 5030001
+    B: 1005772
     bike_access: 0
-    county: 'Alameda'
+    county: 'Marin'
     drive_access: 1
-    model_link_id: 3315452
+    model_link_id: 8063198
     rail_only: 0
     shstGeometryId: ''
     walk_access: 0
     ft: 7
-    lanes: 7
+    lanes: 9
   nodes:
   - bike_access: 0
-    county: 'Alameda'
+    county: 'Marin'
     drive_access: 0
     rail_only: 0
     walk_access: 0
-    model_node_id: 5030000
+    model_node_id: 5030001
     osm_node_id: ''
-    X: 4849545.75458
-    Y: 3674876.56127
+    X: 4758566.06014
+    Y: 3749252.88293
 valid: false

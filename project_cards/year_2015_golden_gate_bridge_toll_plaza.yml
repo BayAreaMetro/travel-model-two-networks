@@ -3,15 +3,43 @@ tags:
   - 'Year 2015'
   - 'Bridge Pass'
   - 'toll review'
-dependencies: ''
+dependencies:
+  prerequisites: 'Add Golden Gate Bridge Toll Plaza'
 changes:
-- category: Roadway Property Change
+- category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
-      - 8016300
+      - 8063198
   properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -2
+    - time: ['15:00', '19:00']
+      change: -2
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['15:00', '19:00']
+      set: 2
   - property: segment_id
     set: 4
   - property: tollbooth
     set: 4
+  - property: ML_tollbooth
+    set: 4
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 2
+    - time: ['15:00', '19:00']
+      set: 2
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'
