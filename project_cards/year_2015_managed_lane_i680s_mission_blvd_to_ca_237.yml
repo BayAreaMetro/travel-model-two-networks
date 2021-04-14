@@ -43,7 +43,7 @@ changes:
   - property: ML_tollseg
     set: 3
   - property: ML_tollbooth
-    set: 25    
+    set: 25
   - property: ML_useclass
     set: 0
     timeofday:
@@ -54,6 +54,6 @@ changes:
     - time: ['15:00', '19:00']
       set: 4
   - property: ML_access
-    set: 'all'
+    set: [2601773]
   - property: ML_egress
-    set: 'all'  
+    set: [2601773, 2001645]  

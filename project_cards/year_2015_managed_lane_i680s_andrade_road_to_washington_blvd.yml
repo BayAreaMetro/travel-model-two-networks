@@ -1,0 +1,69 @@
+project: Year 2015 Modify Express Lanes and USE on I-680 SB Andrade Road to Washington Blvd
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes Review'
+  - 'Express Lanes'
+  - 'toll review'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3001245
+      - 3029924
+      - 3123283
+      - 3023846
+      - 3064500
+      - 3093454
+      - 3030010
+      - 3111078
+      - 3116621
+    - shstReferenceId:
+      - "01e1fac1a94909bfa0a325ca213dfbd6"
+      - "2cf8f16b7810eb966dca71682f93e9e7"
+      - "b98a348d0ce38bf12626b524f6492e5b"
+      - "23fdfd7bf3518e25698ef1630ac02f31"
+      - "60ff0ed3950ba94a3ba6a912d0ab9bc2"
+      - "8cb82c65915dfcaa72fe52cba554e0af"
+      - "2d162e6155ee42bdb79741cacd4390f7"
+      - "a75a389b2735fddd1486c46aab328961"
+      - "afa405d8360cd781226a5414b7e58e24"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      change: -1
+    - time: ['10:00', '15:00']
+      change: -1
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 1
+    - time: ['10:00', '15:00']
+      set: 1
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 25
+  - property: ML_tollseg
+    set: 1
+  - property: ML_tollbooth
+    set: 25
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['6:00', '10:00']
+      set: 4
+    - time: ['10:00', '15:00']
+      set: 4
+    - time: ['15:00', '19:00']
+      set: 4
+  - property: ML_access
+    set: [2501277, 2585590]
+  - property: ML_egress
+    set: [2585590]  
