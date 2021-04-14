@@ -4,30 +4,29 @@ tags:
   - 'Managed Lanes Review'
   - 'Bridge Pass'
   - 'toll review'
-dependencies: ''
+dependencies:
+  prerequisites: 'Add San Mateo Bridge Toll Plaza'
 changes:
 - category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
-      - 3073690
-    - shstReferenceId:
-      - "6efbc4296c278e94b543481fbbf1ac3f"
+      - 3315452
   properties:
   - property: lanes
     change: 0
     timeofday:
     - time: ['6:00', '10:00']
-      change: -1
+      change: -2
     - time: ['15:00', '19:00']
-      change: -1
+      change: -2
   - property: ML_lanes
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 1
+      set: 2
     - time: ['15:00', '19:00']
-      set: 1
+      set: 2 
   - property: segment_id
     set: 6
   - property: tollbooth
