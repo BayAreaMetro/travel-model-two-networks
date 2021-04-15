@@ -34,7 +34,7 @@ shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 assigned_csv_prefix <- paste0(interim_dir, "loaded_net/new_net/", version, "/csv/", "load")
 legacy_assigned_csv_prefix <- paste0(interim_dir, "loaded_net/mtc_net/csv/", "load")
 
-pems_match_file_name <- paste0(interim_dir, "mtc/pems_conflation_result.geojson")
+pems_match_file_name <- paste0(interim_dir, "pems_conflation_result.geojson")
 
 conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 
@@ -77,8 +77,7 @@ for (period in c("AM", "MD", "PM")) {
   filename <- paste0(assigned_csv_prefix, period, ".csv")
   df <- read_csv(filename, col_types = cols(.default = col_double(),
                                             COUNTY = col_character(),
-                                            SHSTGEOMETRYID = col_character(),
-                                            "SHSTGEOMETRYID=032" = col_character(),
+                                            `SHSTGEOMETRYID=032` = col_character(),
                                             CNTYPE = col_character()))
   
   period_hours <- filter(period_hours_df, time_period == period)$hours
@@ -87,6 +86,7 @@ for (period in c("AM", "MD", "PM")) {
     rename(ml_lanes = matches(paste0("ML_LANES_", period))) %>%
     rename(lanes = matches(paste0("LANES_", period))) %>%
     select(model_link_id = MODEL_LINK_ID,
+           distance = DISTANCE,
            lanes,
            ft = FT,
            managed = MANAGED,
@@ -104,7 +104,15 @@ for (period in c("AM", "MD", "PM")) {
 legacy_loaded_df <- tibble()
 for (period in c("AM", "MD", "PM")) {
   filename <- paste0(legacy_assigned_csv_prefix, period, ".csv")
-  df <- read_csv(filename, quote = "")
+  df <- read_csv(filename, quote = "", col_types = cols(.default = col_double(),
+                                                        NAME = col_character(),
+                                                        TOLLRD = col_character(),
+                                                        ONEWAY = col_character(),
+                                                        CARRIAGE = col_character(),
+                                                        CNTYPE = col_character(),
+                                                        HIGHWAYT = col_character(),
+                                                        `PED_FLAG=001` = col_character(),
+                                                        RTEDIR = col_character()))
   
   period_hours <- filter(period_hours_df, time_period == period)$hours
   
@@ -129,16 +137,18 @@ for (period in c("AM", "MD", "PM")) {
 
 # Reductions 
 ```{r reductions}
+distance_df <- loaded_df %>%
+  distinct(model_link_id, distance)
 
 pems_reduction_df <- pems_df %>%
   select(shstReferenceId, year, type, time_period, avg_flow, avg_speed) %>%
   filter(year %in% c(2014, 2015, 2016)) %>%
   group_by(shstReferenceId, type, time_period) %>%
   summarise(avg_flow = mean(avg_flow),
-            avg_speed = mean(avg_speed)) %>%
+            avg_speed = mean(avg_speed), .groups = "drop") %>%
   group_by(shstReferenceId, time_period) %>%
   summarise(avg_flow = sum(avg_flow),
-            avg_speed = sum(avg_speed)) %>%
+            avg_speed = sum(avg_speed), .groups = "drop") %>%
   rename(pems_volume = avg_flow, pems_speed = avg_speed) %>%
   pivot_longer(., cols = -c(shstReferenceId, time_period)) %>%
   mutate(name = paste0(time_period, "_", name)) %>%
@@ -172,6 +182,7 @@ managed_df <- loaded_df %>%
 
 working_df <- loaded_df %>%
   filter(managed == 0) %>%
+  select(-distance) %>%
   left_join(., managed_df, by = c("model_link_id", "segment_id", "time_period")) %>%
   mutate(volume = if_else(is.na(managed_lane_volume), volume, volume + managed_lane_volume)) %>%
   mutate(lanes = if_else(is.na(number_of_managed_lanes), lanes, lanes + number_of_managed_lanes)) %>%
@@ -194,6 +205,7 @@ output_sf <- links_df %>%
   left_join(., pems_reduction_df, by = c("shstReferenceId")) %>%
   left_join(., legacy_df, by = c("shstReferenceId")) %>%
   left_join(., shapes_sf, by = c("shstGeometryId")) %>%
+  left_join(., distance_df, by = c("model_link_id")) %>%
   filter(AM_ft_label %in% ft_to_keep_vector | 
            PM_ft_label %in% ft_to_keep_vector 
         )
