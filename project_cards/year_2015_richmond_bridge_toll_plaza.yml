@@ -14,6 +14,10 @@ changes:
     - shstReferenceId:
       - "e8a712ba58f30c910ff65a46eb6b605e"
   properties:
+  - property: ft
+    set: 7
+  - property: lanes
+    set: 7
   - property: lanes
     change: 0
     timeofday:

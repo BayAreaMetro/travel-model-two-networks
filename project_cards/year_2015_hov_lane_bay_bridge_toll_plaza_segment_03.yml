@@ -14,20 +14,24 @@ changes:
     - shstReferenceId:
       - "4e570e4d6b3e00ac9fb9af5808e8f2d3"
   properties:
+  - property: ft
+    set: 7
+  - property: lanes
+    set: 16
   - property: lanes
     change: 0
     timeofday:
     - time: ['6:00', '10:00']
-      change: -1
+      change: -2
     - time: ['15:00', '19:00']
-      change: -1
+      change: -2
   - property: ML_lanes
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 1
+      set: 2
     - time: ['15:00', '19:00']
-      set: 1
+      set: 2
   - property: segment_id
     set: 5
   - property: tollbooth
