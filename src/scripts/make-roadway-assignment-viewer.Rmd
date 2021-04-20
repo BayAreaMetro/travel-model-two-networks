@@ -1,5 +1,5 @@
 ---
-title: "Make Facility Type Viewer"
+title: "Make Roadway Assignment Viewer"
 output: html_notebook
 ---
 
@@ -39,6 +39,7 @@ pems_match_file_name <- paste0(interim_dir, "pems_conflation_result.geojson")
 conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 
 output_file_name <- paste0(interim_dir, "roadway-assignment-viewer.geojson")
+output_join_road_names <- paste0(interim_dir, "roadway-assignment-names-helper.csv")
 ```
 
 # Parameters
@@ -77,7 +78,7 @@ for (period in c("AM", "MD", "PM")) {
   filename <- paste0(assigned_csv_prefix, period, ".csv")
   df <- read_csv(filename, col_types = cols(.default = col_double(),
                                             COUNTY = col_character(),
-                                            `SHSTGEOMETRYID=032` = col_character(),
+                                            SHSTGEOMETRYID = col_character(),
                                             CNTYPE = col_character()))
   
   period_hours <- filter(period_hours_df, time_period == period)$hours
@@ -86,7 +87,7 @@ for (period in c("AM", "MD", "PM")) {
     rename(ml_lanes = matches(paste0("ML_LANES_", period))) %>%
     rename(lanes = matches(paste0("LANES_", period))) %>%
     select(model_link_id = MODEL_LINK_ID,
-           distance = DISTANCE,
+           feet = FEET,
            lanes,
            ft = FT,
            managed = MANAGED,
@@ -95,6 +96,8 @@ for (period in c("AM", "MD", "PM")) {
            vc_ratio = VC_1,
            congested_speed = CSPD_1,
            volume = V_1) %>%
+    mutate(distance = feet/5280.0) %>%
+    select(-feet) %>%
     mutate(time_period = period) %>%
     mutate(vphpl = if_else(lanes > 0, volume / lanes / period_hours, 0.0))
   
@@ -111,7 +114,7 @@ for (period in c("AM", "MD", "PM")) {
                                                         CARRIAGE = col_character(),
                                                         CNTYPE = col_character(),
                                                         HIGHWAYT = col_character(),
-                                                        `PED_FLAG=001` = col_character(),
+                                                        PED_FLAG = col_character(),
                                                         RTEDIR = col_character()))
   
   period_hours <- filter(period_hours_df, time_period == period)$hours
@@ -137,6 +140,43 @@ for (period in c("AM", "MD", "PM")) {
 
 # Reductions 
 ```{r reductions}
+names_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(model_link_id, name) %>%
+  mutate(name = str_replace(name, "\\[", "")) %>%
+  mutate(name = str_replace(name, "\\]", "")) %>%
+  mutate(name = str_replace_all(name, "'", "")) %>%
+  separate(name, 
+           into = sprintf("%02d", seq(1:5)), 
+           sep = ",",
+           remove = TRUE,
+           extra = "drop",
+           fill = "right") %>%
+  pivot_longer(cols = -c(model_link_id),
+               names_to = "index",
+               values_to = "name") %>%
+  select(-index) %>%
+  mutate(name = trimws(name)) %>%
+  filter(!is.na(name)) %>%
+  filter(name != "nan") %>%
+  filter(name != "") %>%
+  distinct(model_link_id, name) %>%
+  group_by(model_link_id) %>%
+  mutate(index = row_number()) %>%
+  ungroup() %>%
+  pivot_wider(id_cols = model_link_id,
+              names_prefix = "name_",
+              names_from = index,
+              values_from = name) %>%
+  mutate(name = if_else(is.na(name_2), name_1, paste0(name_1, "/", name_2))) %>%
+  mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
+  mutate(simple_name = str_replace(name, " Avenue", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Street", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Drive", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Boulevard", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Way", "")) %>%
+  select(model_link_id, name, simple_name)
+
 distance_df <- loaded_df %>%
   distinct(model_link_id, distance)
 
@@ -200,8 +240,9 @@ working_df <- loaded_df %>%
 ft_to_keep_vector <- c("Freeway", "Expressway", "Ramp", "Divided Arterial", "Undivided Arterial")
 output_sf <- links_df %>%
   filter(drive_access == 1) %>%
-  select(shstGeometryId, shstReferenceId, lanes, model_link_id, name, county) %>%
+  select(shstGeometryId, shstReferenceId, lanes, model_link_id, county) %>%
   left_join(., working_df, by = c("model_link_id")) %>%
+  left_join(., names_df, by = c("model_link_id")) %>%
   left_join(., pems_reduction_df, by = c("shstReferenceId")) %>%
   left_join(., legacy_df, by = c("shstReferenceId")) %>%
   left_join(., shapes_sf, by = c("shstGeometryId")) %>%
