@@ -130,3 +130,35 @@ changes:
     lanes: 1
     ft: 99
     rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1027862
+    B: 1000377
+    model_link_id: 26067397
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1003537
+    B: 1027970
+    model_link_id: 26067398
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1008816
+    B: 1028011
+    model_link_id: 26067399
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1018021
+    B: 1028031
+    model_link_id: 26067400
+    lanes: 1
+    ft: 99
+    rail_only: 1
