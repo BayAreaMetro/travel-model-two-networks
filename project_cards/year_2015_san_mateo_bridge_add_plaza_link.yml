@@ -22,6 +22,7 @@ changes:
     tollbooth: 0
     ft: 1
     lanes: 4
+    assignable: 1
   - A: 5030000
     B: 2535792
     bike_access: 0
@@ -33,6 +34,7 @@ changes:
     walk_access: 0
     ft: 7
     lanes: 7
+    assignable: 1
   nodes:
   - bike_access: 0
     county: 'Alameda'

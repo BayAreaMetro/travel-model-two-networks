@@ -15,24 +15,26 @@ changes:
     bike_access: 0
     county: 'Marin'
     drive_access: 1
-    model_link_id: 8063197
+    model_link_id: 8063198
     rail_only: 0
     shstGeometryId: ''
     walk_access: 0
     tollbooth: 0
     ft: 1
     lanes: 4
+    assignable: 1
   - A: 5030001
     B: 1005772
     bike_access: 0
     county: 'Marin'
     drive_access: 1
-    model_link_id: 8063198
+    model_link_id: 8063199
     rail_only: 0
     shstGeometryId: ''
     walk_access: 0
     ft: 7
     lanes: 9
+    assignable: 1
   nodes:
   - bike_access: 0
     county: 'Marin'
