@@ -38,7 +38,7 @@ changes:
   nodes:
   - bike_access: 0
     county: 'Alameda'
-    drive_access: 0
+    drive_access: 1
     rail_only: 0
     walk_access: 0
     model_node_id: 5030000

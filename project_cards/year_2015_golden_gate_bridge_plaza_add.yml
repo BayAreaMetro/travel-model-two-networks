@@ -21,7 +21,7 @@ changes:
     walk_access: 0
     tollbooth: 0
     ft: 1
-    lanes: 4
+    lanes: 3
     assignable: 1
   - A: 5030001
     B: 1005772
@@ -38,7 +38,7 @@ changes:
   nodes:
   - bike_access: 0
     county: 'Marin'
-    drive_access: 0
+    drive_access: 1
     rail_only: 0
     walk_access: 0
     model_node_id: 5030001
