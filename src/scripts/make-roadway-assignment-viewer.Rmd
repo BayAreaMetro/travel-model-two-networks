@@ -261,4 +261,14 @@ output_sf <- links_df %>%
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
 ```
 
+# Debug
+```{r}
+bridge_link_ids <- c(8063198, 8063199, 3315451, 3315452)
+df <- loaded_df %>%
+  filter(model_link_id %in% bridge_link_ids)
+
+l_df <- links_df %>%
+  filter(model_link_id %in% bridge_link_ids)
+  
+```
 
