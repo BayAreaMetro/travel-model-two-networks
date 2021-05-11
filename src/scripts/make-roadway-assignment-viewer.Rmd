@@ -7,6 +7,7 @@ output: html_notebook
 # Overhead
 ```{r overhead, include = FALSE}
 packages_vector <- c("tidyverse",
+                     "jsonlite",
                      "arrow",
                      "sf")
 
@@ -29,7 +30,7 @@ processed_dir <- paste0(data_dir, "processed/")
 
 version <- "version_09"
 
-links_file_name <- paste0(processed_dir, "version_03/link.feather")
+links_file_name <- paste0(processed_dir, version, "/links.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 assigned_csv_prefix <- paste0(interim_dir, "loaded_net/new_net/", version, "/", "load")
 legacy_assigned_csv_prefix <- paste0(interim_dir, "loaded_net/mtc_net/csv/", "load")
@@ -137,10 +138,25 @@ for (period in c("AM", "MD", "PM")) {
 
 ```
 
-
-
 # Reductions 
 ```{r reductions}
+# Lanes database
+working_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(model_link_id, lanes)
+
+lanes_df <- working_df %>%
+  filter(str_length(lanes) > 1) %>%
+  separate(., lanes, into = c("default", "drop"), sep = ",", remove = FALSE, extra = "drop") %>%
+  mutate(default_lanes = str_replace(default, "\\{'default': ", "")) %>%
+  select(-lanes, -drop) %>%
+  select(model_link_id, lanes = default_lanes) %>%
+  bind_rows(., filter(working_df, str_length(lanes) == 1)) %>%
+  mutate(lanes = as.integer(lanes))
+
+remove(working_df)
+
+# Names database
 names_df <- links_df %>%
   filter(drive_access == 1) %>%
   select(model_link_id, name) %>%
@@ -241,18 +257,20 @@ working_df <- loaded_df %>%
 ft_to_keep_vector <- c("Freeway", "Expressway", "Ramp", "Divided Arterial", "Undivided Arterial")
 output_sf <- links_df %>%
   filter(drive_access == 1) %>%
-  select(shstGeometryId, shstReferenceId, lanes, model_link_id, county) %>%
+  select(shstReferenceId, shape_id, model_link_id, county) %>%
+  mutate(shape_id = as.integer(shape_id)) %>%
   left_join(., working_df, by = c("model_link_id")) %>%
+  left_join(., lanes_df, by = c("model_link_id")) %>%
   left_join(., names_df, by = c("model_link_id")) %>%
   left_join(., pems_reduction_df, by = c("shstReferenceId")) %>%
   left_join(., legacy_df, by = c("shstReferenceId")) %>%
-  left_join(., shapes_sf, by = c("shstGeometryId")) %>%
   left_join(., distance_df, by = c("model_link_id")) %>%
   filter(AM_ft_label %in% ft_to_keep_vector | 
            PM_ft_label %in% ft_to_keep_vector |
            AM_toll_booth < 10 |
            PM_toll_booth < 10
-        )
+        ) %>%
+    left_join(., shapes_sf, by = c("shape_id"))
 
 ```
 
@@ -263,12 +281,15 @@ st_write(output_sf, output_file_name, delete_dsn = TRUE)
 
 # Debug
 ```{r}
-bridge_link_ids <- c(8063198, 8063199, 3315451, 3315452)
-df <- loaded_df %>%
-  filter(model_link_id %in% bridge_link_ids)
+vector <- c(8063198, 8063199, 3315451, 3315452)
+
+o_sf <- output_sf %>%
+  filter(model_link_id %in% vector)
 
 l_df <- links_df %>%
-  filter(model_link_id %in% bridge_link_ids)
+  filter(model_link_id %in% vector)
+
+
   
 ```
 
