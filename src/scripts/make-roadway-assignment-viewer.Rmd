@@ -257,8 +257,7 @@ working_df <- loaded_df %>%
 ft_to_keep_vector <- c("Freeway", "Expressway", "Ramp", "Divided Arterial", "Undivided Arterial")
 output_sf <- links_df %>%
   filter(drive_access == 1) %>%
-  select(shstReferenceId, shape_id, model_link_id, county) %>%
-  mutate(shape_id = as.integer(shape_id)) %>%
+  select(shstReferenceId, id, model_link_id, county) %>%
   left_join(., working_df, by = c("model_link_id")) %>%
   left_join(., lanes_df, by = c("model_link_id")) %>%
   left_join(., names_df, by = c("model_link_id")) %>%
@@ -267,29 +266,15 @@ output_sf <- links_df %>%
   left_join(., distance_df, by = c("model_link_id")) %>%
   filter(AM_ft_label %in% ft_to_keep_vector | 
            PM_ft_label %in% ft_to_keep_vector |
-           AM_toll_booth < 10 |
-           PM_toll_booth < 10
+           (AM_toll_booth > 0 & AM_toll_booth < 10) |
+           (PM_toll_booth >0 & PM_toll_booth < 10)
         ) %>%
-    left_join(., shapes_sf, by = c("shape_id"))
+    left_join(., shapes_sf, by = c("id"))
 
 ```
 
 # Write
 ```{r write}
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
-```
-
-# Debug
-```{r}
-vector <- c(8063198, 8063199, 3315451, 3315452)
-
-o_sf <- output_sf %>%
-  filter(model_link_id %in% vector)
-
-l_df <- links_df %>%
-  filter(model_link_id %in% vector)
-
-
-  
 ```
 

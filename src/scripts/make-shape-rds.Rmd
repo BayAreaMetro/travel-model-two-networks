@@ -37,8 +37,7 @@ shapes_sf <- st_read(shape_file_name)
 # Reductions 
 ```{r reductions}
 output_sf <- shapes_sf %>%
-  mutate(shape_id = as.integer(shape_id)) %>%
-  select(shape_id, geometry)
+  select(id, geometry)
 ```
 
 # Write
