@@ -5,7 +5,7 @@ tags:
   - 'Bridge Pass'
   - 'toll review'
 dependencies:
-  prerequisites: 'Add San Mateo Bridge Toll Plaza'
+  prerequisites: ['Add San Mateo Bridge Toll Plaza']
 changes:
 - category: Parallel Managed lanes
   facility:
@@ -26,7 +26,7 @@ changes:
     - time: ['6:00', '10:00']
       set: 2
     - time: ['15:00', '19:00']
-      set: 2 
+      set: 2
   - property: segment_id
     set: 6
   - property: tollbooth

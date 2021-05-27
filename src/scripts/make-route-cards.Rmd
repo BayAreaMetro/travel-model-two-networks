@@ -28,18 +28,24 @@ output_file_name <- paste0(interim_dir, "transit_for_tableau.csv")
 
 # Parameters
 ```{r parameters}
-VERSION <- "version_03"
+VERSION <- "version_09"
 ```
 
 
 # Data Reads
 ```{r read}
 routes_df <- read_csv(paste0(processed_dir, VERSION, "/routes.txt"), col_types = "ccccciccccccccci")
-freq_df <- read_csv(paste0(processed_dir, VERSION, "/frequencies.txt"), col_types = "iitt")
+freq_df <- read_csv(paste0(processed_dir, VERSION, "/frequencies.txt"), col_types = "iidd")
 trips_df <- read_csv(paste0(processed_dir, VERSION, "/trips.txt"), col_types = "ccncnncccccccccccciii")
 stops_df <- read_csv(paste0(processed_dir, VERSION, "/stops.txt"), col_types  = "ccddccnccnccccinci")
-shapes_df <- read_csv(paste0(processed_dir, VERSION, "/shapes.txt"), col_types = "iinci")
-stop_times_df <- read_csv(paste0(processed_dir, VERSION, "/stop_times.txt"), col_types = "tticncddcccccccccccii")
+shapes_df <- read_csv(paste0(processed_dir, VERSION, "/shapes.txt"), col_types = "iincidd")
+stop_times_df <- read_csv(paste0(processed_dir, VERSION, "/stop_times.txt"), col_types = cols(.default = col_character(),
+                                                                                              arrival_time = col_double(),
+                                                                                              departure_time = col_double(),
+                                                                                              stop_sequence = col_integer(),
+                                                                                              timepoint = col_double(),
+                                                                                              trip_id = col_integer(),
+                                                                                              stop_id = col_integer()))
 
 nodes_sf <- st_read(paste0(processed_dir, VERSION, "/node.geojson"))
 ```
@@ -47,11 +53,8 @@ nodes_sf <- st_read(paste0(processed_dir, VERSION, "/node.geojson"))
 # Reductions for TM Network
 ```{r reductions}
 nodes_df <- bind_cols(tibble(model_node_id = nodes_sf$model_node_id), as_tibble(st_coordinates(nodes_sf))) %>%
-  #mutate(model_node_id = paste0(model_node_id)) %>%
   rename(lng = X, lat = Y)
 
-names(trips_df)
-  
 output_stops_df <- select(routes_df, route_id_original, route_id, agency_id, route_short_name, route_long_name, agency_raw_name) %>%
   left_join(select(trips_df, route_id, service_id, trip_id, trip_headsign, direction_id, shape_id),
             ., by = c("route_id")) %>%

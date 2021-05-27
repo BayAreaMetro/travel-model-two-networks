@@ -26,6 +26,8 @@ interim_dir <- "../../data/interim/"
 
 input_survey_file_name <- paste0(interim_dir, "onboard-survey-trip-list.feather")
 input_file_name_prefix <- paste0(interim_dir, "survey_")
+input_skim_file_name <- paste0(interim_dir, "trn_survey_skim_db.feather")
+
 output_file_name <- paste0(interim_dir, "on-board-survey-comparison-tableau.csv")
 
 ```
@@ -38,35 +40,14 @@ output_file_name <- paste0(interim_dir, "on-board-survey-comparison-tableau.csv"
 # Data Reads
 ```{r data-reads}
 survey_df <- read_feather(input_survey_file_name)
-
-input_df <- tibble()
-for (access_egress in c("wtw", "dtw", "wtd")) {
-  for (time_period in c("EA", "AM", "MD", "PM", "EV")) {
-    for (set in seq(1:3)) {
-      
-      file_name <- paste0(input_file_name_prefix, access_egress, "_", time_period, "_set", set, "_db.csv")
-      df <- read_csv(file_name, col_types = cols(.default = col_double(),
-                                                 Unique_ID = col_character(),
-                                                 npath = col_integer(),
-                                                 maz_o = col_integer(),
-                                                 maz_d = col_integer(),
-                                                 tap_o = col_integer(),
-                                                 tap_d = col_integer(),
-                                                 period = col_character(),
-                                                 skim_set = col_integer())) %>%
-        mutate(access_egress_path = access_egress)
-      
-      input_df <- bind_rows(input_df, df)
-      
-    }
-  }
-}
-
+skim_df <- read_feather(input_skim_file_name)
 ```
 
 # Reductions
 ```{r reductions}
-working_df <- input_df %>%
+working_df <- skim_df %>%
+  mutate(unique_ID = str_replace_all(unique_ID, "---", "___")) %>%
+  rename(survey_id = unique_ID) %>%
   mutate(lb_time = replace_na(lb_time, 0.0)) %>%
   mutate(eb_time = replace_na(eb_time, 0.0)) %>%
   mutate(fr_time = replace_na(fr_time, 0.0)) %>%
@@ -74,16 +55,31 @@ working_df <- input_df %>%
   mutate(lr_time = replace_na(lr_time, 0.0)) %>%
   mutate(cr_time = replace_na(cr_time, 0.0)) %>%
   mutate(network_path_string = if_else(lb_time > 0.0, "LB-", "XX-")) %>%
-  mutate(network_path_string = if_else(eb_time > 0.0, paste0(network_path_string, "EB-"), paste0(network_path_string, "XX-"))) %>%
-  mutate(network_path_string = if_else(fr_time > 0.0, paste0(network_path_string, "FR-"), paste0(network_path_string, "XX-"))) %>%
-  mutate(network_path_string = if_else(hr_time > 0.0, paste0(network_path_string, "HR-"), paste0(network_path_string, "XX-"))) %>%
-  mutate(network_path_string = if_else(lr_time > 0.0, paste0(network_path_string, "LR-"), paste0(network_path_string, "XX-"))) %>%
-  mutate(network_path_string = if_else(cr_time > 0.0, paste0(network_path_string, "CR"), paste0(network_path_string, "XX"))) %>%
+  mutate(network_path_string = if_else(eb_time > 0.0, 
+                                       paste0(network_path_string, "EB-"), 
+                                       paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(fr_time > 0.0, 
+                                       paste0(network_path_string, "FR-"), 
+                                       paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(hr_time > 0.0, 
+                                       paste0(network_path_string, "HR-"), 
+                                       paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(lr_time > 0.0, 
+                                       paste0(network_path_string, "LR-"), 
+                                       paste0(network_path_string, "XX-"))) %>%
+  mutate(network_path_string = if_else(cr_time > 0.0, 
+                                       paste0(network_path_string, "CR"), 
+                                       paste0(network_path_string, "XX"))) %>%
   mutate(network_boardings = if_else(is.na(xfers), 1L, as.integer(xfers) + 1L)) %>%
-  select(survey_id = Unique_ID,
+  mutate(simple_access = if_else(access_mode %in% c("walk", "bike"), "Walk", "Drive")) %>%
+  mutate(simple_egress = if_else(egress_mode %in% c("walk", "bike"), "Walk", "Drive")) %>%
+  mutate(access_egress_path = paste0(simple_access, "-Transit-", simple_egress)) %>%
+  mutate(path_number = 1L) %>%
+  select(survey_id,
          orig_maz = maz_o, 
          dest_maz = maz_d,
-         path_number = npath,
+#         path_number = npath,
+         path_number,
          access_egress_path,
          boarding_tap = tap_o,
          alighting_tap = tap_d,
@@ -103,12 +99,21 @@ survey_join_df <- survey_df %>%
     TRUE ~ as.character(NA),
   )) %>%
   mutate(survey_path_string = if_else(local_bus_in_path == 1, "LB-", "XX-")) %>%
-  mutate(survey_path_string = if_else(express_bus_in_path == 1, paste0(survey_path_string, "EB-"), paste0(survey_path_string, "XX-"))) %>%
-  mutate(survey_path_string = if_else(ferry_in_path == 1, paste0(survey_path_string, "FR-"), paste0(survey_path_string, "XX-"))) %>%
-  mutate(survey_path_string = if_else(heavy_rail_in_path == 1, paste0(survey_path_string, "HR-"), paste0(survey_path_string, "XX-"))) %>%
-  mutate(survey_path_string = if_else(light_rail_in_path == 1, paste0(survey_path_string, "LR-"), paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(express_bus_in_path == 1, 
+                                      paste0(survey_path_string, "EB-"), 
+                                      paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(ferry_in_path == 1, 
+                                      paste0(survey_path_string, "FR-"), 
+                                      paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(heavy_rail_in_path == 1, 
+                                      paste0(survey_path_string, "HR-"), 
+                                      paste0(survey_path_string, "XX-"))) %>%
+  mutate(survey_path_string = if_else(light_rail_in_path == 1, 
+                                      paste0(survey_path_string, "LR-"), 
+                                      paste0(survey_path_string, "XX-"))) %>%
   mutate(survey_path_string = if_else(commuter_rail_in_path == 1, paste0(survey_path_string, "CR"), paste0(survey_path_string, "XX"))) %>%
-  select(survey_id = Unique_ID,
+  mutate(survey_id = trimws(unique_ID)) %>%
+  select(survey_id = unique_ID,
          operator, 
          route,
          survey_path_string,
