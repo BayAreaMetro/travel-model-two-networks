@@ -24,7 +24,9 @@ for (package in packages_vector) {
 processed_dir <- "../../data/processed/"
 interim_dir <- "../../data/interim/"
 
-shape_file_name <- paste0(processed_dir, "version_09/shape.geojson")
+version <- "version_10"
+
+shape_file_name <- paste0(processed_dir, version, "/shape.geojson")
 
 output_file_name <- paste0(interim_dir, "simple_shape.RDS")
 ```

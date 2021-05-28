@@ -28,19 +28,19 @@ external_dir <- paste0(data_dir, "external/")
 interim_dir <- paste0(data_dir, "interim/")
 processed_dir <- paste0(data_dir, "processed/")
 
-version <- "version_09"
+version <- "version_10"
 
 links_file_name <- paste0(processed_dir, version, "/links.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
 assigned_csv_prefix <- paste0(interim_dir, "loaded_net/new_net/", version, "/", "load")
 legacy_assigned_csv_prefix <- paste0(interim_dir, "loaded_net/mtc_net/csv/", "load")
+road_names_file_name <- paste0(interim_dir, "roadway-assignment-names-helper.RDS")
 
 pems_match_file_name <- paste0(interim_dir, "pems_conflation_result.geojson")
 
 conflation_file_name <- paste0(interim_dir, "conflation_result.csv")
 
 output_file_name <- paste0(interim_dir, "roadway-assignment-viewer.geojson")
-output_join_road_names <- paste0(interim_dir, "roadway-assignment-names-helper.csv")
 ```
 
 # Parameters
@@ -69,6 +69,7 @@ shapes_sf <- readRDS(shape_file_name)
 links_df <- read_feather(links_file_name)
 pems_df <- st_read(pems_match_file_name, stringsAsFactors = FALSE)
 st_geometry(pems_df) <- NULL
+names_df <- readRDS(road_names_file_name)
 
 conflation_df <- read_csv(conflation_file_name, col_types = cols(.default = col_character(),
                                                                  TM2_A = col_double(),
@@ -156,44 +157,6 @@ lanes_df <- working_df %>%
 
 remove(working_df)
 
-# Names database
-names_df <- links_df %>%
-  filter(drive_access == 1) %>%
-  select(model_link_id, name) %>%
-  mutate(name = str_replace(name, "\\[", "")) %>%
-  mutate(name = str_replace(name, "\\]", "")) %>%
-  mutate(name = str_replace_all(name, "'", "")) %>%
-  separate(name, 
-           into = sprintf("%02d", seq(1:5)), 
-           sep = ",",
-           remove = TRUE,
-           extra = "drop",
-           fill = "right") %>%
-  pivot_longer(cols = -c(model_link_id),
-               names_to = "index",
-               values_to = "name") %>%
-  select(-index) %>%
-  mutate(name = trimws(name)) %>%
-  filter(!is.na(name)) %>%
-  filter(name != "nan") %>%
-  filter(name != "") %>%
-  distinct(model_link_id, name) %>%
-  group_by(model_link_id) %>%
-  mutate(index = row_number()) %>%
-  ungroup() %>%
-  pivot_wider(id_cols = model_link_id,
-              names_prefix = "name_",
-              names_from = index,
-              values_from = name) %>%
-  mutate(name = if_else(is.na(name_2), name_1, paste0(name_1, "/", name_2))) %>%
-  mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
-  mutate(simple_name = str_replace(name, " Avenue", "")) %>%
-  mutate(simple_name = str_replace(simple_name, " Street", "")) %>%
-  mutate(simple_name = str_replace(simple_name, " Drive", "")) %>%
-  mutate(simple_name = str_replace(simple_name, " Boulevard", "")) %>%
-  mutate(simple_name = str_replace(simple_name, " Way", "")) %>%
-  select(model_link_id, name, simple_name)
-
 distance_df <- loaded_df %>%
   distinct(model_link_id, distance)
 
@@ -277,4 +240,10 @@ output_sf <- links_df %>%
 ```{r write}
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
 ```
+ 
+# debug
+```{r}
+sf <- filter(output_sf, is.null(geometry))
+```
 
+ 
