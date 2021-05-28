@@ -58,6 +58,13 @@ changes:
       - 14948
       - 10330
       - 8977
+      - 3031886
+      - 3006561
+      - 3046803
+      - 3101610
+      - 3011518
+      - 3024387
+      - 4018032
     - shstReferenceId:
       - "b9f8ed1b4f41957c8fa70f72d7c8f3eb"
       - "35b123d05a162292e27042a42a044a1e"
@@ -111,6 +118,6 @@ changes:
   - property: roadway
     set: 'motorway_link'
   - property: ft
-    set: 3  
+    set: 3
   - property: walk_access
-    set: 1 
+    set: 1
