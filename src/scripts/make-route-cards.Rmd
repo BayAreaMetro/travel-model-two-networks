@@ -28,18 +28,19 @@ output_file_name <- paste0(interim_dir, "transit_for_tableau.csv")
 
 # Parameters
 ```{r parameters}
-VERSION <- "version_09"
+VERSION <- "version_11"
+version_prefix <- "v11_"
 ```
 
 
 # Data Reads
 ```{r read}
-routes_df <- read_csv(paste0(processed_dir, VERSION, "/routes.txt"), col_types = "ccccciccccccccci")
-freq_df <- read_csv(paste0(processed_dir, VERSION, "/frequencies.txt"), col_types = "iidd")
-trips_df <- read_csv(paste0(processed_dir, VERSION, "/trips.txt"), col_types = "ccncnncccccccccccciii")
-stops_df <- read_csv(paste0(processed_dir, VERSION, "/stops.txt"), col_types  = "ccddccnccnccccinci")
-shapes_df <- read_csv(paste0(processed_dir, VERSION, "/shapes.txt"), col_types = "iincidd")
-stop_times_df <- read_csv(paste0(processed_dir, VERSION, "/stop_times.txt"), col_types = cols(.default = col_character(),
+routes_df <- read_csv(paste0(processed_dir, VERSION, "/", version_prefix, "routes.txt"), col_types = "ccccciccccccccci")
+freq_df <- read_csv(paste0(processed_dir, VERSION, "/", version_prefix, "frequencies.txt"), col_types = "iidd")
+trips_df <- read_csv(paste0(processed_dir, VERSION, "/", version_prefix, "trips.txt"), col_types = "ccncnncccccccccccciii")
+stops_df <- read_csv(paste0(processed_dir, VERSION, "/", version_prefix, "stops.txt"), col_types  = "ccddccnccnccccinci")
+shapes_df <- read_csv(paste0(processed_dir, VERSION, "/", version_prefix, "shapes.txt"), col_types = "iincidd")
+stop_times_df <- read_csv(paste0(processed_dir, VERSION, "/", version_prefix, "stop_times.txt"), col_types = cols(.default = col_character(),
                                                                                               arrival_time = col_double(),
                                                                                               departure_time = col_double(),
                                                                                               stop_sequence = col_integer(),
