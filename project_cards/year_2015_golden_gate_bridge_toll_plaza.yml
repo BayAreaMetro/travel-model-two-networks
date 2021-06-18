@@ -1,10 +1,10 @@
-project: Year 2015 Modify toll links on Golden Gate Bridge Toll Plaza on US101 SB - Bridge Pass
+project: year 2015 modify toll links on golden gate bridge toll plaza on us101 sb - bridge pass
 tags:
   - 'Year 2015'
   - 'Bridge Pass'
   - 'toll review'
 dependencies:
-  prerequisites: ['Add Golden Gate Bridge Toll Plaza']
+  prerequisites: ['add golden gate bridge toll plaza']
 changes:
 - category: Parallel Managed lanes
   facility:

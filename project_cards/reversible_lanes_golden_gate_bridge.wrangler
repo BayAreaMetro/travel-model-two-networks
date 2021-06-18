@@ -4,7 +4,7 @@ category: Calculated Roadway
 tags:
   - 'Reversible Lanes'
 dependencies:
-  prerequisites: ['Add Golden Gate Bridge Toll Plaza']
+  prerequisites: ['add golden gate bridge toll plaza']
 ---
 
 self.links_df.loc[self.links_df['model_link_id'] == 8063198, 'lanes'] = [{'default': 3, 'timeofday': [{'time': (21600, 36000), 'value': 4}, {'time': (54000, 68400), 'value': 2}]}]

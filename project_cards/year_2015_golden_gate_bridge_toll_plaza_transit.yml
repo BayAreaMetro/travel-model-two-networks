@@ -1,8 +1,8 @@
-project: update routing for Golden Gate Bridge Toll Plaza transit
+project: update routing for golden gate bridge toll plaza transit
 tags:
   - 'Toll Plaza Transit'
 dependencies:
-  prerequisites: ['Add Golden Gate Bridge Toll Plaza']
+  prerequisites: ['add golden gate bridge toll plaza']
 changes:
 - category: Transit Service Property Change
   facility:

@@ -4,7 +4,7 @@ category: Calculated Roadway
 tags:
   - 'Toll Plaza'
 dependencies:
-  prerequisites: ['Add Golden Gate Bridge Toll Plaza']
+  prerequisites: ['add golden gate bridge toll plaza']
 ---
 
 new_geometry = LineString([

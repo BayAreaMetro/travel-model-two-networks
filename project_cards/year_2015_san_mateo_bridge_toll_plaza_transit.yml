@@ -1,8 +1,8 @@
-project: update routing for San Mateo Bridge Toll Plaza transit
+project: update routing for san mateo bridge toll plaza transit
 tags:
   - 'Toll Plaza Transit'
 dependencies:
-  prerequisites: ['Add San Mateo Bridge Toll Plaza']
+  prerequisites: ['add san mateo bridge toll plaza']
 changes:
 - category: Transit Service Property Change
   facility:
