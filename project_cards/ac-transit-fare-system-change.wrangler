@@ -1,0 +1,23 @@
+---
+project: ac transit fare system change to zonal fare
+category: Add Transit
+tags:
+  - "Minor Transit"
+dependencies:
+  prerequisites:
+    - "year 2015 ac transit route 06 edits"
+    - "year 2015 ac transit route 38 edits"
+    - "year 2015 ac transit route 40 edits"
+    - "year 2015 ac transit route 99 edits"
+    - "year 2015 ac transit route 1"
+    - "year 2015 ac transit route 1r"
+---
+
+# Update AC Transit TransBay fares to be fare zone (East Bay to East Bay is one, East Bay to SF is the other)
+# assign zone_id to stops
+
+# get AC transit stops
+actransit_trips_list = self.feed.trips[self.feed.trips.agency_raw_name == "ACTransit_2015_8_14"].trip_id.tolist()
+actransit_stops_list = self.feed.stop_times[self.feed.stop_times.trip_id.isin(actransit_trips_list)].stop_id.tolist()
+
+self.feed.stops["zone_id"] = np.where((self.feed.stops.stop_id.isin(actransit_stops_list)) & (self.feed.stops.model_node_id.astype(int) <= 1500000),"1",np.where(self.feed.stops.stop_id.isin(actransit_stops_list), "2", self.feed.stops.zone_id))
