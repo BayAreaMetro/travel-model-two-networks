@@ -1,0 +1,18 @@
+project: Year 2015 Modify Service Road Dumbarton Bridge Bypass
+tags:
+  - 'Year 2015'
+  - 'Roadway Property Change'
+  - 'updated lanes'
+  - 'highway review'
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 3152465
+    - shstReferenceId:
+      - "e5742b085ba3dcb41da0c499cecc33bc"
+  properties:
+  - property: assignable
+    set: 0
