@@ -24,7 +24,7 @@ for (package in packages_vector) {
 processed_dir <- "../../data/processed/"
 interim_dir <- "../../data/interim/"
 
-version <- "version_10"
+version <- "version_11"
 
 shape_file_name <- paste0(processed_dir, version, "/shape.geojson")
 
@@ -46,5 +46,4 @@ output_sf <- shapes_sf %>%
 ```{r write}
 saveRDS(output_sf, file = output_file_name)
 ```
-
 

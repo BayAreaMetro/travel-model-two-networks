@@ -28,7 +28,7 @@ external_dir <- paste0(data_dir, "external/")
 interim_dir <- paste0(data_dir, "interim/")
 processed_dir <- paste0(data_dir, "processed/")
 
-version <- "version_10"
+version <- "version_11"
 
 links_file_name <- paste0(processed_dir, version, "/links.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
@@ -240,10 +240,4 @@ output_sf <- links_df %>%
 ```{r write}
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
 ```
- 
-# debug
-```{r}
-sf <- filter(output_sf, is.null(geometry))
-```
-
  
