@@ -26,8 +26,8 @@ interim_dir <- "../../data/interim/"
 processed_dir <- "../../data/processed/" 
 
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
-links_file_name <- paste0(interim_dir, "step6_gtfs/link.feather")
-node_file_name <- paste0(interim_dir, "step6_gtfs/node.geojson")
+links_file_name <- paste0(processed_dir, "version_11/links.feather")
+node_file_name <- paste0(processed_dir, "version_11/node.geojson")
 
 output_file_name <- paste0(interim_dir, "transit_for_tableau.geojson")
 ```
@@ -39,12 +39,12 @@ VERSION <- "version_01"
 
 # Data Reads
 ```{r read}
-routes_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "routes.txt"), col_types = "ccccciccccccccci")
-freq_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "frequencies.txt"), col_types = "iitt")
-trips_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "trips.txt"), col_types = "ccncnncccccccccccciii")
-stops_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "stops.txt"), col_types  = "ccddccnccnccccinci")
-shapes_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "shapes.txt"), col_types = "iinci")
-stop_times_df <- read_csv(paste0(interim_dir, "step6_gtfs/", "stop_times.txt"), col_types = "tticncddcccccccccccii")
+routes_df <- read_csv(paste0(processed_dir, "version_11/", "routes.txt"), col_types = cols(.default = col_character()))
+freq_df <- read_csv(paste0(processed_dir, "version_11/", "frequencies.txt"), col_types = cols(.default = col_character()))
+trips_df <- read_csv(paste0(processed_dir, "version_11/", "trips.txt"), col_types = cols(.default = col_character()))
+stops_df <- read_csv(paste0(processed_dir, "version_11/", "stops.txt"), col_types = cols(.default = col_character()))
+shapes_df <- read_csv(paste0(processed_dir, "version_11/", "shapes.txt"), col_types = cols(.default = col_character()))
+stop_times_df <- read_csv(paste0(processed_dir, "version_11/", "stop_times.txt"), col_types = cols(.default = col_character()))
 
 links_df <- read_feather(links_file_name)
 shapes_sf <- readRDS(shape_file_name)
@@ -69,7 +69,7 @@ shape_as_sf_linestring <- function(df) {
 ```{r process-shapes}
 join_link_shape_sf <- links_df %>%
   select(shstGeometryId, A, B) %>%
-  left_join(., shapes_sf, by = c("shstGeometryId"))
+  left_join(., shapes_sf, by = c("shstGeometryId" = "id"))
 
 working_df <- select(routes_df, agency_id, agency_raw_name, route_id, 
                            route_short_name, route_long_name) %>%
@@ -80,17 +80,18 @@ working_df <- select(routes_df, agency_id, agency_raw_name, route_id,
             select(shapes_df, shape_id, shape_pt_sequence, shape_model_node_id), 
             by = c("shape_id")) %>%
   group_by(route_id, service_id, trip_id, direction_id) %>%
-  mutate(join_A = shape_model_node_id) %>%
-  mutate(join_B = lead(shape_model_node_id)) %>%
+  mutate(join_A = as.integer(shape_model_node_id)) %>%
+  mutate(join_B = as.integer(lead(shape_model_node_id))) %>%
   ungroup() %>%
   filter(!is.na(join_B)) %>%
   left_join(., join_link_shape_sf, by = c("join_A" = "A", "join_B" = "B")) %>%
+  mutate(start_time = as.integer(as.double(start_time) / 60.0 / 60.0)) %>%
   mutate(time_period = case_when(
-    hour(start_time) == 3 ~ "Early Morning",
-    hour(start_time) == 6 ~ "Morning Commute",
-    hour(start_time) == 10 ~ "Midday",
-    hour(start_time) == 15 ~ "Evening Commute",
-    hour(start_time) == 19 ~ "Evening/Night",
+    start_time == 3 ~ "Early Morning",
+    start_time == 6 ~ "Morning Commute",
+    start_time == 10 ~ "Midday",
+    start_time == 15 ~ "Evening Commute",
+    start_time == 19 ~ "Evening/Night",
     TRUE ~ "Missing"
   )) %>%
   select(-start_time, -end_time)
@@ -134,7 +135,8 @@ shapes_sf <- sf::st_sf(shape_id = names(list_of_line_tibbles), geometry = shape_
 join_df <- working_df %>%
   distinct(agency_id, agency_raw_name, route_id, route_short_name, route_long_name,
            trip_id, service_id, trip_headsign, direction_id, shape_id,
-           time_period, headway_secs)
+           time_period, headway_secs) %>%
+  mutate(shape_id = as.integer(shape_id))
 
 output_sf <- left_join(shapes_sf, join_df, by = c("shape_id"))
 
