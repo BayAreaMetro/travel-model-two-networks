@@ -11,7 +11,7 @@ changes:
     bike_access: 1
     county: 'Santa Clara'
     drive_access: 1
-    model_link_id: 2517004
+    model_link_id: 2517014
     rail_only: 0
     walk_access: 1
     lanes: 2
@@ -23,7 +23,7 @@ changes:
     bike_access: 1
     county: 'Santa Clara'
     drive_access: 1
-    model_link_id: 2517005
+    model_link_id: 2517015
     rail_only: 0
     walk_access: 1
     lanes: 2
@@ -35,7 +35,7 @@ changes:
     bike_access: 1
     county: 'Santa Clara'
     drive_access: 1
-    model_link_id: 2517006
+    model_link_id: 2517016
     rail_only: 0
     walk_access: 1
     lanes: 2
@@ -47,7 +47,7 @@ changes:
     bike_access: 1
     county: 'Santa Clara'
     drive_access: 1
-    model_link_id: 2517007
+    model_link_id: 2517017
     rail_only: 0
     walk_access: 1
     lanes: 2
