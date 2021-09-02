@@ -20,4 +20,5 @@ dependencies:
 actransit_trips_list = self.feed.trips[self.feed.trips.agency_raw_name == "ACTransit_2015_8_14"].trip_id.tolist()
 actransit_stops_list = self.feed.stop_times[self.feed.stop_times.trip_id.isin(actransit_trips_list)].stop_id.tolist()
 
-self.feed.stops["zone_id"] = np.where((self.feed.stops.stop_id.isin(actransit_stops_list)) & (self.feed.stops.model_node_id.astype(int) <= 1500000),"1",np.where(self.feed.stops.stop_id.isin(actransit_stops_list), "2", self.feed.stops.zone_id))
+# stops in Alameda and Contra Costa are zone 1, all others are zone 2
+self.feed.stops["zone_id"] = np.where((self.feed.stops.stop_id.isin(actransit_stops_list)) & (self.feed.stops.model_node_id.astype(int) >= 2500000) & (self.feed.stops.model_node_id.astype(int) <= 3500000),"1",np.where(self.feed.stops.stop_id.isin(actransit_stops_list), "2", self.feed.stops.zone_id))
