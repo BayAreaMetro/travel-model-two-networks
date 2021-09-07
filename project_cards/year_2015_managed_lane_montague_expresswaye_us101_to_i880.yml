@@ -1,0 +1,106 @@
+project: Year 2015 Modify HOV Lanes and USE on Montague Expressway EB US 101 to I-880
+tags:
+  - 'Year 2015'
+  - 'Managed Lanes'
+  - 'HOV Lanes'
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 2241998
+      - 2090859
+      - 2154655
+      - 2152314
+      - 2022843
+      - 2003833
+      - 2259509
+      - 2098807
+      - 2124572
+      - 2120299
+      - 2014242
+      - 2124731
+      - 2004248
+      - 2009319
+      - 2103044
+      - 2066253
+      - 2027130
+      - 2063614
+      - 2008445
+      - 2103486
+      - 2042855
+      - 2251310
+      - 2225205
+      - 2246521
+      - 2273377
+      - 2053513
+      - 2006755
+      - 2168274
+      - 2141274
+      - 2063789
+      - 2067903
+      - 2193007
+      - 2170376
+      - 2172871
+      - 2222769
+      - 2157329
+    - shstReferenceId:
+      - "e2c3cbdd968e7d0af1ee3d5fccc0b8b3"
+      - "54e790da2730c05fcd053f2e84574f92"
+      - "90a3e6dceb53d7a4b21762e6dfdf81de"
+      - "8e87f27234206abd4d5dc46c6817ee27"
+      - "153ebddbafc8011113fdd6771e88c0f9"
+      - "03938aa36d4461050e01325f663c1d75"
+      - "f3295be018598e3415966838cd8b8919"
+      - "5c6399915c07d2ac3668c57a36697b11"
+      - "747968105f58508fabd2e4b28a90edf6"
+      - "70624c7d69737e91128e68a300acf837"
+      - "0d38641f1a8918ba345cfa10dd45a02f"
+      - "74a130d4f7673fc5d7c8becd55396b74"
+      - "03f3c950b7803276dba341c5a60b761b"
+      - "08b664c6ee2c24fc48e7e04866e8d9d3"
+      - "6046166ca4ca49d862f2d3b855ad27e4"
+      - "3dec70bb3eba978f1dd98acd678f4ca3"
+      - "19513ba03d98d9d5a68c2d6f7acea179"
+      - "3b63f41cc7cb83bb1163a04385a14d90"
+      - "07e7f0e24c08dac622a6200489999800"
+      - "60b21f87ac10a5eec0603982a3f2eb0f"
+      - "280f410e53dcb42a4fcc5631ad0c4359"
+      - "eb8b2737e9113e57b026eb71df53f1e4"
+      - "d30534518f2f1956fe2cb7659837174f"
+      - "e704b05a108e021585d492e7fb578e21"
+      - "fff485031d3bcd4e6d768e523027d5d0"
+      - "31f547c178b50bd47b5b07e1b067f67a"
+      - "064ede4f49bacb5ce248071d8ea2ea36"
+      - "9d7c2e91638f677c7d42f925bfc102ed"
+      - "8441efd7a82f3effe20652abcace1e30"
+      - "3b8e780c881c277ab185f0134345ba27"
+      - "3f78e237227d6d325586f779c68e5700"
+      - "b4ba26f213a703c4c52b1af406a75a3c"
+      - "9f5bc5faea936ae96ae9123c204bffbe"
+      - "a1b5bb25689d016dc732b4cfce72c69d"
+      - "d0a05a398fb5174f6774fbbb5bf1023a"
+      - "9315d5b3cdd49e00c4fa1f98079431c2"
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time: ['15:00', '19:00']
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time: ['15:00', '19:00']
+      set: 1
+  - property: segment_id
+    set: 225
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time: ['15:00', '19:00']
+      set: 2
+  - property: ML_access
+    set: 'all'
+  - property: ML_egress
+    set: 'all'
