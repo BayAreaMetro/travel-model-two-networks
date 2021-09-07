@@ -1,7 +1,13 @@
 #!/bin/bash
 #
 # This script should run in a shst docker
-# To build the docker image using the Dockerfile in this directory use:
+
+# First, create folder "/data/external/sharedstreets_extract" to store the extracted data
+# cd /data/external
+# mkdir "sharedstreets_extract"
+# cd /.
+
+# To build the docker image using the Dockerfile in this directory use (only need to run once):
 # docker build -t shst .
 #
 # see it:
