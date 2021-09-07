@@ -10,28 +10,30 @@ changes:
   facility:
     link:
     - model_link_id:
+      - 3078894
       - 3164800
     - shstReferenceId:
+      - "76d1dafbfda8f0e000f8c90780ca152c"
       - "f855ac9e8170c84c87c8be5453877210"
   properties:
   - property: lanes
     change: 0
     timeofday:
     - time: ['6:00', '10:00']
-      change: -2
+      change: -1
     - time: ['10:00', '15:00']
-      change: -2
+      change: -1
     - time: ['15:00', '19:00']
-      change: -2
+      change: -1
   - property: ML_lanes
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 2
+      set: 1
     - time: ['10:00', '15:00']
-      set: 2
+      set: 1
     - time: ['15:00', '19:00']
-      set: 2    
+      set: 1    
   - property: segment_id
     set: 28
   - property: ML_tollseg
