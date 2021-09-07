@@ -248,14 +248,10 @@ changes:
     timeofday:
     - time: ['6:00', '10:00']
       change: -1
-    - time: ['15:00', '19:00']
-      change: -1
   - property: ML_lanes
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 1
-    - time: ['15:00', '19:00']
       set: 1
   - property: segment_id
     set: 225
@@ -263,8 +259,6 @@ changes:
     set: 0
     timeofday:
     - time: ['6:00', '10:00']
-      set: 2
-    - time: ['15:00', '19:00']
       set: 2
   - property: ML_access
     set: 'all'
