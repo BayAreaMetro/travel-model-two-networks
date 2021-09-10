@@ -1,8 +1,9 @@
-project: Year 2015 Modify HOV Lanes and USE on Benicia Bridge Toll Plaza - Segment 03 - Bridge Pass
+project: Year 2015 Modify HOV Lanes and USE on Benicia Bridge Toll Plaza - Segment
+  03 - Bridge Pass
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'toll review'
+- Year 2015
+- Roadway Property Change
+- toll review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -11,8 +12,7 @@ changes:
     - model_link_id:
       - 4016480
     - shstReferenceId:
-      - "217253518a29aa69c40a4114d557d24d"
+      - 217253518a29aa69c40a4114d557d24d
   properties:
   - property: tollbooth
     set: 1
-  

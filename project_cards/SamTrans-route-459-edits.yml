@@ -1,6 +1,6 @@
 project: year 2015 samtrans route ecr edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -2692,4 +2692,3 @@ changes:
     - -1504388
     - 1536669
     - -1536030
-valid: false

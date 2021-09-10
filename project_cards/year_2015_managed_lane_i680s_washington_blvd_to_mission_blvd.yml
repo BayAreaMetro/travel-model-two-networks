@@ -1,9 +1,10 @@
-project: Year 2015 Modify Express Lanes and USE on I-680 SB Washington Blvd to Mission Blvd
+project: Year 2015 Modify Express Lanes and USE on I-680 SB Washington Blvd to Mission
+  Blvd
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes Review'
-  - 'Express Lanes'
-  - 'toll review'
+- Year 2015
+- Managed Lanes Review
+- Express Lanes
+- toll review
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -15,28 +16,40 @@ changes:
       - 3065220
       - 3157167
     - shstReferenceId:
-      - "5dd2aed813158c62392be446bad86482"
-      - "b4d529a4bab12054ee26a7b2092dff02"
-      - "6219dc0755d904c0023f2acbebb4e185"
-      - "ec7018a4890d0f9343f7a14345a15460"
+      - 5dd2aed813158c62392be446bad86482
+      - b4d529a4bab12054ee26a7b2092dff02
+      - 6219dc0755d904c0023f2acbebb4e185
+      - ec7018a4890d0f9343f7a14345a15460
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 25
@@ -47,13 +60,23 @@ changes:
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 4
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       set: 4
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 4
   - property: ML_access
-    set: [2550205, 2536533]
+    set:
+    - 2550205
+    - 2536533
   - property: ML_egress
-    set: [2550205, 2536533]
+    set:
+    - 2550205
+    - 2536533

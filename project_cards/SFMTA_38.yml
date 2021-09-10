@@ -1,6 +1,6 @@
 project: SFMTA Route 38
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -25,4 +25,3 @@ changes:
     - 1001027
     - -1003170
     - -1013584
-valid: false

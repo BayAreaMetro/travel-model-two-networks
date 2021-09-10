@@ -1,6 +1,6 @@
 project: SFMTA Route 321 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -454,4 +454,3 @@ changes:
     - -1008624
     - -1014985
     - 1003189
-valid: false

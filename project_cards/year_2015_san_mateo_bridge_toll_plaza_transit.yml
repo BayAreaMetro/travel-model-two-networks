@@ -1,12 +1,13 @@
 project: update routing for san mateo bridge toll plaza transit
 tags:
-  - 'Toll Plaza Transit'
+- Toll Plaza Transit
 dependencies:
-  prerequisites: ['add san mateo bridge toll plaza']
+  prerequisites:
+  - add san mateo bridge toll plaza
 changes:
 - category: Transit Service Property Change
   facility:
-    route_short_name: 'M'
+    route_short_name: M
     shape_id: '375'
   properties:
   - property: routing
@@ -17,4 +18,3 @@ changes:
     - -2562924
     - -5030000
     - -2535792
-valid: false

@@ -1,6 +1,6 @@
 project: VTA Route 569 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -1889,4 +1889,3 @@ changes:
     - -2124424
     - 2135849
     - -2082640
-valid: false

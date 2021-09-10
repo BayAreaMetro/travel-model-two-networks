@@ -1,6 +1,6 @@
 project: SFMTA Route 28
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -437,4 +437,3 @@ changes:
     - -1001373
     - 1017471
     - -1017471
-valid: false

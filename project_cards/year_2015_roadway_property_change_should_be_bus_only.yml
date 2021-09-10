@@ -1,9 +1,9 @@
-project: Year 2015 Bus Only Segments 
+project: Year 2015 Bus Only Segments
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'bus only'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- bus only
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -14,10 +14,10 @@ changes:
       - 8027729
       - 7060328
     - shstReferenceId:
-      - "3cab7f966f939208fc75a47f4c493751"
-      - "d1998ed72acdf4a204777c33585db28a"
-      - "e14d2f659b18b8eb9cd5261e44c9afa0"
-  properties:    
+      - 3cab7f966f939208fc75a47f4c493751
+      - d1998ed72acdf4a204777c33585db28a
+      - e14d2f659b18b8eb9cd5261e44c9afa0
+  properties:
   - property: bus_only
     set: 1
   - property: ft
@@ -26,4 +26,3 @@ changes:
     set: 1
   - property: drive_access
     set: 0
-

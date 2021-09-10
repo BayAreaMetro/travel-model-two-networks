@@ -1,6 +1,6 @@
 project: SFMTA Route 305 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -307,4 +307,3 @@ changes:
     - 1007658
     - -1008624
     - -1014985
-valid: false

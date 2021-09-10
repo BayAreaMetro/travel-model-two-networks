@@ -1,6 +1,6 @@
 project: SFMTA Route 306 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -193,4 +193,3 @@ changes:
     - 1010070
     - 1012353
     - -1014187
-valid: false

@@ -1,6 +1,6 @@
 project: SFMTA Route 14R
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -513,4 +513,3 @@ changes:
     direction_id: 3
     start_time: 06:00
     end_time: '10:00'
-valid: false

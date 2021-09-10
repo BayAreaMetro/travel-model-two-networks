@@ -1,6 +1,6 @@
 project: SFMTA Route 22
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -163,4 +163,3 @@ changes:
     - -1001153
     - 1010577
     - -1000662
-valid: false

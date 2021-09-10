@@ -1,6 +1,6 @@
 project: VTA Route 605 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -4300,4 +4300,3 @@ changes:
     - -2101425
     - 2120867
     - -2022369
-valid: false

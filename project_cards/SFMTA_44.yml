@@ -1,6 +1,6 @@
 project: SFMTA Route 44
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -484,4 +484,3 @@ changes:
     - -1011846
     - 1020386
     - -1019320
-valid: false

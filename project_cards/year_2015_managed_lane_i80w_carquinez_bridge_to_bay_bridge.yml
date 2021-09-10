@@ -1,8 +1,9 @@
-project: Year 2015 Modify HOV Lanes and USE on I-80 WB from Carquinez Bridge to Bay Bridge Toll Plaza
+project: Year 2015 Modify HOV Lanes and USE on I-80 WB from Carquinez Bridge to Bay
+  Bridge Toll Plaza
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes'
-  - 'HOV Lanes'
+- Year 2015
+- Managed Lanes
+- HOV Lanes
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -59,77 +60,89 @@ changes:
       - 3103371
       - 4052891
     - shstReferenceId:
-      - "39f9c69a53156a898a5b8eff25d4e629"
-      - "5bcbb4a6b2d8ddf5801c4ed88e077613"
-      - "5c31a0c1729cd20dca4358440559f6b5"
-      - "a175cd5ce61d46642eaee69171c8b4f4"
-      - "a3f569380ff4b190d141f4906ff1ae71"
-      - "cd32266b39516dd9ce41bb6e0d70a282"
-      - "aadc8d27204b84278760b55e967150c7"
-      - "9faa6cb9dbf5fe6c685a433f881c877a"
-      - "37fca9fe4ac78ac912a52463c6ff0c0b"
-      - "9a035e0ca2b93de40510f53e0eccf2a4"
-      - "83d38bc991c21d7deb1b3347bf47828e"
-      - "3fe69a55506d7a078c327d075af084c8"
-      - "389d8c56d06c57675657f50a61b6f27e"
-      - "07c1815feab000de951dcf9b0e2062ec"
-      - "005a078054386cb7659bcbbdacf61c63"
-      - "27593541d10b1bcfcd7048c063ca6866"
-      - "08b3fc209af528c0aceaa74d61934006"
-      - "9086c119f22283579ba4d24afe0c5a3b"
-      - "c50f51079662b3b7e540777531e13e59"
-      - "453df067c2d393b58b97f8df55088e6e"
-      - "1578e83951e6d7859622e62619e2d0f6"
-      - "3edae59b4832e9ee827008ded7bb9fce"
-      - "7eaedb2979c3664fd029de6465c3202b"
-      - "613afe87ee6b14b7235fcecbd1c4ae2a"
-      - "563e35ea87497e9648ef302396c985b0"
-      - "0b1d05865a11f3fede12a617103ac595"
-      - "8aa3a1d82cd8e2fc781c5e8eee7fc5a6"
-      - "f278b4aca20da2c831169c28f84d7620"
-      - "529a625729bc5d16fe2f0facf350ac06"
-      - "7e7c2bd15e83faee157c20cd8bb37c84"
-      - "870957b7cb96c96e87359694296e3494"
-      - "0a3c4db5ea8e12371dbff7c0f1d343fd"
-      - "d66f03dd2d27fd3155c38801b521b1de"
-      - "7b80b9e43d552ba8283aaa0141b990df"
-      - "b9e6ee091df65866e1b4e6348022c3df"
-      - "98cd3e70b79f17ba0cec5feef1bcb1b9"
-      - "cac65a86de6b5eea70e9b82155e14dbd"
-      - "98f4aa1b227ab7f4b27dfb2be22b9aed"
-      - "ded007549a292997457d284dd3e01f7c"
-      - "a00d5a3c6be6c9670b1d7159ffc899e8"
-      - "1bc133ed1f3ff61fb78aa0ec15008c86"
-      - "497444262033963896b3261d9ffb9ceb"
-      - "303b4ab50cc1d78ff51eb68f11518904"
-      - "f1b246798164116c136213fe50fa1afc"
-      - "1601b9f7d896ba4cdf6940b364736b76"
-      - "f30dcff458c14bb7c63f6a6b7ecf4fb6"
+      - 39f9c69a53156a898a5b8eff25d4e629
+      - 5bcbb4a6b2d8ddf5801c4ed88e077613
+      - 5c31a0c1729cd20dca4358440559f6b5
+      - a175cd5ce61d46642eaee69171c8b4f4
+      - a3f569380ff4b190d141f4906ff1ae71
+      - cd32266b39516dd9ce41bb6e0d70a282
+      - aadc8d27204b84278760b55e967150c7
+      - 9faa6cb9dbf5fe6c685a433f881c877a
+      - 37fca9fe4ac78ac912a52463c6ff0c0b
+      - 9a035e0ca2b93de40510f53e0eccf2a4
+      - 83d38bc991c21d7deb1b3347bf47828e
+      - 3fe69a55506d7a078c327d075af084c8
+      - 389d8c56d06c57675657f50a61b6f27e
+      - 07c1815feab000de951dcf9b0e2062ec
+      - 005a078054386cb7659bcbbdacf61c63
+      - 27593541d10b1bcfcd7048c063ca6866
+      - 08b3fc209af528c0aceaa74d61934006
+      - 9086c119f22283579ba4d24afe0c5a3b
+      - c50f51079662b3b7e540777531e13e59
+      - 453df067c2d393b58b97f8df55088e6e
+      - 1578e83951e6d7859622e62619e2d0f6
+      - 3edae59b4832e9ee827008ded7bb9fce
+      - 7eaedb2979c3664fd029de6465c3202b
+      - 613afe87ee6b14b7235fcecbd1c4ae2a
+      - 563e35ea87497e9648ef302396c985b0
+      - 0b1d05865a11f3fede12a617103ac595
+      - 8aa3a1d82cd8e2fc781c5e8eee7fc5a6
+      - f278b4aca20da2c831169c28f84d7620
+      - 529a625729bc5d16fe2f0facf350ac06
+      - 7e7c2bd15e83faee157c20cd8bb37c84
+      - 870957b7cb96c96e87359694296e3494
+      - 0a3c4db5ea8e12371dbff7c0f1d343fd
+      - d66f03dd2d27fd3155c38801b521b1de
+      - 7b80b9e43d552ba8283aaa0141b990df
+      - b9e6ee091df65866e1b4e6348022c3df
+      - 98cd3e70b79f17ba0cec5feef1bcb1b9
+      - cac65a86de6b5eea70e9b82155e14dbd
+      - 98f4aa1b227ab7f4b27dfb2be22b9aed
+      - ded007549a292997457d284dd3e01f7c
+      - a00d5a3c6be6c9670b1d7159ffc899e8
+      - 1bc133ed1f3ff61fb78aa0ec15008c86
+      - 497444262033963896b3261d9ffb9ceb
+      - 303b4ab50cc1d78ff51eb68f11518904
+      - f1b246798164116c136213fe50fa1afc
+      - 1601b9f7d896ba4cdf6940b364736b76
+      - f30dcff458c14bb7c63f6a6b7ecf4fb6
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 21
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 3
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 3
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

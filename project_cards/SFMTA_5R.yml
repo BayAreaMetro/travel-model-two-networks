@@ -1,6 +1,6 @@
 project: SFMTA Route 5R
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -229,4 +229,3 @@ changes:
     - -1011486
     - 1003189
     - -1012890
-valid: false

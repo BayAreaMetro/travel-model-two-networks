@@ -1,8 +1,8 @@
 project: Year 2015 Modify HOV Lanes and USE on I-880 SB CA-237 to US 101
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes'
-  - 'HOV Lanes'
+- Year 2015
+- Managed Lanes
+- HOV Lanes
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -19,40 +19,52 @@ changes:
       - 2050795
       - 2173469
     - shstReferenceId:
-      - "5b24114650ec2433a2da78f100adccce"
-      - "79782d28df96643d72db9d424739a5bc"
-      - "99fe188911d1aa7709330d68405fcab1"
-      - "3fdb2717cd192e28ee9af2241660e65d"
-      - "3d87483056bf3f3b2e3bfedb5e7d712e"
-      - "0f44c10881a147093ce6bd0e97e5323e"
-      - "e0db3e4a240b868c81c2174facdd5813"
-      - "2f7967cee0c131a7f9c64bc376e4041e"
-      - "a23f2e79a56f02926faca6928b4ecfbd"
+      - 5b24114650ec2433a2da78f100adccce
+      - 79782d28df96643d72db9d424739a5bc
+      - 99fe188911d1aa7709330d68405fcab1
+      - 3fdb2717cd192e28ee9af2241660e65d
+      - 3d87483056bf3f3b2e3bfedb5e7d712e
+      - 0f44c10881a147093ce6bd0e97e5323e
+      - e0db3e4a240b868c81c2174facdd5813
+      - 2f7967cee0c131a7f9c64bc376e4041e
+      - a23f2e79a56f02926faca6928b4ecfbd
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 228
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 2
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 2
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

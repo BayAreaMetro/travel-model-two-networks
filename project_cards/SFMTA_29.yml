@@ -1,6 +1,6 @@
 project: SFMTA Route 29
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -532,4 +532,3 @@ changes:
     - -1023720
     - 1019000
     - -1020808
-valid: false

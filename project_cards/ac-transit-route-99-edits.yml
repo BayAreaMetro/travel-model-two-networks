@@ -1,6 +1,6 @@
 project: year 2015 ac transit route 99 edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -1559,4 +1559,3 @@ changes:
     - -2505601
     - 2600747
     - -2579895
-valid: false

@@ -1,9 +1,9 @@
 project: Year 2015 Modify Lanes to 7 Lanes
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'update lanes'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- update lanes
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -21,16 +21,16 @@ changes:
       - 4115386
       - 3161887
     - shstReferenceId:
-      - "2abb410a0cf3abe04cb7c622077ea717" 
-      - "52b2bfac7c4f55a3bc28633747e3ebde" 
-      - "57a16b402cca4710986ff99e0bb0637c" 
-      - "098a555a49342b0361bf73d4fb145628" 
-      - "1923d21769b9a496f72d11b77e9d93bc" 
-      - "48336daf4cb146ab09857067c79ff441" 
-      - "b4e09eb18c43aee9f5d9ce4aea9914ea" 
-      - "c09d1be7fe16a1b4c6dd2297a0b595aa" 
-      - "e8a712ba58f30c910ff65a46eb6b605e" 
-      - "f3c12a0e25207502176968adff57f6ba" 
-  properties:    
+      - 2abb410a0cf3abe04cb7c622077ea717
+      - 52b2bfac7c4f55a3bc28633747e3ebde
+      - 57a16b402cca4710986ff99e0bb0637c
+      - 098a555a49342b0361bf73d4fb145628
+      - 1923d21769b9a496f72d11b77e9d93bc
+      - 48336daf4cb146ab09857067c79ff441
+      - b4e09eb18c43aee9f5d9ce4aea9914ea
+      - c09d1be7fe16a1b4c6dd2297a0b595aa
+      - e8a712ba58f30c910ff65a46eb6b605e
+      - f3c12a0e25207502176968adff57f6ba
+  properties:
   - property: lanes
     set: 7

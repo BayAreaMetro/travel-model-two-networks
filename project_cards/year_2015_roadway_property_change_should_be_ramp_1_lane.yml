@@ -1,10 +1,10 @@
 project: Year 2015 Modify Lanes to 1 Lane and Facility Type to Ramp
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'facility type ramp'
-  - 'update lanes'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- facility type ramp
+- update lanes
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -22,19 +22,19 @@ changes:
       - 1058621
       - 3152416
     - shstReferenceId:
-      - "1cd127adeadc482aa3fa6a547e4d8932"
-      - "07ae2e343e9d9a6f104f30bd97e3bf22"
-      - "23ede8e21ff45ed78d2ae2167c87d588"
-      - "37d6386c0ecfb44f195191aebd585c82"
-      - "99aa877d0eb0219df233a11474e4c80e"
-      - "630284623bb26e5af5d9cd7c5fd8180b"
-      - "a6ce5684d615f02fd95db7ca08bd18fb"
-      - "aa1856cfccc2571e1988c864f766669d"
-      - "c6a933ec3595906f5cf96d6a18ca7fdc"
-      - "e55c99d1d875c63cb52715dfb866332f"
+      - 1cd127adeadc482aa3fa6a547e4d8932
+      - 07ae2e343e9d9a6f104f30bd97e3bf22
+      - 23ede8e21ff45ed78d2ae2167c87d588
+      - 37d6386c0ecfb44f195191aebd585c82
+      - 99aa877d0eb0219df233a11474e4c80e
+      - 630284623bb26e5af5d9cd7c5fd8180b
+      - a6ce5684d615f02fd95db7ca08bd18fb
+      - aa1856cfccc2571e1988c864f766669d
+      - c6a933ec3595906f5cf96d6a18ca7fdc
+      - e55c99d1d875c63cb52715dfb866332f
   properties:
   - property: roadway
-    set: 'motorway_link'   
+    set: motorway_link
   - property: lanes
     set: 1
   - property: ft

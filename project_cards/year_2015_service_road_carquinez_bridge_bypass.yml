@@ -1,7 +1,7 @@
 project: Year 2015 Modify Service Road Carquinez Bridge Bypass
 tags:
-  - 'Year 2015'
-  - 'highway review'
+- Year 2015
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -10,7 +10,7 @@ changes:
     - model_link_id:
       - 5025070
     - shstReferenceId:
-      - "687dc3db7a7897ee272643cc2bcdf686"
+      - 687dc3db7a7897ee272643cc2bcdf686
   properties:
   - property: assignable
     set: 0

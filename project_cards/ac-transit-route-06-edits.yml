@@ -1,6 +1,6 @@
 project: year 2015 ac transit route 06 edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -788,4 +788,3 @@ changes:
     - -2595427
     - 2521855
     - -2550340
-valid: false

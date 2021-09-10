@@ -1,6 +1,6 @@
 project: VTA Route 570 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -4782,4 +4782,3 @@ changes:
     - -2096253
     - 2133722
     - -2033279
-valid: false

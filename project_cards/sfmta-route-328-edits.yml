@@ -1,6 +1,6 @@
 project: SFMTA Route 328 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -282,4 +282,3 @@ changes:
     - 1000816
     - 1012317
     - -1023508
-valid: false

@@ -1,6 +1,6 @@
 project: SFMTA Route 24
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -45,4 +45,3 @@ changes:
     - -1017216
     - -1015868
     - 1019680
-valid: false

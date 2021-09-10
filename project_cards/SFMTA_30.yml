@@ -1,6 +1,6 @@
 project: SFMTA Route 30
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -16,8 +16,8 @@ changes:
       end_time: '19:00'
     - route_id: '310'
       direction_id: 0
-      start_time: "19:00"
-      end_time: '03:00'
+      start_time: '19:00'
+      end_time: 03:00
   properties:
   - property: routing
     existing:
@@ -205,4 +205,3 @@ changes:
     - -1018603
     - 1000584
     - -1000754
-valid: false

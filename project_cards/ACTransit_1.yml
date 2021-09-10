@@ -1,6 +1,6 @@
 project: year 2015 ac transit route 1
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -1414,4 +1414,3 @@ changes:
     - -2516520
     - 2600447
     - -2530653
-valid: false
