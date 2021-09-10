@@ -1,0 +1,13 @@
+---
+project: change gg ferries from zonal to flat fare
+category: Add Transit
+tags:
+- 'Minor Transit'
+dependencies:
+---
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "San Franciso Ferry Terminal") & (self.feed.stops.model_node_id == "1027623"), 'zone_id'] = np.nan
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Sausalito Ferry Terminal") & (self.feed.stops.model_node_id == "5026533"), 'zone_id'] = np.nan
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Larkspur Ferry Terminal") & (self.feed.stops.model_node_id == "5026532"), 'zone_id'] = np.nan

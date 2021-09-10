@@ -1,7 +1,7 @@
 project: Year 2015 Bus Only Segments for Transbay Terminal Ramps
 tags:
 - Year 2015
-- 'Bus Only'
+- Bus Only
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -39,4 +39,3 @@ changes:
     set: 1
   - property: bike_access
     set: 0
-valid: false

@@ -1,10 +1,10 @@
 project: Year 2015 Modify Lanes to 2 Lane and Facility Type to Ramp
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'facility type ramp'
-  - 'update lanes'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- facility type ramp
+- update lanes
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -13,10 +13,10 @@ changes:
     - model_link_id:
       - 3150085
     - shstReferenceId:
-      - "e1e87b288e5d94e04e7a74d3e26582d8"
+      - e1e87b288e5d94e04e7a74d3e26582d8
   properties:
   - property: roadway
-    set: 'motorway_link'   
+    set: motorway_link
   - property: lanes
     set: 2
   - property: ft

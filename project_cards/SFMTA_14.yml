@@ -1,6 +1,6 @@
 project: SFMTA route 14
-tags: 
-  - 'Major Transit'
+tags:
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -89,4 +89,3 @@ changes:
     - -1005082
     - 1003011
     - -1018930
-valid: false

@@ -1,6 +1,6 @@
 project: year 2015 ac transit route 40 edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -51,4 +51,3 @@ changes:
     - -2506283
     - -2580549
     - -2598641
-valid: false

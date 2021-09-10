@@ -1,6 +1,6 @@
 project: year 2015 samtrans route 120 edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -422,4 +422,3 @@ changes:
     - -1519630
     - 1500998
     - -1519156
-valid: false

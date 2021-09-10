@@ -1,6 +1,6 @@
 project: SFMTA Route 304 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -123,4 +123,3 @@ changes:
     - -1011486
     - 1003189
     - -1012890
-valid: false

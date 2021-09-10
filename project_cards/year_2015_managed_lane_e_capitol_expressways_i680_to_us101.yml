@@ -1,8 +1,9 @@
-project: Year 2015 Modify HOV Lanes and USE on E Capitol Expressway SB I-680 to US 101
+project: Year 2015 Modify HOV Lanes and USE on E Capitol Expressway SB I-680 to US
+  101
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes'
-  - 'HOV Lanes'
+- Year 2015
+- Managed Lanes
+- HOV Lanes
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -78,99 +79,111 @@ changes:
       - 2025282
       - 2046895
     - shstReferenceId:
-      - "3b424a4b9f84f8f32e9baf8b78ded83f"
-      - "e2441e6a6afa4ae5e5024688d3e4de85"
-      - "071c85a2bd96bc027590754c227b5bf7"
-      - "cbce43f9167dcbbdd24b2e7f5d7a2f14"
-      - "540add4c9463afa5b33467a7212f8ed6"
-      - "0b7ec40112a35ee2da8dcfba2520ff9b"
-      - "d2f11b71ff458ec3cde68ef77d3e2488"
-      - "3074f9b55d600fb2055ff7348134606d"
-      - "4704ace6d0311a3e1d0ad46457a4ae2b"
-      - "dc0d34a4a35c08089a3ba57afa76967b"
-      - "6d8f7f6081072995322de25e9d6087ed"
-      - "3415dc7b29f56ef0096210621e10423d"
-      - "de0bd1e3a13ce7304cacbd6c3821e8de"
-      - "4b8f705ffe7560b595eb8ad5fa94c786"
-      - "ca4854e5e462837f17f6f529a816db97"
-      - "33db507d67d53627d6fcb00e81487313"
-      - "ad78c0351414999a3521d907ff6354e6"
-      - "66c88b8ce51721b3c8f035d31d655bf7"
-      - "263d637aeb79a0daf2ae6316abf4a882"
-      - "e1dbd19bbc81928e6a711221e2c153fd"
-      - "26e457b1ea8f8708e33e0a9994746ec5"
-      - "fee5d4e5e14effca46d5094ac099cd9c"
-      - "06f95962e155ac0b20f25a66965a888e"
-      - "b06fab8ecc9f6a3abb49946869bd18b1"
-      - "5f04adbcf1723c6e3eccd3773da319eb"
-      - "30264dbc8268b916237932650942bdaa"
-      - "b28c2a7375543fa0a04fc0312c24ddbf"
-      - "14bb68be26415b9496fa2d9d4b4ab4aa"
-      - "5ec98a4933589da37199687759686f1e"
-      - "2eb769acc29f06f0e78685a5976004ce"
-      - "8fa5dbbd853411706bb5da63acfdc77f"
-      - "a00131aa274e54798f71477f5944e2ee"
-      - "327438d1a3d5327ea5b805ca2c076d26"
-      - "234944f65a6c9a2615f12233536d19ca"
-      - "91b7238d016ca50d94ff3ced39325c74"
-      - "36ff94cfd2e510b63722ccfc5dd8264c"
-      - "76f64060c5f7689fe141726dcfac37bc"
-      - "bfec96a8795c25f7e7704673b2efed2c"
-      - "a8fa8bed08e1144e40c7e6c5bb9d6b4e"
-      - "faf5fb6409fccb7c31a21fb37d480d87"
-      - "e380191df1384be8243cb374d2b622b7"
-      - "8d9d8172d1b63109f8acfd4b2850792b"
-      - "1d80be3df5dd4b3029640fdda4555488"
-      - "578aaea23cda6f1c44c4a65f3c1147f3"
-      - "e9cf377a982f770965228581b99746f9"
-      - "9bbd13c42e3a82d9f08901957993bad9"
-      - "c8657c4d64742145a6691306847a0d8e"
-      - "08fd50c239bfdcfff10c4d074e11a0bc"
-      - "b9bf35e71775b1f52b307af35ec328e6"
-      - "695289d816551d3dc46d9bc1bedb6d8c"
-      - "b4fa38c85000b78e507f005703f2151b"
-      - "79d1443cc127a70204a393447ad2de3f"
-      - "28083ec00e550ef1df046726ec4e5286"
-      - "6f02a215df570ec8e589fac94ec88db6"
-      - "9d499aa915c41a4d7c313d333d11812a"
-      - "fdfd74444169aa1af96164a9b84baee8"
-      - "bfd646c4eba1a2cbf0d4a1cb70712045"
-      - "5157d6921beeddf5fae0d90ed85a2c92"
-      - "b77b509e4c9b66a9c0c3da0be941e2b8"
-      - "d0fdfac23032f804774d4c49d52843ca"
-      - "923f32b412a1c09624a54bcdaf049069"
-      - "d713cea5bec842be768e1ae97037a821"
-      - "9cedb69db94865f829b1e94ea7058f86"
-      - "0f4afaa4cb832f847a9cecfdd4c10f00"
-      - "a1f1ad296240089bf54424c758ca3b70"
-      - "a77bf742f08b1f2977ae8efd279d7abd"
-      - "178f66faab9006a8404c33b39fe0de5e"
-      - "2bd90a4d2b981d7e460c459e84434117"
+      - 3b424a4b9f84f8f32e9baf8b78ded83f
+      - e2441e6a6afa4ae5e5024688d3e4de85
+      - 071c85a2bd96bc027590754c227b5bf7
+      - cbce43f9167dcbbdd24b2e7f5d7a2f14
+      - 540add4c9463afa5b33467a7212f8ed6
+      - 0b7ec40112a35ee2da8dcfba2520ff9b
+      - d2f11b71ff458ec3cde68ef77d3e2488
+      - 3074f9b55d600fb2055ff7348134606d
+      - 4704ace6d0311a3e1d0ad46457a4ae2b
+      - dc0d34a4a35c08089a3ba57afa76967b
+      - 6d8f7f6081072995322de25e9d6087ed
+      - 3415dc7b29f56ef0096210621e10423d
+      - de0bd1e3a13ce7304cacbd6c3821e8de
+      - 4b8f705ffe7560b595eb8ad5fa94c786
+      - ca4854e5e462837f17f6f529a816db97
+      - 33db507d67d53627d6fcb00e81487313
+      - ad78c0351414999a3521d907ff6354e6
+      - 66c88b8ce51721b3c8f035d31d655bf7
+      - 263d637aeb79a0daf2ae6316abf4a882
+      - e1dbd19bbc81928e6a711221e2c153fd
+      - 26e457b1ea8f8708e33e0a9994746ec5
+      - fee5d4e5e14effca46d5094ac099cd9c
+      - 06f95962e155ac0b20f25a66965a888e
+      - b06fab8ecc9f6a3abb49946869bd18b1
+      - 5f04adbcf1723c6e3eccd3773da319eb
+      - 30264dbc8268b916237932650942bdaa
+      - b28c2a7375543fa0a04fc0312c24ddbf
+      - 14bb68be26415b9496fa2d9d4b4ab4aa
+      - 5ec98a4933589da37199687759686f1e
+      - 2eb769acc29f06f0e78685a5976004ce
+      - 8fa5dbbd853411706bb5da63acfdc77f
+      - a00131aa274e54798f71477f5944e2ee
+      - 327438d1a3d5327ea5b805ca2c076d26
+      - 234944f65a6c9a2615f12233536d19ca
+      - 91b7238d016ca50d94ff3ced39325c74
+      - 36ff94cfd2e510b63722ccfc5dd8264c
+      - 76f64060c5f7689fe141726dcfac37bc
+      - bfec96a8795c25f7e7704673b2efed2c
+      - a8fa8bed08e1144e40c7e6c5bb9d6b4e
+      - faf5fb6409fccb7c31a21fb37d480d87
+      - e380191df1384be8243cb374d2b622b7
+      - 8d9d8172d1b63109f8acfd4b2850792b
+      - 1d80be3df5dd4b3029640fdda4555488
+      - 578aaea23cda6f1c44c4a65f3c1147f3
+      - e9cf377a982f770965228581b99746f9
+      - 9bbd13c42e3a82d9f08901957993bad9
+      - c8657c4d64742145a6691306847a0d8e
+      - 08fd50c239bfdcfff10c4d074e11a0bc
+      - b9bf35e71775b1f52b307af35ec328e6
+      - 695289d816551d3dc46d9bc1bedb6d8c
+      - b4fa38c85000b78e507f005703f2151b
+      - 79d1443cc127a70204a393447ad2de3f
+      - 28083ec00e550ef1df046726ec4e5286
+      - 6f02a215df570ec8e589fac94ec88db6
+      - 9d499aa915c41a4d7c313d333d11812a
+      - fdfd74444169aa1af96164a9b84baee8
+      - bfd646c4eba1a2cbf0d4a1cb70712045
+      - 5157d6921beeddf5fae0d90ed85a2c92
+      - b77b509e4c9b66a9c0c3da0be941e2b8
+      - d0fdfac23032f804774d4c49d52843ca
+      - 923f32b412a1c09624a54bcdaf049069
+      - d713cea5bec842be768e1ae97037a821
+      - 9cedb69db94865f829b1e94ea7058f86
+      - 0f4afaa4cb832f847a9cecfdd4c10f00
+      - a1f1ad296240089bf54424c758ca3b70
+      - a77bf742f08b1f2977ae8efd279d7abd
+      - 178f66faab9006a8404c33b39fe0de5e
+      - 2bd90a4d2b981d7e460c459e84434117
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 235
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 2
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 2
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

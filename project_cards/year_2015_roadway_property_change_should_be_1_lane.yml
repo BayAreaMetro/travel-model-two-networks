@@ -1,9 +1,9 @@
 project: Year 2015 Modify Lanes to 1 Lane
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'update lanes'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- update lanes
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -17,12 +17,12 @@ changes:
       - 2236739
       - 2242504
     - shstReferenceId:
-      - "2bafee067124d8a05a852efc2f07c4f3"
-      - "23f68d946901abb20224334087aa595b"
-      - "248ac044aaaf584f55a0460dbc6107dd"
-      - "aeac53ed85968d4f38866af3f79300cb"
-      - "ddd1a14e9109d21baca2afc735435362"
-      - "e33ea735d7f03fa64b4d36614030c285"
+      - 2bafee067124d8a05a852efc2f07c4f3
+      - 23f68d946901abb20224334087aa595b
+      - 248ac044aaaf584f55a0460dbc6107dd
+      - aeac53ed85968d4f38866af3f79300cb
+      - ddd1a14e9109d21baca2afc735435362
+      - e33ea735d7f03fa64b4d36614030c285
   properties:
   - property: lanes
     set: 1

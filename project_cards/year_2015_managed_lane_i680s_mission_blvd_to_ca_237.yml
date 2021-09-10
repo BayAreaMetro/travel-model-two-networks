@@ -1,9 +1,9 @@
 project: Year 2015 Modify Express Lanes and USE on I-680 SB Mission Blvd to CA-237
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes Review'
-  - 'Express Lanes'
-  - 'toll review'
+- Year 2015
+- Managed Lanes Review
+- Express Lanes
+- toll review
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -15,28 +15,40 @@ changes:
       - 3086017
       - 2009073
     - shstReferenceId:
-      - "2e359258cbd7a4c2a34854bd2e90802c"
-      - "de41e763c4ddddfd17cb28f8f5a00406"
-      - "81acc1ae1073bed8a72aa5d0412dd656"
-      - "087e221162e741bb3bf5a508f48494a1"
+      - 2e359258cbd7a4c2a34854bd2e90802c
+      - de41e763c4ddddfd17cb28f8f5a00406
+      - 81acc1ae1073bed8a72aa5d0412dd656
+      - 087e221162e741bb3bf5a508f48494a1
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 25
@@ -47,13 +59,22 @@ changes:
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 4
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       set: 4
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 4
   - property: ML_access
-    set: [2601773]
+    set:
+    - 2601773
   - property: ML_egress
-    set: [2601773, 2001645]  
+    set:
+    - 2601773
+    - 2001645

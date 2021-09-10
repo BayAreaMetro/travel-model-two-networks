@@ -1,8 +1,8 @@
 project: Year 2015 Lane correct should be Undivided Arterial
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'Major Arterial Review'
+- Year 2015
+- Roadway Property Change
+- Major Arterial Review
 dependencies: ''
 changes:
 - category: Roadway Property Change

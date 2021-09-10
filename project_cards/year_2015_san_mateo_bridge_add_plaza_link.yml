@@ -1,7 +1,7 @@
 project: add san mateo bridge toll plaza
 tags:
-  - 'Year 2015'
-  - 'Toll Plaza'
+- Year 2015
+- Toll Plaza
 dependencies: ''
 changes:
 - category: Roadway Deletion
@@ -13,7 +13,7 @@ changes:
   - A: 2562924
     B: 5030000
     bike_access: 0
-    county: 'Alameda'
+    county: Alameda
     drive_access: 1
     model_link_id: 3315462
     rail_only: 0
@@ -26,7 +26,7 @@ changes:
   - A: 5030000
     B: 2535792
     bike_access: 0
-    county: 'Alameda'
+    county: Alameda
     drive_access: 1
     model_link_id: 3315463
     rail_only: 0
@@ -37,7 +37,7 @@ changes:
     assignable: 1
   nodes:
   - bike_access: 0
-    county: 'Alameda'
+    county: Alameda
     drive_access: 1
     rail_only: 0
     walk_access: 0
@@ -45,4 +45,3 @@ changes:
     osm_node_id: ''
     X: -122.147744
     Y: 37.6193308
-valid: false

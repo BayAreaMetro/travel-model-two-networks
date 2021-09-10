@@ -1,9 +1,9 @@
 project: Year 2015 Correct As Is
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'lanes correct ft correct'
-  - 'Major Arterial Review'
+- Year 2015
+- Roadway Property Change
+- lanes correct ft correct
+- Major Arterial Review
 dependencies: ''
 changes:
 - category: Roadway Property Change

@@ -1,6 +1,6 @@
 project: SFMTA Route M-OCEANVIEW
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -10,7 +10,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027935
     - 1027936
     - 1027937
     - 1027938
@@ -22,6 +21,7 @@ changes:
     - 1027944
     - 1027945
     - 1027946
+    - 1027947
     set:
     - 1008901
     - -1005228
@@ -60,7 +60,7 @@ changes:
     - -1012590
     - -1012994
     - -1012446
-    - 1027946
+    - 1027947
 - category: Transit Service Property Change
   facility:
     route_id: '380'
@@ -68,7 +68,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027861
     - 1027862
     - 1027863
     - 1027864
@@ -81,9 +80,10 @@ changes:
     - 1027871
     - 1027872
     - 1027873
+    - 1027874
     set:
-    - 1027861
     - 1027862
+    - 1027863
     - 1000377
     - -1015900
     - -1019755
@@ -122,4 +122,3 @@ changes:
     - 1002555
     - 1012377
     - 1013720
-valid: false

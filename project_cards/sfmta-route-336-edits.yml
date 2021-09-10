@@ -1,6 +1,6 @@
 project: SFMTA Route 336 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -76,4 +76,3 @@ changes:
     - -1018737
     - 1019291
     - -1001466
-valid: false

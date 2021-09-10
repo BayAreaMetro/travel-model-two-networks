@@ -1,6 +1,6 @@
 project: VTA Route 593 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -2312,4 +2312,3 @@ changes:
     - -2049480
     - 2136770
     - -2144075
-valid: false

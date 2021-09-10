@@ -1,8 +1,9 @@
-project: Year 2015 Modify HOV Lanes and USE on Ramp Connecting I880 and Bay Bridge Plaza
+project: Year 2015 Modify HOV Lanes and USE on Ramp Connecting I880 and Bay Bridge
+  Plaza
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes'
-  - 'HOV Lanes'
+- Year 2015
+- Managed Lanes
+- HOV Lanes
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -14,35 +15,47 @@ changes:
       - 3049524
       - 3097617
     - shstReferenceId:
-      - "731620b4e9b213e334f146b4c6844099"
-      - "7629e3aa0e1b3bf0602b68674d514080"
-      - "4a5c5b58960183357a13230069d05ddc"
-      - "92df1697545013ebadf5ba7392217f12"
+      - 731620b4e9b213e334f146b4c6844099
+      - 7629e3aa0e1b3bf0602b68674d514080
+      - 4a5c5b58960183357a13230069d05ddc
+      - 92df1697545013ebadf5ba7392217f12
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 233
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 3
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 3
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

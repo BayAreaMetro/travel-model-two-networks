@@ -1,16 +1,61 @@
 project: update routing for golden gate bridge toll plaza transit
 tags:
-  - 'Toll Plaza Transit'
+- Toll Plaza Transit
 dependencies:
-  prerequisites: ['add golden gate bridge toll plaza']
+  prerequisites:
+  - add golden gate bridge toll plaza
 changes:
 - category: Transit Service Property Change
   facility:
-    route_short_name: ['2', '4', '38', '27', '44', '56', '70', '18', '24', '54', '58',
-       '10', '101', '101X', '8', '72X', '92', '97', '72', '74', '76']
-    shape_id: ['558', '604', '610', '600', '580', '578', '617', '636', '643',
-       '645', '556', '567', '626', '625', '638', '545', '549', '552',
-       '660', '652', '661', '662', '667', '649', '654', '658']
+    route_short_name:
+    - '2'
+    - '4'
+    - '38'
+    - '27'
+    - '44'
+    - '56'
+    - '70'
+    - '18'
+    - '24'
+    - '54'
+    - '58'
+    - '10'
+    - '101'
+    - 101X
+    - '8'
+    - 72X
+    - '92'
+    - '97'
+    - '72'
+    - '74'
+    - '76'
+    shape_id:
+    - '558'
+    - '604'
+    - '610'
+    - '600'
+    - '580'
+    - '578'
+    - '617'
+    - '636'
+    - '643'
+    - '645'
+    - '556'
+    - '567'
+    - '626'
+    - '625'
+    - '638'
+    - '545'
+    - '549'
+    - '552'
+    - '660'
+    - '652'
+    - '661'
+    - '662'
+    - '667'
+    - '649'
+    - '654'
+    - '658'
   properties:
   - property: routing
     existing:
@@ -20,4 +65,3 @@ changes:
     - -5013515
     - -5030001
     - -1005772
-valid: false

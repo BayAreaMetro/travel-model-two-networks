@@ -95,8 +95,8 @@ add_d0_shapes_df = pd.DataFrame(
   {"shape_id" : ["1151","1151","1151", "101151","101151"],
    "shape_pt_sequence" : [1,2,3,
                           1,2],
-   "shape_model_node_id" : ["3541176","1028038","3541176",
-                            "3541176","1028038"],
+   "shape_model_node_id" : ["3541176","1028039","3541176",
+                            "3541176","1028039"],
   }
 )
 
@@ -166,7 +166,7 @@ self.feed.stop_times = self.feed.stop_times.append(
 add_d1_shapes_df = pd.DataFrame(
   {"shape_id" : "1152",
    "shape_pt_sequence" : [1,2,3,4],
-   "shape_model_node_id" : ["3541176","1028038","1028039","3541176"],
+   "shape_model_node_id" : ["3541176","1028039","1028040","3541176"],
   }
 )
 

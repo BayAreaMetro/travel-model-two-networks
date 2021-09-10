@@ -1,9 +1,9 @@
 project: Year 2015 Correct As Is should be Divided Arterial part 3
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'lanes correct should be Divided Arterial'
-  - 'Major Arterial Review'
+- Year 2015
+- Roadway Property Change
+- lanes correct should be Divided Arterial
+- Major Arterial Review
 dependencies: ''
 changes:
 - category: Roadway Property Change

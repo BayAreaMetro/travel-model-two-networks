@@ -1,9 +1,10 @@
-project: Year 2015 Modify Express Lanes and USE on I-580 EB (segment 01) Hacienda Drive to Airway_Blvd
+project: Year 2015 Modify Express Lanes and USE on I-580 EB (segment 01) Hacienda
+  Drive to Airway_Blvd
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes Review'
-  - 'Express Lanes'
-  - 'toll review'
+- Year 2015
+- Managed Lanes Review
+- Express Lanes
+- toll review
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -17,47 +18,65 @@ changes:
       - 3117728
       - 3156921
     - shstReferenceId:
-      - "8031c3f28401577839f7baac98227db3"
-      - "4adb195680ebf70c19a79893753d00a4"
-      - "8bed9b5fce914e0324ab29ea29d25ae7"
-      - "79fe87bdf1f043fd3d0bb15427a802ba"
-      - "b1535f160632461e3236f2e1c8465c67"
-      - "ec0a43779245aed9558b850030607b3b"
+      - 8031c3f28401577839f7baac98227db3
+      - 4adb195680ebf70c19a79893753d00a4
+      - 8bed9b5fce914e0324ab29ea29d25ae7
+      - 79fe87bdf1f043fd3d0bb15427a802ba
+      - b1535f160632461e3236f2e1c8465c67
+      - ec0a43779245aed9558b850030607b3b
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       set: 1
-    - time: ['15:00', '19:00']
-      set: 1    
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
   - property: segment_id
     set: 28
   - property: ML_tollseg
     set: 1
   - property: ML_tollbooth
-    set: 28   
+    set: 28
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 4
-    - time: ['10:00', '15:00']
+    - time:
+      - '10:00'
+      - '15:00'
       set: 4
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 4
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

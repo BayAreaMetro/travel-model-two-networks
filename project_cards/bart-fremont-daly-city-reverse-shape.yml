@@ -1,6 +1,6 @@
 project: BART Fremont Daly City reverse shape
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -95,4 +95,3 @@ changes:
     - -1027614
     - -1027615
     - -1556363
-valid: false

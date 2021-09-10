@@ -1,6 +1,6 @@
 project: SFMTA Route 9R
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -360,4 +360,3 @@ changes:
     - -1015135
     - 1010376
     - -1010864
-valid: false

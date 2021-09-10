@@ -1,6 +1,6 @@
 project: SFMTA Route 349 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -260,4 +260,3 @@ changes:
     - -1017701
     - 1016534
     - -1003329
-valid: false

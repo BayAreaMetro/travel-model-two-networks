@@ -1,6 +1,6 @@
 project: SFMTA Route 381 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -582,4 +582,3 @@ changes:
     set:
     - -1008624
     - -1014985
-valid: false

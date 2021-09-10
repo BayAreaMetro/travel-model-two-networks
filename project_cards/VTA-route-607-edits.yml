@@ -1,6 +1,6 @@
 project: VTA Route 607 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -2508,4 +2508,3 @@ changes:
     - -2059653
     - 2027591
     - -2136780
-valid: false

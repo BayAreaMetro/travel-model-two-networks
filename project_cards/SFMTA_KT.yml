@@ -1,6 +1,6 @@
 project: SFMTA Route KT
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -8,23 +8,22 @@ changes:
     route:
     - route_id: '377'
       direction_id: 1
-      shape_id: "1112"
+      shape_id: '1112'
       start_time: 06:00
       end_time: '10:00'
     - route_id: '377'
       direction_id: 1
-      shape_id: "1112"
+      shape_id: '1112'
       start_time: '10:00'
       end_time: '15:00'
     - route_id: '377'
       direction_id: 1
-      shape_id: "1112"
+      shape_id: '1112'
       start_time: '15:00'
       end_time: '19:00'
   properties:
   - property: routing
     existing:
-    - 1027896
     - 1027897
     - 1027898
     - 1027899
@@ -34,6 +33,7 @@ changes:
     - 1027903
     - 1027904
     - 1027905
+    - 1027906
     set:
     - 1002867
     - -1002925
@@ -81,29 +81,28 @@ changes:
     - -1007609
     - -1009392
     - -1010580
-    - 1027905
+    - 1027906
 - category: Transit Service Property Change
   facility:
     route:
     - route_id: '377'
       direction_id: 0
-      shape_id: "1097"
+      shape_id: '1097'
       start_time: 06:00
       end_time: '10:00'
     - route_id: '377'
       direction_id: 0
-      shape_id: "1097"
+      shape_id: '1097'
       start_time: '10:00'
       end_time: '15:00'
     - route_id: '377'
       direction_id: 0
-      shape_id: "1097"
+      shape_id: '1097'
       start_time: '15:00'
       end_time: '19:00'
   properties:
   - property: routing
     existing:
-    - 1027828
     - 1027829
     - 1027830
     - 1027831
@@ -114,9 +113,10 @@ changes:
     - 1027836
     - 1027837
     - 1027838
+    - 1027839
     set:
-    - 1027828
     - 1027829
+    - 1027830
     - 1012791
     - -1014351
     - -1017078
@@ -167,4 +167,3 @@ changes:
     - -1011372
     - -1008901
     - 1024166
-valid: false

@@ -1,6 +1,6 @@
 project: year 2015 ac transit route 38 edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -79,4 +79,3 @@ changes:
     - -2538357
     - 2564896
     - -2507075
-valid: false

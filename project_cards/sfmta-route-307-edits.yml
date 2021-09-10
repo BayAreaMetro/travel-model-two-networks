@@ -1,6 +1,6 @@
 project: SFMTA Route 307 Edits
 tags:
-  - 'Minor Transit'
+- Minor Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -67,4 +67,3 @@ changes:
     - -1022722
     - 1014162
     - -1007792
-valid: false

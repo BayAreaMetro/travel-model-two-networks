@@ -10,10 +10,10 @@
 #
 # Run a command (/bin/bash) in a new container layer over the specified image:
 # 	docker run -it --rm -v [path to this directory]:/usr/node/ shst:latest /bin/bash
-# On a Mac machine:
-# 	e.g. docker run -it --rm -v /Users/lzorn/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
-# On a Windows machine:
-#   e.g. docker run -it --rm -v /c/Users/ywang/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
+# e.g. on a Mac machine:
+# 	docker run -it --rm -v /Users/lzorn/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
+# e.g. on a Windows machine:
+#   docker run -it --rm -v /c/Users/ywang/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
 # 
 # First, create folder "/data/external/sharedstreets_extract" to store the extracted data
 # cd /usr/node/data/external

@@ -1,6 +1,6 @@
 project: SFMTA Route 45
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -91,4 +91,3 @@ changes:
     - -1018603
     - 1000584
     - -1000754
-valid: false
