@@ -1,6 +1,6 @@
 project: SFMTA Route L-TARAVAL
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -11,8 +11,7 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027858
-    - 1027916
+    - 1027859
     - 1027917
     - 1027918
     - 1027919
@@ -31,7 +30,8 @@ changes:
     - 1027932
     - 1027933
     - 1027934
-    - 1027908
+    - 1027935
+    - 1027909
     set:
     - 1023363
     - 1006966
@@ -91,7 +91,7 @@ changes:
     - -1012458
     - -1009841
     - -1002433
-    - 1027908
+    - 1027909
 - category: Transit Service Property Change
   facility:
     route_id: '379'
@@ -100,9 +100,8 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027825
     - 1027826
-    - 1027839
+    - 1027827
     - 1027840
     - 1027841
     - 1027842
@@ -122,9 +121,10 @@ changes:
     - 1027856
     - 1027857
     - 1027858
+    - 1027859
     set:
-    - 1027825
     - 1027826
+    - 1027827
     - -1002433
     - -1009841
     - -1012458
@@ -184,4 +184,3 @@ changes:
     - 1003268
     - 1006966
     - 1023363
-valid: false

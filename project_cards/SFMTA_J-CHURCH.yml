@@ -1,6 +1,6 @@
 project: SFMTA Route J-CHURCH
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -10,7 +10,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027950
     - 1027951
     - 1027952
     - 1027953
@@ -23,18 +22,19 @@ changes:
     - 1027960
     - 1027961
     - 1027962
+    - 1027963
     set:
-    - 1027950
     - 1027951
+    - 1027952
     - 1011387
     - -1008816
     - -1013142
     - -1002358
     - -1011914
-    - 1027952
     - 1027953
     - 1027954
     - 1027955
+    - 1027956
     - 1015862
     - -1020136
     - -1013049
@@ -57,7 +57,7 @@ changes:
     - 1004652
     - -1009389
     - -1003785
-    - 1027962
+    - 1027963
 - category: Transit Service Property Change
   facility:
     route_id: '369'
@@ -65,7 +65,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027999
     - 1028000
     - 1028001
     - 1028002
@@ -78,9 +77,10 @@ changes:
     - 1028009
     - 1028010
     - 1028011
+    - 1028012
     set:
-    - 1027999
     - 1028000
+    - 1028001
     - -1005171
     - -1003785
     - -1009389
@@ -102,15 +102,14 @@ changes:
     - -1017613
     - -1001754
     - -1013049
-    - 1028006
     - 1028007
     - 1028008
     - 1028009
     - 1028010
+    - 1028011
     - -1009043
     - -1013207
     - -1011914
     - -1002358
     - -1013142
-    - 1028011
-valid: false
+    - 1028012

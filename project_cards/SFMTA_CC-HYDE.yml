@@ -1,6 +1,6 @@
 project: SFMTA Route CC-HYDE
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -11,7 +11,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027687
     - 1027688
     - 1027689
     - 1027690
@@ -29,7 +28,8 @@ changes:
     - 1027702
     - 1027703
     - 1027704
-    - 1027665
+    - 1027705
+    - 1027666
     set:
     - 1013352
     - 1001084
@@ -67,7 +67,7 @@ changes:
     - 1020423
     - -1024032
     - 1014376
-    - 1027665
+    - 1027666
 - category: Transit Service Property Change
   facility:
     route_id: '320'
@@ -76,7 +76,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027645
     - 1027646
     - 1027647
     - 1027648
@@ -95,9 +94,10 @@ changes:
     - 1027661
     - 1027662
     - 1027663
+    - 1027664
     set:
-    - 1027645
     - 1027646
+    - 1027647
     - -1011164
     - -1014962
     - 1008363
@@ -135,4 +135,3 @@ changes:
     - -1004326
     - 1001084
     - 1013352
-valid: false

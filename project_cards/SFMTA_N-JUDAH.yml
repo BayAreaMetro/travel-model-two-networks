@@ -1,8 +1,9 @@
 project: sfmta route n-judah
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies:
-  prerequisites: ['move street rail to street connector links']
+  prerequisites:
+  - move street rail to street connector links
 changes:
 - category: Transit Service Property Change
   facility:
@@ -30,8 +31,7 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027822
-    - 1027969
+    - 1027823
     - 1027970
     - 1027971
     - 1027972
@@ -56,17 +56,18 @@ changes:
     - 1027991
     - 1027992
     - 1027993
+    - 1027994
     set:
-    - 1027822
-    - 1027969
+    - 1027823
+    - 1027970
     - -1009869
     - -1020442
     - -1016386
     - -1006274
     - -1016050
     - -1003537
-    - 1027970
-    - -1027971
+    - 1027971
+    - -1027972
     - 1017359
     - -1021472
     - 1005827
@@ -144,7 +145,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1028013
     - 1028014
     - 1028015
     - 1028016
@@ -168,6 +168,7 @@ changes:
     - 1028034
     - 1028035
     - 1028036
+    - 1028037
     set:
     - 1006697
     - -1004566
@@ -244,15 +245,14 @@ changes:
     - -1010088
     - -1010379
     - -1018021
-    - 1028031
     - 1028032
     - 1028033
     - 1028034
     - 1028035
+    - 1028036
     - -1016050
     - -1006274
     - -1016386
     - -1020442
     - -1009869
-    - 1028036
-valid: false
+    - 1028037

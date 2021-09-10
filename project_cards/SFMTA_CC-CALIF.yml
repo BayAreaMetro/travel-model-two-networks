@@ -1,6 +1,6 @@
 project: SFMTA Route CC-CALIF
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -11,7 +11,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027709
     - 1027710
     - 1027711
     - 1027712
@@ -25,10 +24,11 @@ changes:
     - 1027720
     - 1027721
     - 1027722
-    - 1027705
+    - 1027723
     - 1027706
     - 1027707
     - 1027708
+    - 1027709
     set:
     - 1007769
     - -1009432
@@ -73,8 +73,7 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027708
-    - 1027723
+    - 1027709
     - 1027724
     - 1027725
     - 1027726
@@ -91,7 +90,8 @@ changes:
     - 1027737
     - 1027738
     - 1027739
-    - 1027709
+    - 1027740
+    - 1027710
     set:
     - 1013498
     - -1000212
@@ -128,4 +128,3 @@ changes:
     - -1023540
     - -1009432
     - 1007769
-valid: false

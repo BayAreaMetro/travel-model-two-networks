@@ -1,6 +1,6 @@
 project: SFMTA Route CC-MASON
 tags:
-  - 'Major Transit'
+- Major Transit
 dependencies: ''
 changes:
 - category: Transit Service Property Change
@@ -11,7 +11,6 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027676
     - 1027677
     - 1027678
     - 1027679
@@ -22,8 +21,9 @@ changes:
     - 1027684
     - 1027685
     - 1027686
-    - 1027664
+    - 1027687
     - 1027665
+    - 1027666
     set:
     - 1016082
     - -1014382
@@ -52,7 +52,7 @@ changes:
     - 1014376
     - -1013446
     - -1015537
-    - 1027665
+    - 1027666
 - category: Transit Service Property Change
   facility:
     route_id: '319'
@@ -61,9 +61,8 @@ changes:
   properties:
   - property: routing
     existing:
-    - 1027645
     - 1027646
-    - 1027623
+    - 1027647
     - 1027624
     - 1027625
     - 1027626
@@ -75,9 +74,10 @@ changes:
     - 1027632
     - 1027633
     - 1027634
+    - 1027635
     set:
-    - 1027645
     - 1027646
+    - 1027647
     - -1011164
     - -1014962
     - 1008363
@@ -104,4 +104,3 @@ changes:
     - -1020323
     - -1014382
     - 1016082
-valid: false
