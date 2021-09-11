@@ -1,9 +1,10 @@
 ---
 project: SamTrans Route 120 new stop nodes farezone assignment
-category: Calculated Roadway
+category: Add Transit
 tags:
   - 'Minor Transit'
 dependencies: ''
 ---
 
-self.nodes_df.loc[self.nodes_df.model_node_id.isin([1523872,1545076,1503345,1519909,1504028,1514714,1506746]), 'farezone'] = 88
+self.feed.stops.loc[self.feed.stops.stop_id.astype(int).isin([101523872,101545076,101503345,101519909,101504028,101514714,101506746]), 'zone_id'] = '1'
+self.feed.stops.loc[self.feed.stops.stop_id.astype(int).isin([101523872,101545076,101503345,101519909,101504028,101514714,101506746]), 'agency_raw_name'] = 'SamTrans_2015_8_20'
