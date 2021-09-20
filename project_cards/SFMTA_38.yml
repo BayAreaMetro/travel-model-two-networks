@@ -1,0 +1,27 @@
+project: SFMTA Route 38
+tags:
+- Major Transit
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route_id: '340'
+    direction_id: 1
+  properties:
+  - property: routing
+    existing:
+    - -1014424
+    - 1015099
+    - -1001027
+    - -1003170
+    - -1013584
+    - -1006960
+    - -1003554
+    - 1002034
+    - -1013584
+    set:
+    - -1014424
+    - 1015099
+    - 1001027
+    - -1003170
+    - -1013584

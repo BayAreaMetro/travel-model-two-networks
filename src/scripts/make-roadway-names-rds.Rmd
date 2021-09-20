@@ -1,0 +1,94 @@
+---
+title: "Make Roadway Assignment Viewer"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow",
+                     "sf")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+data_dir <- "../../data/"
+interim_dir <- paste0(data_dir, "interim/")
+processed_dir <- paste0(data_dir, "processed/")
+
+version <- "version_10"
+
+links_file_name <- paste0(processed_dir, version, "/links.feather")
+
+output_file_name <- paste0(interim_dir, "roadway-assignment-names-helper.RDS")
+```
+
+# Parameters
+```{r parameters}
+
+```
+
+
+# Data Reads
+```{r read}
+links_df <- read_feather(links_file_name)
+
+```
+
+# Reductions 
+```{r reductions}
+names_df <- links_df %>%
+  filter(drive_access == 1) %>%
+  select(model_link_id, name) %>%
+  mutate(name = str_replace(name, "\\[", "")) %>%
+  mutate(name = str_replace(name, "\\]", "")) %>%
+  mutate(name = str_replace_all(name, "'", "")) %>%
+  separate(name, 
+           into = sprintf("%02d", seq(1:5)), 
+           sep = ",",
+           remove = TRUE,
+           extra = "drop",
+           fill = "right") %>%
+  pivot_longer(cols = -c(model_link_id),
+               names_to = "index",
+               values_to = "name") %>%
+  select(-index) %>%
+  mutate(name = trimws(name)) %>%
+  filter(!is.na(name)) %>%
+  filter(name != "nan") %>%
+  filter(name != "") %>%
+  distinct(model_link_id, name) %>%
+  group_by(model_link_id) %>%
+  mutate(index = row_number()) %>%
+  ungroup() %>%
+  pivot_wider(id_cols = model_link_id,
+              names_prefix = "name_",
+              names_from = index,
+              values_from = name) %>%
+  mutate(name = if_else(is.na(name_2), name_1, paste0(name_1, "/", name_2))) %>%
+  mutate(name = if_else(is.na(name_3), name, paste0(name, "/", name_3))) %>%
+  mutate(simple_name = str_replace(name, " Avenue", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Street", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Drive", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Boulevard", "")) %>%
+  mutate(simple_name = str_replace(simple_name, " Way", "")) %>%
+  select(model_link_id, name, simple_name)
+
+```
+
+# Write
+```{r write}
+saveRDS(names_df, output_file_name)
+
+```
+

@@ -1,0 +1,47 @@
+project: SFMTA Route 24
+tags:
+- Major Transit
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route_id: '332'
+    direction_id: 1
+    shape_id: '892'
+  properties:
+  - property: routing
+    existing:
+    - -1010464
+    - -1006656
+    - -1004132
+    - -1005920
+    - -1003323
+    - -1016960
+    - 1013828
+    - -1009718
+    - -1016960
+    - -1004132
+    - -1006693
+    set:
+    - -1010464
+    - -1006656
+    - 1004132
+    - -1006693
+- category: Transit Service Property Change
+  facility:
+    route_id: '332'
+    direction_id: 0
+    shape_id: '885'
+  properties:
+  - property: routing
+    existing:
+    - -1006860
+    - -1017216
+    - -1014570
+    - -1013090
+    - 1019680
+    set:
+    - -1006860
+    - -1017216
+    - -1015868
+    - 1019680

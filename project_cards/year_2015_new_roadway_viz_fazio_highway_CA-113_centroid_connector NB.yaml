@@ -1,0 +1,19 @@
+project: Year 2015 Add centroid connector at External Station connecting Vic Fazio
+  Highway CA-113 NB
+tags:
+- Year 2015
+- External Stations Review
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 3510669
+    B: 900007
+    model_link_id: 26067346
+    lanes: 1
+    ft: 8
+    bike_access: 0
+    drive_access: 1
+    roadway: taz
+    walk_access: 0
+    assignable: 1

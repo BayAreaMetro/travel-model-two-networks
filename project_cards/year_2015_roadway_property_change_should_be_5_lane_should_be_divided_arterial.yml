@@ -1,0 +1,49 @@
+project: Year 2015 Should be 5 Lane should be Divided Arterial
+tags:
+- Year 2015
+- Roadway Property Change
+- Major Arterial Review
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 1022143
+      - 1022648
+      - 1051663
+      - 1064723
+      - 1070514
+      - 1074555
+      - 2039761
+      - 2057325
+      - 2080397
+      - 2087384
+      - 2095086
+      - 2103763
+      - 2110780
+      - 2110958
+      - 2121205
+      - 2132817
+      - 2170227
+      - 2198845
+      - 2204602
+      - 2230063
+      - 2271372
+      - 3002412
+      - 3052585
+      - 3152709
+      - 3168281
+      - 4003608
+      - 4045430
+      - 4055019
+      - 4063538
+      - 4068784
+      - 4086238
+      - 4092471
+      - 4093571
+  properties:
+  - property: lanes
+    set: 5
+  - property: ft
+    set: 4

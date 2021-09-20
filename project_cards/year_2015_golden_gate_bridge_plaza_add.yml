@@ -1,0 +1,47 @@
+project: add golden gate bridge toll plaza
+tags:
+- Year 2015
+- Toll Plaza
+dependencies: ''
+changes:
+- category: Roadway Deletion
+  links:
+    model_link_id:
+    - 8016300
+- category: Add New Roadway
+  links:
+  - A: 5013515
+    B: 5030001
+    bike_access: 0
+    county: Marin
+    drive_access: 1
+    model_link_id: 8063198
+    rail_only: 0
+    shstGeometryId: ''
+    walk_access: 0
+    tollbooth: 0
+    ft: 1
+    lanes: 3
+    assignable: 1
+  - A: 5030001
+    B: 1005772
+    bike_access: 0
+    county: Marin
+    drive_access: 1
+    model_link_id: 8063199
+    rail_only: 0
+    shstGeometryId: ''
+    walk_access: 0
+    ft: 7
+    lanes: 9
+    assignable: 1
+  nodes:
+  - bike_access: 0
+    county: Marin
+    drive_access: 1
+    rail_only: 0
+    walk_access: 0
+    model_node_id: 5030001
+    osm_node_id: ''
+    X: -122.47657969594002
+    Y: 37.808072775968476

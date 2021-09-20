@@ -1,0 +1,125 @@
+---
+title: "Make Trip List from On-board Survey Data"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow")
+
+need_to_install <-
+  packages_vector[!(packages_vector %in% installed.packages()[, "Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+box_dir <- "../../data/external/mtc/"
+interim_dir <- "../../data/interim/"
+
+survey_file_name <- paste0(box_dir, "onboard_survey030121.rds")
+samtrans_file_name <- paste0(box_dir, "SamTrans033021.rds")
+output_file_name <- paste0(interim_dir, "onboard-survey-trip-list.feather")
+
+```
+
+# Parameters
+```{r parameters}
+```
+
+# Data Reads
+```{r data-reads}
+survey_df <- readRDS(survey_file_name)
+sam_df <- readRDS(samtrans_file_name)
+```
+
+# Reductions
+```{r reductions}
+bind_df <- sam_df %>%
+  select(unique_ID = Unique_ID,
+         weekpart,
+         survey_tech,
+         operator,
+         route,
+         orig_maz,
+         dest_maz,
+         day_part,
+         access_mode,
+         egress_mode,
+         first_board_tech,
+         last_alight_tech,
+         boardings,
+         boarding_weight = weight,
+         trip_weight) %>%
+  mutate(time_period = day_part) %>%
+  mutate(unique_ID = str_replace_all(unique_ID, "---", "___")) %>%
+  mutate(boarding_weight = if_else(is.na(boarding_weight), trip_weight/boardings, boarding_weight)) %>%
+  mutate(boarding_weight = replace_na(boarding_weight, 0.0))
+
+sum(bind_df$boarding_weight)
+
+in_path <- function(input_df, path_string) {
+  
+  return_df <- input_df %>%
+    mutate(in_path = 0L) %>%
+    mutate(in_path = if_else(first_board_tech == path_string, 1L, in_path)) %>%
+    mutate(in_path = if_else(last_alight_tech == path_string, 1L, in_path)) %>%
+    mutate(in_path = if_else(survey_tech == path_string, 1L, in_path))
+  
+  return(return_df)
+    
+  
+}
+output_df <- survey_df %>%
+  filter(weekpart == "WEEKDAY") %>%
+  select(unique_ID,
+         survey_tech,
+         operator,
+         route,
+         orig_maz,
+         dest_maz,
+         day_part,
+         time_period,
+         access_mode,
+         egress_mode,
+         first_board_tech,
+         last_alight_tech,
+         boardings,
+         boarding_weight = weight,
+         trip_weight) %>%
+  bind_rows(., bind_df) %>%
+  in_path(., "local bus") %>%
+  rename(local_bus_in_path = in_path) %>%
+  in_path(., "express bus") %>%
+  rename(express_bus_in_path = in_path) %>%
+  in_path(., "ferry") %>%
+  rename(ferry_in_path = in_path) %>%
+  in_path(., "heavy rail") %>%
+  rename(heavy_rail_in_path = in_path) %>%
+  in_path(., "light rail") %>%
+  rename(light_rail_in_path = in_path) %>%
+  in_path(., "commuter rail") %>%
+  rename(commuter_rail_in_path = in_path)
+
+sum(filter(output_df, local_bus_in_path == 1)$boarding_weight)
+sum(filter(output_df, express_bus_in_path == 1)$boarding_weight)
+sum(filter(output_df, light_rail_in_path == 1)$boarding_weight)
+sum(filter(output_df, ferry_in_path == 1)$boarding_weight)
+sum(filter(output_df, heavy_rail_in_path == 1)$boarding_weight)
+sum(filter(output_df, commuter_rail_in_path == 1)$boarding_weight)
+sum(output_df$boarding_weight)
+```
+
+# Write to Disk
+```{r data-write}
+write_feather(output_df, output_file_name)
+```
+
+

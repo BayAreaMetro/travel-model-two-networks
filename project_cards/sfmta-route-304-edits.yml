@@ -1,0 +1,125 @@
+project: SFMTA Route 304 Edits
+tags:
+- Minor Transit
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route_id: '304'
+    direction_id: 0
+    start_time: 03:00
+    end_time: 06:00
+  properties:
+  - property: routing
+    existing:
+    - -1024291
+    - -1019856
+    - -1004095
+    - -1014416
+    - 1020753
+    - -1010422
+    - -1001497
+    - -1003473
+    - -1006603
+    set:
+    - -1024291
+    - -1019856
+    - -1022891
+    - -1013836
+    - 1020320
+    - -1016662
+    - -1006603
+- category: Transit Service Property Change
+  facility:
+    route_id: '304'
+    direction_id: 0
+    start_time: '19:00'
+    end_time: 03:00
+  properties:
+  - property: routing
+    existing:
+    - -1024291
+    - -1019856
+    - -1004095
+    - -1014416
+    - 1020753
+    - -1010422
+    - -1001497
+    - -1003473
+    - -1006603
+    set:
+    - -1024291
+    - -1019856
+    - -1022891
+    - -1013836
+    - 1020320
+    - -1016662
+    - -1006603
+- category: Transit Service Property Change
+  facility:
+    route:
+    - route_id: '304'
+      direction_id: 1
+      start_time: 03:00
+      end_time: 06:00
+    - route_id: '304'
+      direction_id: 1
+      start_time: '19:00'
+      end_time: 03:00
+  properties:
+  - property: routing
+    existing:
+    - -1009973
+    - -1004992
+    - -1013949
+    - -1011486
+    - -1003189
+    - -1012890
+    - 1014700
+    - -1023917
+    - -1011486
+    - -1003189
+    - -1012890
+    set:
+    - -1009973
+    - -1004992
+    - -1013949
+    - -1011486
+    - 1003189
+    - -1012890
+- category: Transit Service Property Change
+  facility:
+    route:
+    - route_id: '304'
+      direction_id: 1
+      start_time: 06:00
+      end_time: '10:00'
+    - route_id: '304'
+      direction_id: 1
+      start_time: '10:00'
+      end_time: '15:00'
+    - route_id: '304'
+      direction_id: 1
+      start_time: '15:00'
+      end_time: '19:00'
+  properties:
+  - property: routing
+    existing:
+    - -1009973
+    - -1004992
+    - -1013949
+    - -1011486
+    - -1003189
+    - -1012890
+    - 1014700
+    - -1023917
+    - -1011486
+    - -1003189
+    - -1012890
+    set:
+    - -1009973
+    - -1004992
+    - -1013949
+    - -1011486
+    - 1003189
+    - -1012890

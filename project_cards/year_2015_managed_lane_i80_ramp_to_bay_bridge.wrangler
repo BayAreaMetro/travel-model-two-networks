@@ -1,0 +1,11 @@
+---
+project: Year 2015 Modify USE on I-80 WB to Bay Bridge Toll Plaza
+category: Calculated Roadway
+tags:
+- Year 2015
+- Exclude Trucks
+- Managed Lanes
+---
+
+self.links_df.loc[self.links_df['model_link_id'] == 3061568, 'useclass'] = [{'default': 0, 'timeofday': [{'time': (21600, 36000), 'value': 3},{'time': (54000, 68400), 'value': 3}]}]
+self.links_df.loc[self.links_df['model_link_id'] == 3149471, 'useclass'] = [{'default': 0, 'timeofday': [{'time': (21600, 36000), 'value': 3},{'time': (54000, 68400), 'value': 3}]}]

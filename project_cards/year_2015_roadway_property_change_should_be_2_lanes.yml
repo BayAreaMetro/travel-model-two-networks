@@ -1,9 +1,9 @@
 project: Year 2015 Modify Lanes to 2 Lanes
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'updated lanes'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- updated lanes
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -16,13 +16,16 @@ changes:
       - 3101610
       - 7004412
       - 4117232
+      - 5065073
+      - 5088966
+      - 5050486
     - shstReferenceId:
-      - "8f25612b527474e0ef68e4a37a69ee3c" 
-      - "41b848db6bd87e8a12678cf710852309" 
-      - "97bf0f2e64bed3d46595e19dbf9f5f01" 
-      - "98e5e7e8d707e271c2dbceb587399713" 
-      - "10281c76264190014e3bae265bdfba51" 
-      - "ec513b5ed200e5609d2622081abe9db7" 
+      - 8f25612b527474e0ef68e4a37a69ee3c
+      - 41b848db6bd87e8a12678cf710852309
+      - 97bf0f2e64bed3d46595e19dbf9f5f01
+      - 98e5e7e8d707e271c2dbceb587399713
+      - 10281c76264190014e3bae265bdfba51
+      - ec513b5ed200e5609d2622081abe9db7
   properties:
   - property: lanes
     set: 2

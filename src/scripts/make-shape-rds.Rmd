@@ -24,7 +24,9 @@ for (package in packages_vector) {
 processed_dir <- "../../data/processed/"
 interim_dir <- "../../data/interim/"
 
-shape_file_name <- paste0(processed_dir, "version_03/shape.geojson")
+version <- "version_11"
+
+shape_file_name <- paste0(processed_dir, version, "/shape.geojson")
 
 output_file_name <- paste0(interim_dir, "simple_shape.RDS")
 ```
@@ -37,12 +39,11 @@ shapes_sf <- st_read(shape_file_name)
 # Reductions 
 ```{r reductions}
 output_sf <- shapes_sf %>%
-  select(shstGeometryId = id, geometry)
+  select(id, geometry)
 ```
 
 # Write
 ```{r write}
 saveRDS(output_sf, file = output_file_name)
 ```
-
 

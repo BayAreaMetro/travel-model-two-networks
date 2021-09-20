@@ -1,9 +1,9 @@
 project: Year 2015 Modify Facility Type to Ramp
 tags:
-  - 'Year 2015'
-  - 'Roadway Property Change'
-  - 'facility type ramp'
-  - 'highway review'
+- Year 2015
+- Roadway Property Change
+- facility type ramp
+- highway review
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -58,59 +58,70 @@ changes:
       - 14948
       - 10330
       - 8977
+      - 3031886
+      - 3006561
+      - 3046803
+      - 3101610
+      - 3011518
+      - 3024387
+      - 4018032
+      - 5045751
+      - 5065073
+      - 5088966
+      - 5047885
     - shstReferenceId:
-      - "b9f8ed1b4f41957c8fa70f72d7c8f3eb"
-      - "35b123d05a162292e27042a42a044a1e"
-      - "feb9d8a123374c967d9f3a967c285b6d"
-      - "cb10c41dc6d24a5e0615c2942871c24d"
-      - "722847b96342b3e872e0e8e4f9df1d1a"
-      - "5a471ab430e89eb86b78d3f1606f25ab"
-      - "4fcf2306329dc45ae3bda421a347cb31"
-      - "ec022e71477c4dac6e2329c09077cc7e"
-      - "e14ae4698d25b003e6c03f8f2566f92c"
-      - "dc05a3183e19d2aa6a67b9bc3cb3ac7d"
-      - "cddf668857d1d7a397532df5f19cb6b0"
-      - "a0883acf05d860f430a2c52474c28809"
-      - "96a354c0df76e1dd09e3b3ee45a2703a"
-      - "6d3059cd29176de0949312c2767bcb68"
-      - "6bab7c73debf8ab19c8b3717d1ae0d8b"
-      - "1e65ae927211535e566fc826c2a24810"
-      - "aeac53ed85968d4f38866af3f79300cb"
-      - "4c443deb573a91075589b8b32cbbf4c6"
-      - "ff4aab8db62319092b658b8b6518f4f3"
-      - "cd4ae5314a0a9194e0e650a4e8e62bf8"
-      - "8d1388a20091795fb5ed2ceba9fe6b24"
-      - "722c3c7ca673cd4c9177e753b1fcfba5"
-      - "4d7dfc04e4f15a102e4f92995cc22ccf"
-      - "40ea809ff6e25ffe8e20c358791c8584"
-      - "1e14ba4b6875ffaf1c8201fbdd7de696"
-      - "051b8fa35ab03ea6ebba4896bebe2928"
-      - "f7f87589057e6089041ac6ba5c927d73"
-      - "f6163136730a48827aca153f9919172d"
-      - "ddd1a14e9109d21baca2afc735435362"
-      - "c17e2c6d6338d95af7dad1c7ecfdfcba"
-      - "75b5bef4c0778e30a109d3cde639bc7a"
-      - "44418d42ad11f1d3a996c8d53be858f2"
-      - "2ae81e4bdf519d7bb9850009da93dc50"
-      - "0e09acf67a43d35921fd72df603cd65f"
-      - "0a3eb6ef8c03b24278a6bd0c45915ca3"
-      - "5533ce639d0e2ab2923611417a70c425"
-      - "c7b0ac463b8f05614de3c7753aded72f"
-      - "a3fbd28c6b8288ee9526d6212958f6b8"
-      - "9a60da01e44160ac98e4e1710b1d3aa0"
-      - "70a19550462416e7131120577d27e00c"
-      - "57fcaf248509a87ef8b1f50c1b9cda3d"
-      - "462d5766b4523be7628647cb1173a4ef"
-      - "212252dec0cccc14d3d25c93c6ef225f"
-      - "10a409c73fa4916f4116e8717a98a518"
-      - "b3750b34e95167cb7cd37a3791478d49"
-      - "5cdd358e0120c2b81ba4880ef20ad225"
-      - "4090f870ca228fa6a6fb0c88182ec2d2"
-      - "3816ecc5bf88b84de783f021dafb349c"
+      - b9f8ed1b4f41957c8fa70f72d7c8f3eb
+      - 35b123d05a162292e27042a42a044a1e
+      - feb9d8a123374c967d9f3a967c285b6d
+      - cb10c41dc6d24a5e0615c2942871c24d
+      - 722847b96342b3e872e0e8e4f9df1d1a
+      - 5a471ab430e89eb86b78d3f1606f25ab
+      - 4fcf2306329dc45ae3bda421a347cb31
+      - ec022e71477c4dac6e2329c09077cc7e
+      - e14ae4698d25b003e6c03f8f2566f92c
+      - dc05a3183e19d2aa6a67b9bc3cb3ac7d
+      - cddf668857d1d7a397532df5f19cb6b0
+      - a0883acf05d860f430a2c52474c28809
+      - 96a354c0df76e1dd09e3b3ee45a2703a
+      - 6d3059cd29176de0949312c2767bcb68
+      - 6bab7c73debf8ab19c8b3717d1ae0d8b
+      - 1e65ae927211535e566fc826c2a24810
+      - aeac53ed85968d4f38866af3f79300cb
+      - 4c443deb573a91075589b8b32cbbf4c6
+      - ff4aab8db62319092b658b8b6518f4f3
+      - cd4ae5314a0a9194e0e650a4e8e62bf8
+      - 8d1388a20091795fb5ed2ceba9fe6b24
+      - 722c3c7ca673cd4c9177e753b1fcfba5
+      - 4d7dfc04e4f15a102e4f92995cc22ccf
+      - 40ea809ff6e25ffe8e20c358791c8584
+      - 1e14ba4b6875ffaf1c8201fbdd7de696
+      - 051b8fa35ab03ea6ebba4896bebe2928
+      - f7f87589057e6089041ac6ba5c927d73
+      - f6163136730a48827aca153f9919172d
+      - ddd1a14e9109d21baca2afc735435362
+      - c17e2c6d6338d95af7dad1c7ecfdfcba
+      - 75b5bef4c0778e30a109d3cde639bc7a
+      - 44418d42ad11f1d3a996c8d53be858f2
+      - 2ae81e4bdf519d7bb9850009da93dc50
+      - 0e09acf67a43d35921fd72df603cd65f
+      - 0a3eb6ef8c03b24278a6bd0c45915ca3
+      - 5533ce639d0e2ab2923611417a70c425
+      - c7b0ac463b8f05614de3c7753aded72f
+      - a3fbd28c6b8288ee9526d6212958f6b8
+      - 9a60da01e44160ac98e4e1710b1d3aa0
+      - 70a19550462416e7131120577d27e00c
+      - 57fcaf248509a87ef8b1f50c1b9cda3d
+      - 462d5766b4523be7628647cb1173a4ef
+      - 212252dec0cccc14d3d25c93c6ef225f
+      - 10a409c73fa4916f4116e8717a98a518
+      - b3750b34e95167cb7cd37a3791478d49
+      - 5cdd358e0120c2b81ba4880ef20ad225
+      - 4090f870ca228fa6a6fb0c88182ec2d2
+      - 3816ecc5bf88b84de783f021dafb349c
   properties:
   - property: roadway
-    set: 'motorway_link'
+    set: motorway_link
   - property: ft
-    set: 3  
+    set: 3
   - property: walk_access
-    set: 1 
+    set: 1

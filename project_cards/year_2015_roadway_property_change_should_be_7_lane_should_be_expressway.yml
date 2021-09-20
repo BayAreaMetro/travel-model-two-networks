@@ -1,0 +1,21 @@
+project: Year 2015 Should be 7 Lane should be Expressway
+tags:
+- Year 2015
+- Roadway Property Change
+- Major Arterial Review
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 2129154
+      - 2162230
+      - 2186953
+      - 2221005
+      - 2265844
+  properties:
+  - property: lanes
+    set: 7
+  - property: ft
+    set: 2

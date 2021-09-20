@@ -1,33 +1,42 @@
-project: Year 2015 Modify HOV Lanes and USE on San Mateo Bridge Toll Plaza Toll Plaza on CA-92 WB - Bridge Pass
+project: year 2015 modify hov lanes and use on san mateo bridge toll plaza toll plaza
+  on ca-92 wb - bridge pass
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes Review'
-  - 'Bridge Pass'
-  - 'toll review'
-dependencies: ''
+- Year 2015
+- Managed Lanes Review
+- Bridge Pass
+- toll review
+dependencies:
+  prerequisites:
+  - add san mateo bridge toll plaza
 changes:
 - category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
-      - 3073690
-    - shstReferenceId:
-      - "6efbc4296c278e94b543481fbbf1ac3f"
+      - 3315452
   properties:
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
-      change: -1
-    - time: ['15:00', '19:00']
-      change: -1
+    - time:
+      - '6:00'
+      - '10:00'
+      change: -2
+    - time:
+      - '15:00'
+      - '19:00'
+      change: -2
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
-      set: 1
-    - time: ['15:00', '19:00']
-      set: 1
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 2
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 2
   - property: segment_id
     set: 6
   - property: tollbooth
@@ -37,11 +46,15 @@ changes:
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 2
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 2
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

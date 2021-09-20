@@ -1,0 +1,47 @@
+project: add san mateo bridge toll plaza
+tags:
+- Year 2015
+- Toll Plaza
+dependencies: ''
+changes:
+- category: Roadway Deletion
+  links:
+    model_link_id:
+    - 3073690
+- category: Add New Roadway
+  links:
+  - A: 2562924
+    B: 5030000
+    bike_access: 0
+    county: Alameda
+    drive_access: 1
+    model_link_id: 3315462
+    rail_only: 0
+    shstGeometryId: ''
+    walk_access: 0
+    tollbooth: 0
+    ft: 1
+    lanes: 4
+    assignable: 1
+  - A: 5030000
+    B: 2535792
+    bike_access: 0
+    county: Alameda
+    drive_access: 1
+    model_link_id: 3315463
+    rail_only: 0
+    shstGeometryId: ''
+    walk_access: 0
+    ft: 7
+    lanes: 7
+    assignable: 1
+  nodes:
+  - bike_access: 0
+    county: Alameda
+    drive_access: 1
+    rail_only: 0
+    walk_access: 0
+    model_node_id: 5030000
+    osm_node_id: ''
+    X: -122.147744
+    Y: 37.6193308

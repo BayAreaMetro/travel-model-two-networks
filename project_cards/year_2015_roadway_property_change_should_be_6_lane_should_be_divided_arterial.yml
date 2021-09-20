@@ -1,0 +1,21 @@
+project: Year 2015 Should be 6 Lane should be Divided Arterial
+tags:
+- Year 2015
+- Roadway Property Change
+- Major Arterial Review
+dependencies: ''
+changes:
+- category: Roadway Property Change
+  facility:
+    link:
+    - model_link_id:
+      - 1054487
+      - 1071521
+      - 2267690
+      - 3082198
+      - 4074537
+  properties:
+  - property: lanes
+    set: 6
+  - property: ft
+    set: 4

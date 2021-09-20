@@ -1,0 +1,11 @@
+---
+project: change fairfield transit fare from flat to zonal
+category: Add Transit
+tags:
+- 'Minor Transit'
+dependencies:
+---
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Main Street and Lotz Way") & (self.feed.stops.agency_raw_name == "Fairfield_2015_10_14"), 'zone_id'] = '663'
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "El Cerrito Del Norte BART") & (self.feed.stops.agency_raw_name == "Fairfield_2015_10_14"), 'zone_id'] = '671'

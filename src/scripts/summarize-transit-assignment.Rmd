@@ -1,0 +1,68 @@
+---
+title: "Summarize Transit Assignment"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c( "tidyverse")
+
+need_to_install <-
+  packages_vector[!(packages_vector %in% installed.packages()[, "Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+interim_dir <- "../../data/interim/"
+processed_dir <- "../../data/processed/"
+
+input_assignment_outcomes <- paste0(interim_dir, "boarding_by_route_and_period.csv")
+operator_crasswalk_file <- paste0(interim_dir, "operator_crosswalk.csv")
+route_crosswalk_file <- paste0(interim_dir, "route_crosswalk.csv")
+input_survey_file_name <- paste0(interim_dir, "onboard-survey-trip-list.feather")
+
+output_file_name <- paste0(interim_dir, "transit-assignment-tableau.csv")
+
+```
+
+# Parameters
+```{r parameters}
+
+```
+
+# Data Reads
+```{r data-reads}
+operator_name_df <- read_csv(operator_crasswalk_file, col_types = "ccic")
+route_name_df <- read_csv(route_crosswalk_file, col_types = "ccccici")
+survey_df <- read_feather(input_survey_file_name)
+assign_df <- read_csv(input_assignment_outcomes, col_types = cols(.default = col_character(),
+                                                                  boardings = col_double()))
+```
+
+# Reductions
+```{r reductions}
+output_df <- survey_df %>%
+  separate(., Unique_ID, into = c("drop", "operator_name", "drop_2"), sep = "---", remove = FALSE) %>%
+  select(-drop, -drop_2) %>%
+  group_by(operator_name, route, period) %>%
+  summarise(boardings = sum(boarding_weight), .groups = "drop") %>%
+#  left_join(., select(operator_name_df, operator = survey_operator, operator_name = model_operator_name), by = c("operator")) %>%
+  left_join(., select(route_name_df, operator_name = survey_operator, route = survey_route, model_route_id), by = c("operator_name", "route")) %>%
+  select(operator_name, route_id = model_route_id, boardings) %>%
+  left_join(., distinct(assign_df, opeartor_name, route_id, route_short_name, route_long_name), by = c("route_id")) %>%
+  mutate(source = "observed")
+```
+
+# Write to Disk
+```{r data-write}
+write_csv(output_df, path = output_file_name)
+```
+
+

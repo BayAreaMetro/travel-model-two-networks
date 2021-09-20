@@ -1,0 +1,39 @@
+project: sf bay ferry missing link
+tags:
+- Year 2015
+- Add Transit
+- sf bay ferry Alameda - Oakland - San Francisco Ferry
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 1028039
+    B: 2598644
+    model_link_id: 26067369
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 2598644
+    B: 2625970
+    model_link_id: 26067370
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1028039
+    B: 2625970
+    model_link_id: 26067371
+    lanes: 1
+    ft: 99
+    rail_only: 1
+- category: Add New Roadway
+  links:
+  - A: 1028040
+    B: 1028039
+    model_link_id: 26067372
+    lanes: 1
+    ft: 99
+    rail_only: 1

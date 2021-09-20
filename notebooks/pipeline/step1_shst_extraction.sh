@@ -1,20 +1,31 @@
 #!/bin/bash
 #
 # This script should run in a shst docker
-# To build the docker image using the Dockerfile in this directory use:
+# 
+# To build the docker image using the Dockerfile in this directory use (only need to run once):
 # docker build -t shst .
 #
 # see it:
 # docker image list
 #
 # Run a command (/bin/bash) in a new container layer over the specified image:
-# docker run -it --rm -v [path to this directory]:/usr/node/ shst:latest /bin/bash
-# e.g. docker run -it --rm -v /Users/lzorn/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
-
+# 	docker run -it --rm -v [path to this directory]:/usr/node/ shst:latest /bin/bash
+# e.g. on a Mac machine:
+# 	docker run -it --rm -v /Users/lzorn/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
+# e.g. on a Windows machine:
+#   docker run -it --rm -v /c/Users/ywang/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
+# 
+# First, create folder "/data/external/sharedstreets_extract" to store the extracted data
+# cd /usr/node/data/external
+# mkdir "sharedstreets_extract"
+# cd /.
+# 
 # Then you can cd to this directory, make this script executable, and run this script:
 # cd /usr/node/notebooks/pipeline
-# chmod u+x step1_shst_extraction.sh
-# ./step1_shst_extraction.sh
+# chmod u+x step1_shst_extraction.sh (skip this line when running on a Windows machine)
+# ./step1_shst_extraction.sh (if getting "/bin/bash^M: bad interpreter: No such file or directory" error, 
+#	it means this file has Windows line endings, remove them by running "sed -i -e 's/\r$//' step1_shst_extraction.sh" before this step)
+
 
 for i in {1..14}
 do

@@ -1,0 +1,8 @@
+---
+project: year 2015 sterling on ramp HOV only in PM
+category: Calculated Roadway
+tags:
+  - 'Reversible Lanes'
+---
+
+self.links_df.loc[self.links_df['model_link_id'] == 39115, 'useclass'] = [{'default': 0, 'timeofday': [{'time': (54000, 68400), 'value': 3}]}]

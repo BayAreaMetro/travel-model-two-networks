@@ -1,0 +1,19 @@
+project: Year 2015 Add centroid connector at External Station connecting Redwood Highway
+  US-101 NB
+tags:
+- Year 2015
+- External Stations Review
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 4556139
+    B: 900003
+    model_link_id: 26067364
+    lanes: 1
+    ft: 8
+    bike_access: 0
+    drive_access: 1
+    roadway: taz
+    walk_access: 0
+    assignable: 1

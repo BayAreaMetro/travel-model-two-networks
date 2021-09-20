@@ -1,0 +1,78 @@
+project: SFMTA Route 336 Edits
+tags:
+- Minor Transit
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route_id: '336'
+    direction_id: 0
+  properties:
+  - property: routing
+    existing:
+    - -1021778
+    - 1000715
+    - -1002699
+    - -1007345
+    - -1009452
+    - 1000062
+    - -1017085
+    - -1017427
+    - -1009452
+    - -1007345
+    set:
+    - -1021778
+    - 1000715
+    - 1002699
+    - -1007345
+- category: Transit Service Property Change
+  facility:
+    route_id: '336'
+    direction_id: 1
+    start_time: 03:00
+    end_time: 06:00
+  properties:
+  - property: routing
+    existing:
+    - 1019259
+    - -1006801
+    - -1019291
+    - -1001466
+    set:
+    - 1019291
+    - -1001466
+- category: Transit Service Property Change
+  facility:
+    route:
+    - route_id: '336'
+      direction_id: 1
+      start_time: 06:00
+      end_time: '10:00'
+    - route_id: '336'
+      direction_id: 1
+      start_time: '10:00'
+      end_time: '15:00'
+    - route_id: '336'
+      direction_id: 1
+      start_time: '15:00'
+      end_time: '19:00'
+    - route_id: '336'
+      direction_id: 1
+      start_time: '19:00'
+      end_time: 03:00
+  properties:
+  - property: routing
+    existing:
+    - -1011411
+    - -1018737
+    - -1003258
+    - -1006801
+    - 1019259
+    - -1006801
+    - -1019291
+    - -1001466
+    set:
+    - -1011411
+    - -1018737
+    - 1019291
+    - -1001466

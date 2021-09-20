@@ -1,0 +1,69 @@
+project: SFMTA Route 307 Edits
+tags:
+- Minor Transit
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route_id: '307'
+    direction_id: 0
+  properties:
+  - property: routing
+    existing:
+    - -1009873
+    - -1003617
+    - -1001352
+    - 1004188
+    - -1019030
+    - -1011469
+    - -1004740
+    - -1003617
+    - -1001352
+    - -1006026
+    set:
+    - -1009873
+    - -1003617
+    - 1001352
+    - -1006026
+- category: Transit Service Property Change
+  facility:
+    route_id: '307'
+    direction_id: 1
+  properties:
+  - property: routing
+    existing:
+    - 1022530
+    - -1009583
+    - -1023629
+    - 1006286
+    - -1023629
+    - -1003116
+    - -1004493
+    - -1009026
+    - -1008618
+    - -1014699
+    - -1009128
+    - -1023199
+    - -1022722
+    - -1014162
+    - -1007792
+    - -1019501
+    - -1009192
+    - -1000708
+    - 1004165
+    - -1014162
+    - -1007792
+    set:
+    - 1022530
+    - -1009583
+    - 1023629
+    - -1003116
+    - -1004493
+    - -1009026
+    - -1008618
+    - -1014699
+    - -1009128
+    - -1023199
+    - -1022722
+    - 1014162
+    - -1007792

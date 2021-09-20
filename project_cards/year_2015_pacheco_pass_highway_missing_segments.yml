@@ -1,0 +1,56 @@
+project: year 2015 pacheco pass highway missing segments
+tags:
+- year 2015
+- highway review
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 2154279
+    B: 2192760
+    bike_access: 1
+    county: Santa Clara
+    drive_access: 1
+    model_link_id: 2517014
+    rail_only: 0
+    walk_access: 1
+    lanes: 2
+    assignable: 1
+    ft: 5
+    roadway: primary
+  - A: 2192760
+    B: 2154279
+    bike_access: 1
+    county: Santa Clara
+    drive_access: 1
+    model_link_id: 2517015
+    rail_only: 0
+    walk_access: 1
+    lanes: 2
+    assignable: 1
+    ft: 5
+    roadway: primary
+  - A: 2137905
+    B: 2129456
+    bike_access: 1
+    county: Santa Clara
+    drive_access: 1
+    model_link_id: 2517016
+    rail_only: 0
+    walk_access: 1
+    lanes: 2
+    assignable: 1
+    ft: 5
+    roadway: primary
+  - A: 2129456
+    B: 2137905
+    bike_access: 1
+    county: Santa Clara
+    drive_access: 1
+    model_link_id: 2517017
+    rail_only: 0
+    walk_access: 1
+    lanes: 2
+    assignable: 1
+    ft: 5
+    roadway: primary

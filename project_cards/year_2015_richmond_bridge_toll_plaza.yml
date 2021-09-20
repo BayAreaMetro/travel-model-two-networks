@@ -1,9 +1,10 @@
-project: Year 2015 Modify HOV Lanes and USE on Richmond-San Rafael Bridge Toll Plaza - Bridge Pass
+project: Year 2015 Modify HOV Lanes and USE on Richmond-San Rafael Bridge Toll Plaza
+  - Bridge Pass
 tags:
-  - 'Year 2015'
-  - 'Managed Lanes Review'
-  - 'Bridge Pass'
-  - 'toll review'
+- Year 2015
+- Managed Lanes Review
+- Bridge Pass
+- toll review
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
@@ -12,21 +13,33 @@ changes:
     - model_link_id:
       - 4115386
     - shstReferenceId:
-      - "e8a712ba58f30c910ff65a46eb6b605e"
+      - e8a712ba58f30c910ff65a46eb6b605e
   properties:
+  - property: ft
+    set: 7
+  - property: lanes
+    set: 7
   - property: lanes
     change: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       change: -1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       change: -1
   - property: ML_lanes
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 1
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 1
   - property: segment_id
     set: 3
@@ -37,11 +50,15 @@ changes:
   - property: ML_useclass
     set: 0
     timeofday:
-    - time: ['6:00', '10:00']
+    - time:
+      - '6:00'
+      - '10:00'
       set: 2
-    - time: ['15:00', '19:00']
+    - time:
+      - '15:00'
+      - '19:00'
       set: 2
   - property: ML_access
-    set: 'all'
+    set: all
   - property: ML_egress
-    set: 'all'
+    set: all

@@ -1,0 +1,52 @@
+project: SFMTA Route 335 Edits
+tags:
+- Minor Transit
+dependencies: ''
+changes:
+- category: Transit Service Property Change
+  facility:
+    route:
+    - route_id: '335'
+      direction_id: 0
+      start_time: 06:00
+      end_time: '10:00'
+    - route_id: '335'
+      direction_id: 0
+      start_time: '10:00'
+      end_time: '15:00'
+    - route_id: '335'
+      direction_id: 0
+      start_time: '15:00'
+      end_time: '19:00'
+    - route_id: '335'
+      direction_id: 0
+      start_time: '19:00'
+      end_time: 03:00
+  properties:
+  - property: routing
+    existing:
+    - -1015135
+    - -1023201
+    - -1021803
+    - -1007769
+    - -1009432
+    - -1017749
+    - -1023022
+    set:
+    - -1015135
+    - -1023201
+    - -1023022
+- category: Transit Service Property Change
+  facility:
+    route_id: '335'
+    direction_id: 1
+  properties:
+  - property: routing
+    existing:
+    - -1009139
+    - -1015608
+    - -1019756
+    - -1015608
+    set:
+    - -1009139
+    - -1015608

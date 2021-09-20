@@ -1,0 +1,131 @@
+project: Year 2015 Modify HOV Lanes and USE on US-101 NB from North of Marin City
+  to Novato
+tags:
+- Year 2015
+- Managed Lanes
+- HOV Lanes
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 8005271
+      - 8026330
+      - 8025406
+      - 8006737
+      - 8033670
+      - 8020457
+      - 8024402
+      - 8012535
+      - 8031439
+      - 8002713
+      - 8011691
+      - 8017906
+      - 8002140
+      - 8026178
+      - 8027772
+      - 8004534
+      - 8013106
+      - 8020025
+      - 8023146
+      - 8009759
+      - 8024868
+      - 8017687
+      - 8022950
+      - 8023587
+      - 8028601
+      - 8011687
+      - 8018464
+      - 8025546
+      - 8008719
+      - 8021888
+      - 8005324
+      - 8009158
+      - 8012583
+      - 8012444
+      - 8028270
+      - 8032689
+      - 8002978
+      - 8020388
+      - 8026241
+      - 8010028
+      - 8021020
+      - 8020396
+      - 8017255
+      - 8007704
+      - 8006692
+    - shstReferenceId:
+      - 279b677966946e5811b5a321c820e294
+      - c75b38f685953ec4d275ad8e4a28b0d9
+      - c08fb152dde0fd19f5a7b4f4ff2f6df5
+      - 32e405079fb3d399d45c14acd31aeb30
+      - ff7acac14c0bb77fcdacf4ccd6966517
+      - 9b9d6e08cc6272f1a99a0b0b7fcc36a5
+      - b903cd56f8adfba3dd580940531dcee5
+      - 5f3ec56a734ca8e4dab54c6d1fe422e1
+      - ee3b3d3d4c8fcbf35a6ada1d407895cb
+      - 144c1a8876181d62d8db9b89d02aaded
+      - 5940632e043e7f2ebf11425883d973d9
+      - 883d42244d99be12f4656b7a128b0647
+      - 100cd999d6f378a6450f6bd56db90b23
+      - c653ece75a4f073266624b81feaaa7cc
+      - d1eb519279756dd345320f2992ecbeea
+      - 22230e188aede8f5db4929daf1dadc8c
+      - 63d36834b7e7cbb995877a32d6652218
+      - 983a9a58527835db763c3c9d2ce025e0
+      - afc7883b7d3617698cd7e39af1f6d0fc
+      - 4a1e9dce56c907897a0cc589640c58e7
+      - bc81e29140bb5d92b5257d7131a85393
+      - 86a74312c110632a28dbd73e255fd215
+      - ae472fca24b3e7d8cd26ee7d436da880
+      - b2fcff7270de312e336f63ca591e8b73
+      - d856cb1fb3aa16e30375454484b5ecb3
+      - 593a7f27e3277e6c96f9b6df729b340d
+      - 8c84fb7d14d261cf7ac6ade5d185b828
+      - c1b13c6939201ed077da50a3356d210a
+      - 4209cc8a61e09a38fc1c30b503c73291
+      - a67ea0fcd7f9c795fcedccdcefe44484
+      - 280ff73d9138b5e81adada82fe7f8f2f
+      - 4599644bd2c401a23d121030fd31c24c
+      - 5f94699e69958e034bc9ecf683673ed0
+      - 5e92201f1922b73df19fe625afc3b5ef
+      - d5e18fa8bb1b16d73de53c6bbeabae58
+      - f7af436be0f63176a6b6d23bd4e65ea4
+      - 169a9b39cf05aab266edb9036e5ee7d0
+      - 9b07cce76f57f628acc0451fe12ad27f
+      - c6bc98a1ca847f5abc6c20394fd6be14
+      - 4c26658336f3c8e42f3a86bb5723a0e9
+      - 9fe557f3fb1249c0f33890ef1158b36e
+      - 9b13585e69921b2406b2533869431177
+      - 8365554811b5035174422c151925a22b
+      - 3a695142aa93574364f9e3d91373709a
+      - 328ab08fc6b88c8fb499b43fcbcc9397
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time:
+      - '15:00'
+      - '19:00'
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+  - property: segment_id
+    set: 24
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 2
+  - property: ML_access
+    set: all
+  - property: ML_egress
+    set: all

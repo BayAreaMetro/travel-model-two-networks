@@ -1,7 +1,7 @@
 project: Year 2015 Bus Only Segments for Golden Gate Transit on US 101
 tags:
 - Year 2015
-- 'Bus Only'
+- Bus Only
 dependencies: ''
 changes:
 - category: Roadway Property Change
@@ -54,4 +54,3 @@ changes:
     set: 1
   - property: bike_access
     set: 1
-valid: false
