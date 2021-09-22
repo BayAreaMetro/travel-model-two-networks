@@ -1,0 +1,111 @@
+---
+title: "Determine Project Card Repository Configuration Parameters"
+output: html_notebook
+---
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "arrow",
+                     "sf")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+data_dir <- "../../data/"
+processed_dir <- paste0(data_dir, "processed/")
+
+version <- "version_12"
+
+links_filename <- paste0(processed_dir, version, "/links.feather")
+nodes_filename <- paste0(processed_dir, version, "/node.geojson")
+
+```
+
+# Parameters
+```{r parameters}
+
+```
+
+# Data Reads
+```{r read}
+links_df <- read_feather(links_filename)
+nodes_sf <- st_read(nodes_filename)
+```
+
+# Reductions 
+```{r reductions}
+reduced_links_df <- links_df %>%
+  group_by(county) %>%
+  summarise(min_id = min(model_link_id),
+            max_id = max(model_link_id),
+            .groups = "drop") %>%
+  arrange(min_id)
+
+node_types_df <- links_df %>%
+  filter(roadway %in% c("maz", "taz", "tap")) %>%
+  mutate(model_node_id = pmin(A, B)) %>%
+  select(model_node_id, link_type = roadway) %>%
+  distinct(.)
+
+reduced_nodes_df <- tibble(model_node_id = nodes_sf$model_node_id, 
+                           county = nodes_sf$county) %>%
+  left_join(., node_types_df, by = c("model_node_id")) %>%
+  mutate(link_type = replace_na(link_type, "network")) %>%
+  group_by(county, link_type) %>%
+  summarise(min_id = min(model_node_id),
+            max_id = max(model_node_id),
+            .groups = "drop") %>%
+  arrange(min_id)
+```
+
+# Nodes
+```{r print-nodes}
+reduced_nodes_df
+```
+ 
+# Links
+```{r print-links}
+reduced_links_df
+```
+ 
+
+# Debug
+```{r}
+# links missing counties
+a_df <- links_df %>%
+  filter(str_length(county)<3)
+
+# nodes missing county
+b_df <- nodes_sf %>%
+  st_drop_geometry(.) %>%
+  filter(str_length(county)<3)
+
+# alameda nodes out of range
+c_df <- nodes_sf %>%
+  st_drop_geometry(.) %>%
+  filter(county == "Alameda") %>%
+  filter(model_node_id > 3000000)
+
+# what should 5030000 be
+d_df <- nodes_sf %>%
+  st_drop_geometry(.) %>%
+  filter(county == "Alameda") %>%
+  arrange(-model_node_id) %>%
+  head(10)
+
+e_df <- nodes_df %>%
+  arrange(model_node_id) %>%
+  head(10)
+```
+
+

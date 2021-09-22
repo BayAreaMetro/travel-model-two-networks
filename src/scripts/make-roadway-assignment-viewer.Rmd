@@ -7,7 +7,6 @@ output: html_notebook
 # Overhead
 ```{r overhead, include = FALSE}
 packages_vector <- c("tidyverse",
-                     "jsonlite",
                      "arrow",
                      "sf")
 
@@ -28,7 +27,7 @@ external_dir <- paste0(data_dir, "external/")
 interim_dir <- paste0(data_dir, "interim/")
 processed_dir <- paste0(data_dir, "processed/")
 
-version <- "version_11"
+version <- "version_12"
 
 links_file_name <- paste0(processed_dir, version, "/links.feather")
 shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
@@ -79,6 +78,7 @@ loaded_df <- tibble()
 for (period in c("AM", "MD", "PM")) {
   filename <- paste0(assigned_csv_prefix, period, ".csv")
   df <- read_csv(filename, col_types = cols(.default = col_double(),
+                                            NAME = col_character(),
                                             COUNTY = col_character(),
                                             SHSTGEOMETRYID = col_character(),
                                             CNTYPE = col_character()))
@@ -241,3 +241,5 @@ output_sf <- links_df %>%
 st_write(output_sf, output_file_name, delete_dsn = TRUE)
 ```
  
+
+
