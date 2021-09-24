@@ -9,9 +9,9 @@
 # docker image list
 #
 # Run a command (/bin/bash) in a new container layer over the specified image:
-# 	docker run -it --rm -v [path to this directory]:/usr/node/ shst:latest /bin/bash
+#   docker run -it --rm -v [path to this directory]:/usr/node/ shst:latest /bin/bash
 # On a Mac machine:
-# 	e.g. docker run -it --rm -v /Users/lzorn/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
+#   e.g. docker run -it --rm -v /Users/lzorn/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
 # On a Windows machine:
 #   e.g. docker run -it --rm -v /c/Users/ywang/Documents/GitHub/travel-model-two-networks:/usr/node/ shst:latest /bin/bash
 # 
@@ -31,7 +31,7 @@
 # cd /usr/node/notebooks/pipeline
 # chmod u+x step4_conflate_with_third_party.sh (skip this line when running on a Windows machine)
 # ./step4_conflate_with_third_party.sh (if getting "/bin/bash^M: bad interpreter: No such file or directory" error, 
-#	it means this file has Windows line endings, remove them by running "sed -i -e 's/\r$//' step4_conflate_with_third_party.sh" before this step)
+#   it means this file has Windows line endings, remove them by running "sed -i -e 's/\r$//' step4_conflate_with_third_party.sh" before this step)
 
 for i in {1..14}
 do
@@ -48,20 +48,20 @@ do
     echo "Matching TM2nonMarin_$i to shst network using car rules"
     shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/car_rules/$i_tm2nonMarin.out.geojson --tile-hierarchy=8
 
-	echo "Matching TM2nonMarin_$i to shst network using pedestrian rules"
+    echo "Matching TM2nonMarin_$i to shst network using pedestrian rules"
     shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/ped_rules/$i_tm2nonMarin.out.geojson --tile-hierarchy=8 --match-pedestrian
 
-	echo "Matching TM2nonMarin_$i to shst network using car rules following direction"
+    echo "Matching TM2nonMarin_$i to shst network using car rules following direction"
     shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/reverse_dir/$i_tm2nonMarin.out.geojson --tile-hierarchy=8 --follow-line-direction
 
 
     echo "Matching TM2Marin_$i to shst network using car rules"
     shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/car_rules/$i_tm2Marin.out.geojson --tile-hierarchy=8
 
-	echo "Matching TM2Marin_$i to shst network using pedestrian rules"
+    echo "Matching TM2Marin_$i to shst network using pedestrian rules"
     shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/ped_rules/$i_tm2Marin.out.geojson --tile-hierarchy=8 --match-pedestrian
 
-	echo "Matching TM2Marin_$i to shst network using car rules following direction"
+    echo "Matching TM2Marin_$i to shst network using car rules following direction"
     shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/reverse_dir/$i_tm2Marin.out.geojson --tile-hierarchy=8 --follow-line-direction
 
 done
