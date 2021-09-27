@@ -1,9 +1,10 @@
 ---
-project: SamTrans Route ECR new stop nodes farezone assignment
+project: samtrans route ecr new stop nodes farezone assignment
 category: Add Transit
 tags:
   - 'Minor Transit'
-dependencies: ''
+dependencies:
+  prerequisites: ['year 2015 samtrans route ecr edits']
 ---
 
 self.feed.stops.loc[self.feed.stops.stop_id.astype(int).isin([102036044,101511493,101516920,101525498,101516256,101513094,101513976,101528479,101529690,101529454,101519622,101513122,101514054,101543182,101512385,101534620,101503246,101537667,101538028,101526122,101519051,101503077,101508313,101508126,101537888,101519350,101516319,101509775,101536669]), 'zone_id'] = '1'
