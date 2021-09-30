@@ -23,9 +23,13 @@
 for filename in ../../data/external/gtfs/*.geojson
 do
     name=$(basename "$filename" .geojson)
-    echo ${name}
 
-    echo "Matching ${name} to shst following line direction"
-    shst match ../../data/external/gtfs/$name.geojson --out=../../data/interim/step6_gtfs/shst_match/$name.out.geojson --follow-line-direction --tile-hierarchy=8
+    if [[ "$name" =~ ^(BART_2015_8_3.transit|Caltrain_2015_5_13.transit|Capitol_2017_3_20.transit|GGFerries_2017_3_18.transit|SF_Bay_Ferry2016_07_01.transit)$ ]]; then
+    	echo "Skip rail and ferry match: ${name}"
+
+	else
+		echo "Matching ${name} to shst following line direction"
+    	shst match ../../data/external/gtfs/$name.geojson --out=../../data/interim/step6_gtfs/shst_match/$name.out.geojson --follow-line-direction --tile-hierarchy=8
+	fi
 
 done
