@@ -36,52 +36,48 @@
 for i in {1..14}
 do
     echo "Matching tomtom_$i to shst network using bike rules"
-    # shst match ../../data/external/tomtom/tomtom$i.in.geojson --out=../../data/interim/tomtom/bike_rules/$i_tomtom.out.geojson --tile-hierarchy=8  --match-bike
+    shst match ../../data/external/tomtom/tomtom$i.in.geojson --out=../../data/interim/tomtom/bike_rules/$i_tomtom.out.geojson --tile-hierarchy=8  --match-bike --follow-line-direction
     
     echo "Matching tomtom_$i to shst network using car rules"
-    # shst match ../../data/external/tomtom/tomtom$i.in.geojson --out=../../data/interim/tomtom/car_rules/$i_tomtom.out.geojson --tile-hierarchy=8
+    shst match ../../data/external/tomtom/tomtom$i.in.geojson --out=../../data/interim/tomtom/car_rules/$i_tomtom.out.geojson --tile-hierarchy=8 --follow-line-direction
     
     echo "Matching tomtom_$i to shst network using pedestrian rules"
-    # shst match ../../data/external/tomtom/tomtom$i.in.geojson --out=../../data/interim/tomtom/ped_rules/$i_tomtom.out.geojson --tile-hierarchy=8 --match-pedestrian
+    shst match ../../data/external/tomtom/tomtom$i.in.geojson --out=../../data/interim/tomtom/ped_rules/$i_tomtom.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
 
 
     echo "Matching TM2nonMarin_$i to shst network using car rules"
-    shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/car_rules/$i_tm2nonMarin.out.geojson --tile-hierarchy=8
+    shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/car_rules/$i_tm2nonMarin.out.geojson --tile-hierarchy=8 --follow-line-direction
 
     echo "Matching TM2nonMarin_$i to shst network using pedestrian rules"
-    shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/ped_rules/$i_tm2nonMarin.out.geojson --tile-hierarchy=8 --match-pedestrian
+    shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/ped_rules/$i_tm2nonMarin.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
 
     echo "Matching TM2nonMarin_$i to shst network using car rules following direction"
-    shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/reverse_dir/$i_tm2nonMarin.out.geojson --tile-hierarchy=8 --follow-line-direction
+    shst match ../../data/external/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=../../data/interim/TM2_nonMarin/reverse_dir/$i_tm2nonMarin.out.geojson --tile-hierarchy=8
 
 
     echo "Matching TM2Marin_$i to shst network using car rules"
-    shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/car_rules/$i_tm2Marin.out.geojson --tile-hierarchy=8
+    shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/car_rules/$i_tm2Marin.out.geojson --tile-hierarchy=8 --follow-line-direction
 
     echo "Matching TM2Marin_$i to shst network using pedestrian rules"
-    shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/ped_rules/$i_tm2Marin.out.geojson --tile-hierarchy=8 --match-pedestrian
+    shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/ped_rules/$i_tm2Marin.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
 
     echo "Matching TM2Marin_$i to shst network using car rules following direction"
-    shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/reverse_dir/$i_tm2Marin.out.geojson --tile-hierarchy=8 --follow-line-direction
+    shst match ../../data/external/TM2_Marin/tm2Marin_$i.in.geojson --out=../../data/interim/TM2_Marin/reverse_dir/$i_tm2Marin.out.geojson --tile-hierarchy=8
 
 done
 
 echo "Matching SFCTA true shape to shst network using car rules"
-shst match ../data/external/sfclines/sfcta.in.geojson --out=../../data/interim/sfclines/car_rules/sfcta.out.geojson --tile-hierarchy=8
+shst match ../data/external/sfclines/sfcta.in.geojson --out=../../data/interim/sfclines/car_rules/sfcta.out.geojson --tile-hierarchy=8 --follow-line-direction
 
 echo "Matching SFCTA true shape to shst network using pedestrian rules"
-shst match ../data/external/sfclines/sfcta.in.geojson --out=../../data/interim/sfclines/ped_rules/sfcta.out.geojson --tile-hierarchy=8 --match-pedestrian
+shst match ../data/external/sfclines/sfcta.in.geojson --out=../../data/interim/sfclines/ped_rules/sfcta.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
 
 
 echo "Matching SFCTA Stick Network to shst network using car rules"
-shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/car_rules/sfcta.out.geojson --tile-hierarchy=8
+shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/car_rules/sfcta.out.geojson --tile-hierarchy=8 --follow-line-direction
 
 echo "Matching SFCTA Stick Network to shst network using pedestrian rules"
-shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/ped_rules/sfcta.out.geojson --tile-hierarchy=8 --match-pedestrian
+shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/ped_rules/sfcta.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
 
 echo "Matching SFCTA Stick Network to shst network using car rules following direction"
-shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/reverse_dir/sfcta.out.geojson --tile-hierarchy=8 --follow-line-direction
-
-
-echo "Matching PEMS to shst network using best direction rules"
-shst match ../../data/external/mtc/pems.in.geojson --search-radius=250 --out=../../data/interim/mtc/pems_conflation_result.geojson --best-direction
+shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/reverse_dir/sfcta.out.geojson --tile-hierarchy=8
