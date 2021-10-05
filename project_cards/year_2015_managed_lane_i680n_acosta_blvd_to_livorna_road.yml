@@ -1,4 +1,4 @@
-project: Year 2015 Modify HOV Lanes and USE on I-680 NB from Alcosta Blvd to Rudgear
+project: Year 2015 Modify HOV Lanes and USE on I-680 NB from Alcosta Blvd to Livorna
   Road
 tags:
 - Year 2015
@@ -10,11 +10,8 @@ changes:
   facility:
     link:
     - model_link_id:
-      - 3036037
-      - 4026985
       - 4120008
       - 4020617
-      - 4033582
       - 4025174
       - 4055125
       - 4064696
@@ -33,11 +30,8 @@ changes:
       - 4056752
       - 4062144
     - shstReferenceId:
-      - 3613705b902e4f9d92aca02ebc941ca0
-      - 365cd7f9dad7f91caeeff9c7c111a547
       - f1c529d2b90c7f2a94f3bf2f6130c235
       - 29abac221c7717007705a5ba31626893
-      - 43c8b0271968a33fd2f95500d7ad931b
       - 32d8ced62663b6ad645742b2588f7097
       - 6ec3da00d57c8970e1ca4c8f7d4c4bb5
       - 820caf33e463363d2091253c0bce0960
