@@ -81,31 +81,32 @@ reduced_links_df
 
 # Debug
 ```{r}
-# links missing counties
-a_df <- links_df %>%
-  filter(str_length(county)<3)
-
-# nodes missing county
-b_df <- nodes_sf %>%
-  st_drop_geometry(.) %>%
-  filter(str_length(county)<3)
-
-# alameda nodes out of range
-c_df <- nodes_sf %>%
-  st_drop_geometry(.) %>%
-  filter(county == "Alameda") %>%
-  filter(model_node_id > 3000000)
-
-# what should 5030000 be
-d_df <- nodes_sf %>%
-  st_drop_geometry(.) %>%
-  filter(county == "Alameda") %>%
-  arrange(-model_node_id) %>%
+# 1. Link IDs in SF with IDs greater than 1,000,000
+debug_sf_df <- links_df %>%
+  filter(county == "San Francisco") %>%
+  filter(model_link_id < 1000000) %>%
+  arrange(-model_link_id) %>%
   head(10)
 
-e_df <- nodes_df %>%
-  arrange(model_node_id) %>%
+# 2. Link IDs in Alameda with IDs greater than 4,000,000
+debug_ala_df <- links_df %>%
+  filter(county == "Alameda") %>%
+  filter(model_link_id < 4000000) %>%
+  arrange(-model_link_id) %>%
+  select(model_link_id, county) %>%
   head(10)
+
+# 3. Link IDs in Contra Costa with IDs greather than 5,000,000
+debug_cc_df <- links_df %>%
+  filter(county == "Contra Costa") %>%
+  filter(model_link_id < 5000000) %>%
+  arrange(-model_link_id) %>%
+  select(model_link_id, county) %>%
+  head(10)
+
+debug_df <- links_df %>%
+  filter(model_link_id > 8500000)
+
 ```
 
 
