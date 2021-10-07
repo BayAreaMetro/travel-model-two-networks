@@ -1,0 +1,43 @@
+---
+title: "Make Link Feather"
+output: html_notebook
+---
+
+
+# Overhead
+```{r overhead, include = FALSE}
+packages_vector <- c("tidyverse",
+                     "jsonlite",
+                     "arrow")
+
+need_to_install <- packages_vector[!(packages_vector %in% installed.packages()[,"Package"])]
+
+if (length(need_to_install)) install.packages(need_to_install)
+
+for (package in packages_vector) {
+  library(package, character.only = TRUE)
+}
+
+```
+
+# Remote I/O
+```{r remote-io}
+processed_dir <- "../../data/processed/"
+interim_dir <- "../../data/interim/"
+
+version <- "version_12"
+
+input_filename <- paste0(processed_dir, version, "/link.json")
+output_filename <- paste0(processed_dir, version, "/link.feather")
+```
+
+# Data Reads
+```{r read}
+input_df <- fromJSON(input_filename, flatten = TRUE)
+```
+
+# Write
+```{r write}
+write_feather(input_df, output_filename)
+```
+
