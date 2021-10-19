@@ -81,3 +81,6 @@ shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/s
 
 echo "Matching SFCTA Stick Network to shst network using car rules following direction"
 shst match ../../data/external/sfcta/sfcta_in.geojson --out=../../data/interim/sfcta/reverse_dir/sfcta.out.geojson --tile-hierarchy=8
+
+echo "Matching PEMS to shst network using best direction rules"
+shst match ../../data/external/mtc/pems.in.geojson --search-radius=250 --out=../../data/interim/mtc/pems_conflation_result.geojson --best-direction 
