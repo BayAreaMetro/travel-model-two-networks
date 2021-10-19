@@ -25,7 +25,6 @@ for (package in packages_vector) {
 interim_dir <- "../../data/interim/"
 
 input_survey_file_name <- paste0(interim_dir, "onboard-survey-trip-list.feather")
-input_file_name_prefix <- paste0(interim_dir, "survey_")
 input_skim_file_name <- paste0(interim_dir, "trn_survey_skim_db.csv")
 
 output_file_name <- paste0(interim_dir, "on-board-survey-comparison-tableau.csv")
@@ -40,7 +39,6 @@ output_file_name <- paste0(interim_dir, "on-board-survey-comparison-tableau.csv"
 # Data Reads
 ```{r data-reads}
 survey_df <- read_feather(input_survey_file_name)
-# skim_df <- read_feather(input_skim_file_name)
 skim_df <- read_csv(input_skim_file_name, col_types = cols(.default = col_double(),
                                                            unique_ID = col_character(),
                                                            period = col_character(),

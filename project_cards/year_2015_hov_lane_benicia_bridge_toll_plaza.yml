@@ -3,43 +3,49 @@ project: Year 2015 Modify HOV Lanes and USE on Benicia Bridge Toll Plaza - Bridg
 tags:
 - Year 2015
 - Managed Lanes Review
-- Bridge Pass
 - toll review
+- Bridge Pass
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
   facility:
     link:
     - model_link_id:
-      - 4033903
-      - 4113965
+      - 4032858
     - shstReferenceId:
-      - 44745ac6ebae7a5b78ba6c4bccc43b68
-      - e5bab32b8697116f3e53cb25c1d897ac
+      - 42540cb7ed261fa5074bc659ba8caee2
   properties:
+  - property: ft
+    set: 7
+  - property: lanes
+    set: 12
   - property: lanes
     change: 0
     timeofday:
     - time:
       - '6:00'
       - '10:00'
-      change: -1
+      change: -2
     - time:
       - '15:00'
       - '19:00'
-      change: -1
+      change: -2
   - property: ML_lanes
     set: 0
     timeofday:
     - time:
       - '6:00'
       - '10:00'
-      set: 1
+      set: 2
     - time:
       - '15:00'
       - '19:00'
-      set: 1
+      set: 2
   - property: segment_id
+    set: 1
+  - property: tollbooth
+    set: 1
+  - property: ML_tollbooth
     set: 1
   - property: ML_useclass
     set: 0
@@ -47,11 +53,11 @@ changes:
     - time:
       - '6:00'
       - '10:00'
-      set: 2
+      set: 3
     - time:
       - '15:00'
       - '19:00'
-      set: 2
+      set: 3
   - property: ML_access
     set: all
   - property: ML_egress
