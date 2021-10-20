@@ -413,6 +413,13 @@ def read_shst_extract(path, suffix):
 def highway_attribute_list_to_value(x, highway_to_roadway_dict, roadway_hierarchy_dict):
     """
     clean up osm highway, and map to standard roadway
+
+    Assumption:
+    - if multiple OSM ways of the same SHST link have the same roadway type (converted from 'highway'), use that type
+    - if multiple OSM ways of the same SHST link have different roadway type, use the type with the smallest "hierarchy" value, 
+    i.e. the highest hierarchy, For example, a SHST link that contains a "motorway" OSM way and a "footway" OSM way would be labeled as "motorway".
+    - if missing OSM 'highway' info, use 'roadClass' field which is from shst extraction.
+
     """
     if type(x.highway) == list:
         value_list = list(set([highway_to_roadway_dict[c] for c in x.highway]))
