@@ -17,7 +17,7 @@ Installing Docker Desktop and getting Docker to run on an Mac machine is straigh
 
 * Input: 
   * [Dockerfile](github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/Dockerfile), used to build the shst image  
-  * County boundaries, `../../data/external/county_boundaries/boundary_[1-14].json`
+  * County boundaries (Step 0 output), `../../data/external/county_boundaries/boundary_[1-14].json`
 * Output: Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`, log files with columns: 
    'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
 
@@ -44,9 +44,9 @@ Add OSM attributes to extracted SharedStreets network and convert to Network Sta
   * OSM node extract, `../../data/external/osmnx_extract/node.geojson`
   * Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`
 * Output:
-  * Link shapes, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'
-  * Link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 
-  * Nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns:
+  * Link shapes, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'; with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'
+  * Link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
+  * Nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
 
 ### [Step 4: Conflate Third Party Data with Base Networks from Step 3](step4_conflate_with_third_party.ipynb)
 
