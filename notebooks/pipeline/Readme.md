@@ -101,3 +101,36 @@ Add county tagging to network links, shapes, and nodes; remove out-of-the-region
   * Link shapes, `../../data/interim/step5_tidy_roadway/shape.geojson`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'NAME'
   * Link attributes, `../../data/interim/step5_tidy_roadway/link.feather` and `../../data/interim/step5_tidy_roadway/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width', 'county', 'length', 'model_link_id', 'county_numbering_start', 'A', 'B'
   * Nodes, `../../data/interim/step5_tidy_roadway/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'geometry', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'county_numbering_start'
+
+
+### [Step 6: Conflate Transit GTFS Data with Roadway Network]
+Three parts, run in sequence:
+
+####[step6a_gtfs_shape_to_geojson_for_shst_js.ipynb](step6a_gtfs_shape_to_geojson_for_shst_js.ipynb)
+Convert the 'shape' data from transit gtfs into geojson for SharedStreets conflation.
+
+* Input: `../../data/external/gtfs/2015/[operator_name]/shapes.txt`
+
+* Output: `../../data/external/gtfs/[operator_name].transit.geojson`, including the following operators: 'ACTransit_2015_8_14', 'Blue&Gold_gtfs_10_4_2017', 'Emeryville_2016_10_26', 'Fairfield_2015_10_14', 'GGTransit_2015_9_3', 'Marguerite_2016_10_10', 'MarinTransit_2015_8_31', 'MVGo_2016_10_26', 'petalumatransit-petaluma-ca-us__11_12_15', 'RioVista_2015_8_20', 'SamTrans_2015_8_20', 'SantaRosa_google_transit_08_28_15', 'SFMTA_2015_8_11', 'Soltrans_2016_5_20', 'SonomaCounty_2015_8_18', 'TriDelta-GTFS-2018-05-24_21-43-17', 'vacavillecitycoach-2020-ca-us', 'VTA_2015_8_27', 'westcat-ca-us_9_17_2015', 'Wheels_2016_7_13' 
+
+####[step6b_conflate_with_gtfs.sh](step6b_conflate_with_gtfs.sh)
+Match transit gtfs shapes to SharedStreets network.
+
+* Input: shapes in geojson format (output of step6a)
+* Output: `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
+
+####[step6c_gtfs_transit_network_builder_v3](step6c_gtfs_transit_network_builder_v3)
+Conflate transit gtfs data (including ShSt match results and other gtfs data) with roadway network.
+
+* Input:
+  * Link shapes, link attributes, and nodes from Step 5, `../../data/interim/step5_tidy_roadway/shape.geojson`, `../../data/interim/step5_tidy_roadway/link.feather`, `../../data/interim/step5_tidy_roadway/node.geojson`
+  * GTFS raw data, in `../../data/external/gtfs/2015/`
+  * ShSt match results (output of step6b), `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
+  * GTFS to TM2 mode crosswalk, `../../data/interim/gtfs_to_tm2_mode_crosswalk.csv`
+  * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp` [question mark]
+
+* Output:
+  * Transit standard files, in `../../data/processed/version_12/`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`
+  * CUBE travel model transit network, `../../data/processed/version_12/transit.LIN`
+  * consolidated gtfs input (mainly for QAQC), in `../../data/interim/step6_gtfs/consolidated_gtfs_input/`, including the following files: `routes.txt`, `trips.txt`, `stops.txt`, `shapes.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
+  * Tansit route true shape (for QAQC), `../../data/interim/step6_gtfs/transit_route.geojson`
