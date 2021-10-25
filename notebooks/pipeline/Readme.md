@@ -44,9 +44,9 @@ Add OSM attributes to extracted SharedStreets network and convert to Network Sta
   * OSM node extract, `../../data/external/osmnx_extract/node.geojson`
   * Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`
 * Output:
-  * Link shapes, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'; with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'
-  * Link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
-  * Nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
+  * Network Standard link shapes, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'; with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'
+  * Network Standard link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
+  * Network Standard nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
 
 ### [Step 4: Conflate Third Party Data with Base Networks from Step 3](step4_conflate_with_third_party.ipynb)
 
@@ -84,7 +84,7 @@ After running Part 1, run [step4_conflate_with_third_party.sh](step4_conflate_wi
 
 Part 2 takes the output of `step4_conflate_with_third_party.sh` - only the 'matched' geojson files - and merge them with the base networks data created in Step 3.
 * Output:
-  * Link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width'
+  * Network Standard link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width'
   * `../../data/interim/conflation_result.csv`
 
 
@@ -92,18 +92,18 @@ Part 2 takes the output of `step4_conflate_with_third_party.sh` - only the 'matc
 Add county tagging to network links, shapes, and nodes; remove out-of-the-region links and nodes, drop circular links and duplicate links between same node pairs; flag drive dead-end; number nodes, links, and link AB nodes.
 
 * Input:
-  * Link shapes from Step 3, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`
-  * Nodes from Step 3, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`
-  * Link attributes from Step 4 (has attributes from conflation), `../../data/interim/step4_conflate_with_tomtom/link.feather`
+  * Network Standard link shapes from Step 3, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`
+  * Network Standard nodes from Step 3, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`
+  * Network Standard link attributes from Step 4 (has attributes from conflation), `../../data/interim/step4_conflate_with_tomtom/link.feather`
   * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp` -- Get this from [`BOX_TM2NET_DATA > external > county_boundaries > cb_2018_us_county_500k > cb_2018_us_county_500k.shp`](https://mtcdrive.box.com/s/sm86z4zol33l73oeufll881eabqecpnz)
 
 * Output:
-  * Link shapes, `../../data/interim/step5_tidy_roadway/shape.geojson`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'NAME'
-  * Link attributes, `../../data/interim/step5_tidy_roadway/link.feather` and `../../data/interim/step5_tidy_roadway/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width', 'county', 'length', 'model_link_id', 'county_numbering_start', 'A', 'B'
-  * Nodes, `../../data/interim/step5_tidy_roadway/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'geometry', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'county_numbering_start'
+  * Network Standard link shapes, `../../data/interim/step5_tidy_roadway/shape.geojson`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'NAME'
+  * Network Standard link attributes, `../../data/interim/step5_tidy_roadway/link.feather` and `../../data/interim/step5_tidy_roadway/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width', 'county', 'length', 'model_link_id', 'county_numbering_start', 'A', 'B'
+  * Network Standard nodes, `../../data/interim/step5_tidy_roadway/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'geometry', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'county_numbering_start'
 
 
-### [Step 6: Conflate Transit GTFS Data with Roadway Network]
+### Step 6: Conflate Transit GTFS Data with Roadway Network
 Three parts, run in sequence:
 
 ####[step6a_gtfs_shape_to_geojson_for_shst_js.ipynb](step6a_gtfs_shape_to_geojson_for_shst_js.ipynb)
@@ -123,7 +123,7 @@ Match transit gtfs shapes to SharedStreets network.
 Conflate transit gtfs data (including ShSt match results and other gtfs data) with roadway network.
 
 * Input:
-  * Link shapes, link attributes, and nodes from Step 5, `../../data/interim/step5_tidy_roadway/shape.geojson`, `../../data/interim/step5_tidy_roadway/link.feather`, `../../data/interim/step5_tidy_roadway/node.geojson`
+  * Network Standard link shapes, link attributes, and nodes from Step 5, `../../data/interim/step5_tidy_roadway/shape.geojson`, `../../data/interim/step5_tidy_roadway/link.feather`, `../../data/interim/step5_tidy_roadway/node.geojson`
   * GTFS raw data, in `../../data/external/gtfs/2015/`
   * ShSt match results (output of step6b), `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
   * GTFS to TM2 mode crosswalk, `../../data/interim/gtfs_to_tm2_mode_crosswalk.csv`
@@ -131,6 +131,49 @@ Conflate transit gtfs data (including ShSt match results and other gtfs data) wi
 
 * Output:
   * Transit standard files, in `../../data/processed/version_12/`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`
+  * Network Standard link shapes, link attributes, and nodes, `../../data/interim/step6_gtfs/version_12/shape.geojson`, `../../data/interim/step6_gtfs/version_12/link.feather`, `../../data/interim/step6_gtfs/version_12/node.geojson`
   * CUBE travel model transit network, `../../data/processed/version_12/transit.LIN`
   * consolidated gtfs input (mainly for QAQC), in `../../data/interim/step6_gtfs/consolidated_gtfs_input/`, including the following files: `routes.txt`, `trips.txt`, `stops.txt`, `shapes.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
   * Tansit route true shape (for QAQC), `../../data/interim/step6_gtfs/transit_route.geojson`
+
+
+### [Step7: Build Controid Connectors](step7_centroid_connector_builder)
+
+* Input:
+  * Network Standard link shapes, link attributes, and nodes from Step 6, at `../../data/interim/step6_gtfs/version_12/`
+  * TAZ and MAZ polygons, `../data/external/maz_taz/tazs_TM2_v2_2.shp` and `../data/external/maz_taz/mazs_TM2_v2_2.shp`
+  * Assignable links lookup, when building the network for the first time, the legacy lookup was used, [`\GitHub\Lasso\mtc_data\lookups\legacy_tm2_attributes.csv`](https://github.com/BayAreaMetro/Lasso/blob/mtc_parameters/mtc_data/lookups/legacy_tm2_attributes.csv); as the network was updated and assignable calculations improved, newer versions of lookup would be used, e.g. `../../data/processed/version_05/assignable_analysis_links.dbf`
+  * Centroid Connectors of legacy TM2 network (non-Marin version), `../../data/external/TM2_nonMarin/tm2_links.shp`, `../../data/external/TM2_nonMarin/tm2_nodes.shp`
+
+* Output:
+  * Shapes of all centroid connectors, including TAZ drive connector, MAZ drive, walk, bike connectors, in two formats, `../../data/interim/step7_centroid_connector/cc_shape.geojson`, `../../data/interim/step7_centroid_connector/cc_shape.pickle`
+  * Link variables of all centroid connectors, in two formats, `../../data/interim/step7_centroid_connector/cc_link.json`, `../../data/interim/step7_centroid_connector/cc_link.pickle`
+  * All centroid nodes, `../../data/interim/step7_centroid_connector/centroid_node.geojson`, `../../data/interim/step7_centroid_connector/centroid_node.pickle`
+
+  * Output by centroids and connectors types, mainly for QAQC: 
+    * TAZ centroids, `../../data/interim/step7_centroid_connector/taz_drive_centroid.pickle`
+    * TAZ drive centroid connectors, `../../data/interim/step7_centroid_connector/taz_drive_cc.pickle` and `../../data/interim/step7_centroid_connector/taz_drive.geojson`, note that it only contains one-direction (one link for each connector shape)
+    * TAZ drive centroid connector shapes, `../../data/interim/step7_centroid_connector/taz.geojson`
+    * MAZ drive centroids, `../../data/interim/step7_centroid_connector/maz_drive_centroid.pickle`
+    * MAZ drive centroid connectors, `../../data/interim/step7_centroid_connector/maz_drive_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
+    * MAZ drive centroid connector shapes, `../../data/interim/step7_centroid_connector/maz_drive.geojson`
+    * MAZ walk centroids, `../../data/interim/step7_centroid_connector/maz_walk_centroid.pickle`
+    * MAZ walk centroid connectors, `../../data/interim/step7_centroid_connector/maz_walk_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
+    * MAZ walk centroid connector shapes, `../../data/interim/step7_centroid_connector/maz_walk.geojson`
+    * MAZ bikew centroids, `../../data/interim/step7_centroid_connector/maz_bike_centroid.pickle`
+    * MAZ bike centroid connectors, `../../data/interim/step7_centroid_connector/maz_bike_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
+    * MAZ bike centroid connector shapes, `../../data/interim/step7_centroid_connector/maz_bike.geojson`
+
+
+### [Step8: Standard Format](step8_standard_format)
+Add necessary fields to the base netowrk.
+
+* Input: Network Standard link shapes, link attributes, and nodes from Step 6, at `../../data/interim/step6_gtfs/version_12/`, including:
+  * `link.feather`, with field:
+  * `node.geojson`, with field: 
+  * `shape.geojson`,
+
+* Output: Network Standard link shapes, link attributes, and nodes, at `../../data/interim/step8_standard_format/`, including:
+  * `shape.geojson`, with columns: 
+  * `link.json` and `link.feather`, with columns: 'access', 'bike_access', 'drive_access', 'fromIntersectionId', 'lanes', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'u', 'v', 'walk_access', 'wayId', 'county', 'model_link_id', 'A', 'B', 'rail_traveltime', 'rail_only', 'locationReferences'
+  * `node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'rail_only', 'geometry', 'X', 'Y', 'point'
