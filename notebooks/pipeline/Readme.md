@@ -106,20 +106,20 @@ Add county tagging to network links, shapes, and nodes; remove out-of-the-region
 ### Step 6: Conflate Transit GTFS Data with Roadway Network
 Three parts, run in sequence:
 
-####[step6a_gtfs_shape_to_geojson_for_shst_js.ipynb](step6a_gtfs_shape_to_geojson_for_shst_js.ipynb)
+#### [step6a_gtfs_shape_to_geojson_for_shst_js.ipynb](step6a_gtfs_shape_to_geojson_for_shst_js.ipynb)
 Convert the 'shape' data from transit gtfs into geojson for SharedStreets conflation.
 
 * Input: `../../data/external/gtfs/2015/[operator_name]/shapes.txt`
 
 * Output: `../../data/external/gtfs/[operator_name].transit.geojson`, including the following operators: 'ACTransit_2015_8_14', 'Blue&Gold_gtfs_10_4_2017', 'Emeryville_2016_10_26', 'Fairfield_2015_10_14', 'GGTransit_2015_9_3', 'Marguerite_2016_10_10', 'MarinTransit_2015_8_31', 'MVGo_2016_10_26', 'petalumatransit-petaluma-ca-us__11_12_15', 'RioVista_2015_8_20', 'SamTrans_2015_8_20', 'SantaRosa_google_transit_08_28_15', 'SFMTA_2015_8_11', 'Soltrans_2016_5_20', 'SonomaCounty_2015_8_18', 'TriDelta-GTFS-2018-05-24_21-43-17', 'vacavillecitycoach-2020-ca-us', 'VTA_2015_8_27', 'westcat-ca-us_9_17_2015', 'Wheels_2016_7_13' 
 
-####[step6b_conflate_with_gtfs.sh](step6b_conflate_with_gtfs.sh)
+#### [step6b_conflate_with_gtfs.sh](step6b_conflate_with_gtfs.sh)
 Match transit gtfs shapes to SharedStreets network.
 
 * Input: shapes in geojson format (output of step6a)
 * Output: `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
 
-####[step6c_gtfs_transit_network_builder_v3](step6c_gtfs_transit_network_builder_v3)
+#### [step6c_gtfs_transit_network_builder_v3](step6c_gtfs_transit_network_builder_v3)
 Conflate transit gtfs data (including ShSt match results and other gtfs data) with roadway network.
 
 * Input:
@@ -145,24 +145,24 @@ Conflate transit gtfs data (including ShSt match results and other gtfs data) wi
   * Assignable links lookup, when building the network for the first time, the legacy lookup was used, [`\GitHub\Lasso\mtc_data\lookups\legacy_tm2_attributes.csv`](https://github.com/BayAreaMetro/Lasso/blob/mtc_parameters/mtc_data/lookups/legacy_tm2_attributes.csv); as the network was updated and assignable calculations improved, newer versions of lookup would be used, e.g. `../../data/processed/version_05/assignable_analysis_links.dbf`
   * Centroid Connectors of legacy TM2 network (non-Marin version), `../../data/external/TM2_nonMarin/tm2_links.shp`, `../../data/external/TM2_nonMarin/tm2_nodes.shp`
 
-* Output:
-  * Shapes of all centroid connectors, including TAZ drive connector, MAZ drive, walk, bike connectors, in two formats, `../../data/interim/step7_centroid_connector/cc_shape.geojson`, `../../data/interim/step7_centroid_connector/cc_shape.pickle`
-  * Link variables of all centroid connectors, in two formats, `../../data/interim/step7_centroid_connector/cc_link.json`, `../../data/interim/step7_centroid_connector/cc_link.pickle`
-  * All centroid nodes, `../../data/interim/step7_centroid_connector/centroid_node.geojson`, `../../data/interim/step7_centroid_connector/centroid_node.pickle`
+* Output (at `../../data/interim/step7_centroid_connector/`):
+  * Shapes of all centroid connectors, including TAZ drive connector, MAZ drive, walk, bike connectors, in two formats, `cc_shape.geojson`, `cc_shape.pickle`
+  * Link variables of all centroid connectors, in two formats, `cc_link.json`, `cc_link.pickle`
+  * All centroid nodes, `centroid_node.geojson`, `centroid_node.pickle`
 
-  * Output by centroids and connectors types, mainly for QAQC: 
-    * TAZ centroids, `../../data/interim/step7_centroid_connector/taz_drive_centroid.pickle`
-    * TAZ drive centroid connectors, `../../data/interim/step7_centroid_connector/taz_drive_cc.pickle` and `../../data/interim/step7_centroid_connector/taz_drive.geojson`, note that it only contains one-direction (one link for each connector shape)
-    * TAZ drive centroid connector shapes, `../../data/interim/step7_centroid_connector/taz.geojson`
-    * MAZ drive centroids, `../../data/interim/step7_centroid_connector/maz_drive_centroid.pickle`
-    * MAZ drive centroid connectors, `../../data/interim/step7_centroid_connector/maz_drive_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
-    * MAZ drive centroid connector shapes, `../../data/interim/step7_centroid_connector/maz_drive.geojson`
-    * MAZ walk centroids, `../../data/interim/step7_centroid_connector/maz_walk_centroid.pickle`
-    * MAZ walk centroid connectors, `../../data/interim/step7_centroid_connector/maz_walk_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
-    * MAZ walk centroid connector shapes, `../../data/interim/step7_centroid_connector/maz_walk.geojson`
-    * MAZ bikew centroids, `../../data/interim/step7_centroid_connector/maz_bike_centroid.pickle`
-    * MAZ bike centroid connectors, `../../data/interim/step7_centroid_connector/maz_bike_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
-    * MAZ bike centroid connector shapes, `../../data/interim/step7_centroid_connector/maz_bike.geojson`
+  * Output by centroids and connectors types, mainly for QAQC (at `../../data/interim/step7_centroid_connector/`): 
+    * TAZ centroids, `taz_drive_centroid.pickle`
+    * TAZ drive centroid connectors, `taz_drive_cc.pickle` and `../../data/interim/step7_centroid_connector/taz_drive.geojson`, note that it only contains one-direction (one link for each connector shape)
+    * TAZ drive centroid connector shapes, `taz.geojson`
+    * MAZ drive centroids, `maz_drive_centroid.pickle`
+    * MAZ drive centroid connectors, `maz_drive_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
+    * MAZ drive centroid connector shapes, `maz_drive.geojson`
+    * MAZ walk centroids, `maz_walk_centroid.pickle`
+    * MAZ walk centroid connectors, `maz_walk_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
+    * MAZ walk centroid connector shapes, `maz_walk.geojson`
+    * MAZ bikew centroids, `maz_bike_centroid.pickle`
+    * MAZ bike centroid connectors, `maz_bike_cc.pickle`, note that it only contains one-direction (one link for each connector shape)
+    * MAZ bike centroid connector shapes, `maz_bike.geojson`
 
 
 ### [Step8: Standard Format](step8_standard_format)
@@ -177,3 +177,19 @@ Add necessary fields to the base netowrk.
   * `shape.geojson`, with columns: 
   * `link.json` and `link.feather`, with columns: 'access', 'bike_access', 'drive_access', 'fromIntersectionId', 'lanes', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'u', 'v', 'walk_access', 'wayId', 'county', 'model_link_id', 'A', 'B', 'rail_traveltime', 'rail_only', 'locationReferences'
   * `node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'rail_only', 'geometry', 'X', 'Y', 'point'
+
+
+### [Step9: Create TAPS](step9_create_taps)
+Create TAPs and TAP links.
+
+* Input:
+  * `../../data/processed/version_03/working_scenario_01.pickle`
+  * Lasso parameters, [`/GitHub/Lasso`, "mtc_parameters" branch](https://github.com/BayAreaMetro/Lasso/tree/mtc_parameters)
+  * Legacy TM2 network (non-Marin version), `../../data/external/TM2_nonMarin/tm2_links.shp`, `../../data/external/TM2_nonMarin/tm2_nodes.shp`
+  * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp`
+
+* Output (at `../../data/interim/step9_taps/`):
+  * TAP link attributes, `tap_link.pickle`
+  * TAP link shapes, `tap_shape.pickle`
+  * TAP nodes, `tap_node.pickle`
+  * Taps and tap links mainly for analyze the different options and QAQC, `stops_and_taps.csv`
