@@ -48,16 +48,17 @@ Add OSM attributes to extracted SharedStreets network and convert to Network Sta
   * Network Standard link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
   * Network Standard nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
 
-### [Step 4: Conflate Third Party Data with Base Networks from Step 3](step4_conflate_with_third_party.ipynb)
+### [Step 4: Conflate Third Party Data with Base Networks from Step 3]
+Four parts, run in sequence:
 
-Contains two parts:
-Part 1 prepares third party data (remove duplicates, remove unnecessary records, partition regional network datasets by the 14 boundaries) for SharedStreets matching.
+#### [step4a_prepare_conflate_with_third_party.ipynb](step4a_prepare_conflate_with_third_party.ipynb)
+Prepare third party data (remove duplicates, remove unnecessary records, partition regional network datasets by the 14 boundaries, set to the correct projection EPSG 4326) for SharedStreets matching.
 * Input:
   * TomTom network for the Bay Area (pending)
   * TM2 non-Marion version, `../../data/external/TM2_nonMarin/mtc_final_network_base.shp`
   * TM2 Marin version, `../../data/external/TM2_Marin/mtc_final_network_base.shp`
   * SFCTA Stick network, `../../data/external/sfcta/SanFrancisco_links.shp`
-  * PEMS
+  * PEMS count, `../../data/external/mtc/pems_period.csv`
 * Output:
   * `../../data/external/tomtom/tomtom[1-14].in.geojson`
   * `../../data/external/TM2_nonMarin/tm2nonMarin_[1-14].in.geojson`
@@ -65,24 +66,54 @@ Part 1 prepares third party data (remove duplicates, remove unnecessary records,
   * `../../data/external/sfcta/sfcta_in.geojson`
   * `../../data/external/mtc/pems.in.geojson`
 
-After running Part 1, run [step4_conflate_with_third_party.sh](step4_conflate_with_third_party.sh) with Part 1's output as its input. This bash script matches these third party datasets to SharedStreets References using various rules. The output of SharedStreets References matching:
+#### [step4b_third_party_shst_match.sh](step4b_third_party_shst_match.sh)
+Matche third party datasets to SharedStreets References using various rules.
+
+* Input: output of step4a
+
+* Output:
+  TOMTOM data:
   * `../../data/interim/tomtom/bike_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
   * `../../data/interim/tomtom/car_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
   * `../../data/interim/tomtom/ped_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
 
+  Legacy TM2 non-Marin data:
   * `../../data/interim/TM2_nonMarin/car_rules/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
   * `../../data/interim/TM2_nonMarin/ped_rules/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
   * `../../data/interim/TM2_nonMarin/reverse_dir/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
 
+  Legacy TM2 Marin data:
   * `../../data/interim/TM2_Marin/car_rules/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
   * `../../data/interim/TM2_Marin/ped_rules/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
   * `../../data/interim/TM2_Marin/reverse_dir/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
 
+  SFCTA stick network data:
   * `../../data/interim/sfcta/car_rules/sfcta.out.[matched,unmatched].geojson`
   * `../../data/interim/sfcta/ped_rules/sfcta.out.[matched,unmatched].geojson`
   * `../../data/interim/sfcta/reverse_dir/sfcta.out.[matched,unmatched].geojson`
 
-Part 2 takes the output of `step4_conflate_with_third_party.sh` - only the 'matched' geojson files - and merge them with the base networks data created in Step 3.
+  PEMS data:
+  * `../../data/interim/mtc/pems.out.matched.geojson`
+
+#### [step4c_pems_conflation.ipynb](step4c_pems_conflation.ipynb)
+Further conflate PEMS data based on shield number (e.g., I-80), direction (e.g., E), and FT.
+
+* Input:
+  * PEMs data, `../../data/external/mtc/pems_period.csv`
+  * PEMs ShSt conflation result, `../../data/interim/mtc/pems.out.matched.geojson`
+  * Base network links attributes and shapes (output of Step3), `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson` and `../../data/interim/step3_join_shst_extraction_with_osm/link.json` 
+  * Tranit conflation result from step4d (only need 'tomtom_shieldnum' and 'tomtom_rtedir' info, so only tomtom conflation result), `../../data/interim/conflation_result.csv`
+* Output:
+  * PEMs conflation result, `../../data/interim/mtc/pems_conflation_result_new.geojson`. It is not added to the standard network; it is used in [validation](https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/src/scripts/make-roadway-assignment-viewer.Rmd)
+
+#### [step4d_conflate_with_third_party.ipynb](step4d_conflate_with_third_party.ipynb)
+Merge the SharedStreets match results in step4b with the base networks data created in Step 3.
+
+* Input:
+  * Base networks including links and shapes from step3
+  * Third party data ShSt match results from step4b
+  * PEMs conflation result from step4c 
+
 * Output:
   * Network Standard link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width'
   * `../../data/interim/conflation_result.csv`
@@ -120,7 +151,7 @@ Match transit gtfs shapes to SharedStreets network.
 * Output: `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
 
 #### [step6c_gtfs_transit_network_builder_v3](step6c_gtfs_transit_network_builder_v3)
-Conflate transit gtfs data (including ShSt match results and other gtfs data) with roadway network.
+Conflate transit gtfs data (including ShSt match results and other gtfs data) with roadway network. Also add rail walk access links.
 
 * Input:
   * Network Standard link shapes, link attributes, and nodes from Step 5, `../../data/interim/step5_tidy_roadway/shape.geojson`, `../../data/interim/step5_tidy_roadway/link.feather`, `../../data/interim/step5_tidy_roadway/node.geojson`
@@ -130,7 +161,7 @@ Conflate transit gtfs data (including ShSt match results and other gtfs data) wi
   * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp` [question mark]
 
 * Output:
-  * Transit standard files, in `../../data/processed/version_12/`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`
+  * Transit standard files (*Final output for transit*), in `../../data/processed/version_12/`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`
   * Network Standard link shapes, link attributes, and nodes, `../../data/interim/step6_gtfs/version_12/shape.geojson`, `../../data/interim/step6_gtfs/version_12/link.feather`, `../../data/interim/step6_gtfs/version_12/node.geojson`
   * CUBE travel model transit network, `../../data/processed/version_12/transit.LIN`
   * consolidated gtfs input (mainly for QAQC), in `../../data/interim/step6_gtfs/consolidated_gtfs_input/`, including the following files: `routes.txt`, `trips.txt`, `stops.txt`, `shapes.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
@@ -138,6 +169,7 @@ Conflate transit gtfs data (including ShSt match results and other gtfs data) wi
 
 
 ### [Step7: Build Controid Connectors](step7_centroid_connector_builder)
+Create TAZ/MAZ centroids and centroid connectors, which will be [added to the Standard networks](https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/10-all-projects.ipynb) along with TAPs and Project Cards to create model networks for Cube/Emme.
 
 * Input:
   * Network Standard link shapes, link attributes, and nodes from Step 6, at `../../data/interim/step6_gtfs/version_12/`
@@ -145,7 +177,7 @@ Conflate transit gtfs data (including ShSt match results and other gtfs data) wi
   * Assignable links lookup, when building the network for the first time, the legacy lookup was used, [`\GitHub\Lasso\mtc_data\lookups\legacy_tm2_attributes.csv`](https://github.com/BayAreaMetro/Lasso/blob/mtc_parameters/mtc_data/lookups/legacy_tm2_attributes.csv); as the network was updated and assignable calculations improved, newer versions of lookup would be used, e.g. `../../data/processed/version_05/assignable_analysis_links.dbf`
   * Centroid Connectors of legacy TM2 network (non-Marin version), `../../data/external/TM2_nonMarin/tm2_links.shp`, `../../data/external/TM2_nonMarin/tm2_nodes.shp`
 
-* Output (at `../../data/interim/step7_centroid_connector/`):
+* Output (at `../../data/interim/step7_centroid_connector/`; key files also saved at the [Lasso repo](https://github.com/BayAreaMetro/Lasso/tree/mtc_parameters/mtc_data/centroid), to be used to create model networks):
   * Shapes of all centroid connectors, including TAZ drive connector, MAZ drive, walk, bike connectors, in two formats, `cc_shape.geojson`, `cc_shape.pickle`
   * Link variables of all centroid connectors, in two formats, `cc_link.json`, `cc_link.pickle`
   * All centroid nodes, `centroid_node.geojson`, `centroid_node.pickle`
@@ -168,27 +200,27 @@ Conflate transit gtfs data (including ShSt match results and other gtfs data) wi
 ### [Step8: Standard Format](step8_standard_format)
 Add necessary fields to the base netowrk.
 
-* Input: Network Standard link shapes, link attributes, and nodes from Step 6, at `../../data/interim/step6_gtfs/version_12/`, including:
-  * `link.feather`, with field:
-  * `node.geojson`, with field: 
-  * `shape.geojson`,
+* Input: Network Standard link shapes, link attributes, and nodes from Step 6, at `../../data/interim/step6_gtfs/version_12/`, including: 
+  * `link.feather`
+  * `node.geojson` 
+  * `shape.geojson`
 
-* Output: Network Standard link shapes, link attributes, and nodes, at `../../data/interim/step8_standard_format/`, including:
+* Output: Network Standard link shapes, link attributes, and nodes (*Final output for standard roadway networks plus transit nodes and links*), at `../../data/interim/step8_standard_format/`, including:
   * `shape.geojson`, with columns: 
   * `link.json` and `link.feather`, with columns: 'access', 'bike_access', 'drive_access', 'fromIntersectionId', 'lanes', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'u', 'v', 'walk_access', 'wayId', 'county', 'model_link_id', 'A', 'B', 'rail_traveltime', 'rail_only', 'locationReferences'
   * `node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'rail_only', 'geometry', 'X', 'Y', 'point'
 
 
 ### [Step9: Create TAPS](step9_create_taps)
-Create TAPs and TAP links.
+Create TAPs and TAP links,  which will be [added to the Standard networks](https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/10-all-projects.ipynb) to create model networks for Cube/Emme.
 
 * Input:
-  * `../../data/processed/version_03/working_scenario_01.pickle`
+  * Lasso scenario, same data as the standard network output from Step8, just faster to load in pickle format, `../../data/processed/version_03/working_scenario_01.pickle`, created by https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/01-attribute-and-make-pickles.ipynb
   * Lasso parameters, [`/GitHub/Lasso`, "mtc_parameters" branch](https://github.com/BayAreaMetro/Lasso/tree/mtc_parameters)
   * Legacy TM2 network (non-Marin version), `../../data/external/TM2_nonMarin/tm2_links.shp`, `../../data/external/TM2_nonMarin/tm2_nodes.shp`
   * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp`
 
-* Output (at `../../data/interim/step9_taps/`):
+* Output: (at `../../data/interim/step9_taps/`; key files also saved at the [Lasso repo](https://github.com/BayAreaMetro/Lasso/tree/mtc_parameters/mtc_data/tap), to be used to create model networks):
   * TAP link attributes, `tap_link.pickle`
   * TAP link shapes, `tap_shape.pickle`
   * TAP nodes, `tap_node.pickle`
