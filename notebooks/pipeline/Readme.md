@@ -225,3 +225,4 @@ Create TAPs and TAP links,  which will be [added to the Standard networks](https
   * TAP link shapes, `tap_shape.pickle`
   * TAP nodes, `tap_node.pickle`
   * Taps and tap links mainly for analyze the different options and QAQC, `stops_and_taps.csv`
+  * `Tap_node.csv`, which includes available mode, county, etc. for TAPs. This file was only requested by Shimon to update TAP coding in the onboard survey.
