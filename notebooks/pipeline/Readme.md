@@ -1,5 +1,5 @@
 
-## Process
+<img src="https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/TM2_network_rebuild_flow.png" width="800">
 
 ### [Step 0: Prepare for SharedStreets extraction](step0_prepare_for_shst_extraction.ipynb)
 
