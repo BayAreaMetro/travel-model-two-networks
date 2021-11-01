@@ -115,7 +115,7 @@ Merge the SharedStreets match results in step4b with the base networks data crea
   * PEMs conflation result from step4c 
 
 * Output:
-  * Network Standard link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width'
+  * Network Standard link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
   * `../../data/interim/conflation_result.csv`
 
 
@@ -130,7 +130,7 @@ Add county tagging to network links, shapes, and nodes; remove out-of-the-region
 
 * Output:
   * Network Standard link shapes, `../../data/interim/step5_tidy_roadway/shape.geojson`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'NAME'
-  * Network Standard link attributes, `../../data/interim/step5_tidy_roadway/link.feather` and `../../data/interim/step5_tidy_roadway/link.json`, with columns: 'access', 'area', 'bike_access', 'bridge', 'drive_access', 'est_width', 'fromIntersectionId', 'highway', 'id', 'junction', 'key', 'landuse', 'lanes', 'link', 'maxspeed', 'name', 'oneWay', 'ref', 'roadway', 'roundabout', 'service', 'shstGeometryId', 'shstReferenceId', 'toIntersectionId', 'tunnel', 'u', 'v', 'walk_access', 'wayId', 'width', 'county', 'length', 'model_link_id', 'county_numbering_start', 'A', 'B'
+  * Network Standard link attributes, `../../data/interim/step5_tidy_roadway/link.feather` and `../../data/interim/step5_tidy_roadway/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access', 'model_link_id', 'length',  'county', 'county_numbering_start', 'A', 'B'
   * Network Standard nodes, `../../data/interim/step5_tidy_roadway/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'geometry', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'county_numbering_start'
 
 
