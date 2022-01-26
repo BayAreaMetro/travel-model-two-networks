@@ -76,6 +76,10 @@ if __name__ == '__main__':
     model_net.links_mtc_df['name'] = model_net.links_mtc_df['name'].apply(lambda x: lasso.util.shorten_name(x))
     WranglerLogger.debug("After shortening, model_links_mtc_df.name max len: {}".format(
       model_net.links_mtc_df['name'].str.len().max()))
+ 
+    # write the model_net pickle
+    WranglerLogger.info("Writing model_net.pickle")
+    pickle.dump(model_net, open("model_net.pickle", 'wb'))
 
     if args.cube_output_dir:
       # create cube output dir if it doesn't exist
@@ -91,11 +95,12 @@ if __name__ == '__main__':
       )
 
       model_net.write_roadway_as_fixedwidth(
-        output_link_txt = os.path.join(args.cube_output_dir, 'links.txt'),
-        output_node_txt = os.path.join(args.cube_output_dir, 'nodes.txt'),
-        output_link_header_width_txt = os.path.join(args.cube_output_dir, 'links_header_width.txt'),
-        output_node_header_width_txt = os.path.join(args.cube_output_dir, 'nodes_header_width.txt'),
-        output_cube_network_script   = os.path.join(args.cube_output_dir, 'make_complete_network_from_fixed_width_file.s'),
+        output_dir = args.cube_output_dir,
+        output_link_txt = 'links.txt',
+        output_node_txt = 'nodes.txt',
+        output_link_header_width_txt = 'links_header_width.txt',
+        output_node_header_width_txt = 'nodes_header_width.txt',
+        output_cube_network_script   = 'make_complete_network_from_fixed_width_file.s',
         #drive_only = True
       )
 
@@ -122,8 +127,13 @@ if __name__ == '__main__':
       # write the consolidated agency transit lin files
       lasso.mtc.write_as_cube_lin(standard_transit_net, my_param, outpath = os.path.join(args.cube_output_dir, "transit.lin"))
 
+      WranglerLogger.info("Completed writing cube files")
+
     if args.emme_output_dir:
       from lasso import emme
+
+      # create emme output dir if it doesn't exist
+      os.makedirs(args.emme_output_dir, exist_ok=True)
 
       lasso.emme.create_emme_network(
         links_df = model_net.links_mtc_df,
@@ -135,6 +145,11 @@ if __name__ == '__main__':
         write_maz_active_modes_network = True,
         write_tap_transit_network = True,
         parameters = my_param,
-        subregion_boundary_file= os.path.join(LASSO_DIR, 'mtc_data', 'emme', 'subregion_boundary_for_active_modes.shp') ,
-        subregion_boundary_id_variable = 'subregion'
+        polygon_file_to_split_active_modes_network = os.path.join(LASSO_DIR, '..', 'mtc_data', 'emme', 'subregion_boundary_for_active_modes.shp') ,
+        polygon_variable_to_split_active_modes_network = 'subregion'
       )
+    
+      WranglerLogger.info("Completed writing emme files")
+    
+    # Success
+    sys.exit(0)
