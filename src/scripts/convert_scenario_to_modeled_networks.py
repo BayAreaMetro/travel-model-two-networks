@@ -7,14 +7,45 @@ import lasso
 
 USAGE = """
   Reads a pickled instance of a network_wrangler.Scenario and creates instances of
-  lasso.ModelRoadwayNetwork, lasso.CubeTransit, and lasso.EMMETransit, and writes them out.
+  lasso.ModelRoadwayNetwork, which is written to model_net.pickle in the working directory.
+
+  If that file is found, then it can be read/used instead of re-converting and re-computing.
+
+  If --gpkg_output_dir is passed, outputs the model network into that directory as a
+  GeoPackage.
+
+  If --cube_output_dir is passed, outputs the model network into that directory for Cube, 
+  including TrueShape shapefile.  Uses lasso.CubeTransit.
+  
+  If --emme_output_dir is passed, outputs the model network into that directory for Emme.
+  Uses lasso.EMMETransit.
 
 """
+
+# TODO: Is this defined elsewhere?  Like in lasso\mtc.py?
+MODEL_ROADWAY_LINK_VARIABLES = [
+  'A','B','model_link_id','shstGeometryId','name',                              # IDs
+  'ft','assignable','cntype','distance','county',                               # Misc attributes
+  'bike_access','drive_access','walk_access','rail_only','bus_only','transit',  # Mode attributes
+  'managed','tollbooth','tollseg','segment_id',                                 # Managed roadway
+  'lanes_EA','lanes_AM','lanes_MD','lanes_PM','lanes_EA',                       # Lanes
+  'useclass_EA','useclass_AM','useclass_MD','useclass_PM','useclass_EV',        # Use classes
+  'geometry'                                                                    # geometry
+]
+
+MODEL_ROADWAY_NODE_VARIABLES = [
+  'N','osm_node_id','tap_id',                                                   # IDs
+  'county',                                                                     # Misc attributes
+  'bike_access','drive_access','walk_access','rail_only','farezone',            # Mode attributes
+  'geometry'                                                                    # geometry
+]
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("scenario_pickle_file", help="Input: Specify the scenario pickle file to read.")
     parser.add_argument("transfer_fare_csv",    help="Location of transfer.csv file specifying transfer fares between systems")
+    parser.add_argument("--gpkg_output_dir",    help="Output directory for model network in file geodatabase format")
+    parser.add_argument("--gpkg_link_filter",  help="Optional link variable to additionally output link subsets (e.g. county)")
     parser.add_argument("--cube_output_dir",    help="Output directory for model network in Cube format")
     parser.add_argument("--emme_output_dir",    help="Output directory for model network in Emme format")
     args = parser.parse_args()
@@ -25,9 +56,17 @@ if __name__ == '__main__':
       WranglerLogger.info("{0: >20}: {1}".format(arg, getattr(args, arg)))
 
     if (args.cube_output_dir == None) and (args.emme_output_dir == None):
-      WranglerLogger.error("No cube_output_dir passed nor emme_output_dir passed.  Nothing to do. Exiting")
+      WranglerLogger.fatal("No cube_output_dir passed nor emme_output_dir passed.  Nothing to do. Exiting")
       sys.exit("No cube_output_dir passed nor emme_output_dir passed.  Nothing to do. Exiting")
-  
+
+    if args.gpkg_link_filter and args.gpkg_link_filter not in MODEL_ROADWAY_LINK_VARIABLES:
+      WranglerLogger.fatal("gpkg_link_filter argument passed [{}] which is not one of MODEL_ROADWAY_LINK_VARIABLES."
+        .format(args.gpkg_link_filter))
+      WranglerLogger.fatal("MODEL_ROADWAY_LINK_VARIABLES: {}".format(MODEL_ROADWAY_LINK_VARIABLES))
+      WranglerLogger.fatal("Exiting.")
+      sys.exit("gpkg_link_filter argument passed [{}] which is not one of MODEL_ROADWAY_LINK_VARIABLES."
+        .format(args.gpkg_link_filter))
+
     # use the installed lasso directory as the lasso_base_dir
     LASSO_DIR = os.path.dirname(lasso.__file__)
     my_param = lasso.Parameters(lasso_base_dir=LASSO_DIR)
@@ -36,58 +75,94 @@ if __name__ == '__main__':
     WranglerLogger.info("Reading scenario pickle file from {}".format(args.scenario_pickle_file))
     scenario = pickle.load(open(args.scenario_pickle_file, 'rb'))
 
-    # make the model network
-    model_net = lasso.ModelRoadwayNetwork.from_RoadwayNetwork(roadway_network_object = scenario.road_net, 
-      parameters = my_param)
+    # give the user the option to read this and use it rather than recreating the model network
+    # since these steps are slowwww
+    MODEL_NET_PICKLE_FILE = "model_net.pickle"
+    read_model_net_pickle = False
+    if os.path.exists(MODEL_NET_PICKLE_FILE):
+      WranglerLogger.info("{} exists.  Re-generate and recompute? ('y' means regenerate/'n' means read this file)".format(MODEL_NET_PICKLE_FILE))
+      response = input("")
+      if response in ["n","N"]:
+        read_model_net_pickle = True
+      WranglerLogger.info("Received response {}; read_model_net_pickle={}".format(response, read_model_net_pickle))
 
-    # update farezone due to AC Transit, Fairfield, gg ferries Fare change
-    # todo: What's this?
-    model_net = lasso.mtc.calculate_farezone(
-      roadway_network = model_net,
-      transit_network = scenario.transit_net,
-      parameters = my_param,
-      network_variable = 'farezone',
-      overwrite = True,
-    )
 
-    # todo: What are we expecting here?
-    WranglerLogger.debug("model_net.nodes_df.farezone.value_counts():\n{}".format(
-      model_net.nodes_df.farezone.value_counts()))
 
-    WranglerLogger.info("Running roadway_standard_to_mtc_network()")
-    model_net = lasso.mtc.roadway_standard_to_mtc_network(model_net, my_param)
+    if read_model_net_pickle:
+      model_net = pickle.load(open(MODEL_NET_PICKLE_FILE, 'rb'))
+    
+    else:
+      # make the model network
+      model_net = lasso.ModelRoadwayNetwork.from_RoadwayNetwork(
+        roadway_network_object = scenario.road_net, 
+        parameters = my_param
+      )
 
-    # add county
-    model_net = lasso.mtc.calculate_county(
-      roadway_network = model_net,
-      parameters = my_param,
-      network_variable = 'county'
-    )
+      # update farezone due to AC Transit, Fairfield, gg ferries Fare change
+      # todo: What's this?
+      model_net = lasso.mtc.calculate_farezone(
+        roadway_network = model_net,
+        transit_network = scenario.transit_net,
+        parameters = my_param,
+        network_variable = 'farezone',
+        overwrite = True,
+      )
 
-    WranglerLogger.debug("model_net.links_mtc_df.county.value_counts():\n{}".format(
-      model_net.links_mtc_df.county.value_counts()))
+      # todo: What are we expecting here?
+      WranglerLogger.debug("model_net.nodes_df.farezone.value_counts():\n{}".format(
+        model_net.nodes_df.farezone.value_counts()))
 
-    WranglerLogger.debug("model_net.nodes_mtc_df.county.value_counts():\n{}".format(
-      model_net.nodes_mtc_df.county.value_counts()))
+      WranglerLogger.info("Running roadway_standard_to_mtc_network()")
+      model_net = lasso.mtc.roadway_standard_to_mtc_network(model_net, my_param)
 
-    # shorten name
-    WranglerLogger.debug("Before shortening, model_links_mtc_df.name max len: {}".format(
-      model_net.links_mtc_df['name'].str.len().max()))
-    model_net.links_mtc_df['name'] = model_net.links_mtc_df['name'].apply(lambda x: lasso.util.shorten_name(x))
-    WranglerLogger.debug("After shortening, model_links_mtc_df.name max len: {}".format(
-      model_net.links_mtc_df['name'].str.len().max()))
+      # add county
+      model_net = lasso.mtc.calculate_county(
+        roadway_network = model_net,
+        parameters = my_param,
+        network_variable = 'county'
+      )
+
+      WranglerLogger.debug("model_net.links_mtc_df.county.value_counts():\n{}".format(
+        model_net.links_mtc_df.county.value_counts()))
+
+      WranglerLogger.debug("model_net.nodes_mtc_df.county.value_counts():\n{}".format(
+        model_net.nodes_mtc_df.county.value_counts()))
+
+      # shorten name
+      WranglerLogger.debug("Before shortening, model_links_mtc_df.name max len: {}".format(
+        model_net.links_mtc_df['name'].str.len().max()))
+      model_net.links_mtc_df['name'] = model_net.links_mtc_df['name'].apply(lambda x: lasso.util.shorten_name(x))
+      WranglerLogger.debug("After shortening, model_links_mtc_df.name max len: {}".format(
+        model_net.links_mtc_df['name'].str.len().max()))
  
-    # write the model_net pickle
-    WranglerLogger.info("Writing model_net.pickle")
-    pickle.dump(model_net, open("model_net.pickle", 'wb'))
+      # write the model_net pickle
+      WranglerLogger.info("Writing {}".format(MODEL_NET_PICKLE_FILE))
+      pickle.dump(model_net, open(MODEL_NET_PICKLE_FILE, 'wb'))
+
+    if args.gpkg_output_dir:
+      # create GeoPackage output dir if it doesn't exist
+      os.makedirs(args.gpkg_output_dir, exist_ok=True)
+
+      WranglerLogger.info("Writing full roadway network GeoPackage")
+      model_net.write_roadway_as_shp(
+        output_dir=args.gpkg_output_dir,
+        link_output_variables = MODEL_ROADWAY_LINK_VARIABLES,
+        node_output_variables = MODEL_ROADWAY_NODE_VARIABLES,
+        output_gpkg = 'model_net.gpkg',
+        output_link_gpkg_layer = 'links',
+        output_node_gpkg_layer = 'nodes',
+        output_gpkg_link_filter = args.gpkg_link_filter
+      )
+
 
     if args.cube_output_dir:
       # create cube output dir if it doesn't exist
       os.makedirs(args.cube_output_dir, exist_ok=True)
       # write shapefiles first
       model_net.write_roadway_as_shp(
-        output_link_shp = os.path.join(args.cube_output_dir, 'links.shp'),
-        output_node_shp = os.path.join(args.cube_output_dir, 'nodes.shp'),
+        output_dir = args.cube_output_dir,
+        output_link_shp = 'links.shp',
+        output_node_shp = 'nodes.shp',
         link_output_variables = ["model_link_id", "A", "B", "geometry", "cntype", "lanes_AM", "assignable", "useclass_AM", 'name', 'tollbooth'],
         node_output_variables = ["model_node_id", "N", "geometry", "farezone", "tap_id"],
         data_to_csv = False,
