@@ -28,7 +28,7 @@ MODEL_ROADWAY_LINK_VARIABLES = [
   'ft','assignable','cntype','distance','county',                               # Misc attributes
   'bike_access','drive_access','walk_access','rail_only','bus_only','transit',  # Mode attributes
   'managed','tollbooth','tollseg','segment_id',                                 # Managed roadway
-  'lanes_EA','lanes_AM','lanes_MD','lanes_PM','lanes_EA',                       # Lanes
+  'lanes_EA','lanes_AM','lanes_MD','lanes_PM','lanes_EV',                       # Lanes
   'useclass_EA','useclass_AM','useclass_MD','useclass_PM','useclass_EV',        # Use classes
   'geometry'                                                                    # geometry
 ]
@@ -55,9 +55,9 @@ if __name__ == '__main__':
     for arg in vars(args):
       WranglerLogger.info("{0: >20}: {1}".format(arg, getattr(args, arg)))
 
-    if (args.cube_output_dir == None) and (args.emme_output_dir == None):
-      WranglerLogger.fatal("No cube_output_dir passed nor emme_output_dir passed.  Nothing to do. Exiting")
-      sys.exit("No cube_output_dir passed nor emme_output_dir passed.  Nothing to do. Exiting")
+    if (args.cube_output_dir == None) and (args.emme_output_dir == None) and (args.gpkg_output_dir == None):
+      WranglerLogger.fatal("No gpkg_output_dir, cube_output_dir nor emme_output_dir passed.  Nothing to do. Exiting")
+      sys.exit("No gpkg_output_dir, cube_output_dir nor emme_output_dir passed.  Nothing to do. Exiting")
 
     if args.gpkg_link_filter and args.gpkg_link_filter not in MODEL_ROADWAY_LINK_VARIABLES:
       WranglerLogger.fatal("gpkg_link_filter argument passed [{}] which is not one of MODEL_ROADWAY_LINK_VARIABLES."
