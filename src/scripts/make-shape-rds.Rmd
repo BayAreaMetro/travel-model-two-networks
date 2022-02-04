@@ -1,6 +1,8 @@
 ---
 title: "Make Shape RDS"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 
@@ -21,14 +23,18 @@ for (package in packages_vector) {
 
 # Remote I/O
 ```{r remote-io}
-processed_dir <- "../../data/processed/"
-interim_dir <- "../../data/interim/"
+USERPROFILE    <- Sys.getenv("USERPROFILE")
+USERPROFILE    <- str_replace_all(USERPROFILE, "\\\\","/")
+BOX_DATA_DIR   <- paste0(USERPROFILE, 
+                         "/Box/Modeling and Surveys/Development/Travel Model Two Development",
+                         "/Travel Model Two Network Rebuild/travel-model-two-networks/data")
+VERSION        <- "12"
+processed_dir  <- file.path(BOX_DATA_DIR, "processed")
+interim_dir    <- file.path(BOX_DATA_DIR, "interim")
 
-version <- "version_12"
-
-shape_file_name <- paste0(processed_dir, version, "/shape.geojson")
-
-output_file_name <- paste0(interim_dir, "simple_shape.RDS")
+shape_file_name  <- file.path(processed_dir, paste0("version_",VERSION), "network_standard",
+                              paste0("v",VERSION,"_shape.geojson"))
+output_file_name <- file.path(interim_dir, "simple_shape.RDS")
 ```
 
 # Data Reads
