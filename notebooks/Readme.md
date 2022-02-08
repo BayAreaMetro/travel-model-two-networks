@@ -30,8 +30,8 @@ Applies project cards in sets based on tags:
 5. 'External Stations Review'
 
 To prepare for creating the model network, the following methods are then run:
-1. [`mtc.add_tap_and_tap_connector()`]()
-2. [`mtc.calculate_county()]()
+1. [`mtc.add_tap_and_tap_connector()`](https://github.com/BayAreaMetro/Lasso/blob/06797ab8cf5ddc92ee594157d9c172b1deea1888/lasso/mtc.py#L2491)
+2. [`mtc.calculate_county()`](https://github.com/BayAreaMetro/Lasso/blob/06797ab8cf5ddc92ee594157d9c172b1deea1888/lasso/mtc.py#L2733)
 
 Input: 
 * Pickled [`Scenario`](https://github.com/BayAreaMetro/network_wrangler/blob/generic_agency/network_wrangler/scenario.py) instance output by [01 Attribute Network and Make Scenario Pickle](01-attribute-and-make-pickles.ipynb)
