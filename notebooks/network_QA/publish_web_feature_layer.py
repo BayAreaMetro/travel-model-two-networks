@@ -4,17 +4,18 @@
 import arcpy
 import os
 
-counties = ["Alameda", "Contra Costa", "Marin",  "Napa",  "San Francisco",  "San Mateo",  "Santa Clara",  "Solano",  "Sonoma"]
+# counties = ["Alameda", "Contra Costa", "Marin",  "Napa",  "San Francisco",  "San Mateo",  "Santa Clara",  "Solano",  "Sonoma"]
+counties = ["Contra Costa"]
 
 for x in counties:
 
     # Sign in to portal
     # arcpy.SignInToPortal('https://www.arcgis.com', 'MyUserName', 'MyPassword')
-    # I can bypass this step by doing this within ArcGIS Pro's python window
+    # I can bypass this step by running this script within ArcGIS Pro's python window
 
     # Specify a local path for storing temporary contents to be used for publishing the service definition draft and service definition file
     outdir = r"M:\Development\Travel Model Two\Supply\Network_QA_2022\ArcGISOnline_ServiceDef"
-    service = "TM2 QA " + x
+    service = "TM2 QA " + x + " 2015"
     sddraft_filename = service + ".sddraft"
     sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 
