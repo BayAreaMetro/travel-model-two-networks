@@ -1,9 +1,10 @@
-project: Year 2015 Modify HOV Lanes and USE on I-680 NB from Alcosta Blvd to Livorna
+project: Year 2017 Modify HOV Lanes and USE on I-680 NB from Alcosta Blvd to Livorna
   Road
 tags:
-- Year 2015
-- Managed Lanes
-- HOV Lanes
+- Year 2017
+#- Managed Lanes
+#- HOV Lanes
+# Commenting out for https://github.com/BayAreaMetro/travel-model-two-networks/issues/53
 dependencies: ''
 changes:
 - category: Parallel Managed lanes
