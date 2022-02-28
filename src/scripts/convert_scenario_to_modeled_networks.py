@@ -3,7 +3,8 @@ import pandas as pd
 # https://github.com/BayAreaMetro/network_wrangler/tree/generic_agency
 from network_wrangler import WranglerLogger 
 # https://github.com/BayAreaMetro/Lasso/tree/mtc_parameters
-import lasso            
+import lasso
+from lasso import mtc
 
 USAGE = """
   Reads a pickled instance of a network_wrangler.Scenario and creates instances of
@@ -45,7 +46,7 @@ if __name__ == '__main__':
     parser.add_argument("scenario_pickle_file", help="Input: Specify the scenario pickle file to read.")
     parser.add_argument("transfer_fare_csv",    help="Location of transfer.csv file specifying transfer fares between systems")
     parser.add_argument("--gpkg_output_dir",    help="Output directory for model network in file geodatabase format")
-    parser.add_argument("--gpkg_link_filter",  help="Optional link variable to additionally output link subsets (e.g. county)")
+    parser.add_argument("--gpkg_link_filter",   help="Optional link variable to additionally output link subsets (e.g. county)")
     parser.add_argument("--cube_output_dir",    help="Output directory for model network in Cube format")
     parser.add_argument("--emme_output_dir",    help="Output directory for model network in Emme format")
     args = parser.parse_args()
@@ -139,6 +140,9 @@ if __name__ == '__main__':
       WranglerLogger.info("Writing {}".format(MODEL_NET_PICKLE_FILE))
       pickle.dump(model_net, open(MODEL_NET_PICKLE_FILE, 'wb'))
 
+    # create lasso.StandardTransit network
+    standard_transit_net = lasso.StandardTransit.fromTransitNetwork(scenario.transit_net, parameters = my_param.__dict__)
+
     if args.gpkg_output_dir:
       # create GeoPackage output dir if it doesn't exist
       os.makedirs(args.gpkg_output_dir, exist_ok=True)
@@ -149,12 +153,21 @@ if __name__ == '__main__':
         link_output_variables = MODEL_ROADWAY_LINK_VARIABLES,
         node_output_variables = MODEL_ROADWAY_NODE_VARIABLES,
         output_gpkg = 'model_net.gpkg',
-        output_link_gpkg_layer = 'links',
-        output_node_gpkg_layer = 'nodes',
+        output_link_gpkg_layer = 'roadway_links',
+        output_node_gpkg_layer = 'roadway_nodes',
         output_gpkg_link_filter = args.gpkg_link_filter
       )
 
-
+      lasso.mtc.write_cube_lines_to_geopackage(
+        output_dir               = args.gpkg_output_dir, 
+        output_gpkg              = "model_net.gpkg",
+        transit_network          = standard_transit_net, 
+        standard_roadway_network = scenario.road_net,
+        parameters               = my_param,
+        # TODO: Deal with this dependency!
+        faresystem_crosswalk_file= "C:\\Users\\lzorn\\Documents\\scratch\\tm2_network_building\\processed\\version_12\\network_cube\\faresystem_crosswalk.txt"
+      )
+      
     if args.cube_output_dir:
       # create cube output dir if it doesn't exist
       os.makedirs(args.cube_output_dir, exist_ok=True)
@@ -191,7 +204,6 @@ if __name__ == '__main__':
         transfer_fare_df = transfer_fare_df
       )
 
-      standard_transit_net = lasso.StandardTransit.fromTransitNetwork(scenario.transit_net, parameters = my_param.__dict__)
       # write the agency transit lin files (why?)
       for agency in standard_transit_net.feed.routes.agency_raw_name.unique():
         sub_transit_net = copy.deepcopy(standard_transit_net)
