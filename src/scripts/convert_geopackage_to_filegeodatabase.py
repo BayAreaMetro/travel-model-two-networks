@@ -85,9 +85,13 @@ if __name__ == '__main__':
                 print("Feature {} not in gpkg_features; skipping".format(feature))
                 continue
 
-            print('Copying feature {}'.format(feature)) 
+            # 'main.' is a geopackage thing and it isn't a helpful prefix -- drop it
+            dest_feature = feature.replace("main.","")
+            dest_feature = arcpy.ValidateTableName(dest_feature)
+
+            print('Copying feature {} to {}'.format(feature, dest_feature)) 
             arcpy.management.CopyFeatures(os.path.join(input_geopackage, feature),
-                                          os.path.join(output_geodatabase_dir, output_geodatabase_file, feature))
+                                          os.path.join(output_geodatabase_dir, output_geodatabase_file, dest_feature))
     
     except Exception as e:
         print("Exception: {}".format(e))
