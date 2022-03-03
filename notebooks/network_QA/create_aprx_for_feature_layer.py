@@ -4,6 +4,7 @@
 # I start from manually starting a blank project 
 # and run the following code in the python window within ArcGIS Pro
 # 
+# this script is stil in development - county with space... also need to remove the layers in the current project
 # --------------------------------------------------------------------------------
 
 import arcpy
@@ -23,11 +24,11 @@ for CountyName in county_list:
     # add transit layers
     # ----------------------------
     # transit links
-    lyrToAdd = r"M:\Data\GIS layers\TM2_Networks\model_net.gdb\transit_links"
+    lyrToAdd = r"M:\Data\GIS layers\TM2_Networks\model_net.gdb\transit_links_with_routeName_agencyName"
     aprxMap.addDataFromPath(lyrToAdd)
 
     # import symbology 
-    arcpy.management.ApplySymbologyFromLayer("transit_links", r"M:\Development\Travel Model Two\Supply\Network_QA_2022\Maps_to_publish\Symbology_layers\transit_links.lyrx", None, "MAINTAIN")
+    arcpy.management.ApplySymbologyFromLayer("transit_links_with_routeName_agencyName", r"M:\Development\Travel Model Two\Supply\Network_QA_2022\Maps_to_publish\Symbology_layers\transit_links.lyrx", None, "MAINTAIN")
 
     # fare zones
     lyrToAdd = r"M:\Data\GIS layers\TM2_Networks\model_net.gdb\nodes"
@@ -44,8 +45,8 @@ for CountyName in county_list:
            lyr.name = lyr.name.replace(layerName, "nodes_farezone")
            print(f"Layer renamed to: {lyr.name}")  
 
-    # import symbology 
-    arcpy.management.ApplySymbologyFromLayer("nodes_farezone", r"M:\Development\Travel Model Two\Supply\Network_QA_2022\Maps_to_publish\Symbology_layers\nodes_farezone.lyrx", None, "MAINTAIN")
+    # import symbology - hard to symbolize; skip
+    # arcpy.management.ApplySymbologyFromLayer("nodes_farezone", r"M:\Development\Travel Model Two\Supply\Network_QA_2022\Maps_to_publish\Symbology_layers\nodes_farezone.lyrx", None, "MAINTAIN")
 
     # add TM2 links layers - TANA and non TANA
     # ----------------------------
@@ -122,7 +123,7 @@ for CountyName in county_list:
     layer_to_turn_off = aprxMap.listLayers("mazs_" + CountyName)[0]
     layer_to_turn_off.visible = False
 
-    layer_to_turn_off = aprxMap.listLayers("transit_links")[0]
+    layer_to_turn_off = aprxMap.listLayers("transit_links_with_routeName_agencyName")[0]
     layer_to_turn_off.visible = False
 
     layer_to_turn_off = aprxMap.listLayers("nodes_farezone")[0]
@@ -155,7 +156,7 @@ for CountyName in county_list:
     layer_to_remove = aprxMap.listLayers("mazs_" + CountyName)[0]
     aprxMap.removeLayer(layer_to_remove)
 
-    layer_to_remove = aprxMap.listLayers("transit_links")[0]
+    layer_to_remove = aprxMap.listLayers("transit_links_with_routeName_agencyName")[0]
     aprxMap.removeLayer(layer_to_remove)
 
     layer_to_remove = aprxMap.listLayers("nodes_farezone")[0]

@@ -4,8 +4,7 @@
 import arcpy
 import os
 
-# counties = ["Alameda", "Contra Costa", "Marin",  "Napa",  "San Francisco",  "San Mateo",  "Santa Clara",  "Solano",  "Sonoma"]
-counties = ["Contra Costa"]
+counties = ["Alameda", "Contra_Costa", "Marin",  "Napa",  "San_Francisco",  "San_Mateo",  "Santa_Clara",  "Solano",  "Sonoma"]
 
 for x in counties:
 
@@ -15,7 +14,7 @@ for x in counties:
 
     # Specify a local path for storing temporary contents to be used for publishing the service definition draft and service definition file
     outdir = r"M:\Development\Travel Model Two\Supply\Network_QA_2022\ArcGISOnline_ServiceDef"
-    service = "TM2 QA " + x + " 2015"
+    service = "TM2 network QA " + x + " 2015"
     sddraft_filename = service + ".sddraft"
     sddraft_output_filename = os.path.join(outdir, sddraft_filename)
 
