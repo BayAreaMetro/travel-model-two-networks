@@ -23,33 +23,48 @@ USAGE = """
 
 """
 
-# TODO: Is this defined elsewhere?  Like in lasso\mtc.py?
-MODEL_ROADWAY_LINK_VARIABLES = [
-  'A','B','model_link_id','shstGeometryId','name',                              # IDs
-  'ft','assignable','cntype','distance','county',                               # Misc attributes
-  'bike_access','drive_access','walk_access','rail_only','bus_only','transit',  # Mode attributes
-  'managed','tollbooth','tollseg','segment_id',                                 # Managed roadway
-  'lanes_EA','lanes_AM','lanes_MD','lanes_PM','lanes_EV',                       # Lanes
-  'useclass_EA','useclass_AM','useclass_MD','useclass_PM','useclass_EV',        # Use classes
-  'geometry'                                                                    # geometry
-]
-
-MODEL_ROADWAY_NODE_VARIABLES = [
-  'N','osm_node_id','tap_id',                                                   # IDs
-  'county',                                                                     # Misc attributes
-  'bike_access','drive_access','walk_access','rail_only','farezone',            # Mode attributes
-  'geometry'                                                                    # geometry
-]
-
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
-    parser.add_argument("scenario_pickle_file", help="Input: Specify the scenario pickle file to read.")
-    parser.add_argument("transfer_fare_csv",    help="Location of transfer.csv file specifying transfer fares between systems")
-    parser.add_argument("--gpkg_output_dir",    help="Output directory for model network in file geodatabase format")
-    parser.add_argument("--gpkg_link_filter",   help="Optional link variable to additionally output link subsets (e.g. county)")
-    parser.add_argument("--cube_output_dir",    help="Output directory for model network in Cube format")
-    parser.add_argument("--emme_output_dir",    help="Output directory for model network in Emme format")
+    parser.add_argument("scenario_pickle_file",         help="Input: Specify the scenario pickle file to read.")
+    parser.add_argument("transfer_fare_csv",            help="Location of transfer.csv file specifying transfer fares between systems")
+    parser.add_argument("--gpkg_output_dir",            help="Output directory for model network in file geodatabase format")
+    parser.add_argument("--gpkg_link_filter",           help="Optional link variable to additionally output link subsets (e.g. county)")
+    parser.add_argument("--cube_output_dir",            help="Output directory for model network in Cube format")
+    parser.add_argument("--emme_output_dir",            help="Output directory for model network in Emme format")
+    parser.add_argument("--add_QA_vars",                help="Option to output extra variables for QA purposes; put Y in the arg to indicate yes")
+    parser.add_argument("--faresystem_crosswalk_file",  help="The file path to faresystem_crosswalk.txt. A required input. We may want to get rid of this arg in the future.")
     args = parser.parse_args()
+
+    # TODO: Is this defined elsewhere?  Like in lasso\mtc.py?
+    MODEL_ROADWAY_LINK_VARIABLES = [
+      'A','B','model_link_id','shstGeometryId','name',                              # IDs
+      'ft','assignable','cntype','distance','county',                               # Misc attributes
+      'bike_access','drive_access','walk_access','rail_only','bus_only','transit',  # Mode attributes
+      'managed','tollbooth','tollseg','segment_id',                                 # Managed roadway
+      'lanes_EA','lanes_AM','lanes_MD','lanes_PM','lanes_EV',                       # Lanes
+      'useclass_EA','useclass_AM','useclass_MD','useclass_PM','useclass_EV',        # Use classes
+      'geometry'                                                                    # geometry
+    ]
+
+    # Include extra variables if the add_QA_vars option is chosen
+    # For now the only extra variable is heuristic_num
+    if args.add_QA_vars == "Y":
+        MODEL_ROADWAY_LINK_VARIABLES = [
+          'A','B','model_link_id','shstGeometryId','name',                              # IDs
+          'ft','assignable','cntype','distance','county',                               # Misc attributes
+          'bike_access','drive_access','walk_access','rail_only','bus_only','transit',  # Mode attributes
+          'managed','tollbooth','tollseg','segment_id',                                 # Managed roadway
+          'heuristic_num','lanes_EA','lanes_AM','lanes_MD','lanes_PM','lanes_EV',       # Lanes
+          'useclass_EA','useclass_AM','useclass_MD','useclass_PM','useclass_EV',        # Use classes
+          'geometry'                                                                    # geometry
+        ]
+
+    MODEL_ROADWAY_NODE_VARIABLES = [
+      'N','osm_node_id','tap_id',                                                   # IDs
+      'county',                                                                     # Misc attributes
+      'bike_access','drive_access','walk_access','rail_only','farezone',            # Mode attributes
+      'geometry'                                                                    # geometry
+    ]
 
     # log the arguments passed
     WranglerLogger.info("Args:")
@@ -67,6 +82,14 @@ if __name__ == '__main__':
       WranglerLogger.fatal("Exiting.")
       sys.exit("gpkg_link_filter argument passed [{}] which is not one of MODEL_ROADWAY_LINK_VARIABLES."
         .format(args.gpkg_link_filter))
+
+    faresystem_crosswalk_file = args.faresystem_crosswalk_file
+    if os.path.exists(faresystem_crosswalk_file):
+      print("The fare system crosswalk file exists: ",os.path.exists(faresystem_crosswalk_file))
+    else: 
+      WranglerLogger.fatal("faresystem_crosswalk.txt cannot be found.")
+      WranglerLogger.fatal("Exiting.")
+      sys.exit("faresystem_crosswalk.txt cannot be found. Exiting.")
 
     # use the installed lasso directory as the lasso_base_dir
     LASSO_DIR = os.path.dirname(lasso.__file__)
@@ -165,7 +188,9 @@ if __name__ == '__main__':
         standard_roadway_network = scenario.road_net,
         parameters               = my_param,
         # TODO: Deal with this dependency!
-        faresystem_crosswalk_file= "C:\\Users\\lzorn\\Documents\\scratch\\tm2_network_building\\processed\\version_12\\network_cube\\faresystem_crosswalk.txt"
+        # "C:\\Users\\lzorn\\Documents\\scratch\\tm2_network_building\\processed\\version_12\\network_cube\\faresystem_crosswalk.txt"
+        #faresystem_crosswalk_file is now an arg.
+        faresystem_crosswalk_file = args.faresystem_crosswalk_file
       )
       
     if args.cube_output_dir:
