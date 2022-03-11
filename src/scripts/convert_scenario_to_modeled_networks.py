@@ -218,6 +218,7 @@ if __name__ == '__main__':
       )
 
       # read special fare transfer file that is an input to this function
+      # transfer.csv is the inter-agency transfer cost, created manually using the TM2 legacy fare.far
       transfer_fare_df = pd.read_csv(args.transfer_fare_csv)
       WranglerLogger.debug("transfer_fare_df.head():\n{}".format(transfer_fare_df.head()))
 
