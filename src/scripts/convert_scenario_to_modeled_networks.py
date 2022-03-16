@@ -153,6 +153,15 @@ if __name__ == '__main__':
         model_net.nodes_mtc_df.county.value_counts()))
 
       # shorten name
+      # background: the 'name' field is a mix of strings (e.g. 'Dublin Boulevard') and lists of strings 
+      #             (e.g. ['Brockton Drive', 'Pimlico Drive'], ['', 'Murphy Ranch Road'], ['Sacramento Street', 'Sacramento Street']).
+      #             A link would have a list of strings as 'name' if more than one OSM links were matched to 
+      #             the same SharedStreets link during Pipeline's conflation. The shorten_name method cleans up 
+      #             these list-type names to strings, the new names for the three examples above would be
+      #             'Brockton Drive Pimlico Drive', 'Murphy Ranch Road', 'Sacramento Street'.
+      # caveat: this method is not 100% "accurate" and may creat confusion, e.g. for 'Brockton Drive Pimlico Drive',
+      #         is it really 'Brockton Drive' or 'Pimlico Drive'? A more complicated method may be to use the name of link with the longest
+      #         matched length of all match linked. But maybe that is an overkill given the importance of 'name' in modeling.
       WranglerLogger.debug("Before shortening, model_links_mtc_df.name max len: {}".format(
         model_net.links_mtc_df['name'].str.len().max()))
       model_net.links_mtc_df['name'] = model_net.links_mtc_df['name'].apply(lambda x: lasso.util.shorten_name(x))
