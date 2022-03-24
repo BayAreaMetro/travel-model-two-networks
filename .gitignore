@@ -19,3 +19,5 @@ data/
 notebooks/.ipynb_checkpoints/*
 notebooks/other/.ipynb_checkpoints/*
 notebooks/pipeline/.ipynb_checkpoints/*
+notebooks/network_wrangler_*.log
+notebooks/pipeline/network_wrangler_*.log

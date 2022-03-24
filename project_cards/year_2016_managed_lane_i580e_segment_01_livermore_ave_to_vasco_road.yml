@@ -1,0 +1,73 @@
+project: Year 2016 Modify Express Lanes and USE on I-580 EB (segment 01) Livermore
+  Ave to Vasco Road
+tags:
+- Year 2016
+#- Managed Lanes Review
+#- Express Lanes
+#- toll review
+# Commenting out for https://github.com/BayAreaMetro/travel-model-two-networks/issues/53
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3105865
+    - shstReferenceId:
+      - 9f6166830b83cbce9108390c801b9e6f
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      change: -2
+    - time:
+      - '10:00'
+      - '15:00'
+      change: -2
+    - time:
+      - '15:00'
+      - '19:00'
+      change: -2
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 2
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 2
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 2
+  - property: segment_id
+    set: 28
+  - property: ML_tollseg
+    set: 3
+  - property: ML_tollbooth
+    set: 28
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 4
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 4
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 4
+  - property: ML_access
+    set: all
+  - property: ML_egress
+    set: all

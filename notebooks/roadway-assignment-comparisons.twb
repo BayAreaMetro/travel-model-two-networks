@@ -3312,7 +3312,7 @@
     </worksheet>
   </worksheets>
   <windows source-height='30'>
-    <window class='worksheet' maximized='true' name='map.bridges'>
+    <window class='worksheet' name='map.bridges'>
       <cards>
         <edge name='left'>
           <strip size='299'>
@@ -3604,7 +3604,7 @@
       </viewpoint>
       <simple-id uuid='{E2FC9878-27D6-4056-8BFB-4BED126A6194}' />
     </window>
-    <window class='worksheet' name='chart.volume PM'>
+    <window class='worksheet' maximized='true' name='chart.volume PM'>
       <cards>
         <edge name='left'>
           <strip size='160'>

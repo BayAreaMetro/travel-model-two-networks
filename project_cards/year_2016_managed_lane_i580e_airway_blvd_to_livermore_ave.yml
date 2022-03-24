@@ -1,0 +1,75 @@
+project: Year 2016 Modify Express Lanes and USE on I-580 EB Airway Blvd to Livermore
+  Ave
+tags:
+- Year 2016
+#- Managed Lanes Review
+#- Express Lanes
+#- toll review
+# Commenting out for https://github.com/BayAreaMetro/travel-model-two-networks/issues/53
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3049429
+      - 3048060
+    - shstReferenceId:
+      - 4a347f9a0d03c1e9ce1993b666b277ba
+      - 48336daf4cb146ab09857067c79ff441
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      change: -2
+    - time:
+      - '10:00'
+      - '15:00'
+      change: -2
+    - time:
+      - '15:00'
+      - '19:00'
+      change: -2
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 2
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 2
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 2
+  - property: segment_id
+    set: 28
+  - property: ML_tollseg
+    set: 2
+  - property: ML_tollbooth
+    set: 28
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 4
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 4
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 4
+  - property: ML_access
+    set: all
+  - property: ML_egress
+    set: all

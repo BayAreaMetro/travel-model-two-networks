@@ -564,7 +564,7 @@
             <column-instance column='[boardings]' derivation='Sum' name='[sum:boardings:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <filter class='categorical' column='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:operator:nk]' filter-group='3'>
-            <groupfilter function='member' level='[none:operator:nk]' member='&quot;Santa Clara VTA&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='member' level='[none:operator:nk]' member='&quot;San Francisco MUNI&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
           </filter>
           <filter class='categorical' column='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:period:nk]'>
             <groupfilter function='level-members' level='[none:period:nk]' user:ui-enumeration='all' user:ui-marker='enumerate' />
@@ -906,7 +906,7 @@
             <column-instance column='[boardings]' derivation='Sum' name='[sum:boardings:qk]' pivot='key' type='quantitative' />
           </datasource-dependencies>
           <filter class='categorical' column='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:operator:nk]' filter-group='3'>
-            <groupfilter function='member' level='[none:operator:nk]' member='&quot;Santa Clara VTA&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
+            <groupfilter function='member' level='[none:operator:nk]' member='&quot;San Francisco MUNI&quot;' user:ui-domain='relevant' user:ui-enumeration='inclusive' user:ui-marker='enumerate' />
           </filter>
           <shelf-sorts>
             <shelf-sort-v2 dimension-to-sort='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:route:nk]' direction='DESC' is-on-innermost-dimension='true' measure-to-sort-by='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[sum:boardings:qk]' shelf='rows'>
@@ -915,6 +915,11 @@
               </sort-filter-info>
             </shelf-sort-v2>
             <shelf-sort-v2 dimension-to-sort='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:operator:nk]' direction='DESC' measure-to-sort-by='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[sum:boardings:qk]' shelf='rows' />
+            <shelf-sort-v2 dimension-to-sort='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:route:nk]' direction='DESC' is-on-innermost-dimension='true' measure-to-sort-by='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[sum:boardings:qk]' shelf='rows'>
+              <sort-filter-info>
+                <sort-filter level-name='[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:Calculation_432767801889390592:nk]' member-value='&quot;Survey Summarized&quot;' />
+              </sort-filter-info>
+            </shelf-sort-v2>
           </shelf-sorts>
           <slices>
             <column>[federated.0zsqjll1t2d62v14w2xkt0fvbtmo].[none:operator:nk]</column>
@@ -973,7 +978,7 @@
     </worksheet>
   </worksheets>
   <windows source-height='30'>
-    <window class='worksheet' maximized='true' name='table.operator'>
+    <window class='worksheet' name='table.operator'>
       <cards>
         <edge name='left'>
           <strip size='160'>
@@ -1123,7 +1128,7 @@
       </viewpoint>
       <simple-id uuid='{38C91D39-9511-443B-A089-A23D5E971008}' />
     </window>
-    <window class='worksheet' name='table.route' tab-color='#17927d'>
+    <window class='worksheet' maximized='true' name='table.route' tab-color='#17927d'>
       <cards>
         <edge name='left'>
           <strip size='160'>

@@ -1,6 +1,8 @@
 ---
 title: "Make Pretty Transit Viewer"
-output: html_notebook
+output:
+  html_document:
+    df_print: paged
 ---
 
 # Overhead
@@ -22,33 +24,44 @@ for (package in packages_vector) {
 
 # Remote I/O
 ```{r remote-io}
-interim_dir <- "../../data/interim/"
-processed_dir <- "../../data/processed/" 
+USERPROFILE    <- Sys.getenv("USERPROFILE")
+USERPROFILE    <- str_replace_all(USERPROFILE, "\\\\","/")
+BOX_DATA_DIR   <- paste0(USERPROFILE, 
+                         "/Box/Modeling and Surveys/Development/Travel Model Two Development",
+                         "/Travel Model Two Network Rebuild/travel-model-two-networks/data")
+VERSION        <- "12"
 
-shape_file_name <- paste0(interim_dir, "simple_shape.RDS")
-links_file_name <- paste0(processed_dir, "version_11/links.feather")
-node_file_name <- paste0(processed_dir, "version_11/node.geojson")
+processed_dir        <- file.path(BOX_DATA_DIR, "processed")
+interim_dir          <- file.path(BOX_DATA_DIR, "interim")
+standard_version_dir <- file.path(processed_dir, paste0("version_",VERSION), "network_standard")
 
-output_file_name <- paste0(interim_dir, "transit_for_tableau.geojson")
-```
+# Input files
+shape_file_name      <- file.path(interim_dir, "simple_shape.RDS") # see make-shape-rds.Rmd
+links_file_name      <- file.path(standard_version_dir, paste0("v",VERSION,"_links.feather"))
+node_file_name       <- file.path(standard_version_dir, paste0("v",VERSION,"_node.geojson"))
 
-# Parameters
-```{r parameters}
-VERSION <- "version_01"
+# Ouput files
+output_file_name     <- file.path(interim_dir, "transit_for_tableau.geojson")
 ```
 
 # Data Reads
 ```{r read}
-routes_df <- read_csv(paste0(processed_dir, "version_11/", "routes.txt"), col_types = cols(.default = col_character()))
-freq_df <- read_csv(paste0(processed_dir, "version_11/", "frequencies.txt"), col_types = cols(.default = col_character()))
-trips_df <- read_csv(paste0(processed_dir, "version_11/", "trips.txt"), col_types = cols(.default = col_character()))
-stops_df <- read_csv(paste0(processed_dir, "version_11/", "stops.txt"), col_types = cols(.default = col_character()))
-shapes_df <- read_csv(paste0(processed_dir, "version_11/", "shapes.txt"), col_types = cols(.default = col_character()))
-stop_times_df <- read_csv(paste0(processed_dir, "version_11/", "stop_times.txt"), col_types = cols(.default = col_character()))
+routes_df     <- read_csv(file.path(standard_version_dir, paste0("v",VERSION,"_routes.txt")), 
+                          col_types = cols(.default = col_character()))
+freq_df       <- read_csv(file.path(standard_version_dir, paste0("v",VERSION,"_frequencies.txt")),
+                          col_types = cols(.default = col_character()))
+trips_df      <- read_csv(file.path(standard_version_dir, paste0("v",VERSION,"_trips.txt")),
+                          col_types = cols(.default = col_character()))
+stops_df      <- read_csv(file.path(standard_version_dir, paste0("v",VERSION,"_stops.txt")),
+                          col_types = cols(.default = col_character()))
+shapes_df     <- read_csv(file.path(standard_version_dir, paste0("v",VERSION,"_shapes.txt")),
+                          col_types = cols(.default = col_character()))
+stop_times_df <- read_csv(file.path(standard_version_dir, paste0("v",VERSION,"_stop_times.txt")),
+                          col_types = cols(.default = col_character()))
 
-links_df <- read_feather(links_file_name)
+links_df  <- read_feather(links_file_name)
 shapes_sf <- readRDS(shape_file_name)
-nodes_sf <- st_read(node_file_name)
+nodes_sf  <- st_read(node_file_name)
 ```
 
 # Helpers
