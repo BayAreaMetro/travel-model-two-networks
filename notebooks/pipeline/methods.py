@@ -2,12 +2,16 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 import glob
+import os
 from shapely.geometry import Point
 import osmnx as ox
 import math
 from shapely.geometry import Point, shape, LineString
 from scipy.spatial import cKDTree
 import json
+
+# some parameters shared by Pipeline scripts
+LAT_LONG_EPSG = 4326
 
 shst_link_df_list = []
 
