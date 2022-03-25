@@ -23,6 +23,7 @@ import fiona
 from shapely.geometry import Point
 from methods import *
 import time
+from pyproj import CRS
 
 # from methods import read_shst_extract
 # from methods import link_df_to_geojson
@@ -63,10 +64,10 @@ for i in [OUTPUT_TomTom_DIR, OUTPUT_TM2_nonMarin_DIR, OUTPUT_TM2_Marin_DIR,
         print('create output folder: {}'.format(i))
         os.makedirs(i)
 
-# data_interim_dir = "../../data/interim/"
+data_interim_dir = "../../data/interim/"
 
 
-#####################################
+####################################
 # Prepare tomtom for conflation
 print('preparing TomTom data')
 # starting time
@@ -81,13 +82,11 @@ tomtom_raw_gdf = gpd.read_file(INPUT_TomTom_FILE, layer='mn_nw')
 # convert to ESPG lat-lon
 lat_lon_epsg_str = 'epsg:{}'.format(str(LAT_LONG_EPSG))
 print(lat_lon_epsg_str)
-tomtom_raw_gdf = tomtom_raw_gdf.to_crs({'init': lat_lon_epsg_str})
-# tomtom_raw_gdf = tomtom_raw_gdf.to_crs({'init': 'epsg:4326'})
+
+tomtom_raw_gdf = tomtom_raw_gdf.to_crs(CRS(lat_lon_epsg_str))
 print('converted to projection: ' + str(tomtom_raw_gdf.crs))
 
-print('total {} tomtom links: , with the following fields: \n{}'.format(
-    tomtom_raw_gdf.shape[0], list(tomtom_raw_gdf)
-))
+print('total {} tomtom links'.format(tomtom_raw_gdf.shape[0]))
 print(tomtom_raw_gdf.info())
 
 # There is no existing unique tomtom handle for Bay Area, thus we need to create unique handle
@@ -114,17 +113,16 @@ print('finished preparing TomTom data, took {} minutes'.format((end - start) / 6
 #####################################
 # Prepare TM2 non-Marin for conflation
 
+start = time.time()
 print('load TM2_nonMarin data from {}'.format(INPUT_TM2_nonMarin_FILE))
 tm2_link_gdf = gpd.read_file(INPUT_TM2_nonMarin_FILE)
 print('TM2_Marin data info: \n{}'.format(tm2_link_gdf.info()))
 
 # define initial ESPG
-tm2_link_gdf.crs = {"init": "esri:102646"}
-# if the above throws an "invalid crs" error, try the following:
-# tm2_link_gdf.crs = "esri:102646"
+tm2_link_gdf.crs = "esri:102646"
 
 # convert to ESPG lat-lon
-tm2_link_gdf = tm2_link_gdf.to_crs({'init': lat_lon_epsg_str})
+tm2_link_gdf = tm2_link_gdf.to_crs(CRS(lat_lon_epsg_str))
 print('converted to projection: ' + str(tm2_link_gdf.crs))
 
 # select only road way links
@@ -141,7 +139,8 @@ print('\n out of {} links in TM2_non-Marin network, {} are roadway links'.format
 print('# of unique AB node pairs: {}'.format(
     tm2_link_roadway_gdf.groupby(["A", "B"]).count().shape[0]))
 
-# Partition TM2 Non Marin for shst Match
+Partition TM2 Non Marin for shst Match
+print('exporting TM2_nonMarin partitioned data for ShSt match')
 for i in range(14):
     boundary_gdf = gpd.read_file(
         os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
@@ -152,9 +151,20 @@ for i in range(14):
         driver="GeoJSON")
 
 # export raw network data for merging back the conflation result
+# before exporting, fix NAME that would cause encoding error
+tm2_link_roadway_gdf.loc[
+    tm2_link_roadway_gdf.NAME.notnull() & (
+    tm2_link_roadway_gdf.NAME.str.contains('Vista Monta')) & (
+    tm2_link_roadway_gdf.NAME != 'Vista Montara C'), 'NAME'] = 'Vista Montana'
+
+print('export TM2_nonMarin with all attributes')
 tm2_link_roadway_gdf.to_file(
     os.path.join(OUTPUT_TM2_nonMarin_DIR, 'tm2nonMarin_raw.geojson'),
     driver="GeoJSON")
+
+end = time.time()
+print('finished preparing TM2_nonMarin data, took {} minutes'.format((end - start) / 60))
+
 
 #####################################
 # Prepare TM2 Marin for conflation
@@ -164,12 +174,10 @@ tm2_marin_link_gdf = gpd.read_file(INPUT_TM2_Marin_FILE)
 print('TM2_Marin data info: \n{}'.format(tm2_marin_link_gdf.info()))
 
 # define initial ESPG
-# tm2_marin_link_gdf.crs = {"init" : "esri:102646"}
-# if the above throws an "invalid crs" error, try the following:
-tm2_marin_link_gdf.crs = "esri:102646"
+tm2_marin_link_gdf.crs = CRS("esri:102646")
 
 # convert to ESPG lat-lon
-tm2_marin_link_gdf = tm2_marin_link_gdf.to_crs({'init': lat_lon_epsg_str})
+tm2_marin_link_gdf = tm2_marin_link_gdf.to_crs(CRS(lat_lon_epsg_str))
 print('converted to projection: ' + str(tm2_marin_link_gdf.crs))
 
 # select only road way links
@@ -187,6 +195,7 @@ print('# of unique AB node pairs: {}'.format(
     tm2_marin_link_roadway_gdf.groupby(["A", "B"]).count().shape[0]))
 
 # Partition TM2 Marin for shst Match
+print('exporting TM2_Marin partitioned data for ShSt match')
 for i in range(14):
     boundary_gdf = gpd.read_file(
         os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
@@ -197,6 +206,13 @@ for i in range(14):
         driver="GeoJSON")
 
 # export raw network data for merging back the conflation result
+# before exporting, fix NAME that would cause encoding error
+tm2_marin_link_roadway_gdf.loc[
+    tm2_marin_link_roadway_gdf.NAME.notnull() & (
+    tm2_marin_link_roadway_gdf.NAME.str.contains('Vista Monta')) & (
+    tm2_marin_link_roadway_gdf.NAME != 'Vista Montara C'), 'NAME'] = 'Vista Montana'
+
+print('export TM2_Marin with all attributes')
 tm2_marin_link_roadway_gdf.to_file(
     os.path.join(OUTPUT_TM2_Marin_DIR, 'tm2Marin_raw.geojson'), driver="GeoJSON")
 
@@ -207,13 +223,13 @@ print('load SFCTA data from {}'.format(INPUT_SFCTA_FILE))
 sfcta_stick_gdf = gpd.read_file(INPUT_SFCTA_FILE)
 
 # set initial ESPG
-sfcta_stick_gdf.crs = {"init": "epsg:2227"}
+sfcta_stick_gdf.crs = CRS("EPSG:2227")
 # convert to ESPG lat-lon
-sfcta_stick_gdf = sfcta_stick_gdf.to_crs({'init': lat_lon_epsg_str})
+sfcta_stick_gdf = sfcta_stick_gdf.to_crs(CRS(lat_lon_epsg_str))
 print('converted to projection: ' + str(sfcta_stick_gdf.crs))
 
 # only conflation SF part of the network
-boundary_4_gdf = gpd.read_file(BOUNDARY_DIR, 'boundary_4.geojson')
+boundary_4_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_4.geojson'))
 sfcta_SF_gdf = sfcta_stick_gdf[
     sfcta_stick_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
 print('{} SF links, with following fields: \n{}'.format(
@@ -224,17 +240,19 @@ sfcta_SF_roadway_gdf = sfcta_SF_gdf[~(sfcta_SF_gdf.FT == 6)]
 
 # Write out SFCTA stick network for conflation
 sfcta_SF_roadway_gdf[['A', 'B', "geometry"]].to_file(
-    os.path.join(OUTPUT_CCTA_DIR, 'sfcta_in.geojson'), driver="GeoJSON")
+    os.path.join(OUTPUT_SFCTA_DIR, 'sfcta_in.geojson'), driver="GeoJSON")
 
 # export modified raw data for merging the conflation results back
 sfcta_SF_roadway_gdf.to_file(
-    os.path.join(OUTPUT_CCTA_DIR, 'sfcta_raw.geojson'), driver="GeoJSON")
+    os.path.join(OUTPUT_SFCTA_DIR, 'sfcta_raw.geojson'), driver="GeoJSON")
 
 #####################################
 # Prepare CCTA for conflation
 
 print('load CCTA data from {}'.format(INPUT_CCTA_FILE))
 ccta_raw_gdf = gpd.read_file(INPUT_CCTA_FILE)
+
+print('CCTA data projection: ' + str(ccta_raw_gdf.crs))
 
 # filter out connectors
 ccta_gdf = ccta_raw_gdf.loc[(ccta_raw_gdf.AB_FT != 6) & (ccta_raw_gdf.BA_FT != 6)]
@@ -273,24 +291,20 @@ ccta_gdf.to_file(
 
 #####################################
 # Prepare ACTC for conflation
+# connectors were already filtered out
 
 print('load ACTC data from {}'.format(INPUT_ACTC_FILE))
 actc_raw_gdf = gpd.read_file(INPUT_ACTC_FILE)
 print('ACTC data has {} links, {} unique A-B combination'.format(
     actc_raw_gdf.shape[0], len(actc_raw_gdf.groupby(['A', 'B']).count())
 ))
-
+print(actc_raw_gdf.info())
 # define initial ESPG
-actc_raw_gdf.crs = {"init": "esri:26910"}
-# if the above throws an "invalid crs" error, try the following:
-# tm2_link_gdf.crs = "esri:26910"
+actc_raw_gdf.crs = CRS("EPSG:26910")
 
 # convert to ESPG lat-lon
-actc_raw_gdf = actc_raw_gdf.to_crs({'init': lat_lon_epsg_str})
+actc_raw_gdf = actc_raw_gdf.to_crs(CRS(lat_lon_epsg_str))
 print('converted to projection: ' + str(actc_raw_gdf.crs))
-
-# double check that connectors were already filtered out
-print('check FT: \n{}'.format(actc_raw_gdf.FT.value_count(dropna=False)))
 
 # Partition ACTC data for shst Match
 for i in range(14):
@@ -298,7 +312,7 @@ for i in range(14):
         os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
     sub_gdf = actc_raw_gdf[
         actc_raw_gdf.intersects(boundary_gdf.geometry.unary_union)].copy()
-    sub_gdf[["ID", "geometry"]].to_file(
+    sub_gdf[["A", "B", "geometry"]].to_file(
         os.path.join(OUTPUT_ACTC_DIR, 'actc_{}.in.geojson'.format(str(i + 1))),
         driver="GeoJSON")
 
@@ -310,6 +324,7 @@ actc_raw_gdf.to_file(
 #####################################
 # Prepare PEMS for conflation
 
+print('load ACTC data from {}'.format(INPUT_PEMS_FILE))
 pems_df = pd.read_csv(INPUT_PEMS_FILE)
 print(pems_df.columns)
 
@@ -317,14 +332,17 @@ print(pems_df.columns)
 pems_df["geometry"] = [Point(xy) for xy in zip(pems_df.longitude, pems_df.latitude)]
 
 pems_gdf = gpd.GeoDataFrame(pems_df, geometry=pems_df["geometry"],
-                            crs={"init": lat_lon_epsg_str})
+                            crs=CRS(lat_lon_epsg_str))
 
 # drop records missing geometry
 pems_gdf = pems_gdf[~((pems_gdf.longitude.isnull()) | (pems_gdf.latitude.isnull()))]
 
-# export for conflation
-pems_gdf.drop_duplicates(subset=["station", "longitude", "latitude"],
-                         inplace=True)[["station", "longitude", "latitude", "geometry"]].to_file(
+# drop duplicates
+pems_gdf.drop_duplicates(subset=["station", "longitude", "latitude"], inplace=True)
+print('after dropping duplicates, {} rows left'.format(pems_gdf.shape[0]))
+
+# export for conflation                    
+pems_gdf[["station", "longitude", "latitude", "geometry"]].to_file(
     os.path.join(OUTPUT_PEMS_DIR, 'pems.in.geojson'), driver="GeoJSON")
 
 # export modified pems_gdf
