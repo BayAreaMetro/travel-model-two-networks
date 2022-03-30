@@ -1,7 +1,7 @@
 import argparse, copy, os, pickle, sys
 import pandas as pd
 # https://github.com/BayAreaMetro/network_wrangler/tree/generic_agency
-from network_wrangler import WranglerLogger 
+from network_wrangler import WranglerLogger, setupLogging
 # https://github.com/BayAreaMetro/Lasso/tree/mtc_parameters
 import lasso
 from lasso import mtc
@@ -65,6 +65,15 @@ if __name__ == '__main__':
       'bike_access','drive_access','walk_access','rail_only','farezone',            # Mode attributes
       'geometry'                                                                    # geometry
     ]
+
+    # create logger files
+    LOG_FILENAME = os.path.join(
+        os.getcwd(),
+        "convert_scenario_to_modeled_networks_{}.info.log".format(datetime.now().strftime("%Y_%m_%d__%H_%M_%S")),
+    )
+    setupLogging(info_log_filename = LOG_FILENAME,
+                 debug_log_filename = LOG_FILENAME.replace('info', 'debug'))
+
 
     # log the arguments passed
     WranglerLogger.info("Args:")
