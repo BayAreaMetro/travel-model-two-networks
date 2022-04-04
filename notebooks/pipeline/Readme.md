@@ -5,7 +5,7 @@
 
 Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
 
-* Input: County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: `[[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp]`(https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+* Input: County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: [`[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
 * Output: 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
 
 ### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
