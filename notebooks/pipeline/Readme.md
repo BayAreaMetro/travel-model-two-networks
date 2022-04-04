@@ -1,14 +1,14 @@
 
 <img src="https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/TM2_network_rebuild_flow.png" width="800">
 
-### [Step 0: Prepare for SharedStreets extraction](step0_prepare_for_shst_extraction.ipynb)
+### [Step 0: Prepare for SharedStreets extraction](step0_prepare_for_shst_extraction.py)
 
 Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
 
-* Input: County shapefile, `../../data/external/county_boundaries/county_5m%20-%20Copy.shp` -- Get this from [`BOX_TM2NET_DATA > external > county_boundaries > county_5m - Copy.shp`](https://mtcdrive.box.com/s/jj5grp9eso5r1ljbztwjid6znzrzc6g7)
-* Output: County boundaries, `../../data/external/county_boundaries/boundary_[1-14].json`
+* Input: County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: `[[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp]`(https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+* Output: 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
 
-### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
+-### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
 
 Use [Docker](https://www.docker.com/) to build an image as instructed by the [Dockerfile](Dockerfile).
 See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker), and extract SharedStreet networks data by the boundaries defined in step 0.
