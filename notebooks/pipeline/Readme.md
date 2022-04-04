@@ -8,7 +8,7 @@ Export county boundary polygons for SharedStreets Extraction.  Converts county s
 * Input: County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: `[[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp]`(https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
 * Output: 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
 
--### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
+### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
 
 Use [Docker](https://www.docker.com/) to build an image as instructed by the [Dockerfile](Dockerfile).
 See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker), and extract SharedStreet networks data by the boundaries defined in step 0.
