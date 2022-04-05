@@ -6,7 +6,7 @@
 Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
 
 #### Input:
-* County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: [`[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+* County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pieces, resulting in 14 rows: [`[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
 #### Output:
 * 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
 
@@ -31,48 +31,53 @@ See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-re
 
 `python "%ROOT_OUTPUT_DATA_DIR%\external\step1_shst_extracts" "%ROOT_OUTPUT_DATA_DIR\external\step1_shst_extracts\mtc_all_out.gpkg"`
 
-### [Step 2: OSMnx extraction](step2_osmnx_extraction.ipynb)
+### [Step 2: OSMnx extraction](step2_osmnx_extraction.py)
 
 Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 
-* Input:
-  * County shapefile, `../../data/external/county_boundaries/county_5m%20-%20Copy.shp`
-  * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
-* Output:
-  * OSM link extract, `../../data/external/osmnx_extract/link.geojson` with columns: 'osmid', 'oneway', 'lanes', 'ref', 'name', 'highway', 'maxspeed',
-       'length', 'bridge', 'service', 'width', 'access', 'junction', 'tunnel', 'est_width', 'area', 'landuse', 'u', 'v', 'key', 'geometry'
-  * OSM node extract, `../../data/external/osmnx_extract/node.geojson` with columns: 'y', 'x', 'osmid', 'ref', 'highway', 'geometry'
+#### Input:
+* County shapefile, `[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`
+* OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
+#### Output:
+* OSM link extract, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/link.geojson` with columns: 'osmid', 'oneway', 'lanes', 'ref', 'name', 'highway', 'maxspeed',
+     'length', 'bridge', 'service', 'width', 'access', 'junction', 'tunnel', 'est_width', 'area', 'landuse', 'u', 'v', 'key', 'geometry'
+* OSM node extract, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/node.geojson` with columns: 'y', 'x', 'osmid', 'ref', 'highway', 'geometry'
 
-### [Step 3: Process SharedStreets Extraction to Network Standard and Conflate with OSM](step3_join_shst_extraction_with_osm.ipynb)
+### [Step 3: Process SharedStreets Extraction to Network Standard and Conflate with OSM](step3_join_shst_extraction_with_osm.py)
 
 Add OSM attributes to extracted SharedStreets network and convert to Network Standard data formats. 
 
-* Input:
-  * OSM link extract, `../../data/external/osmnx_extract/link.geojson`
-  * OSM node extract, `../../data/external/osmnx_extract/node.geojson`
-  * Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`
-* Output:
-  * Network Standard link shapes, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'; with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'
-  * Network Standard link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
-  * Network Standard nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
+#### Input:
+* OSM link extract (from step2), `[INPUT_DATA_DIR]/external/external/step2_osmnx_extraction/link.geojson`
+* Shared Street extract (from step1), `[INPUT_DATA_DIR]/external/step1_shst_extraction/mtc_[1-14].out.geojson`
+#### Output:
+* Network Standard link shapes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_extraction_with_osm/step3_shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'; with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'
+* Network Standard link attributes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_extraction_with_osm/step3_link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
+* Network Standard nodes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_extraction_with_osm/step3_node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
 
 ### [Step 4: Conflate Third Party Data with Base Networks from Step 3]
 Four parts, run in sequence:
 
-#### [step4a_prepare_conflate_with_third_party.ipynb](step4a_prepare_conflate_with_third_party.ipynb)
-Prepare third party data (remove duplicates, remove unnecessary records, partition regional network datasets by the 14 boundaries, set to the correct projection EPSG 4326) for SharedStreets matching.
-* Input:
-  * TomTom network for the Bay Area (pending)
-  * TM2 non-Marion version, `../../data/external/TM2_nonMarin/mtc_final_network_base.shp`
-  * TM2 Marin version, `../../data/external/TM2_Marin/mtc_final_network_base.shp`
-  * SFCTA Stick network, `../../data/external/sfcta/SanFrancisco_links.shp`
-  * PEMS count, `../../data/external/mtc/pems_period.csv`
-* Output:
-  * `../../data/external/tomtom/tomtom[1-14].in.geojson`
-  * `../../data/external/TM2_nonMarin/tm2nonMarin_[1-14].in.geojson`
-  * `../../data/external/TM2_Marin/tm2Marin_[1-14].in.geojson`
-  * `../../data/external/sfcta/sfcta_in.geojson`
-  * `../../data/external/mtc/pems.in.geojson`
+#### [step4a: Prepare third-party data for SharedStreet conflation.py](step4a_prepare_third_party_data_for_conflation.py)
+Prepare third party data for SharedStreets matching, including: remove duplicates, remove no roadway links (e.g. centroid connectors), add missing links (e.g. add the other link for two-way links) partition regional network datasets by the 14 boundaries, set to the standard lat-lon EPSG 4326.
+##### Input:
+* TomTom network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/TomTom networkFGDB/network2019/Network_region.gdb/mn_nw`
+* TM2 non-Marion version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_nonMarin/mtc_final_network_base.shp`
+* TM2 Marin version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_Marin/mtc_final_network_base.shp`
+* SFCTA Stick network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/sfcta/SanFrancisco_links.shp`
+* ACTC network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/actc_model/AlamedaCo_MASTER_20190410_no_cc.shp`
+* CCTA network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/ccta_model/ccta_2015_network/ccta_2015_network.shp`
+* PEMS count, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/mtc/pems_period.csv`
+
+##### Output:
+Two sets of data for each third-party data source, one set only contains unique identifier for each link and link geometry (`[data_source]_[1-14].in.geojson`), which will be used in SharedStreet matching in step4b - using the entire dataset would substantially increase run time; the other set contains all link attributes (`[data_source]_raw.geojson`), which will be joined back to matched links in step4d.   
+* TomTom network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TomTom/tomtom[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TomTom/tomtom_raw.geojson`
+* TM2 non-Marion version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_raw.geojson`
+* TM2 Marin version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_raw.geojson`
+* SFCTA Stick network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/sfcta/sfcta_raw.geojson`
+* ACTC network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/actc/actc_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/actc/actc_raw.geojson`
+* CCTA network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/ccta/ccta_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/ccta/ccta_raw.geojson`
+* PEMS count, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/pems.in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/pems_raw.geojson`
 
 #### [step4b_third_party_shst_match.sh](step4b_third_party_shst_match.sh)
 Matche third party datasets to SharedStreets References using various rules.

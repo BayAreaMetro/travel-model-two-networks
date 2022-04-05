@@ -1,18 +1,32 @@
 USAGE = """
 
 Extracts complete OSM attributes using OSMNX.
-Input: polygon boundary file for the region
-Output: nodes and links data from OSMNX in geojson format
+
+set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
+Input: polygon boundary file for the region, [INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp
+Output: nodes and links data from OSMNX in geojson format,
+    [OUTPUT_DATA_DIR]/external/external/step2_osmnx_extraction/link.geojson,
+    [OUTPUT_DATA_DIR]/external/external/step2_osmnx_extraction/node.geojson
 """
 from methods import *
+from pyproj import CRS
 from network_wrangler import WranglerLogger, setupLogging
 from datetime import datetime
 
-# input/output directory and files
-ROOT_DATA_DIR = 'C:\\Users\\{}\\Box\\Modeling and Surveys\\Development\\Travel Model Two Development\\Build_TM2_networkV13_pipeline'.format(os.getenv('USERNAME'))
-INPUT_DIR = os.path.join(ROOT_DATA_DIR, 'external', 'step0_boundaries')
-COUNTY_POLYGON = 'county_5m - Copy.shp'
-OUTPUT_DIR = os.path.join(ROOT_DATA_DIR, 'external', 'step2_osmnx_extraction')
+#####################################
+# EPSG requirement
+# TARGET_EPSG = 4326
+lat_lon_epsg_str = 'epsg:{}'.format(str(LAT_LONG_EPSG))
+WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
+
+#####################################
+# inputs and outputs
+
+INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
+OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
+INPUT_POLYGON   = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
+OUTPUT_DIR      = os.path.join(OUTPUT_DATA_DIR, 'external', 'step2_osmnx_extraction')
+
 
 if __name__ == '__main__':
     # create output folder if not exist
@@ -28,14 +42,14 @@ if __name__ == '__main__':
     setupLogging(LOG_FILENAME)
 
     # read polygon boundary
-    county_polys_gdf = gpd.read_file(os.path.join(INPUT_DIR, COUNTY_POLYGON))
+    county_polys_gdf = gpd.read_file(INPUT_POLYGON)
     WranglerLogger.info('Input county boundary file uses projection: ' + str(county_polys_gdf.crs))
 
     # project to lat-long
-    county_polys_gdf = county_polys_gdf.to_crs(epsg=LAT_LONG_EPSG)
+    county_polys_gdf = county_polys_gdf.to_crs(CRS(lat_lon_epsg_str))
     WranglerLogger.info('converted to projection: ' + str(county_polys_gdf.crs))
 
-    # dissolve into one polygon (osmnx extraction doesn't have the area limitation as ShSt extraction)
+    # dissolve into one polygon
     WranglerLogger.info('dissolve into one polygon')
     boundary = county_polys_gdf.geometry.unary_union
 

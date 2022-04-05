@@ -4,9 +4,9 @@ Partitions the region geographically into 14 sub-regions.
 SharedStreets extraction requires a polygon boundary as input. 
 Running extraction with the entire Bay Area as the boundary will run out of space.
 
-set ROOT_DIR environment variable
-Input:  [ROOT_DATA_DIR]/external/step0_boundaries/county_5m - Copy.shp: polygons of Bay Area counties
-Output: [ROOT_DATA_DIR]/external/step0_boundaries/modified/boundary_[1-14].json
+set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
+Input:  [INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp: polygons of Bay Area counties
+Output: [OUTPUT_DATA_DIR]/external/step0_boundaries/modified/boundary_[1-14].json
 """
 
 from methods import *
@@ -20,11 +20,12 @@ from datetime import datetime
 INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 INPUT_POLYGON   = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
-OUTPUT_DIR      = os.path.join(OUTPUT_DATA_DIR, 'external','step0_boundaries')
+OUTPUT_DIR      = os.path.join(OUTPUT_DATA_DIR, 'external', 'step0_boundaries')
 
-# # EPSG requirement
+# EPSG requirement
 # TARGET_EPSG = 4326
 lat_lon_epsg_str = 'epsg:{}'.format(str(LAT_LONG_EPSG))
+WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
 
 if __name__ == '__main__':
     # create output folder if not exist
@@ -50,9 +51,9 @@ if __name__ == '__main__':
     WranglerLogger.debug('county_polys_gdf: {}'.format(county_polys_gdf))
 
     # export polygon to geojson for shst extraction
-    for row_index,row in county_polys_gdf.iterrows():
+    for row_index, row in county_polys_gdf.iterrows():
         WranglerLogger.info('Exporting boundary file number: {}'.format(row_index+1))
 
         boundary_gdf = gpd.GeoDataFrame({"geometry": gpd.GeoSeries(row['geometry'])})
 
-        boundary_gdf.to_file(os.path.join(OUTPUT_DIR, 'boundary_{}.geojson'.format(row_index+1)),driver="GeoJSON")
+        boundary_gdf.to_file(os.path.join(OUTPUT_DIR, 'boundary_{}.geojson'.format(row_index+1)), driver="GeoJSON")
