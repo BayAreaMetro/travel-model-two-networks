@@ -22,3 +22,9 @@ notebooks/pipeline/.ipynb_checkpoints/*
 notebooks/network_wrangler_*.log
 notebooks/pipeline/network_wrangler_*.log
 .idea/workspace.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/misc.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/travel-model-two-networks.iml
+.idea/vcs.xml
