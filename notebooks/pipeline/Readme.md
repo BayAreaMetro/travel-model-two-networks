@@ -28,6 +28,7 @@ Installing Docker Desktop and getting Docker to run on an Mac machine is straigh
 See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-geometries)
 
 **Optional conversion to geopackage using [convert_geojson_to_geopackage.py](../../src/scripts/convert_geojson_to_geopackage.py)**:
+
 `python "%ROOT_OUTPUT_DATA_DIR%\external\step1_shst_extracts" "%ROOT_OUTPUT_DATA_DIR\external\step1_shst_extracts\mtc_all_out.gpkg"`
 
 ### [Step 2: OSMnx extraction](step2_osmnx_extraction.ipynb)
