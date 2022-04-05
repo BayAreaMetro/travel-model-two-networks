@@ -5,8 +5,10 @@
 
 Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
 
-* Input: County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: [`[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
-* Output: 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
+#### Input:
+* County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pices, resulting in 14 rows: [`[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+#### Output:
+* 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
 
 ### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
 
@@ -15,11 +17,13 @@ See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sha
 
 Installing Docker Desktop and getting Docker to run on an Mac machine is straightforward. Setting up Docker on a Windows machine requires BIOS configuration. Path referencing and line-ending format are also different in Mac versus Windows. See the inline comments for examples. 
 
-* Input: 
-  * [Dockerfile](github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/Dockerfile), used to build the shst image  
-  * County boundaries (Step 0 output), `../../data/external/county_boundaries/boundary_[1-14].json`
-* Output: Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`, log files with columns: 
+#### Input:
+* [Dockerfile](github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/Dockerfile), used to build the shst image  
+* 14 county/sub-county boundaries (Step 0 output), `[ROOT_OUTPUT_DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
+#### Output: 
+* Shared Street extract, `[ROOT_OUTPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].out.geojson` with columns: 
    'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
+* Shared Street extract logs: `[ROOT_OUTPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].tiles.txt`
 
 See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-geometries)
 
