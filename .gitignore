@@ -21,3 +21,4 @@ notebooks/other/.ipynb_checkpoints/*
 notebooks/pipeline/.ipynb_checkpoints/*
 notebooks/network_wrangler_*.log
 notebooks/pipeline/network_wrangler_*.log
+.idea/workspace.xml
