@@ -61,13 +61,13 @@ Four parts, run in sequence:
 #### [step4a: Prepare third-party data for SharedStreet conflation.py](step4a_prepare_third_party_data_for_conflation.py)
 Prepare third party data for SharedStreets matching, including: remove duplicates, remove no roadway links (e.g. centroid connectors), add missing links (e.g. add the other link for two-way links) partition regional network datasets by the 14 boundaries, set to the standard lat-lon EPSG 4326.
 ##### Input:
-* TomTom network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/TomTom networkFGDB/network2019/Network_region.gdb/mn_nw`
-* TM2 non-Marion version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_nonMarin/mtc_final_network_base.shp`
-* TM2 Marin version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_Marin/mtc_final_network_base.shp`
-* SFCTA Stick network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/sfcta/SanFrancisco_links.shp`
-* ACTC network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/actc_model/AlamedaCo_MASTER_20190410_no_cc.shp`
-* CCTA network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/ccta_model/ccta_2015_network/ccta_2015_network.shp`
-* PEMS count, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/raw/mtc/pems_period.csv`
+* TomTom network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/TomTom networkFGDB/network2019/Network_region.gdb/mn_nw`
+* TM2 non-Marion version, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_nonMarin/mtc_final_network_base.shp`
+* TM2 Marin version, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_Marin/mtc_final_network_base.shp`
+* SFCTA Stick network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/sfcta/SanFrancisco_links.shp`
+* ACTC network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/actc_model/AlamedaCo_MASTER_20190410_no_cc.shp`
+* CCTA network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/ccta_model/ccta_2015_network/ccta_2015_network.shp`
+* PEMS count, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/mtc/pems_period.csv`
 
 ##### Output:
 Two sets of data for each third-party data source, one set only contains unique identifier for each link and link geometry (`[data_source]_[1-14].in.geojson`), which will be used in SharedStreet matching in step4b - using the entire dataset would substantially increase run time; the other set contains all link attributes (`[data_source]_raw.geojson`), which will be joined back to matched links in step4d.   
@@ -82,31 +82,33 @@ Two sets of data for each third-party data source, one set only contains unique 
 #### [step4b_third_party_shst_match.sh](step4b_third_party_shst_match.sh)
 Matche third party datasets to SharedStreets References using various rules.
 
-* Input: output of step4a
+##### Input: 
+* Output of step4a
 
-* Output:
-  TOMTOM data:
-  * `../../data/interim/tomtom/bike_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
-  * `../../data/interim/tomtom/car_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
-  * `../../data/interim/tomtom/ped_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
-
-  Legacy TM2 non-Marin data:
-  * `../../data/interim/TM2_nonMarin/car_rules/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_nonMarin/ped_rules/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_nonMarin/reverse_dir/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
-
-  Legacy TM2 Marin data:
-  * `../../data/interim/TM2_Marin/car_rules/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_Marin/ped_rules/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_Marin/reverse_dir/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
-
-  SFCTA stick network data:
-  * `../../data/interim/sfcta/car_rules/sfcta.out.[matched,unmatched].geojson`
-  * `../../data/interim/sfcta/ped_rules/sfcta.out.[matched,unmatched].geojson`
-  * `../../data/interim/sfcta/reverse_dir/sfcta.out.[matched,unmatched].geojson`
-
-  PEMS data:
-  * `../../data/interim/mtc/pems.out.matched.geojson`
+##### Output: 
+Folder `[ROOT_OUTPUT_DATA_DIR]/interim/step4b_third_party_shst_match`, containing the following data and sub-folders. For each input geojson file, up to two files are created - one containing successfully matched links (`[]_matched.geojson`), the other containing links failed to match (`[]_unmatched.geojson`). 
+* TOMTOM data:
+  * `/TomTom/bike_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
+  * `/TomTom/car_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
+  * `/TomTom/ped_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
+* Legacy TM2_non-Marin data:
+  * `/TM2_nonMarin/car_rules/tm2nonMarin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_nonMarin/ped_rules/tm2nonMarin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_nonMarin/reverse_dir/tm2nonMarin_[1-14].out.[matched,unmatched].geojson`
+* Legacy TM2_Marin data:
+  * `/TM2_Marin/car_rules/tm2Marin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_Marin/ped_rules/tm2Marin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_Marin/reverse_dir/tm2Marin_[1-14].out.[matched,unmatched].geojson`
+* SFCTA stick network:
+  * `/sfcta/car_rules/sfcta.out.[matched,unmatched].geojson`
+  * `/sfcta/ped_rules/sfcta.out.[matched,unmatched].geojson`
+  * `/sfcta/reverse_dir/sfcta.out.[matched,unmatched].geojson`
+* ACTC model network:
+  * `/actc/actc_[1-14].out.[matched,unmatched].geojson`
+* CCTA model network:
+  * `/ccta/ccta_[1-14].out.[matched,unmatched].geojson`
+* PEMS:
+  * `/pems/pems.out.matched.geojson`
 
 #### [step4c_pems_conflation.ipynb](step4c_pems_conflation.ipynb)
 Further conflate PEMS data based on shield number (e.g., I-80), direction (e.g., E), and FT.
