@@ -60,7 +60,7 @@ if __name__ == '__main__':
 
     # Request additional way tags from OSM
     way_tags = ox.settings.useful_tags_way
-    ADDITIONAL_WAY_TAGS = ['cycleway','sidewalk','turn']
+    ADDITIONAL_WAY_TAGS = ['cycleway','sidewalk','turn','turn:lanes']
     way_tags.extend(ADDITIONAL_WAY_TAGS)
     # remove duplicates in case any of these were added already
     way_tags = list(set(way_tags))
