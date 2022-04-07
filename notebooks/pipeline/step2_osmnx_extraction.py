@@ -60,7 +60,8 @@ if __name__ == '__main__':
 
     # Request additional way tags from OSM
     way_tags = ox.settings.useful_tags_way
-    ADDITIONAL_WAY_TAGS = ['cycleway','sidewalk','turn','turn:lanes']
+    ADDITIONAL_WAY_TAGS = ['cycleway','sidewalk','turn','turn:lanes',
+        'lanes:forward','lanes:backward','lanes:both_ways','lanes:bus','lanes:taxi','lanes:hov','shoulder']
     way_tags.extend(ADDITIONAL_WAY_TAGS)
     # remove duplicates in case any of these were added already
     way_tags = list(set(way_tags))
@@ -77,6 +78,9 @@ if __name__ == '__main__':
     link_gdf = ox.graph_to_gdfs(osmnx_graph, nodes=False, edges=True)
     WranglerLogger.info('link_gdf has {} records, with columns: \n{}'.format(
         link_gdf.shape[0], list(link_gdf)))
+    # report value_types for ordinal columns
+    for column in link_gdf.select_dtypes([object]):
+        WranglerLogger.info("column {} value_counts:\n{}".format(column, link_gdf[column].value_counts()))
 
     # writing out OSM link data to geojson
     WranglerLogger.info('writing out OSM links to geojson at {}'.format(OUTPUT_DIR))
@@ -102,6 +106,9 @@ if __name__ == '__main__':
     node_gdf = ox.graph_to_gdfs(osmnx_graph, nodes=True, edges=False)
     WranglerLogger.info('node_gdf has {} records, with columns: \n{}'.format(
         node_gdf.shape[0], list(node_gdf)))
+    # report value_types for ordinal columns
+    for column in node_gdf.select_dtypes([object]):
+        WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts()))
 
     # writing out OSM node data to geojson
     WranglerLogger.info('writing out OSM nodes to geojson at {}'.format(OUTPUT_DIR))
