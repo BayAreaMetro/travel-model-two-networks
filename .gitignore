@@ -29,3 +29,4 @@ notebooks/pipeline/network_wrangler_*.log
 .idea/travel-model-two-networks.iml
 .idea/vcs.xml
 .idea/modules.xml
+*.geojson
