@@ -31,6 +31,41 @@ INPUT_POLYGON   = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', '
 OUTPUT_DIR      = os.path.join(OUTPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
 OUTPUT_GPKG     = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")
 
+# way (link) tags we want from OSM
+# OSM Defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
+# as useful_tags_way
+WAY_TAGS = [
+    'highway',          # https://wiki.openstreetmap.org/wiki/Key:highway
+    'tunnel',           # https://wiki.openstreetmap.org/wiki/Key:tunnel
+    'bridge',           # https://wiki.openstreetmap.org/wiki/Key:bridge
+    'junction',         # https://wiki.openstreetmap.org/wiki/Key:junction
+    'oneway',           # https://wiki.openstreetmap.org/wiki/Key:oneway
+    'name',             # https://wiki.openstreetmap.org/wiki/Key:name
+    'ref',              # https://wiki.openstreetmap.org/wiki/Key:ref
+    'width',            # https://wiki.openstreetmap.org/wiki/Key:width
+    'est_width',        # https://wiki.openstreetmap.org/wiki/Key:est_width
+    'access',           # https://wiki.openstreetmap.org/wiki/Key:access
+    'area',             # https://wiki.openstreetmap.org/wiki/Key:area
+    'service',          # https://wiki.openstreetmap.org/wiki/Key:service
+    'maxspeed',         # https://wiki.openstreetmap.org/wiki/Key:maxspeed
+    # lanes accounting
+    'lanes',            # https://wiki.openstreetmap.org/wiki/Key:lanes
+    'bus',              # https://wiki.openstreetmap.org/wiki/Key:bus
+    'hov',              # https://wiki.openstreetmap.org/wiki/Key:hov
+    'taxi',             # https://wiki.openstreetmap.org/wiki/Key:taxi
+    'lanes:taxi',       # https://wiki.openstreetmap.org/wiki/Key:taxi
+    'lanes:hov',        # https://wiki.openstreetmap.org/wiki/Key:hov
+    'shoulder',         # https://wiki.openstreetmap.org/wiki/Key:shoulder
+    'lanes:bus',        # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
+    'lanes:backward',   # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'lanes:forward',    # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'lanes:both_ways',  # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'turn',             # https://wiki.openstreetmap.org/wiki/Key:turn
+    'turn:lanes',       # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
+    # active modes
+    'sidewalk',         # https://wiki.openstreetmap.org/wiki/Key:sidewalk
+    'cycleway',         # https://wiki.openstreetmap.org/wiki/Key:cycleway
+]
 
 if __name__ == '__main__':
     # create output folder if not exist
@@ -58,15 +93,9 @@ if __name__ == '__main__':
     boundary = county_polys_gdf.geometry.unary_union
     WranglerLogger.info('dissolved into one polygon')
 
-    # Request additional way tags from OSM
-    way_tags = ox.settings.useful_tags_way
-    ADDITIONAL_WAY_TAGS = ['cycleway','sidewalk','turn','turn:lanes',
-        'lanes:forward','lanes:backward','lanes:both_ways','lanes:bus','lanes:taxi','lanes:hov','shoulder']
-    way_tags.extend(ADDITIONAL_WAY_TAGS)
-    # remove duplicates in case any of these were added already
-    way_tags = list(set(way_tags))
-    WranglerLogger.info(" Updating os.settings.useful_tags_way from {} to {}".format(ox.settings.useful_tags_way, way_tags))
-    ox.utils.config(useful_tags_way=way_tags)
+    # Request specific way tags from OSM
+    WranglerLogger.info("Requesting the following way tags from OSM: {}".format(WAY_TAGS))
+    ox.utils.config(useful_tags_way=WAY_TAGS)
 
     # OSM extraction - Note: this is memory intensive (~15GB) and time-consuming (~50 min)
     WranglerLogger.info('starting osmnx extraction')
