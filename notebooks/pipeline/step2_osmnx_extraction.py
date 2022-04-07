@@ -9,7 +9,7 @@ Output: nodes and links data from OSMNX in geojson format,
     [OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/node.geojson
     Plus geopackage with these layers, [OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/osmnx_extraction.gpkg
 """
-import datetime, json, os
+import datetime, json, os, sys
 import methods
 import geopandas as gpd
 import osmnx as ox
@@ -57,6 +57,15 @@ if __name__ == '__main__':
     # dissolve into one polygon
     boundary = county_polys_gdf.geometry.unary_union
     WranglerLogger.info('dissolved into one polygon')
+
+    # Request additional way tags from OSM
+    way_tags = ox.settings.useful_tags_way
+    ADDITIONAL_WAY_TAGS = ['cycleway','sidewalk','turn']
+    way_tags.extend(ADDITIONAL_WAY_TAGS)
+    # remove duplicates in case any of these were added already
+    way_tags = list(set(way_tags))
+    WranglerLogger.info(" Updating os.settings.useful_tags_way from {} to {}".format(ox.settings.useful_tags_way, way_tags))
+    ox.utils.config(useful_tags_way=way_tags)
 
     # OSM extraction - Note: this is memory intensive (~15GB) and time-consuming (~50 min)
     WranglerLogger.info('starting osmnx extraction')
