@@ -39,9 +39,9 @@ Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 * County shapefile, `[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`
 * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 #### Output:
-* OSM link extract, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/link.geojson` with columns: 'osmid', 'oneway', 'lanes', 'ref', 'name', 'highway', 'maxspeed',
+* OSM link extract, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/link.geojson` with columns: 'osmid', 'oneway', 'lanes', 'ref', 'name', 'highway', 'maxspeed',
      'length', 'bridge', 'service', 'width', 'access', 'junction', 'tunnel', 'est_width', 'area', 'landuse', 'u', 'v', 'key', 'geometry'
-* OSM node extract, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/node.geojson` with columns: 'y', 'x', 'osmid', 'ref', 'highway', 'geometry'
+* OSM node extract, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/node.geojson` with columns: 'y', 'x', 'osmid', 'ref', 'highway', 'geometry'
 
 ### [Step 3: Process SharedStreets Extraction to Network Standard and Conflate with OSM](step3_join_shst_extraction_with_osm.py)
 
