@@ -86,6 +86,7 @@ if __name__ == '__main__':
     WranglerLogger.info('Extracting corresponding osm ways for every shst geometry')
 
     WranglerLogger.info('...expand each shst extract record into osm segments')
+    # Note: this step is memory intensive and time-consuming
     osm_from_shst_link_list = []
     temp = shst_link_non_dup_gdf.apply(lambda x: extract_osm_link_from_shst_shape(x, osm_from_shst_link_list),
                                        axis=1)
@@ -137,8 +138,8 @@ if __name__ == '__main__':
             x, highway_to_roadway_dict, roadway_hierarchy_dict),
         axis=1)
 
-    WranglerLogger.debug('link counts by roadway types: {}'.format(link_gdf.roadway.value_counts()))
-    WranglerLogger.debug('roadway data from roadClass while OSM highway value is missing: {}'.format(
+    WranglerLogger.debug('link counts by roadway types: \n{}'.format(link_gdf.roadway.value_counts()))
+    WranglerLogger.debug('roadway data from roadClass while OSM highway value is missing: \n{}'.format(
         link_gdf[link_gdf.highway == ''].roadway.value_counts()
     ))
 
@@ -147,7 +148,7 @@ if __name__ == '__main__':
     WranglerLogger.info('Dropping link duplicates based on ShstRefenceID and from/to nodes')
     link_gdf.drop_duplicates(subset=["shstReferenceId"], inplace=True)
 
-    # add network type variables
+    # add network type variables "drive_access", "walk_access", "bike_access" based on pre-defined lookup
     WranglerLogger.info('Adding network type variables')
     network_type_df = pd.read_csv(NETWORK_TYPE_LOOKUP_FILE)
 
@@ -159,6 +160,7 @@ if __name__ == '__main__':
     WranglerLogger.info('Finished converting SHST extraction into standard network links,\
     network has {} links, which are based on {} geometrics'.format(
         link_gdf.shape[0], link_gdf.shstGeometryId.nunique()))
+    WranglerLogger.debug('The standard network links have the following attributes: \n{}'.format(list(link_gdf)))
 
     # create shapes based on the network links
     WranglerLogger.info('Creating shapes from links')
@@ -217,3 +219,5 @@ if __name__ == '__main__':
 
     with open(os.path.join(SHST_WITH_OSM_DIR, 'step3_node.geojson'), "w") as f:
         json.dump(node_geojson, f)
+
+    # TODO: export the data in other format, probably need to adjust field type before exporting
