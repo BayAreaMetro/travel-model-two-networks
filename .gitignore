@@ -31,3 +31,5 @@ notebooks/pipeline/network_wrangler_*.log
 .idea/modules.xml
 *.geojson
 *.log
+*.gpkg
+*.json
