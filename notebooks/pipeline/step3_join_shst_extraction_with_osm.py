@@ -30,7 +30,7 @@ INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 
 # OSM extraction and SharedStreet extraction
-OSM_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extraction')
+OSM_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
 OSM_LINK_FILE = os.path.join(OSM_EXTRACT_DIR, 'link.geojson')
 ## OSM_NODE_FILE = os.path.join(OSM_EXTRACT_DIR, 'node.geojson')
 SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step1_shst_extraction')

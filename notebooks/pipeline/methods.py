@@ -194,7 +194,18 @@ def consolidate_osm_way_to_shst_link(osm_link):
             "width",
             'cycleway',
             'sidewalk',
-            'turn:lanes'
+            'turn:lanes',
+            'bus',
+            'hov',
+            'taxi',
+            'lanes:taxi',
+            'lanes:hov',
+            'shoulder',
+            'lanes:bus',
+            'lanes:backward',
+            'lanes:forward',
+            'lanes:both_ways',
+            'turn'
         ]:
             agg_dict.update(
                 {c: lambda x: list(x) if len(list(x)) > 1 else list(x)[0]}
