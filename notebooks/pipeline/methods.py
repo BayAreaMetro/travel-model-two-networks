@@ -385,7 +385,7 @@ def read_shst_extract(path, suffix):
     """
     shst_gdf = pd.DataFrame()
 
-    shst_file = glob.glob(path + "**/" + suffix, recursive=True)
+    shst_file = glob.glob(path + "/**/" + suffix, recursive=True)
     print("----------start reading shst extraction data-------------")
     for i in shst_file:
         print("reading shst extraction data : ", i)
