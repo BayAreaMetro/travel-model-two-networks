@@ -41,7 +41,7 @@ if __name__ == '__main__':
         gdf = gpd.GeoDataFrame.from_file(args.input_file, driver='GeoJSON')
         logging.info("... complete; read {} rows".format(len(gdf)))
 
-        logging.info("Writing layer {} to {}".format(layer, file_copy))
+        logging.info("Writing copy to {}".format(file_copy))
         gdf.to_file(file_copy, driver='GeoJSON')
         logging.info("... complete")
 
