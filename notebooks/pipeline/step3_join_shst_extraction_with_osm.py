@@ -123,7 +123,7 @@ if __name__ == '__main__':
     # osm_from_shst_link_df = pd.concat(osm_from_shst_link_list)
     osmWays_from_shst_df = extract_osm_links_from_shst_extraction(shst_link_non_dup_gdf)
     WranglerLogger.info('shst extracts has {} geometries, {} OSM Ways'.format(
-        osmWays_from_shst_df.id.nunique(),
+        osmWays_from_shst_df.geometryId.nunique(),
         osmWays_from_shst_df.shape[0])
     )
     WranglerLogger.debug('osmWays_from_shst_df has the following OSM fields: {}'.format(list(osmWays_from_shst_df)))

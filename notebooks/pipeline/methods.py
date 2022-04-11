@@ -156,7 +156,7 @@ def add_two_way_osm(link_gdf):
         & (link_gdf.u != link_gdf.v)
         ].copy()
 
-    print('shst extraction has {} two-way OSM Ways, {} geometries'.format(
+    print('shst extraction has {} two-way OSM Ways, which contain {} geometries'.format(
         reverse_osm_link_gdf.shape[0],
         reverse_osm_link_gdf.id.nunique())
     )
