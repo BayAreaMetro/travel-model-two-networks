@@ -16,13 +16,12 @@ LAT_LONG_EPSG = 4326
 shst_link_df_list = []
 
 
-def extract_osm_link_from_shst_shape(
+def extract_osm_link_from_shst_row(
         row: pd.Series,
         osm_from_shst_link_list: list,
 ):
     """
-    get all osm info for each row of shst record
-
+    get all osm ways for each shst record
     """
     link_df = pd.DataFrame(row.get("metadata").get("osmMetadata").get("waySections"))
     link_df["geometryId"] = row.get("metadata").get("geometryId")
@@ -30,19 +29,54 @@ def extract_osm_link_from_shst_shape(
     osm_from_shst_link_list.append(link_df)
 
 
+def extract_osm_links_from_shst_extraction(shst_gdf):
+    """
+    expand each shst extract record into osm ways
+    The resulting dataframe contains the following fields: ['nodeIds', 'wayId', 'roadClass', 'oneWay', 'roundabout',
+                                                            'link', 'name', 'geometryId', 'u', 'v']
+    """
+    # create a list to store value
+    osm_from_shst_link_list = []
+
+    # convert each row into list of values and add to osm_from_shst_link_list. "extract_osm_link_from_shst_row"
+    # extracts data without returning a value, hence "temp = " in the following method call
+    temp = shst_gdf.apply(lambda x: extract_osm_link_from_shst_row(x, osm_from_shst_link_list),
+                          axis=1)
+
+    # make dataframe
+    osm_from_shst_link_df = pd.concat(osm_from_shst_link_list)
+
+    # add fields to represent each link's starting_node ("u") and ending_node ("v")
+    osm_from_shst_link_with_uv_df = get_osm_way_starting_ending_nodes(osm_from_shst_link_df)
+
+    return osm_from_shst_link_with_uv_df
+
+
+def get_osm_way_starting_ending_nodes(link_gdf):
+    """
+    get links starting node_id ("u") and ending node_id ("v"), based on a list of nodes that each link contains in
+    field "nodeIds", and add "u", "v" to the link dataframe
+    """
+    if 'nodeIds' in list(link_gdf):
+        link_gdf['u'] = link_gdf.nodeIds.apply(lambda x: int(x[0]))
+        link_gdf['v'] = link_gdf.nodeIds.apply(lambda x: int(x[-1]))
+    else:
+        print('the link data is missing the "nodeIds" field')
+    return link_gdf
+
+
 def osm_link_with_shst_info(link_df, shst_gdf):
     """
-    get complete osm links with shst info
-    1. two way shst to two osm links
-    2. add u, v node
+    add ShSt-specific link attributes back to OSM ways derived from ShSt extraction records
     
     Parameters
     --------------
-    osm link from shst extraction
+    link_df: osm ways derived from shst extraction
+    shst_gdf: ShSt extraction
     
     return
     --------------
-    complete osm link with shst info
+    complete ShSt-derived OSM ways
     """
     osm_link_gdf = pd.merge(link_df,
                             shst_gdf.drop(["roadClass", "metadata", "source"], axis=1),
@@ -53,54 +87,81 @@ def osm_link_with_shst_info(link_df, shst_gdf):
     return osm_link_gdf
 
 
-def add_two_way_osm(link_gdf, osmnx_link):
+def merge_osmnx_attributes_with_shst(link_gdf, osmnx_link):
     """
-    for osm with oneway = False, add the reverse direction to complete
+    merges link attributes from OSM extract into ShSt-derived OSM Ways dataframe
 
     Parameters
     ------------
-    link_gdf: osm segments (ways) from shst extraction
-    osmnx_link:
+    link_gdf: osm Ways from shst extracts
+    osmnx_link: osm extract
+
+    Return
+    ------------
+    OSM Ways with all attributes from ShSt extracts and OSM extracts
+    """
+    osm_ways_from_shst_gdf = link_gdf.copy()
+    osm_ways_from_shst_gdf["wayId"] = osm_ways_from_shst_gdf["wayId"].astype(int)
+    osm_ways_from_shst_gdf.drop("name", axis=1, inplace=True)
+
+    osmnx_link_gdf = osmnx_link.copy()
+    osmnx_link_gdf.drop_duplicates(subset=['osmid'], inplace=True)
+    osmnx_link_gdf.drop(['length', 'u', 'v', 'geometry'], axis=1, inplace=True)
+
+    osm_ways_all_atts = pd.merge(
+        osm_ways_from_shst_gdf, osmnx_link_gdf, left_on=['wayId'], right_on=['osmid'], how="left"
+    )
+    return osm_ways_all_atts
+
+
+def add_two_way_osm(link_gdf):
+    """
+    for osm Ways with oneway = False, add the reverse direction to complete
+
+    Parameters
+    ------------
+    link_gdf: osm Ways from shst extracts, with links attributes also from OSM extract
+    osmnx_link: osm extraction
 
     return
     ------------
     complete osm links from shst extraction records
     """
-    osm_link_gdf = link_gdf.copy()
-    osm_link_gdf["wayId"] = osm_link_gdf["wayId"].astype(int)
-    osm_link_gdf.drop("name", axis=1, inplace=True)
+    # osm_link_gdf = link_gdf.copy()
+    # osm_link_gdf["wayId"] = osm_link_gdf["wayId"].astype(int)
+    # osm_link_gdf.drop("name", axis=1, inplace=True)
+    #
+    # osmnx_link_gdf = osmnx_link.copy()
+    #
+    # osmnx_link_gdf.drop_duplicates(subset=["osmid"], inplace=True)
+    # osmnx_link_gdf.drop(["length", "u", "v", "geometry"], axis=1, inplace=True)
+    #
+    # print(
+    #     "shst extraction has {} geometries".format(osm_link_gdf.id.nunique())
+    # )
+    # print("shst extraction has {} osm links".format(osm_link_gdf.shape[0]))
+    #
+    # osm_link_gdf["u"] = osm_link_gdf.nodeIds.apply(lambda x: int(x[0]))
+    # osm_link_gdf["v"] = osm_link_gdf.nodeIds.apply(lambda x: int(x[-1]))
+    #
+    # print("---joining osm shst with osmnx data---")
+    # osm_link_gdf = pd.merge(
+    #     osm_link_gdf, osmnx_link_gdf, left_on=["wayId"], right_on=["osmid"], how="left"
+    # )
 
-    osmnx_link_gdf = osmnx_link.copy()
-
-    osmnx_link_gdf.drop_duplicates(subset=["osmid"], inplace=True)
-    osmnx_link_gdf.drop(["length", "u", "v", "geometry"], axis=1, inplace=True)
-
-    print(
-        "shst extraction has {} geometries".format(osm_link_gdf.id.nunique())
-    )
-    print("shst extraction has {} osm links".format(osm_link_gdf.shape[0]))
-
-    osm_link_gdf["u"] = osm_link_gdf.nodeIds.apply(lambda x: int(x[0]))
-    osm_link_gdf["v"] = osm_link_gdf.nodeIds.apply(lambda x: int(x[-1]))
-
-    print("---joining osm shst with osmnx data---")
-    osm_link_gdf = pd.merge(
-        osm_link_gdf, osmnx_link_gdf, left_on=["wayId"], right_on=["osmid"], how="left"
-    )
-
-    reverse_osm_link_gdf = osm_link_gdf[
-        (osm_link_gdf.oneWay == False)
-        & (osm_link_gdf.forwardReferenceId != osm_link_gdf.backReferenceId)
-        & (osm_link_gdf.u != osm_link_gdf.v)
+    # get two-way links
+    reverse_osm_link_gdf = link_gdf[
+        (link_gdf.oneWay == False)
+        & (link_gdf.forwardReferenceId != link_gdf.backReferenceId)
+        & (link_gdf.u != link_gdf.v)
         ].copy()
 
-    print(
-        "shst extraction has {} two-way osm links".format(reverse_osm_link_gdf.shape[0])
-    )
-    print(
-        "and they are {} geometrys".format(reverse_osm_link_gdf.id.nunique())
+    print('shst extraction has {} two-way OSM Ways, {} geometries'.format(
+        reverse_osm_link_gdf.shape[0],
+        reverse_osm_link_gdf.id.nunique())
     )
 
+    # revert their u, v, forwardReferenceId, backReferenceId to create links of the opposite direction
     reverse_osm_link_gdf.rename(
         columns={
             "u": "v",
@@ -112,41 +173,38 @@ def add_two_way_osm(link_gdf, osmnx_link):
         },
         inplace=True,
     )
-
+    # add tag to links of the opposite direction
     reverse_osm_link_gdf["reverse_out"] = 1
 
-    osm_link_gdf = pd.concat(
-        [osm_link_gdf, reverse_osm_link_gdf], sort=False, ignore_index=True
+    # concatenate the reversed links and the initial links
+    link_all_gdf = pd.concat(
+        [link_gdf, reverse_osm_link_gdf], sort=False, ignore_index=True
     )
 
-    osm_link_gdf.rename(
-        columns={
-            "forwardReferenceId": "shstReferenceId",
-            "geometryId": "shstGeometryId",
-        },
-        inplace=True,
-    )
+    # update "forwardReferenceId" and "backReferenceId": assign the former as shstReferenceId because the link now only
+    # represent the 'forward' direction, dropping the latter because the opposite link is represented by another row
+    link_all_gdf.rename(columns={"forwardReferenceId": "shstReferenceId",
+                                 "geometryId": "shstGeometryId"},
+                        inplace=True,
+                        )
+    link_all_gdf.drop("backReferenceId", axis=1, inplace=True)
 
-    osm_link_gdf.drop("backReferenceId", axis=1, inplace=True)
-
-    print(
-        "after join, ther are {} osm links from shst extraction, \
-    out of which there are {} links that do not have osm info, \
-    due to shst extraction (default tile 181224) contains {} osm ids that are not included in latest OSM extraction, \
-    e.g. private streets, closed streets.".format(
-            len(osm_link_gdf),
-            len(osm_link_gdf[osm_link_gdf.osmid.isnull()]),
-            osm_link_gdf[osm_link_gdf.osmid.isnull()].wayId.nunique(),
+    print('after adding the opposite link of two-way OSM Ways, the ShSt-derived OSM Ways have {} OSM links,\
+    {} geometries, {} ShSt references'.format(
+        link_all_gdf.shape[0],
+        link_all_gdf.shstGeometryId.nunique(),
+        link_all_gdf.groupby(["shstReferenceId", "shstGeometryId"]).count().shape[0]
         )
     )
 
-    print(
-        "after join, there are {} shst referencies".format(
-            osm_link_gdf.groupby(["shstReferenceId", "shstGeometryId"]).count().shape[0]
+    print('of these links, {} are missing OSM extracts info, due to shst extracts (default tile 181224) containing\
+     {} osmids that are not included in the latest OSM extracts, e.g. private streets, closed streets.'.format(
+            link_all_gdf.loc[link_all_gdf.osmid.isnull()].shape[0],
+            link_all_gdf.loc[link_all_gdf.osmid.isnull()].wayId.nunique(),
         )
     )
 
-    return osm_link_gdf
+    return link_all_gdf
 
 
 def consolidate_osm_way_to_shst_link(osm_link):
@@ -155,11 +213,11 @@ def consolidate_osm_way_to_shst_link(osm_link):
     
     Parameters
     ----------
-    osm link with shst info
+    osm_link: ShSt-derived OSM Ways with a number of link attributes
     
     return
     ----------
-    shst link with osm info
+    ShSt geometry based links with the same link attributes
     
     """
     osm_link_gdf = osm_link.copy()
@@ -301,8 +359,8 @@ def create_node_gdf(link_gdf):
         forward_link_gdf[["v", "toIntersectionId", "v_point"]].rename(columns={"v": "osm_node_id",
                                                                                "toIntersectionId": "shst_node_id",
                                                                                "v_point": "geometry"})],
-                          sort=False,
-                          ignore_index=True)
+        sort=False,
+        ignore_index=True)
 
     # drop duplicates
     point_gdf.drop_duplicates(subset=["osm_node_id", "shst_node_id"], inplace=True)
@@ -412,7 +470,7 @@ def read_shst_extract(path, suffix):
 
 def highway_attribute_list_to_value(x, highway_to_roadway_dict, roadway_hierarchy_dict):
     """
-    clean up osm highway, and map to standard roadway
+    clean up osm highway for ShSt links with more than one OSM Ways
 
     Assumption:
     - if multiple OSM ways of the same SHST link have the same roadway type (converted from 'highway'), use that type
