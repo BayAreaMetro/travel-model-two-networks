@@ -73,26 +73,26 @@ Prepare third party data for SharedStreets matching, including: remove duplicate
 * SFCTA Stick network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/sfcta/SanFrancisco_links.shp`
 * ACTC network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/actc_model/AlamedaCo_MASTER_20190410_no_cc.shp`
 * CCTA network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/ccta_model/ccta_2015_network/ccta_2015_network.shp`
-* PEMS count, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/mtc/pems_period.csv`
 
 ##### Output:
-Two sets of data for each third-party data source, one set only contains unique identifier for each link and link geometry (`[data_source]_[1-14].in.geojson`), which will be used in SharedStreet matching in step4b - using the entire dataset would substantially increase run time; the other set contains all link attributes (`[data_source]_raw.geojson`), which will be joined back to matched links in step4d.   
+One set of data only containing unique identifier for each link and link geometry (`[data_source]_[1-14].in.geojson`), which will be used in SharedStreet matching in step4b - including all link attributes would substantially increase run time   
 * TomTom network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TomTom/tomtom[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TomTom/tomtom_raw.geojson`
 * TM2 non-Marion version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_raw.geojson`
 * TM2 Marin version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_raw.geojson`
 * SFCTA Stick network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/sfcta/sfcta_raw.geojson`
 * ACTC network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/actc/actc_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/actc/actc_raw.geojson`
 * CCTA network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/ccta/ccta_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/ccta/ccta_raw.geojson`
-* PEMS count, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/pems.in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/pems_raw.geojson`
+
+Additionally, a geopackage (with each data source in a layer) containing all link attributes which will be joined back to matched links in step4d, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/modified_all_attrs.gpkg`
 
 #### [step4b_third_party_shst_match.sh](step4b_third_party_shst_match.sh)
-Matche third party datasets to SharedStreets References using various rules.
+Match third party datasets to SharedStreets References using various rules.
 
 ##### Input: 
 * Output of step4a
 
 ##### Output: 
-Folder `[ROOT_OUTPUT_DATA_DIR]/interim/step4b_third_party_shst_match`, containing the following data and sub-folders. For each input geojson file, up to two files are created - one containing successfully matched links (`[]_matched.geojson`), the other containing links failed to match (`[]_unmatched.geojson`). 
+Folder `[ROOT_OUTPUT_DATA_DIR]/interim/step4b_third_party_shst_match`, containing the following data and sub-folders. For each input geojson file, up to two files are created - one containing successfully matched links (`[]_matched.geojson`) whose link attributes from the corresponding data sources will be merged into the base network (ShSt+OSM) in the next step, the other containing links failed to match (`[]_unmatched.geojson`), which can be used for QAQC. 
 * TOMTOM data:
   * `/TomTom/bike_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
   * `/TomTom/car_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
@@ -133,7 +133,7 @@ Merge the SharedStreets match results in step4b with the base networks data crea
 * Input:
   * Base networks including links and shapes from step3
   * Third party data ShSt match results from step4b
-  * PEMs conflation result from step4c 
+  * PEMS count, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/mtc/pems_period.csv`
 
 * Output:
   * Network Standard link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'

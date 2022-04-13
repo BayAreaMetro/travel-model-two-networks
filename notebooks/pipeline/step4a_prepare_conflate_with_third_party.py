@@ -13,19 +13,22 @@ Inputs: third-party data sources, including -
 Outputs: two sets of data for each of the above sources:
     - data only with 'geometry' and identification, to be used in SharedStreet matching;
       also partitioned to match ShSt sub-region boundaries
-    - data with all attributes, to be joined back to the SharedStreet matching result  
+    - modified_all_attrs.gpkg: data with all link attributes, to be joined back to the SharedStreet matching result  
 
 """
-from methods import *
+import datetime, os
+import methods
+import pandas as pd
+import geopandas as gpd
 import fiona
+from shapely.geometry import Point, shape, LineString
 from pyproj import CRS
 from network_wrangler import WranglerLogger, setupLogging
-from datetime import datetime
 
 #####################################
 # EPSG requirement
 # TARGET_EPSG = 4326
-lat_lon_epsg_str = 'epsg:{}'.format(str(LAT_LONG_EPSG))
+lat_lon_epsg_str = 'epsg:{}'.format(str(methods.LAT_LONG_EPSG))
 WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
 
 #####################################
@@ -42,35 +45,34 @@ INPUT_TM2_Marin_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'TM2_Marin', 'mtc_
 INPUT_SFCTA_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'sfcta', 'SanFrancisco_links.shp')
 INPUT_CCTA_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'ccta_model', 'ccta_2015_network', 'ccta_2015_network.shp')
 INPUT_ACTC_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'actc_model', 'AlamedaCo_MASTER_20190410_no_cc.shp')
-INPUT_PEMS_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'mtc', 'pems_period.csv')
 
 # sub-region boundary polygons to split third-party data
-BOUNDARY_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries')
+BOUNDARY_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', 'modified')
 
 # third-party network data outputs
-THIRD_PARTY_MODIFIED_DATA_DIR = os.path.join(OUTPUT_DATA_DIR, 'external', 'step4a_third_party_data', 'modified')
-OUTPUT_TomTom_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'TomTom')
-OUTPUT_TM2_nonMarin_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'TM2_nonMarin')
-OUTPUT_TM2_Marin_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'TM2_Marin')
-OUTPUT_SFCTA_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'sfcta')
-OUTPUT_CCTA_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'ccta')
-OUTPUT_ACTC_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'actc')
-OUTPUT_PEMS_DIR = os.path.join(THIRD_PARTY_MODIFIED_DATA_DIR, 'pems')
+THIRD_PARTY_MODIFIED_DIR = os.path.join(OUTPUT_DATA_DIR, 'external', 'step4a_third_party_data', 'modified')
+OUTPUT_TomTom_DIR = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'TomTom')
+OUTPUT_TM2_nonMarin_DIR = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'TM2_nonMarin')
+OUTPUT_TM2_Marin_DIR = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'TM2_Marin')
+OUTPUT_SFCTA_DIR = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'sfcta')
+OUTPUT_CCTA_DIR = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'ccta')
+OUTPUT_ACTC_DIR = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'actc')
+OUTPUT_ALL_ATTRS_GPKG = os.path.join(THIRD_PARTY_MODIFIED_DIR, 'modified_all_attrs.gpkg')
 
 
 if __name__ == '__main__':
     # create output directories if not exist
     for i in [OUTPUT_TomTom_DIR, OUTPUT_TM2_nonMarin_DIR, OUTPUT_TM2_Marin_DIR,
-              OUTPUT_SFCTA_DIR, OUTPUT_CCTA_DIR, OUTPUT_ACTC_DIR, OUTPUT_PEMS_DIR]:
+              OUTPUT_SFCTA_DIR, OUTPUT_CCTA_DIR, OUTPUT_ACTC_DIR]:
         if not os.path.exists(i):
             WranglerLogger.info('create output folder: {}'.format(i))
             os.makedirs(i)
 
     # setup logging
     LOG_FILENAME = os.path.join(
-        OUTPUT_DATA_DIR, 'external', 'step4a_third_party_data',
+        THIRD_PARTY_MODIFIED_DIR,
         "step4a_prepare_third_party_data_for_conflation_{}.info.log".format(
-            datetime.now().strftime("%Y_%m_%d__%H_%M_%S")),
+            datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")),
     )
     setupLogging(LOG_FILENAME, LOG_FILENAME.replace('info', 'debug'))
 
@@ -100,7 +102,7 @@ if __name__ == '__main__':
     tomtom_raw_gdf["tomtom_link_id"] = range(1, len(tomtom_raw_gdf) + 1)
 
     # Partition tomtom by sub-region boundaries for shst match
-    WranglerLogger.info('exporting partitioned TomTom data and raw data to {}'.format(OUTPUT_TomTom_DIR))
+    WranglerLogger.info('exporting partitioned TomTom data to {}'.format(OUTPUT_TomTom_DIR))
     for i in range(14):
         boundary_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
         sub_tomtom_gdf = tomtom_raw_gdf[tomtom_raw_gdf.intersects(boundary_gdf.geometry.unary_union)].copy()
@@ -110,7 +112,8 @@ if __name__ == '__main__':
             driver="GeoJSON")
 
     # export modified raw data for merging the conflation results back
-    tomtom_raw_gdf.to_file(os.path.join(OUTPUT_TomTom_DIR, 'tomtom_raw.geojson'), driver="GeoJSON")
+    WranglerLogger.info('exporting TomTom all attributes as a layer to {}'.format(OUTPUT_ALL_ATTRS_GPKG))
+    tomtom_raw_gdf.to_file(OUTPUT_ALL_ATTRS_GPKG, layer='tomtom_allAttrs', driver='GPKG')
 
     WranglerLogger.info('finished preparing TomTom data')
     WranglerLogger.debug('TomTom has the following attributes: {}'.format(list(tomtom_raw_gdf)))
@@ -144,7 +147,7 @@ if __name__ == '__main__':
         tm2_link_roadway_gdf.groupby(["A", "B"]).count().shape[0]))
 
     # Partition TM2 Non Marin for shst Match
-    WranglerLogger.info('exporting TM2_nonMarin partitioned data and raw data to {}'.format(OUTPUT_TM2_nonMarin_DIR))
+    WranglerLogger.info('exporting TM2_nonMarin partitioned data to {}'.format(OUTPUT_TM2_nonMarin_DIR))
     for i in range(14):
         boundary_gdf = gpd.read_file(
             os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
@@ -161,10 +164,8 @@ if __name__ == '__main__':
             tm2_link_roadway_gdf.NAME.str.contains('Vista Monta')) & (
                 tm2_link_roadway_gdf.NAME != 'Vista Montara C'), 'NAME'] = 'Vista Montana'
 
-    WranglerLogger.info('export TM2_nonMarin with all attributes')
-    tm2_link_roadway_gdf.to_file(
-        os.path.join(OUTPUT_TM2_nonMarin_DIR, 'tm2nonMarin_raw.geojson'),
-        driver="GeoJSON")
+    WranglerLogger.info('exporting TM2_nonMarin all attributes as a layer to {}'.format(OUTPUT_ALL_ATTRS_GPKG))
+    tm2_link_roadway_gdf.to_file(OUTPUT_ALL_ATTRS_GPKG, layer='tm2nonMarin_allAttrs', driver='GPKG')
 
     WranglerLogger.info('finished preparing TM2_nonMarin data')
     WranglerLogger.debug('TM2_nonMarin data has the following attributes: {}'.format(list(tm2_link_roadway_gdf)))
@@ -198,7 +199,7 @@ if __name__ == '__main__':
         tm2_marin_link_roadway_gdf.groupby(["A", "B"]).count().shape[0]))
 
     # Partition TM2 Marin for shst Match
-    WranglerLogger.info('exporting TM2_Marin partitioned data and raw data to {}'.format(OUTPUT_TM2_Marin_DIR))
+    WranglerLogger.info('exporting TM2_Marin partitioned data to {}'.format(OUTPUT_TM2_Marin_DIR))
     for i in range(14):
         boundary_gdf = gpd.read_file(
             os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
@@ -215,9 +216,8 @@ if __name__ == '__main__':
             tm2_marin_link_roadway_gdf.NAME.str.contains('Vista Monta')) & (
                 tm2_marin_link_roadway_gdf.NAME != 'Vista Montara C'), 'NAME'] = 'Vista Montana'
 
-    WranglerLogger.info('export TM2_Marin with all attributes')
-    tm2_marin_link_roadway_gdf.to_file(
-        os.path.join(OUTPUT_TM2_Marin_DIR, 'tm2Marin_raw.geojson'), driver="GeoJSON")
+    WranglerLogger.info('exporting TM2_nonMarin all attributes as a layer to {}'.format(OUTPUT_ALL_ATTRS_GPKG))
+    tm2_marin_link_roadway_gdf.to_file(OUTPUT_ALL_ATTRS_GPKG, layer='tm2Marin_allAttrs', driver='GPKG')
 
     WranglerLogger.info('finished preparing TM2_Marin data')
     WranglerLogger.debug('TM2_Marin data has the following attributes: {}'.format(list(tm2_marin_link_roadway_gdf)))
@@ -250,8 +250,8 @@ if __name__ == '__main__':
         os.path.join(OUTPUT_SFCTA_DIR, 'sfcta_in.geojson'), driver="GeoJSON")
 
     # export modified raw data for merging the conflation results back
-    sfcta_SF_roadway_gdf.to_file(
-        os.path.join(OUTPUT_SFCTA_DIR, 'sfcta_raw.geojson'), driver="GeoJSON")
+    WranglerLogger.info('exporting SFCTA all attributes as a layer to {}'.format(OUTPUT_ALL_ATTRS_GPKG))
+    sfcta_SF_roadway_gdf.to_file(OUTPUT_ALL_ATTRS_GPKG, layer='sfcta_allAttrs', driver='GPKG')
 
     WranglerLogger.info('finished preparing SFCTA data')
     WranglerLogger.debug('SFTCA data has the following attributes: {}'.format(list(sfcta_SF_roadway_gdf)))
@@ -287,6 +287,7 @@ if __name__ == '__main__':
         ccta_gdf.shape[0], ccta_gdf.ID.nunique()))
 
     # Partition CCTA data for shst Match
+    WranglerLogger.info('exporting CCTA partitioned data to {}'.format(OUTPUT_CCTA_DIR))
     for i in range(14):
         boundary_gdf = gpd.read_file(
             os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
@@ -297,8 +298,8 @@ if __name__ == '__main__':
             driver="GeoJSON")
 
     # export raw network data for merging back the conflation result
-    ccta_gdf.to_file(
-        os.path.join(OUTPUT_CCTA_DIR, 'ccta_raw.geojson'), driver="GeoJSON")
+    WranglerLogger.info('exporting CCTA all attributes as a layer to {}'.format(OUTPUT_ALL_ATTRS_GPKG))
+    ccta_gdf.to_file(OUTPUT_ALL_ATTRS_GPKG, layer='ccta_allAttrs', driver='GPKG')
 
     WranglerLogger.info('finished preparing CCTA data')
     WranglerLogger.debug('CCTA data has the following attributes: {}'.format(list(ccta_gdf)))
@@ -322,6 +323,7 @@ if __name__ == '__main__':
     WranglerLogger.info('converted to projection: ' + str(actc_raw_gdf.crs))
 
     # Partition ACTC data for shst Match
+    WranglerLogger.info('exporting ACTC partitioned data to {}'.format(OUTPUT_CCTA_DIR))
     for i in range(14):
         boundary_gdf = gpd.read_file(
             os.path.join(BOUNDARY_DIR, 'boundary_{}.geojson'.format(str(i + 1))))
@@ -332,38 +334,8 @@ if __name__ == '__main__':
             driver="GeoJSON")
 
     # export raw network data for merging back the conflation result
-    actc_raw_gdf.to_file(
-        os.path.join(OUTPUT_ACTC_DIR, 'actc_raw.geojson'), driver="GeoJSON")
+    WranglerLogger.info('exporting ACTC all attributes as a layer to {}'.format(OUTPUT_ALL_ATTRS_GPKG))
+    actc_raw_gdf.to_file(OUTPUT_ALL_ATTRS_GPKG, layer='actc_allAttrs', driver='GPKG')
 
     WranglerLogger.info('finished preparing ACTC data')
     WranglerLogger.debug('ACTC data has the following attributes: {}'.format(list(actc_raw_gdf)))
-
-    #####################################
-    # Prepare PEMS for conflation
-
-    WranglerLogger.info('loading PEMS data from {}'.format(INPUT_PEMS_FILE))
-    pems_df = pd.read_csv(INPUT_PEMS_FILE)
-    WranglerLogger.debug('PEMS data info: \n{}'.format(pems_df.info()))
-
-    # create geometry from X and Y
-    pems_df["geometry"] = [Point(xy) for xy in zip(pems_df.longitude, pems_df.latitude)]
-
-    pems_gdf = gpd.GeoDataFrame(pems_df, geometry=pems_df["geometry"],
-                                crs=CRS(lat_lon_epsg_str))
-
-    # drop records missing geometry
-    pems_gdf = pems_gdf[~((pems_gdf.longitude.isnull()) | (pems_gdf.latitude.isnull()))]
-
-    # drop duplicates
-    pems_gdf.drop_duplicates(subset=["station", "longitude", "latitude"], inplace=True)
-    WranglerLogger.info('after dropping duplicates, {} rows left'.format(pems_gdf.shape[0]))
-
-    # export for conflation
-    pems_gdf[["station", "longitude", "latitude", "geometry"]].to_file(
-        os.path.join(OUTPUT_PEMS_DIR, 'pems.in.geojson'), driver="GeoJSON")
-
-    # export modified pems_gdf
-    pems_gdf.to_file(os.path.join(OUTPUT_PEMS_DIR, 'pems_raw.geojson'), driver="GeoJSON")
-
-    WranglerLogger.info('finished preparing PEMS data')
-    WranglerLogger.debug('PEMS data has the following attributes: {}'.format(list(pems_gdf)))
