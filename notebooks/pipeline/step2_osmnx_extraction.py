@@ -1,18 +1,24 @@
 USAGE = """
 
-Extracts complete OSM attributes using OSMNX.
+Extracts complete OSM attributes using OSMNX and saves to disk
 
 set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
-Input: polygon boundary file for the region, [INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp
-Output: nodes and links data from OSMNX in geojson format,
-    [OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/link.geojson,
-    [OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/node.geojson
-    Plus geopackage with these layers, [OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/osmnx_extraction.gpkg
+
+Input: 
+ - polygon boundary file for the region: 
+   [INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp
+Output: 
+ - nodes and links data geofeather format for subsequent steps, as this format is fast to read/write: 
+   [OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/[node,link].feather[.crs]: 
+ - nodes and links data in geopackage format for visualization; layers are link & node:
+   [OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/osmnx_extraction.gpkg: 
+
 """
-import datetime, json, os, sys
+import datetime, os, sys
 import methods
 import geopandas as gpd
 import osmnx as ox
+import geofeather
 from pyproj import CRS
 from network_wrangler import WranglerLogger, setupLogging
 
@@ -25,11 +31,14 @@ WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
 #####################################
 # inputs and outputs
 
-INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
-OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
-INPUT_POLYGON   = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
-OUTPUT_DIR      = os.path.join(OUTPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
-OUTPUT_GPKG     = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")
+INPUT_DATA_DIR      = os.environ['INPUT_DATA_DIR']
+OUTPUT_DATA_DIR     = os.environ['OUTPUT_DATA_DIR']
+INPUT_POLYGON       = os.path.join(INPUT_DATA_DIR,  'external', 'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
+OUTPUT_DIR          = os.path.join(OUTPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
+OUTPUT_FEATHER_LINK = os.path.join(OUTPUT_DIR, "link.feather")
+OUTPUT_FEATHER_NODE = os.path.join(OUTPUT_DIR, "node.feather")
+OUTPUT_GPKG         = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")
+
 
 # way (link) tags we want from OSM
 # OSM Defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
@@ -111,50 +120,33 @@ if __name__ == '__main__':
     for column in link_gdf.select_dtypes([object]):
         WranglerLogger.info("column {} value_counts:\n{}".format(column, link_gdf[column].value_counts()))
 
-    # writing out OSM link data to geojson
-    WranglerLogger.info('writing out OSM links to geojson at {}'.format(OUTPUT_DIR))
-    # this is already a geodataframe, why not just use the geodatframe to_file() method?
-    # for now, have both methods to understand the difference in the output
-    # I will remove one of them shortly
-    link_gdf.to_file(os.path.join(OUTPUT_DIR, 'link2.geojson'), driver='GeoJSON')
+    # write links to geopackage
     WranglerLogger.info('writing out OSM links to gpkg at {}'.format(OUTPUT_DIR))
     link_gdf.to_file(OUTPUT_GPKG, layer="link", driver="GPKG")
-
-    # this is the old way this was done
-    link_prop = link_gdf.drop("geometry", axis=1).columns.tolist()
-    link_geojson = methods.link_df_to_geojson(link_gdf, link_prop)
-    with open(os.path.join(OUTPUT_DIR, 'link.geojson'), "w") as f:
-        json.dump(link_geojson, f)
-    del link_prop
-    del link_geojson
+    # write links to geofeather
+    WranglerLogger.info('writing out OSM links to geofeather at {}'.format(OUTPUT_FEATHER_LINK))
+    geofeather.to_geofeather(link_gdf, OUTPUT_FEATHER_LINK)
     del link_gdf
     WranglerLogger.info('link objects deleted')
 
     # writing out OSM node data to geojson
     WranglerLogger.info('getting nodes from osmnx data')
     node_gdf = ox.graph_to_gdfs(osmnx_graph, nodes=True, edges=False)
+    node_gdf.reset_index(inplace=True) # geofeather requires reset index
     WranglerLogger.info('node_gdf has {} records, with columns: \n{}'.format(
         node_gdf.shape[0], list(node_gdf)))
     # report value_types for ordinal columns
     for column in node_gdf.select_dtypes([object]):
         WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts()))
 
-    # writing out OSM node data to geojson
-    WranglerLogger.info('writing out OSM nodes to geojson at {}'.format(OUTPUT_DIR))
-    # this is already a geodataframe, why not just use the geodatframe to_file() method?
-    node_gdf.to_file(os.path.join(OUTPUT_DIR, 'node2.geojson'), driver="GeoJSON")
+    # writing out OSM node data to geopackage
     WranglerLogger.info('writing out OSM links to gpkg at {}'.format(OUTPUT_DIR))
     node_gdf.to_file(OUTPUT_GPKG, layer="node", driver="GPKG")
+    # write nodes to geofeather
+    WranglerLogger.info('writing out OSM nodes to geofeather at {}'.format(OUTPUT_FEATHER_NODE))
+    geofeather.to_geofeather(node_gdf, OUTPUT_FEATHER_NODE)
 
-    # this is the old way this was done
-    node_prop = node_gdf.drop("geometry", axis=1).columns.tolist()
-    node_geojson = methods.point_df_to_geojson(node_gdf, node_prop)
-    with open(os.path.join(OUTPUT_DIR, 'node.geojson'), "w") as f:
-        json.dump(node_geojson, f)
-    del node_prop
-    del node_geojson
     del node_gdf
     WranglerLogger.info('node objects deleted')
-
 
     WranglerLogger.info('finished writing out OSM links and nodes')
