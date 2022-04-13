@@ -1,14 +1,13 @@
+import glob,json,math,os
 import pandas as pd
 import numpy as np
 import geopandas as gpd
-import glob
-import os
 from shapely.geometry import Point
 import osmnx as ox
-import math
 from shapely.geometry import Point, shape, LineString
 from scipy.spatial import cKDTree
-import json
+from network_wrangler import WranglerLogger
+import geofeather
 
 # some parameters shared by Pipeline scripts
 LAT_LONG_EPSG = 4326
@@ -21,10 +20,42 @@ def extract_osm_link_from_shst_row(
         osm_from_shst_link_list: list,
 ):
     """
-    get all osm ways for each shst record
+    get all osm ways for each shst record from the metadata
+    https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-osm-metadata
+
+    sharedstreet metadata example: 
+    { 
+      "gisMetadata": [], 
+      "geometryId": "7fd0e10cc0a694e96701e99c7c6f4525", 
+      "osmMetadata": {
+        "waySections": [ 
+          {
+            "nodeIds": ["65324846", "4763953722", "4763953417"], 
+            "wayId": "255168049", 
+            "roadClass": "Tertiary", 
+            "oneWay": false, 
+            "roundabout": false, 
+            "link": false, 
+            "name": ""
+          }, 
+          {
+            "nodeIds": ["4763953417", "65324849"], 
+            "wayId": "514442927", 
+            "roadClass": "Tertiary", 
+            "oneWay": false, 
+            "roundabout": false, 
+            "link": false, 
+            "name": ""
+          }
+        ], 
+        "name": "18th Street"
+      }
+    }
     """
     link_df = pd.DataFrame(row.get("metadata").get("osmMetadata").get("waySections"))
     link_df["geometryId"] = row.get("metadata").get("geometryId")
+    # keep track of how many waySections correspond to this row
+    link_df['waySections_len'] = len(link_df)
 
     osm_from_shst_link_list.append(link_df)
 
@@ -454,16 +485,16 @@ def read_shst_extract(path, suffix):
     """
     shst_gdf = pd.DataFrame()
 
-    shst_file = glob.glob(path + "/**/" + suffix, recursive=True)
-    print("----------start reading shst extraction data-------------")
-    for i in shst_file:
-        print("reading shst extraction data : ", i)
-        new = gpd.read_file(i)
-        new['source'] = i
-        shst_gdf = pd.concat([shst_gdf, new],
+    shst_files = glob.glob(path + "/**/" + suffix, recursive=True)
+    WranglerLogger.info("----------start reading shst extraction data-------------")
+    for shst_file in shst_files:
+        WranglerLogger.info("reading shst extraction data: {}".format(shst_file))
+        new_gdf = geofeather.from_geofeather(shst_file)
+        new_gdf['source'] = shst_file
+        shst_gdf = pd.concat([shst_gdf, new_gdf],
                              ignore_index=True,
                              sort=False)
-    print("----------finished reading shst extraction data-------------")
+    WranglerLogger.info("----------finished reading shst extraction data-------------")
 
     return shst_gdf
 

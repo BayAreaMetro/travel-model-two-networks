@@ -14,14 +14,14 @@ set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
 
 import pandas as pd
 import geopandas as gpd
-import json
+import geofeather  # this is fast
+import datetime, json, os, sys
 
 from methods import extract_osm_links_from_shst_extraction, osm_link_with_shst_info, merge_osmnx_attributes_with_shst,\
     add_two_way_osm, fill_na, consolidate_osm_way_to_shst_link, highway_attribute_list_to_value, create_node_gdf, \
-    read_shst_extract, link_df_to_geojson, point_df_to_geojson, os
+    read_shst_extract, link_df_to_geojson, point_df_to_geojson
 
 from network_wrangler import WranglerLogger, setupLogging
-from datetime import datetime
 
 #####################################
 # inputs and outputs
@@ -31,9 +31,9 @@ OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 
 # OSM extraction and SharedStreet extraction
 OSM_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
-OSM_LINK_FILE = os.path.join(OSM_EXTRACT_DIR, 'link.geojson')
+OSM_LINK_FILE   = os.path.join(OSM_EXTRACT_DIR, 'link.feather')
 ## OSM_NODE_FILE = os.path.join(OSM_EXTRACT_DIR, 'node.geojson')
-SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step1_shst_extraction')
+SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step1_shst_extracts')
 # lookups for roadway type and network type
 HIGHWAY_TO_ROADWAY_CROSSWALK_FILE = os.path.join(INPUT_DATA_DIR, 'lookups', 'highway_to_roadway.csv')
 NETWORK_TYPE_LOOKUP_FILE = os.path.join(INPUT_DATA_DIR, 'lookups', 'network_type_indicator.csv')
@@ -50,19 +50,19 @@ if __name__ == '__main__':
     # setup logging
     LOG_FILENAME = os.path.join(
         SHST_WITH_OSM_DIR,
-        "step3_join_shst_extraction_with_osm_{}.info.log".format(datetime.now().strftime("%Y_%m_%d__%H_%M_%S")),
+        "step3_join_shst_extraction_with_osm_{}.info.log".format(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")),
     )
     setupLogging(LOG_FILENAME, LOG_FILENAME.replace('info', 'debug'))
 
 
     #####################################
     # load OSM data
-    WranglerLogger.info('reading osmnx data')
-    osmnx_link_gdf = gpd.read_file(OSM_LINK_FILE)
+    WranglerLogger.info('Reading osmnx links from {}'.format(OSM_LINK_FILE))
+    osmnx_link_gdf = geofeather.from_geofeather(OSM_LINK_FILE)
     # looks like osm node data is not used ?
     # osmnx_node_gdf = gpd.read_file(OSM_NODE_FILE)
-    WranglerLogger.info('finished reading osmnx data')
-    WranglerLogger.info('osmnx link data has the following attributes: {}'.format(list(osmnx_link_gdf)))
+    WranglerLogger.info('Finished reading {} rows of osmnx links'.format(len(osmnx_link_gdf)))
+    WranglerLogger.info('osmnx link data has the following attributes:\n{}'.format(osmnx_link_gdf.dtypes))
     # WranglerLogger.info('osmnx node data has the following attributes: {}'.format(list(osmnx_node_gdf)))
 
     WranglerLogger.info(osmnx_link_gdf.head(3))
@@ -102,37 +102,39 @@ if __name__ == '__main__':
 
     # 1. load and consolidate ShSt extracts
     WranglerLogger.info('1. Loading SharedStreets extracts from {}'.format(SHST_EXTRACT_DIR))
-    shst_link_gdf = read_shst_extract(SHST_EXTRACT_DIR, "*.out.geojson")
+    shst_link_gdf = read_shst_extract(SHST_EXTRACT_DIR, "*.out.feather")
     WranglerLogger.info('finished reading SharedStreet data')
     WranglerLogger.info('SharedStreet data has the following fields: {}'.format(list(shst_link_gdf)))
     WranglerLogger.info(shst_link_gdf.head(3))
 
     WranglerLogger.info('Dropping duplicates')
     WranglerLogger.info('.. before removing duplicates, shst extract has {} geometries'.format(shst_link_gdf.shape[0]))
-    shst_link_non_dup_gdf = shst_link_gdf.drop_duplicates(
-        subset=['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'])
-    WranglerLogger.info('...after removing duplicates, {} geometries remain'.format(shst_link_non_dup_gdf.shape[0]))
+    shst_link_gdf.drop_duplicates(
+        subset=['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'], inplace=True)
+    WranglerLogger.info('...after removing duplicates, {} geometries remain'.format(shst_link_gdf.shape[0]))
 
     # 2. expand ShSt extract into OSM Ways
     # Note: this step is memory intensive and time-consuming
     WranglerLogger.info('2. Expanding ShSt extract into OSM Ways with ShSt-specific link attributes')
     # osm_from_shst_link_list = []
     #
-    # temp = shst_link_non_dup_gdf.apply(lambda x: extract_osm_link_from_shst_shape(x, osm_from_shst_link_list),
+    # temp = shst_link_gdf.apply(lambda x: extract_osm_link_from_shst_shape(x, osm_from_shst_link_list),
     #                                    axis=1)
     # osm_from_shst_link_df = pd.concat(osm_from_shst_link_list)
-    osmWays_from_shst_df = extract_osm_links_from_shst_extraction(shst_link_non_dup_gdf)
+    osmWays_from_shst_df = extract_osm_links_from_shst_extraction(shst_link_gdf)
     WranglerLogger.info('shst extracts has {} geometries, {} OSM Ways'.format(
         osmWays_from_shst_df.geometryId.nunique(),
         osmWays_from_shst_df.shape[0])
     )
     WranglerLogger.debug('osmWays_from_shst_df has the following OSM fields: {}'.format(list(osmWays_from_shst_df)))
     WranglerLogger.debug(osmWays_from_shst_df.head())
+    WranglerLogger.debug("osmWays_from_shst_df.waySedtions_len.value_counts():\n{}".format(osmWays_from_shst_df.waySections_len.value_counts()))
+    # temp for debugging
 
     # 3. add ShSt-specific attributes to ShSt-derived OSM Ways
     WranglerLogger.info('3. Adding ShSt-specific attributes to ShSt-derived OSM Ways')
     osmWays_from_shst_gdf = osm_link_with_shst_info(osmWays_from_shst_df,
-                                                    shst_link_non_dup_gdf)
+                                                    shst_link_gdf)
     WranglerLogger.debug('osmWays_from_shst_gdf has the following fields: {}'.format(list(osmWays_from_shst_gdf)))
     WranglerLogger.debug(osmWays_from_shst_gdf.head())
 
@@ -206,7 +208,7 @@ if __name__ == '__main__':
     #####################################
     # create shapes based on the network links
     WranglerLogger.info('Creating shapes from links')
-    shape_gdf = shst_link_non_dup_gdf[shst_link_non_dup_gdf.id.isin(link_gdf.shstGeometryId.tolist())]
+    shape_gdf = shst_link_gdf[shst_link_gdf.id.isin(link_gdf.shstGeometryId.tolist())]
     WranglerLogger.info('In the end, there are {} geometries'.format(str(shape_gdf.shape[0])))
 
     # create node gdf from links and attach network type variable
