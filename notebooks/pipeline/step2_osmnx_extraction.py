@@ -44,36 +44,38 @@ OUTPUT_GPKG         = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")
 # OSM Defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
 # as useful_tags_way
 WAY_TAGS = [
-    'highway',          # https://wiki.openstreetmap.org/wiki/Key:highway
-    'tunnel',           # https://wiki.openstreetmap.org/wiki/Key:tunnel
-    'bridge',           # https://wiki.openstreetmap.org/wiki/Key:bridge
-    'junction',         # https://wiki.openstreetmap.org/wiki/Key:junction
-    'oneway',           # https://wiki.openstreetmap.org/wiki/Key:oneway
-    'name',             # https://wiki.openstreetmap.org/wiki/Key:name
-    'ref',              # https://wiki.openstreetmap.org/wiki/Key:ref
-    'width',            # https://wiki.openstreetmap.org/wiki/Key:width
-    'est_width',        # https://wiki.openstreetmap.org/wiki/Key:est_width
-    'access',           # https://wiki.openstreetmap.org/wiki/Key:access
-    'area',             # https://wiki.openstreetmap.org/wiki/Key:area
-    'service',          # https://wiki.openstreetmap.org/wiki/Key:service
-    'maxspeed',         # https://wiki.openstreetmap.org/wiki/Key:maxspeed
+    'highway',              # https://wiki.openstreetmap.org/wiki/Key:highway
+    'tunnel',               # https://wiki.openstreetmap.org/wiki/Key:tunnel
+    'bridge',               # https://wiki.openstreetmap.org/wiki/Key:bridge
+    'junction',             # https://wiki.openstreetmap.org/wiki/Key:junction
+    'oneway',               # https://wiki.openstreetmap.org/wiki/Key:oneway
+    'name',                 # https://wiki.openstreetmap.org/wiki/Key:name
+    'ref',                  # https://wiki.openstreetmap.org/wiki/Key:ref
+    'width',                # https://wiki.openstreetmap.org/wiki/Key:width
+    'est_width',            # https://wiki.openstreetmap.org/wiki/Key:est_width
+    'access',               # https://wiki.openstreetmap.org/wiki/Key:access
+    'area',                 # https://wiki.openstreetmap.org/wiki/Key:area
+    'service',              # https://wiki.openstreetmap.org/wiki/Key:service
+    'maxspeed',             # https://wiki.openstreetmap.org/wiki/Key:maxspeed
     # lanes accounting
-    'lanes',            # https://wiki.openstreetmap.org/wiki/Key:lanes
-    'bus',              # https://wiki.openstreetmap.org/wiki/Key:bus
-    'hov',              # https://wiki.openstreetmap.org/wiki/Key:hov
-    'taxi',             # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:taxi',       # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:hov',        # https://wiki.openstreetmap.org/wiki/Key:hov
-    'shoulder',         # https://wiki.openstreetmap.org/wiki/Key:shoulder
-    'lanes:bus',        # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'lanes:backward',   # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'lanes:forward',    # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'lanes:both_ways',  # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'turn',             # https://wiki.openstreetmap.org/wiki/Key:turn
-    'turn:lanes',       # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
+    'lanes',                # https://wiki.openstreetmap.org/wiki/Key:lanes
+    'bus',                  # https://wiki.openstreetmap.org/wiki/Key:bus
+    'hov',                  # https://wiki.openstreetmap.org/wiki/Key:hov
+    'taxi',                 # https://wiki.openstreetmap.org/wiki/Key:taxi
+    'lanes:taxi',           # https://wiki.openstreetmap.org/wiki/Key:taxi
+    'lanes:hov',            # https://wiki.openstreetmap.org/wiki/Key:hov
+    'shoulder',             # https://wiki.openstreetmap.org/wiki/Key:shoulder
+    'lanes:bus',            # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
+    'lanes:backward',       # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'lanes:forward',        # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'lanes:both_ways',      # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'turn',                 # https://wiki.openstreetmap.org/wiki/Key:turn
+    'turn:lanes',           # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
+    'turn:lanes:backward',  # https://wiki.openstreetmap.org/wiki/Key:turn
+    'turn:lanes:forward'    # https://wiki.openstreetmap.org/wiki/Key:turn
     # active modes
-    'sidewalk',         # https://wiki.openstreetmap.org/wiki/Key:sidewalk
-    'cycleway',         # https://wiki.openstreetmap.org/wiki/Key:cycleway
+    'sidewalk',             # https://wiki.openstreetmap.org/wiki/Key:sidewalk
+    'cycleway',             # https://wiki.openstreetmap.org/wiki/Key:cycleway
 ]
 
 if __name__ == '__main__':
