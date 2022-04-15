@@ -61,9 +61,12 @@ WAY_TAGS = [
     'lanes',                # https://wiki.openstreetmap.org/wiki/Key:lanes
     'bus',                  # https://wiki.openstreetmap.org/wiki/Key:bus
     'hov',                  # https://wiki.openstreetmap.org/wiki/Key:hov
+    'hov:lanes',            # https://wiki.openstreetmap.org/wiki/Key:hov
+    'hov:lanes:forward',    # https://wiki.openstreetmap.org/wiki/Key:hov
+    'hov:lanes:backward',   # https://wiki.openstreetmap.org/wiki/Key:hov
+    'lanes:hov',            # https://wiki.openstreetmap.org/wiki/Key:hov
     'taxi',                 # https://wiki.openstreetmap.org/wiki/Key:taxi
     'lanes:taxi',           # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:hov',            # https://wiki.openstreetmap.org/wiki/Key:hov
     'shoulder',             # https://wiki.openstreetmap.org/wiki/Key:shoulder
     'lanes:bus',            # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
     'lanes:backward',       # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
