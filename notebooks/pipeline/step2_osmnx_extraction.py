@@ -91,7 +91,7 @@ if __name__ == '__main__':
     # setup logging
     LOG_FILENAME = os.path.join(
         OUTPUT_DIR,
-        "step2_osmnx_extraction_{}.info.log".format(datetime.datetime.now().strftime("%Y_%m_%d__%H_%M_%S")),
+        "step2_osmnx_extraction_{}.info.log".format(datetime.datetime.now().strftime("%Y%m%d__%H%M")),
     )
     setupLogging(LOG_FILENAME)
 
