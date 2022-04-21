@@ -33,3 +33,12 @@ notebooks/pipeline/network_wrangler_*.log
 *.log
 *.gpkg
 *.json
+*.crs
+*.feather
+*.cpg
+*.dbf
+*.prj
+*.sbn
+*.sbx
+*.shp
+*.shx
