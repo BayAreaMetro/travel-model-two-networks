@@ -40,48 +40,7 @@ OUTPUT_FEATHER_NODE = os.path.join(OUTPUT_DIR, "node.feather")
 OUTPUT_GPKG         = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")
 
 
-# way (link) tags we want from OSM
-# OSM Defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
-# as useful_tags_way
-WAY_TAGS = [
-    'highway',            # https://wiki.openstreetmap.org/wiki/Key:highway
-    'tunnel',             # https://wiki.openstreetmap.org/wiki/Key:tunnel
-    'bridge',             # https://wiki.openstreetmap.org/wiki/Key:bridge
-    'junction',           # https://wiki.openstreetmap.org/wiki/Key:junction
-    'oneway',             # https://wiki.openstreetmap.org/wiki/Key:oneway
-    'name',               # https://wiki.openstreetmap.org/wiki/Key:name
-    'ref',                # https://wiki.openstreetmap.org/wiki/Key:ref
-    'width',              # https://wiki.openstreetmap.org/wiki/Key:width
-    'est_width',          # https://wiki.openstreetmap.org/wiki/Key:est_width
-    'access',             # https://wiki.openstreetmap.org/wiki/Key:access
-    'area',               # https://wiki.openstreetmap.org/wiki/Key:area
-    'service',            # https://wiki.openstreetmap.org/wiki/Key:service
-    'maxspeed',           # https://wiki.openstreetmap.org/wiki/Key:maxspeed
-    # lanes accounting
-    'lanes',              # https://wiki.openstreetmap.org/wiki/Key:lanes
-    'lanes:backward',     # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'lanes:forward',      # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'lanes:both_ways',    # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'bus',                # https://wiki.openstreetmap.org/wiki/Key:bus
-    'lanes:bus',          # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'lanes:bus:forward',  # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'lanes:bus:backward', # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'hov',                # https://wiki.openstreetmap.org/wiki/Key:hov
-    'hov:lanes',          # https://wiki.openstreetmap.org/wiki/Key:hov
-    'hov:lanes:forward',  # https://wiki.openstreetmap.org/wiki/Key:hov
-    'hov:lanes:backward', # https://wiki.openstreetmap.org/wiki/Key:hov
-    'taxi',               # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:taxi',         # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:hov',          # https://wiki.openstreetmap.org/wiki/Key:hov
-    'shoulder',           # https://wiki.openstreetmap.org/wiki/Key:shoulder
-    'turn',               # https://wiki.openstreetmap.org/wiki/Key:turn
-    'turn:lanes',         # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
-    'turn:lanes:forward', # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
-    'turn:lanes:backward',# https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
-    # active modes
-    'sidewalk',             # https://wiki.openstreetmap.org/wiki/Key:sidewalk
-    'cycleway',             # https://wiki.openstreetmap.org/wiki/Key:cycleway
-]
+
 
 if __name__ == '__main__':
     # create output folder if not exist
@@ -93,7 +52,7 @@ if __name__ == '__main__':
     # setup logging
     LOG_FILENAME = os.path.join(
         OUTPUT_DIR,
-        "step2_osmnx_extraction_{}.info.log".format(datetime.datetime.now().strftime("%Y%m%d__%H%M")),
+        "step2_osmnx_extraction_{}.info.log".format(datetime.datetime.now().strftime("%Y%m%d_%H%M")),
     )
     setupLogging(LOG_FILENAME)
 
@@ -110,8 +69,8 @@ if __name__ == '__main__':
     WranglerLogger.info('dissolved into one polygon')
 
     # Request specific way tags from OSM
-    WranglerLogger.info("Requesting the following way tags from OSM: {}".format(WAY_TAGS))
-    ox.utils.config(useful_tags_way=WAY_TAGS)
+    WranglerLogger.info("Requesting the following way tags from OSM: {}".format(methods.OSM_WAY_TAGS))
+    ox.utils.config(useful_tags_way=methods.OSM_WAY_TAGS)
 
     # OSM extraction - Note: this is memory intensive (~15GB) and time-consuming (~50 min)
     WranglerLogger.info('starting osmnx extraction')
