@@ -8,10 +8,34 @@ Input:
  - polygon boundary file for the region: 
    [INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp
 Output: 
- - nodes and links data geofeather format for subsequent steps, as this format is fast to read/write: 
+ - Node and link data in geofeather format for subsequent steps, as this format is fast to read/write: 
    [OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/[node,link].feather[.crs]: 
- - nodes and links data in geopackage format for visualization; layers are link & node:
+ - Node and link data in geopackage format for visualization; layers are link & node:
    [OUTPUT_DATA_DIR]/external/step2_osmnx_extraction/osmnx_extraction.gpkg: 
+  
+   Data is fetched using osmnx.graph.graph_from_polygon() using simplify=False,
+   so there are typically multiple links per OSM way.  (This is because if simplify is True, 
+   OSMNx will aggregate some OSM ways into a single link, which we don't want; see a nice explanation 
+   of this process in OSMnx: Python for Street Networks: https://geoffboeing.com/2016/11/osmnx-python-street-networks/)
+
+   Link data includes columns:
+     * osmid: the OpenStreetMap way ID (e.g. 619590730 for this link: https://www.openstreetmap.org/way/619590730)
+     * geometry: the shape of the link
+     * length: the length of the link, in meters; this is added by OSMNx
+     * u, v: the OSM node ID of the start and end of the link.  However, OSMNx seems to still be doing some simplification 
+       under the hood, so these are often 0 rather than corresponding the the OSM values. For example, for OSM way 619590730 referenced above
+       (https://www.openstreetmap.org/way/619590730), the way is split into two links, and only one has the the u value, 
+       1723738865 (https://www.openstreetmap.org/node/1723738865); the rest are zeros.
+     * key: this is an OSMNx identifier for when multiple parallel links exist with the same u,v; key then distinguishes between them so
+       that (u,v,key) is unique.  I believe this is only relevant if `simplify=True`, however, as there are many links with (u,v,key)=(0,0,0)
+     * all the other columns are specified in methods.OSM_WAY_TAGS
+
+  Node data include columns:
+     * osmid: the OpenStreetMap node ID (e.g. 1723738865 for https://www.openstreetmap.org/node/1723738865).  However,
+       this is often missing and set to 0 even when real node IDs exist; see the discussion on the u,v columns in the link dataset above.
+     * y, x: latitude and longitude of the node
+     * some of the tags in methods.OSM_WAY_TAGS also have corresponding data for nodes so they're included here.  For the
+       set of tags we're using, this looks like it's only 'highway' and 'ref'
 
 """
 import datetime, os, sys
