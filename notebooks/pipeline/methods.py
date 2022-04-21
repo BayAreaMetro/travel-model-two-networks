@@ -1,4 +1,4 @@
-import glob,json,math,os
+import errno,glob,json,math,os
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -12,142 +12,227 @@ import geofeather
 # some parameters shared by Pipeline scripts
 LAT_LONG_EPSG = 4326
 
-shst_link_df_list = []
-
-
-def extract_osm_link_from_shst_row(
-        row: pd.Series,
-        osm_from_shst_link_list: list,
-):
+def extract_osm_links_from_shst_metadata(shst_gdf):
     """
-    get all osm ways for each shst record from the metadata
+    Expand each shst extract record into osm ways; the information from this is within the metadata for the row:
     https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-osm-metadata
 
-    sharedstreet metadata example: 
-    { 
-      "gisMetadata": [], 
-      "geometryId": "7fd0e10cc0a694e96701e99c7c6f4525", 
-      "osmMetadata": {
-        "waySections": [ 
-          {
-            "nodeIds": ["65324846", "4763953722", "4763953417"], 
-            "wayId": "255168049", 
-            "roadClass": "Tertiary", 
-            "oneWay": false, 
-            "roundabout": false, 
-            "link": false, 
-            "name": ""
-          }, 
-          {
-            "nodeIds": ["4763953417", "65324849"], 
-            "wayId": "514442927", 
-            "roadClass": "Tertiary", 
-            "oneWay": false, 
-            "roundabout": false, 
-            "link": false, 
-            "name": ""
-          }
-        ], 
-        "name": "18th Street"
-      }
-    }
+    The returned GeoDataFrame contains the following fields: 
+        'nodeIds'           : from SharedStreets OSM Metadata waySections, OSM node IDs as a list of strings (which are ints)
+        'wayId'             : from SharedStreets OSM Metadata waySections, OSM way ID as an int
+        'roadClass'         : from SharedStreets OSM Metadata waySections; string, I'm guessing it's from the highway tag?  https://wiki.openstreetmap.org/wiki/Key:highway#Roads
+        'oneWay'            : from SharedStreets OSM Metadata waySections; boolean, I'm guessing it's from the oneway tag?   https://wiki.openstreetmap.org/wiki/Key:oneway
+        'roundabout'        : from SharedStreets OSM Metadata waySections; boolean, I'm guessing it's from the junction tag? https://wiki.openstreetmap.org/wiki/Tag:junction%3Droundabout
+        'link'              : from SharedStreets OSM Metadata waySections; boolean, I'm guessing it's from the highway tag?  https://wiki.openstreetmap.org/wiki/Highway_link
+        'name'              : from SharedStreets OSM Metadata waySections; string
+        'waySections_len'   : from SharedStreets OSM Metadata waySections; number of waySections
+        'geometryId'        : from SharedStreets OSM Metadata
+        'u','v'             : from SharedStreets OSM Metadata waySections, first and last elements in nodeIds
+        'id'                : SharedStreets id, 32-character hex
+        'fromIntersectionId': SharedStreets ?, 32-character hex
+        'toIntersectionId'  : SharedStreets ?, 32-character hex
+        'forwardReferenceId': SharedStreets ?, 32-character hex
+        'backReferenceId'   : SharedStreets ?, 32-character hex
+        'geometry'          : SharedStreets geometry
     """
-    link_df = pd.DataFrame(row.get("metadata").get("osmMetadata").get("waySections"))
-    link_df["geometryId"] = row.get("metadata").get("geometryId")
-    # keep track of how many waySections correspond to this row
-    link_df['waySections_len'] = len(link_df)
 
-    osm_from_shst_link_list.append(link_df)
+    # It is fast to iterate through a list
+    WranglerLogger.debug("Converting shst_gdf metadata to list")
+    metadata_list = shst_gdf['metadata'].tolist()
+    WranglerLogger.debug("metadata_list is length {}; first 10 items: {}".format(len(metadata_list), metadata_list[:10]))
 
+    # sharedstreet metadata example: 
+    # { 
+    #   "gisMetadata": [], 
+    #   "geometryId": "7fd0e10cc0a694e96701e99c7c6f4525", 
+    #   "osmMetadata": {
+    #     "waySections": [ 
+    #       {
+    #         "nodeIds": ["65324846", "4763953722", "4763953417"], 
+    #         "wayId": "255168049", 
+    #         "roadClass": "Tertiary", 
+    #         "oneWay": false, 
+    #         "roundabout": false, 
+    #         "link": false, 
+    #         "name": ""
+    #       }, 
+    #       {
+    #         "nodeIds": ["4763953417", "65324849"], 
+    #         "wayId": "514442927", 
+    #         "roadClass": "Tertiary", 
+    #         "oneWay": false, 
+    #         "roundabout": false, 
+    #         "link": false, 
+    #         "name": ""
+    #       }
+    #     ], 
+    #     "name": "18th Street"
+    #   }
+    # }
 
-def extract_osm_links_from_shst_extraction(shst_gdf):
-    """
-    expand each shst extract record into osm ways
-    The resulting dataframe contains the following fields: ['nodeIds', 'wayId', 'roadClass', 'oneWay', 'roundabout',
-                                                            'link', 'name', 'geometryId', 'u', 'v']
-    """
-    # create a list to store value
+    # will create a list of dicts to make a dataframe
+    # each dict will be an OSM way
     osm_from_shst_link_list = []
+    for metadata in metadata_list:
+        name = metadata.get('osmMetadata').get('name')
+        waySections_len = len(metadata.get('osmMetadata').get('waySections'))
+        geometryId = metadata.get('geometryId')
+        for osm_way in metadata.get('osmMetadata').get('waySections'):
+            osm_dict = osm_way
+            osm_dict['name'] = name
+            osm_dict['waySections_len'] = waySections_len
+            osm_dict['geometryId'] = geometryId
+            osm_from_shst_link_list.append(osm_dict)
+    WranglerLogger.debug("osm_from_shst_link_list has length {}".format(len(osm_from_shst_link_list)))
 
-    # convert each row into list of values and add to osm_from_shst_link_list. "extract_osm_link_from_shst_row"
-    # extracts data without returning a value, hence "temp = " in the following method call
-    temp = shst_gdf.apply(lambda x: extract_osm_link_from_shst_row(x, osm_from_shst_link_list),
-                          axis=1)
+    osm_from_shst_link_df = pd.DataFrame.from_records(osm_from_shst_link_list)
+    # convert wayId to numeric and waySections_len to int8
+    osm_from_shst_link_df["wayId"]           = osm_from_shst_link_df["wayId"].astype(int)
+    osm_from_shst_link_df["waySections_len"] = osm_from_shst_link_df["waySections_len"].astype(np.int8)
 
-    # make dataframe
-    osm_from_shst_link_df = pd.concat(osm_from_shst_link_list)
+    WranglerLogger.debug("osm_from_shst_link_df has length {} and dtypes:\n{}".format(len(osm_from_shst_link_df),
+        osm_from_shst_link_df.dtypes))
+    # link                 bool
+    # name               object
+    # nodeIds            object
+    # oneWay               bool
+    # roadClass          object
+    # roundabout           bool
+    # wayId               int32
+    # waySections_len      int8
+    # geometryId         object        
+    WranglerLogger.debug("osm_from_shst_link_df.head:\n{}".format(osm_from_shst_link_df.head()))
 
-    # add fields to represent each link's starting_node ("u") and ending_node ("v")
-    osm_from_shst_link_with_uv_df = get_osm_way_starting_ending_nodes(osm_from_shst_link_df)
+    WranglerLogger.debug("osm_ways_from_shst_df.waySections_len.value_counts():\n{}".format(
+        osm_from_shst_link_df.waySections_len.value_counts()))
 
-    return osm_from_shst_link_with_uv_df
+    # add fields to represent each link's starting_node ("u") and ending_node ("v") from the nodeIds field
+    osm_from_shst_link_df['u'] = osm_from_shst_link_df.nodeIds.apply(lambda x: int(x[0]))
+    osm_from_shst_link_df['v'] = osm_from_shst_link_df.nodeIds.apply(lambda x: int(x[-1]))
 
+    # add remaining fields from shared streets geodataframe, including geometry, which makes it a GeoDataFrame with the SharedStreets geometries
+    osm_from_shst_link_gdf = pd.merge(
+        left     = shst_gdf[['id','fromIntersectionId','toIntersectionId','forwardReferenceId','backReferenceId','geometry']],
+        right    = osm_from_shst_link_df,
+        how      = "left",
+        left_on  = "id",
+        right_on = "geometryId"
+    )
 
-def get_osm_way_starting_ending_nodes(link_gdf):
+    WranglerLogger.debug("osm_from_shst_link_gdf has length {} and dtypes:\n{}".format(len(osm_from_shst_link_gdf),
+        osm_from_shst_link_gdf.dtypes))
+    # link                      bool
+    # name                    object
+    # nodeIds                 object
+    # oneWay                    bool
+    # roadClass               object
+    # roundabout                bool
+    # wayId                    int32
+    # waySections_len           int8
+    # geometryId              object
+    # u                        int64
+    # v                        int64
+    # id                      object
+    # fromIntersectionId      object
+    # toIntersectionId        object
+    # forwardReferenceId      object
+    # backReferenceId         object
+    # geometry              geometry
+    WranglerLogger.debug("osm_from_shst_link_gdf.head:\n{}".format(osm_from_shst_link_gdf.head()))
+    return osm_from_shst_link_gdf
+
+def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     """
-    get links starting node_id ("u") and ending node_id ("v"), based on a list of nodes that each link contains in
-    field "nodeIds", and add "u", "v" to the link dataframe
-    """
-    if 'nodeIds' in list(link_gdf):
-        link_gdf['u'] = link_gdf.nodeIds.apply(lambda x: int(x[0]))
-        link_gdf['v'] = link_gdf.nodeIds.apply(lambda x: int(x[-1]))
-    else:
-        print('the link data is missing the "nodeIds" field')
-    return link_gdf
-
-
-def osm_link_with_shst_info(link_df, shst_gdf):
-    """
-    add ShSt-specific link attributes back to OSM ways derived from ShSt extraction records
-    
-    Parameters
-    --------------
-    link_df: osm ways derived from shst extraction
-    shst_gdf: ShSt extraction
-    
-    return
-    --------------
-    complete ShSt-derived OSM ways
-    """
-    osm_link_gdf = pd.merge(link_df,
-                            shst_gdf.drop(["roadClass", "metadata", "source"], axis=1),
-                            how="left",
-                            left_on="geometryId",
-                            right_on="id")
-
-    return osm_link_gdf
-
-
-def merge_osmnx_attributes_with_shst(link_gdf, osmnx_link):
-    """
-    merges link attributes from OSM extract into ShSt-derived OSM Ways dataframe
+    merges link attributes and geometries from OSM extract into ShSt-derived OSM Ways dataframe
 
     Parameters
     ------------
-    link_gdf: osm Ways from shst extracts
-    osmnx_link: osm extract
+    osm_ways_from_shst_gdf: osm Ways from shst extracts
+    osmnx_link_gdf: osm extract
+    OUTPUT_DIR: temporary for writing debug file(s)
 
     Return
     ------------
-    OSM Ways with all attributes from ShSt extracts and OSM extracts
+    OSMNX GeoDataFrame (including all the tags) merged with OSM ways from SharedStreets metadata
     """
-    osm_ways_from_shst_gdf = link_gdf.copy()
-    osm_ways_from_shst_gdf["wayId"] = osm_ways_from_shst_gdf["wayId"].astype(int)
-    osm_ways_from_shst_gdf.drop("name", axis=1, inplace=True)
+    WranglerLogger.debug("merge_osmnx_attributes_with_shst called with osm_ways_from_shst_gdf (type {}) and osmnx_link_gdf (type {})".format(
+        type(osm_ways_from_shst_gdf), type(osmnx_link_gdf)))
 
-    osmnx_link_gdf = osmnx_link.copy()
-    osmnx_link_gdf.drop_duplicates(subset=['osmid'], inplace=True)
-    osmnx_link_gdf.drop(['length', 'u', 'v', 'geometry'], axis=1, inplace=True)
+    # rename name to make it clear it's from shst metadata
+    osm_ways_from_shst_gdf.rename(columns={"name":"name_shst_metadata"}, inplace=True)
 
-    osm_ways_all_atts = pd.merge(
-        osm_ways_from_shst_gdf, osmnx_link_gdf, left_on=['wayId'], right_on=['osmid'], how="left"
+    # OSM way links can be chopped up into many nodes, presumably to give it shape
+    # for example, this link has a single osmid but 10 nodes:
+    # https://www.openstreetmap.org/way/5149900
+    # consolidate these -- we expect all the columns to be the same except for length, u, v and the geometry
+    group_cols = list(osmnx_link_gdf.columns.values)
+    for remove_col in ['length','u','v','geometry']:
+        group_cols.remove(remove_col)
+
+    # Log some debug info about this
+    osmnx_link_gdf['dupes'] = osmnx_link_gdf.duplicated(subset=group_cols, keep=False)
+    WranglerLogger.debug("duplicates in osmnx_link_gdf based on {}: {} rows; head(50):\n{}".format(group_cols,
+        osmnx_link_gdf['dupes'].sum(), osmnx_link_gdf.loc[ osmnx_link_gdf['dupes'] == True ].head(50)
+    ))
+
+    # And consolidate to the each OSM way we will drop the geometry here so it's a df now
+    # Note: I would have liked to use geopandas.dissolve() and keep/aggregate the geometry but I don't think it's possible
+    osmnx_link_df = osmnx_link_gdf[group_cols].drop_duplicates()
+
+    # to keep this as a dataframe, call merge with geodataframe as left
+    # https://geopandas.org/en/stable/docs/user_guide/mergingdata.html#attribute-joins
+    osmnx_shst_gdf = pd.merge(
+        left      = osm_ways_from_shst_gdf, 
+        right     = osmnx_link_df, 
+        left_on   = 'wayId',
+        right_on  = 'osmid', 
+        how       = 'outer',
+        indicator = True,
+        suffixes  = ['_shst', '_osmnx']
     )
-    return osm_ways_all_atts
+    # recode indicator to be more clear
+    osmnx_shst_gdf['_merge'] = osmnx_shst_gdf['_merge'].cat.rename_categories({
+        'both'      : 'both', 
+        'left_only' : 'osmnx_only', 
+        'right_only': 'shst_only'
+    })
+
+    WranglerLogger.debug("osmnx_shst_gdf type {}, len {}, dtypes:\n{}".format(
+        type(osmnx_shst_gdf), len(osmnx_shst_gdf), osmnx_shst_gdf.dtypes
+    ))
+    WranglerLogger.debug("osmnx_shst_gdf.head():\n{}".format(osmnx_shst_gdf.head()))
+
+    # These rows have geometry_osmx geometry as None -- so they were in the sharedstreets extract only
+    # I believe they are "private" ways since we pass network_type='all' rather than 'all_private'
+    # to osmnx.graph.graph_from_polygon() in step2
+    #   Log and remove
+    null_osmnx_geom_df = osmnx_shst_gdf.loc[ pd.isnull(osmnx_shst_gdf.geometry) ].copy()
+    WranglerLogger.debug("osmnx_shst_gdf has {} rows with null geometry; head:\n{}".format(
+        len(null_osmnx_geom_df), null_osmnx_geom_df.head()
+    ))
+    WranglerLogger.debug('null_osmnx_geom._merge.value_counts():\n{}'.format(null_osmnx_geom_df._merge.value_counts()))
+    # temporary(?): drop null shst columns and join with their geometries and save them to look at
+    null_osmnx_geom_df.reset_index(drop=True, inplace=True)
+    null_osmnx_geom_df.drop(columns=['id','fromIntersectionId','toIntersectionId','forwardReferenceId','backReferenceId','geometry'], inplace=True)
+    null_osmnx_geom_gdf = pd.merge(
+        left    = osmnx_link_gdf[['osmid','geometry']],
+        right   = null_osmnx_geom_df,
+        how     = 'right',
+        on      = 'osmid',
+    )
+    DEBUG_FILE = os.path.join(OUTPUT_DIR, 'shst_osm_ways_without_osmx_ways.feather')
+    geofeather.to_geofeather(null_osmnx_geom_gdf, DEBUG_FILE)
+    WranglerLogger.debug('Wrote null_osmnx_geom_gdf to {}'.format(DEBUG_FILE))
+
+    # remove those rows which didn't correspond to osmnx ways
+    osmnx_shst_gdf = osmnx_shst_gdf.loc[ pd.notnull(osmnx_shst_gdf.geometry) ]
+    osmnx_shst_gdf.reset_index(drop=True, inplace=True)
+    return osmnx_shst_gdf
 
 
 def add_two_way_osm(link_gdf):
     """
-    for osm Ways with oneway = False, add the reverse direction to complete
+    Selects rows that represent two-way links, and adds the reverse direction of that link
 
     Parameters
     ------------
@@ -158,37 +243,16 @@ def add_two_way_osm(link_gdf):
     ------------
     complete osm links from shst extraction records
     """
-    # osm_link_gdf = link_gdf.copy()
-    # osm_link_gdf["wayId"] = osm_link_gdf["wayId"].astype(int)
-    # osm_link_gdf.drop("name", axis=1, inplace=True)
-    #
-    # osmnx_link_gdf = osmnx_link.copy()
-    #
-    # osmnx_link_gdf.drop_duplicates(subset=["osmid"], inplace=True)
-    # osmnx_link_gdf.drop(["length", "u", "v", "geometry"], axis=1, inplace=True)
-    #
-    # print(
-    #     "shst extraction has {} geometries".format(osm_link_gdf.id.nunique())
-    # )
-    # print("shst extraction has {} osm links".format(osm_link_gdf.shape[0]))
-    #
-    # osm_link_gdf["u"] = osm_link_gdf.nodeIds.apply(lambda x: int(x[0]))
-    # osm_link_gdf["v"] = osm_link_gdf.nodeIds.apply(lambda x: int(x[-1]))
-    #
-    # print("---joining osm shst with osmnx data---")
-    # osm_link_gdf = pd.merge(
-    #     osm_link_gdf, osmnx_link_gdf, left_on=["wayId"], right_on=["osmid"], how="left"
-    # )
-
+    WranglerLogger.debug("add_two_way_osm with type(link_gdf): {}".format(type(link_gdf)))
     # get two-way links
-    reverse_osm_link_gdf = link_gdf[
-        (link_gdf.oneWay == False)
-        & (link_gdf.forwardReferenceId != link_gdf.backReferenceId)
-        & (link_gdf.u != link_gdf.v)
-        ].copy()
+    reverse_osm_link_gdf = link_gdf.loc[
+        (link_gdf.oneWay == False) &
+        (link_gdf.forwardReferenceId != link_gdf.backReferenceId) &
+        (link_gdf.u != link_gdf.v)
+    ].copy()
 
-    print('shst extraction has {} two-way OSM Ways, which contain {} geometries'.format(
-        reverse_osm_link_gdf.shape[0],
+    WranglerLogger.debug('osmnx_shst_gdf has {} two-way OSM ways, which contain {} geometries'.format(
+        len(reverse_osm_link_gdf),
         reverse_osm_link_gdf.id.nunique())
     )
 
@@ -204,36 +268,50 @@ def add_two_way_osm(link_gdf):
         },
         inplace=True,
     )
-    # add tag to links of the opposite direction
-    reverse_osm_link_gdf["reverse_out"] = 1
+    # reverse the geometries themselves, enabling offset and arrows to work when this is drawn in GIS
+    reverse_osm_link_gdf.reset_index(inplace=True)
+    forward_linestrings = reverse_osm_link_gdf['geometry'].tolist()
+    WranglerLogger.debug('forward_linestrings len={} type(forward_linestrings[0])={} first 5={}'.format(
+        len(forward_linestrings), type(forward_linestrings[0]), forward_linestrings[:5]
+    ))
+    reverse_linestrings = []
+    for forward_linestring in forward_linestrings:
+        # forward_linstring is a shapely.geometry.LineString object
+        reverse_coordinates = list(forward_linestring.coords)[::-1]
+        reverse_linestrings.append(LineString(reverse_coordinates))
+    reverse_osm_link_gdf['geometry'] = reverse_linestrings
+
+    # add variable to note that it's a reverse that we've created
+    link_gdf["reverse"] = 0
+    reverse_osm_link_gdf["reverse"] = 1
 
     # concatenate the reversed links and the initial links
     link_all_gdf = pd.concat(
         [link_gdf, reverse_osm_link_gdf], sort=False, ignore_index=True
     )
 
-    # update "forwardReferenceId" and "backReferenceId": assign the former as shstReferenceId because the link now only
-    # represent the 'forward' direction, dropping the latter because the opposite link is represented by another row
+    # update "forwardReferenceId" and "backReferenceId": rename the former to shstReferenceId because the link now only
+    # represents the 'forward' direction; drop the latter because the opposite link is represented by another row
     link_all_gdf.rename(columns={"forwardReferenceId": "shstReferenceId",
                                  "geometryId": "shstGeometryId"},
                         inplace=True,
                         )
-    link_all_gdf.drop("backReferenceId", axis=1, inplace=True)
+    link_all_gdf.drop(columns=["backReferenceId"], inplace=True)
 
-    print('after adding the opposite link of two-way OSM Ways, the ShSt-derived OSM Ways have {} OSM links,\
-    {} geometries, {} ShSt references'.format(
+    WranglerLogger.debug('after adding the opposite link of two-way OSM Ways, the ShSt-derived OSM Ways have {} OSM links, {} geometries, {} ShSt references'.format(
         link_all_gdf.shape[0],
         link_all_gdf.shstGeometryId.nunique(),
         link_all_gdf.groupby(["shstReferenceId", "shstGeometryId"]).count().shape[0]
         )
     )
 
-    print('of these links, {} are missing OSM extracts info, due to shst extracts (default tile 181224) containing\
+    WranglerLogger.debug('of these links, {} are missing OSM extracts info, due to shst extracts (default tile 181224) containing\
      {} osmids that are not included in the latest OSM extracts, e.g. private streets, closed streets.'.format(
             link_all_gdf.loc[link_all_gdf.osmid.isnull()].shape[0],
             link_all_gdf.loc[link_all_gdf.osmid.isnull()].wayId.nunique(),
         )
     )
+    WranglerLogger.debug("add_two_way_osm returning link_all_gdf with type(link_all_gdf): {}".format(type(link_all_gdf)))
 
     return link_all_gdf
 
@@ -253,64 +331,61 @@ def consolidate_osm_way_to_shst_link(osm_link):
     """
     osm_link_gdf = osm_link.copy()
 
+    GROUPBY_COLS = [
+        "shstReferenceId",
+        "id",
+        "shstGeometryId",
+        "fromIntersectionId",
+        "toIntersectionId"
+    ]
     agg_dict = {"geometry": lambda x: x.iloc[0],
                 "u": lambda x: x.iloc[0],
-                "v": lambda x: x.iloc[-1]}
+                "v": lambda x: x.iloc[-1],
+                "waySections_len": "first"}
 
+    def make_tuple(x):
+        """ Agregation function, tuple-izes series with multiple values
+        """
+        T = tuple(x)
+        # if it's a series with one object, e.g. 
+        # 0    [2401244716, 2401244713, 2401244712] 
+        # dtype: object
+        if isinstance(x, pd.Series) and x.dtype == object and len(x) == 1:
+            return T
+
+        if len(T) > 1:
+            if isinstance(T, (pd.Series, pd.Index, np.ndarray)) and len(T) != 1:
+                WranglerLogger.debug("T:{} type:{} len:{}".format(T,type(T),len(T)))
+            return T
+
+        if isinstance(T[0], (pd.Series, pd.Index, np.ndarray)) and len(T[0]) != 1:
+            WranglerLogger.debug("T[0]:{} type:{} len:{}".format(T[0],type(T[0]),len(T[0])))
+            WranglerLogger.debug("=> T:{} type:{} len:{}".format(T,type(T),len(T)))
+            WranglerLogger.debug("=> x:{} type:{} len:{}".format(x,type(x),len(x)))
+        return T[0]
+
+    # these columns are going to be aggregated by making them into tuples, so convert them to object dtypes
+    object_columns = {}
     for c in osm_link_gdf.columns:
-        if c in [
-            "link",
-            "nodeIds",
-            "oneWay",
-            "roadClass",
-            "roundabout",
-            "wayId",
-            "access",
-            "area",
-            "bridge",
-            "est_width",
-            "highway",
-            "junction",
-            "key",
-            "landuse",
-            "lanes",
-            "maxspeed",
-            "name",
-            "oneway",
-            "ref",
-            "service",
-            "tunnel",
-            "width",
-            'cycleway',
-            'sidewalk',
-            'turn:lanes',
-            'bus',
-            'hov',
-            'taxi',
-            'lanes:taxi',
-            'lanes:hov',
-            'shoulder',
-            'lanes:bus',
-            'lanes:backward',
-            'lanes:forward',
-            'lanes:both_ways',
-            'turn'
-        ]:
-            agg_dict.update(
-                {c: lambda x: list(x) if len(list(x)) > 1 else list(x)[0]}
-            )
+        # groupby cols, no need to aggregate these
+        if c in GROUPBY_COLS: continue
+        # these aggregation methods are already defined
+        if c in agg_dict.keys(): continue
+        # use make_tuple() for the rest
+        agg_dict[c] = make_tuple
+        object_columns[c] = object
 
-    print("......start aggregating osm segments to one shst link for forward links")
+    WranglerLogger.debug("......start aggregating osm segments to one shst link for forward links")
     forward_link_gdf = osm_link_gdf[osm_link_gdf.reverse_out == 0].copy()
 
+    WranglerLogger.debug('forward_link_gdf.dtypes:\n{}'.format(forward_link_gdf.dtypes))
+    WranglerLogger.debug('forward_link_gdf.head:\n{}'.format(forward_link_gdf.head(30)))
+    WranglerLogger.debug('agg_dict:{}'.format(agg_dict))
+
     if len(forward_link_gdf) > 0:
-        forward_link_gdf = forward_link_gdf.groupby(
-            ["shstReferenceId",
-             "id",
-             "shstGeometryId",
-             "fromIntersectionId",
-             "toIntersectionId"]
-        ).agg(agg_dict).reset_index()
+        forward_link_gdf = forward_link_gdf.astype(dtype=object_columns)
+        WranglerLogger.debug("converted forward_link_gdf columns for groupby to:\n{}".format(forward_link_gdf.dtypes))
+        forward_link_gdf = forward_link_gdf.groupby(GROUPBY_COLS).agg(agg_dict).reset_index()
         forward_link_gdf["forward"] = 1
     else:
         forward_link_gdf = None
@@ -370,7 +445,7 @@ def create_node_gdf(link_gdf):
     """
     print("-------start creating shst nodes--------")
     # geometry only matches for forward direction
-    forward_link_gdf = link_gdf[link_gdf.forward == 1].copy()
+    forward_link_gdf = link_gdf[link_gdf.reverse == 0].copy()
 
     # create point geometry from shst linestring
     forward_link_gdf["u_point"] = forward_link_gdf.apply(lambda x: Point(list(x.geometry.coords)[0]), axis=1)
@@ -486,15 +561,22 @@ def read_shst_extract(path, suffix):
     shst_gdf = pd.DataFrame()
 
     shst_files = glob.glob(path + "/**/" + suffix, recursive=True)
-    WranglerLogger.info("----------start reading shst extraction data-------------")
+
+    # raise an error if no files are found
+    if len(shst_files) == 0:
+        raise FileNotFoundError(errno.ENOENT, path + "/**/" + suffix)
+
+    WranglerLogger.debug("----------start reading shst extraction data-------------")
     for shst_file in shst_files:
-        WranglerLogger.info("reading shst extraction data: {}".format(shst_file))
+        (dirname,filename) = os.path.split(shst_file)
+        WranglerLogger.debug("reading shst extraction data: {}".format(filename))
         new_gdf = geofeather.from_geofeather(shst_file)
         new_gdf['source'] = shst_file
         shst_gdf = pd.concat([shst_gdf, new_gdf],
                              ignore_index=True,
                              sort=False)
-    WranglerLogger.info("----------finished reading shst extraction data-------------")
+    WranglerLogger.debug("----------finished reading shst extraction data-------------")
+    WranglerLogger.debug("shst extraction head:{}\n".format(shst_gdf.head(10)))
 
     return shst_gdf
 
