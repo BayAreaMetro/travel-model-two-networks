@@ -21,6 +21,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=USAGE, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('input_geofeather_dir', help='Input directory for geofeather files')
     parser.add_argument('output_gpkg',   help='Output GeoPackage file')
+    parser.add_argument('input_geofeather_files', nargs='*', help='Optional: names of geofeather files. If none specified, will convert all found in input_geofeather_dir')
 
     # setup logging
     pd.set_option("display.max_rows", 500)
@@ -46,6 +47,10 @@ if __name__ == '__main__':
 
     # read geofeather files and output them to geopackage
     for full_filename in file_list:
+        (dirname, filename) = os.path.split(full_filename)
+        if len(args.input_geofeather_files) > 0 and filename not in args.input_geofeather_files: 
+            continue
+        
         WranglerLogger.info("Reading {}".format(full_filename))
         input_gdf = geofeather.from_geofeather(full_filename)
         WranglerLogger.info("Initial dtypes:\n{}".format(input_gdf.dtypes))
