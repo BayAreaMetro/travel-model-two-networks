@@ -1,4 +1,4 @@
-import errno, glob, json, math, os
+import errno, glob, math, os, sys
 import pandas as pd
 import numpy as np
 import geopandas as gpd
@@ -213,27 +213,28 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     # OSM way links can be chopped up into many nodes, presumably to give it shape
     # for example, this link has a single osmid but 10 nodes:
     # https://www.openstreetmap.org/way/5149900
-    # consolidate these -- we expect all the columns to be the same except for length, u, v and the geometry
-    group_cols = list(osmnx_link_gdf.columns.values)
-    for remove_col in ['length', 'u', 'v', 'geometry']:
-        group_cols.remove(remove_col)
+    # consolidate these -- we expect all the columns to be the same except for length, u, v, key and the geometry
+    osm_way_match_cols = list(osmnx_link_gdf.columns.values)
+    for remove_col in ['length', 'u', 'v', 'key', 'geometry']:
+        osm_way_match_cols.remove(remove_col)
 
     # Log some debug info about this
-    osmnx_link_gdf['dupes'] = osmnx_link_gdf.duplicated(subset=group_cols, keep=False)
-    WranglerLogger.debug("duplicates in osmnx_link_gdf based on {}: {} rows; head(50):\n{}".format(group_cols,
-                                                                                                   osmnx_link_gdf[
-                                                                                                       'dupes'].sum(),
-                                                                                                   osmnx_link_gdf.loc[
-                                                                                                       osmnx_link_gdf[
-                                                                                                           'dupes'] == True].head(
-                                                                                                       50)
-                                                                                                   ))
+    osmnx_link_gdf['dupes'] = osmnx_link_gdf.duplicated(subset=osm_way_match_cols, keep=False)
+    WranglerLogger.debug("duplicates in osmnx_link_gdf based on {}: {} rows; " \
+        "head(50):\n{}".format(osm_way_match_cols, osmnx_link_gdf['dupes'].sum(), 
+        osmnx_link_gdf.loc[ osmnx_link_gdf['dupes'] == True].head(50)))
 
-    # And consolidate to the each OSM way we will drop the geometry here so it's a df now. The "geometry" field in the
+    # And consolidate to the each OSM; way we will drop the geometry here so it's a df now. The "geometry" field in the
     # merged "osmnx_shst_gdf" is from sharedstreets, therefore multiple OSM ways derived from one sharedstreet record
-    # would have the same geometry.
+    # would have the same geometry.  Retain the length of the OSM way (in meters)
     # Note: I would have liked to use geopandas.dissolve() and keep/aggregate the geometry but I don't think it's possible
-    osmnx_link_df = osmnx_link_gdf[group_cols].drop_duplicates()
+    agg_dict = {}
+    for col in osm_way_match_cols:
+        if col=='osmid': continue # this is our groupby key
+        agg_dict[col] = 'first' # these are all the same for each osmid so take the first
+    agg_dict['length'] = 'sum' # sum this one
+    osmnx_link_df = osmnx_link_gdf.groupby(by=['osmid']).agg(agg_dict).reset_index(drop=False)
+    WranglerLogger.debug("After aggregating to osm ways, osmnx_link_df len={}, head():\n{}".format(len(osmnx_link_df), osmnx_link_df.head()))
 
     # to keep this as a dataframe, call merge with geodataframe as left
     # https://geopandas.org/en/stable/docs/user_guide/mergingdata.html#attribute-joins
@@ -272,16 +273,16 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     ))
     WranglerLogger.debug('null_shst_geom_df._merge.value_counts():\n{}'.format(null_shst_geom_df._merge.value_counts()))
     # temporary(?): drop null shst columns, and add geometry from osmnx extracts, and save them to look at
-    null_shst_geom_df.reset_index(drop=True, inplace=True)
     null_shst_geom_df.drop(
         columns=['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'],
         inplace=True)
     null_shst_geom_gdf = pd.merge(
-        left=osmnx_link_gdf[['osmid', 'geometry']],
-        right=null_shst_geom_df,
-        how='right',
-        on='osmid',
+        left = osmnx_link_gdf[['osmid', 'geometry']],
+        right= null_shst_geom_df,
+        how  = 'right',
+        on   = 'osmid',
     )
+    null_shst_geom_gdf.reset_index(drop=True, inplace=True)
     OSMNX_ONLY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'osmnx_ways_without_shst.feather')
     geofeather.to_geofeather(null_shst_geom_gdf, OSMNX_ONLY_DEBUG_FILE)
     WranglerLogger.debug('Wrote null_osmnx_geom_gdf to {}'.format(OSMNX_ONLY_DEBUG_FILE))
@@ -303,7 +304,8 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     # export rows with different oneway_shst and oneway_osmnx
     # TODO: decide which one is more accurate, and modify function 'add_two_way_osm()' accordingly. Now it uses oneway_shst.
     oneway_diff = osmnx_shst_gdf.loc[(osmnx_shst_gdf.oneway_shst != osmnx_shst_gdf.oneway_osmnx) &
-                                     osmnx_shst_gdf.oneway_osmnx.notnull()]
+                                     osmnx_shst_gdf.oneway_osmnx.notnull()].copy()
+    oneway_diff.reset_index(drop=True, inplace=True)
     ONEWAY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'shst_osmnx_oneway_diff.feather')
     geofeather.to_geofeather(oneway_diff, ONEWAY_DEBUG_FILE)
     WranglerLogger.debug('Wrote oneway_diff to {}'.format(ONEWAY_DEBUG_FILE))
@@ -311,34 +313,35 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     return osmnx_shst_gdf
 
 
-def add_two_way_osm(link_gdf):
+def add_two_way_osm(osmnx_shst_gdf):
     """
     Selects rows that represent two-way links, and adds the reverse direction of that link
 
     Parameters
     ------------
-    link_gdf: osm Ways from shst extracts, with links attributes also from OSM extract
-    osmnx_link: osm extraction
+    osmnx_shst_gdf: osm ways from shst extracts, with links attributes also from OSM extract
 
     return
     ------------
     complete osm links from shst extraction records
     """
-    WranglerLogger.debug("add_two_way_osm with type(link_gdf): {}".format(type(link_gdf)))
-    # get two-way links
-    reverse_osm_link_gdf = link_gdf.loc[
-        (link_gdf.oneWay == False) &
-        (link_gdf.forwardReferenceId != link_gdf.backReferenceId) &
-        (link_gdf.u != link_gdf.v)
+    WranglerLogger.debug("add_two_way_osm with type(osmnx_shst_gdf): {}".format(type(osmnx_shst_gdf)))
+    # get two-way links; basing our judgement on what these are using the SharedStreet assesment
+    # of oneway because the geometries are from SharedStreets, which combines some link+reverse
+    # links into a single bi-directional link sometimes, and we want to create the reverse of those
+    reverse_osmnx_shst_gdf = osmnx_shst_gdf.loc[
+        (osmnx_shst_gdf.oneway_shst == False) &
+        (osmnx_shst_gdf.forwardReferenceId != osmnx_shst_gdf.backReferenceId) &
+        (osmnx_shst_gdf.u != osmnx_shst_gdf.v)
         ].copy()
 
     WranglerLogger.debug('osmnx_shst_gdf has {} two-way OSM ways, which contain {} geometries'.format(
-        len(reverse_osm_link_gdf),
-        reverse_osm_link_gdf.id.nunique())
+        len(reverse_osmnx_shst_gdf),
+        reverse_osmnx_shst_gdf.id.nunique())
     )
 
     # revert their u, v, forwardReferenceId, backReferenceId to create links of the opposite direction
-    reverse_osm_link_gdf.rename(
+    reverse_osmnx_shst_gdf.rename(
         columns={
             "u": "v",
             "v": "u",
@@ -350,8 +353,8 @@ def add_two_way_osm(link_gdf):
         inplace=True,
     )
     # reverse the geometries themselves, enabling offset and arrows to work when this is drawn in GIS
-    reverse_osm_link_gdf.reset_index(inplace=True)
-    forward_linestrings = reverse_osm_link_gdf['geometry'].tolist()
+    reverse_osmnx_shst_gdf.reset_index(inplace=True)
+    forward_linestrings = reverse_osmnx_shst_gdf['geometry'].tolist()
     WranglerLogger.debug('forward_linestrings len={} type(forward_linestrings[0])={} first 5={}'.format(
         len(forward_linestrings), type(forward_linestrings[0]), forward_linestrings[:5]
     ))
@@ -360,23 +363,20 @@ def add_two_way_osm(link_gdf):
         # forward_linstring is a shapely.geometry.LineString object
         reverse_coordinates = list(forward_linestring.coords)[::-1]
         reverse_linestrings.append(LineString(reverse_coordinates))
-    reverse_osm_link_gdf['geometry'] = reverse_linestrings
+    reverse_osmnx_shst_gdf['geometry'] = reverse_linestrings
 
     # add variable to note that it's a reverse that we've created
-    link_gdf["reverse"] = 0
-    reverse_osm_link_gdf["reverse"] = 1
+    osmnx_shst_gdf["reverse"] = 0
+    reverse_osmnx_shst_gdf["reverse"] = 1
 
     # concatenate the reversed links and the initial links
-    link_all_gdf = pd.concat(
-        [link_gdf, reverse_osm_link_gdf], sort=False, ignore_index=True
-    )
+    link_all_gdf = pd.concat( [osmnx_shst_gdf, reverse_osmnx_shst_gdf], sort=False, ignore_index=True)
 
     # update "forwardReferenceId" and "backReferenceId": rename the former to shstReferenceId because the link now only
     # represents the 'forward' direction; drop the latter because the opposite link is represented by another row
     link_all_gdf.rename(columns={"forwardReferenceId": "shstReferenceId",
                                  "geometryId": "shstGeometryId"},
-                        inplace=True,
-                        )
+                        inplace=True)
     link_all_gdf.drop(columns=["backReferenceId"], inplace=True)
 
     WranglerLogger.debug(
@@ -387,15 +387,13 @@ def add_two_way_osm(link_gdf):
         )
     )
 
-    WranglerLogger.debug('of these links, {} are missing OSM extracts info, due to shst extracts (default tile 181224) containing\
-     {} osmids that are not included in the latest OSM extracts, e.g. private streets, closed streets.'.format(
-        link_all_gdf.loc[link_all_gdf.osmid.isnull()].shape[0],
-        link_all_gdf.loc[link_all_gdf.osmid.isnull()].wayId.nunique(),
+    WranglerLogger.debug('of these links, {} are missing OSM extracts info, due to shst extracts (default tile 181224) containing " \
+        "{} osmids that are not included in the latest OSM extracts, e.g. private streets, closed streets.'.format(
+            link_all_gdf.loc[link_all_gdf.osmid.isnull()].shape[0],
+            link_all_gdf.loc[link_all_gdf.osmid.isnull()].wayId.nunique()
+        )
     )
-    )
-    WranglerLogger.debug(
-        "add_two_way_osm returning link_all_gdf with type(link_all_gdf): {}".format(type(link_all_gdf)))
-
+    WranglerLogger.debug("add_two_way_osm returning link_all_gdf with type(link_all_gdf): {}".format(type(link_all_gdf)))
     return link_all_gdf
 
 

@@ -33,6 +33,7 @@ Output:
   Node data include columns:
      * osmid: the OpenStreetMap node ID (e.g. 1723738865 for https://www.openstreetmap.org/node/1723738865).  However,
        this is often missing and set to 0 even when real node IDs exist; see the discussion on the u,v columns in the link dataset above.
+       **Because of this, this dataset isn't used subsequently.**
      * y, x: latitude and longitude of the node
      * some of the tags in methods.OSM_WAY_TAGS also have corresponding data for nodes so they're included here.  For the
        set of tags we're using, this looks like it's only 'highway' and 'ref'

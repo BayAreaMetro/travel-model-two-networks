@@ -4,12 +4,11 @@ Add OSM attributes to extracted SharedStreets network and convert to Network Sta
 
 set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
 # Input: 
-    OSM extraction, [INPUT_DATA_DIR]/external/external/step2_osmnx_extraction/link.geojson
-    SharedStreet extraction, [INPUT_DATA_DIR]/external/step1_shst_extraction/mtc_[1-14].out.geojson
-# Output: roadway network in standard format, with SharedStreet geometries and OSM link/node attributes,
-    [OUTPUT_DATA_DIR]/interim/step3_join_shst_extraction_with_osm/step3_shape.geojson,
-    [OUTPUT_DATA_DIR]/interim/step3_join_shst_extraction_with_osm/step3_link.json,
-    [OUTPUT_DATA_DIR]/interim/step3_join_shst_extraction_with_osm/step3_node.geojson
+    SharedStreet extract, [INPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].out.feather[.crs]
+    OSMnx extract,        [INPUT_DATA_DIR]/external/external/step2_osmnx_extracts/link.feather[.crs]
+# Output: roadway network in geofeather format, with SharedStreet geometries and OSMX link/node attributes,
+    [OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_link.feather[.crs]
+    [OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather[.crs]
 """
 
 import pandas as pd
@@ -22,19 +21,18 @@ from network_wrangler import WranglerLogger, setupLogging
 
 #####################################
 # inputs and outputs
-
 INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 
 # OSM extraction and SharedStreet extraction
-OSM_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
-OSM_LINK_FILE   = os.path.join(OSM_EXTRACT_DIR, 'link.feather')
-## OSM_NODE_FILE = os.path.join(OSM_EXTRACT_DIR, 'node.geojson')
 SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step1_shst_extracts')
+OSM_EXTRACT_DIR  = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
+OSM_LINK_FILE    = os.path.join(OSM_EXTRACT_DIR, 'link.feather')
 # lookups for roadway type and network type
 HIGHWAY_TO_ROADWAY_CROSSWALK_FILE = os.path.join(INPUT_DATA_DIR, 'lookups', 'highway_to_roadway.csv')
 NETWORK_TYPE_LOOKUP_FILE = os.path.join(INPUT_DATA_DIR, 'lookups', 'network_type_indicator.csv')
 
+# This script will write to this directory
 SHST_WITH_OSM_DIR = os.path.join(OUTPUT_DATA_DIR, 'interim', 'step3_join_shst_with_osm')
 
 
