@@ -295,20 +295,359 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
         ))
     osmnx_shst_gdf.reset_index(drop=True, inplace=True)
 
-    # log oneway_shst and oneway_osm comparison, export to check on the map
-    WranglerLogger.debug('Compare oneway_shst with oneway_osmnx:\n{}\n{}\n{}\n{}'.format(
-        'oneway_shst value counts', osmnx_shst_gdf.oneway_shst.value_counts(),
-        'oneway_osmnx value counts', osmnx_shst_gdf.oneway_osmnx.value_counts()
+    # (temporary) QAQC links where 'oneway_shst' and 'oneway_osmnx' have discrepancies, export to check on the map
+    # TODO: decide which one is more accurate and modify function 'tag_osm_ways_oneway_twoway()' accordingly. Now using oneway_shst
+    WranglerLogger.debug('QAQC discrepancy between oneway_shst and oneway_osm:\n{}\n{}\n{}\n{}'.format(
+        'oneway_shst value counts', osmnx_shst_gdf.oneway_shst.value_counts(dropna=False),
+        'oneway_osmnx value counts', osmnx_shst_gdf.oneway_osmnx.value_counts(dropna=False)
     ))
-    # export rows with different oneway_shst and oneway_osmnx
-    # TODO: decide which one is more accurate, and modify function 'add_two_way_osm()' accordingly. Now it uses oneway_shst.
-    oneway_diff = osmnx_shst_gdf.loc[(osmnx_shst_gdf.oneway_shst != osmnx_shst_gdf.oneway_osmnx) &
-                                     osmnx_shst_gdf.oneway_osmnx.notnull()]
+    oneway_diff = osmnx_shst_gdf.loc[osmnx_shst_gdf.oneway_shst.notnull() & osmnx_shst_gdf.oneway_osmnx.notnull() & (
+                                     osmnx_shst_gdf.oneway_shst != osmnx_shst_gdf.oneway_osmnx)]
+    oneway_diff.reset_index(drop=True, inplace=True)
+    WranglerLogger.debug('export {} links with different oneway_shst and oneway_osm for debugging'.format(
+        oneway_diff.shape[0]))
     ONEWAY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'shst_osmnx_oneway_diff.feather')
     geofeather.to_geofeather(oneway_diff, ONEWAY_DEBUG_FILE)
     WranglerLogger.debug('Wrote oneway_diff to {}'.format(ONEWAY_DEBUG_FILE))
 
     return osmnx_shst_gdf
+
+
+def modify_osmway_lane_accounting_field_type(link_gdf):
+    """
+    For all fields related to lane accounting, convert numeric attributes to field type = numeric, and clean up the
+    mixture of None and non (both numeric and string attributes).
+
+    """
+    lane_acct_att_numeric = ['lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',
+                             'lanes:hov',
+                             'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward']
+    lane_acct_att_str     = ['turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',
+                             'hov', 'hov:lanes',
+                             'bus',
+                             'shoulder', 'cycleway']
+
+    WranglerLogger.info('Clean up fields type for attributes related to lane accounting, '
+                        'including numeric attributes: {}\n and str attributes: {}'.format(lane_acct_att_numeric,
+                                                                                           lane_acct_att_str))
+    for col in lane_acct_att_numeric:
+        link_gdf[col] = pd.to_numeric(link_gdf[col], errors='coerce')
+        WranglerLogger.debug('converted {} to numeric, with unique values: {}'.format(col, link_gdf[col].unique()))
+
+    for col in lane_acct_att_str:
+        link_gdf[col].fillna('', inplace=True)
+        WranglerLogger.debug('cleaned up {}, with unique values: {}'.format(col, link_gdf[col].unique()))
+
+    return link_gdf
+
+
+def tag_osm_ways_oneway_twoway(link_gdf):
+    """
+    Tags osm ways dataframe with 'one_way' or 'two_way'
+    """
+
+    WranglerLogger.info('Add "osm_dir_tag" to label two-way and one-way OSM ways')
+
+    # label 'two-way' links
+    link_gdf.loc[(link_gdf.oneway_shst == False) & (
+                  link_gdf.forwardReferenceId != link_gdf.backReferenceId) & (
+                  link_gdf.u != link_gdf.v), 'osm_dir_tag'] = 'two_way'
+
+    # the rest are 'one-way' links
+    link_gdf['osm_dir_tag'].fillna('one_way', inplace=True)
+
+    WranglerLogger.debug('input {} links: including {} two-way links and {} one-way links'.format(
+        link_gdf.shape[0], (link_gdf.osm_dir_tag == 'two_way').sum(), (link_gdf.osm_dir_tag == 'one_way').sum()))
+
+    return link_gdf
+
+
+def impute_num_lanes_each_direction_from_osm(link_gdf):
+    """
+    In OSM data, 'lanes' represents the total number of lanes of a given road, so for links representing two-way roads,
+    lanes = lanes:forward + lanes:backward + lanes:both_ways, with 'lanes:forward' and 'lane:backward' representing lane
+    counts of each direction, and 'lanes:both_ways' (1 or None) representing middle turn lane shared by both directions.
+
+    This step:
+      - creates additional columns to explicitly represent lane count of each direction
+      - impute values when lanes:forward or lanes:backward is missing
+      - code lanes:both_ways into 'middle_turn' lane
+
+    For two-way links, 12 cases were identified based on data availabilities and imputation method. A 'lane_cnt_tag' of
+    case type is also added to the link_gdf for QAQC. For cases without sufficient data to impute, skip for now.
+    For one-way links, use 'lanes'; if 'lanes' is missing, use 'lanes:forward' if available
+
+    """
+
+    # split the links gdf into two-way links and one-way links
+    two_way = link_gdf.loc[link_gdf['osm_dir_tag'] == 'two_way']
+    one_way = link_gdf.loc[link_gdf['osm_dir_tag'] == 'one_way']
+
+    WranglerLogger.info('Impute lanes of each direction for two-way links')
+
+    # CASE 1: links missing 'lanes' but have either 'lanes:backward' or 'lanes:forward' or both; no 'lanes:both_way'
+    type1_idx = two_way.lanes.isnull() & (
+                (two_way['lanes:forward'].notnull()) | (
+                    two_way['lanes:backward'].notnull())) & (
+                two_way['lanes:both_ways'].isnull())
+    WranglerLogger.debug('{} links of type1:\n{}'.format(type1_idx.sum(), two_way.loc[type1_idx]))
+    # add tag
+    two_way.loc[type1_idx, 'lane_cnt_tag'] = 'type1'
+
+    if type1_idx.sum() > 0:
+        # Impute: tot_lanes_forward = lanes:forward, tot_lanes_backward = lanes:backward
+        two_way.loc[type1_idx, 'forward_tot_lanes'] = two_way['lanes:forward']
+        two_way.loc[type1_idx, 'backward_tot_lanes'] = two_way['lanes:backward']
+
+    # CASE 2: links missing 'lanes' but have either 'lanes:backward' or 'lanes:forward' or both; have 'lanes:both_way'
+    type2_idx = two_way.lanes.isnull() & (
+                (two_way['lanes:forward'].notnull()) | (
+                    two_way['lanes:backward'].notnull())) & (
+                two_way['lanes:both_ways'].notnull())
+    WranglerLogger.debug('{} links of type2:\n{}'.format(type2_idx.sum(), two_way.loc[type2_idx]))
+    # add tag
+    two_way.loc[type2_idx, 'lane_cnt_tag'] = 'type2'
+
+    if type2_idx.sum() > 0:
+        # cannot impute
+        pass
+
+    # CASE 3: links missing 'lanes', 'lanes:backward' and 'lanes:forward'; no 'lanes:both_way'
+    type3_idx = two_way.lanes.isnull() & (
+                two_way['lanes:forward'].isnull()) & (
+                two_way['lanes:backward'].isnull()) & (
+                two_way['lanes:both_ways'].isnull())
+    WranglerLogger.debug('{} links of type3:\n{}'.format(type3_idx.sum(), two_way.loc[type3_idx]))
+    # add tag
+    two_way.loc[type3_idx, 'lane_cnt_tag'] = 'type3'
+
+    if type3_idx.sum() > 0:
+        # cannot impute
+        pass
+
+    # CASE 4: links missing 'lanes', 'lanes:backward' and 'lanes:forward'; have 'lanes:both_way'
+    # do nothing
+    type4_idx = two_way.lanes.isnull() & (
+                two_way['lanes:forward'].isnull()) & (
+                two_way['lanes:backward'].isnull()) & (
+                two_way['lanes:both_ways'].notnull())
+    WranglerLogger.debug('{} links of type4:\n{}'.format(type4_idx.sum(), two_way.loc[type4_idx]))
+    # add tag
+    two_way.loc[type4_idx, 'lane_cnt_tag'] = 'type4'
+
+    if type4_idx.sum() > 0:
+        # cannot impute
+        pass
+
+    # CASE 5: links have 'lanes' but are missing either 'lanes:backward' or 'lanes:forward'; no 'lanes:both_way'
+    type5_idx = two_way.lanes.notnull() & (    # have 'lanes'
+          (two_way['lanes:forward'].isnull() & two_way['lanes:backward'].notnull()) | (    # only have backward
+           two_way['lanes:forward'].notnull() & two_way['lanes:backward'].isnull())) & (   # only have forward
+          two_way['lanes:both_ways'].isnull())
+    WranglerLogger.debug('{} links of type5:\n{}'.format(type5_idx.sum(), two_way.loc[type5_idx]))
+    # add tag
+    two_way.loc[type5_idx, 'lane_cnt_tag'] = 'type5'
+
+    if type5_idx.sum() > 0:
+        # Impute: assign forward/backward lanes with available data, calculate lanes for the missing direction
+        # if lanes:forward not missing, lanes:backward is missing
+        two_way.loc[type5_idx & two_way['lanes:forward'].notnull(), 'forward_tot_lanes'] = two_way['lanes:forward']
+        two_way.loc[type5_idx & two_way['lanes:forward'].notnull(), 'backward_tot_lanes'] = two_way['lanes'] - two_way['lanes:forward']
+        # if lanes:backward not missing, lanes:forward is missing
+        two_way.loc[type5_idx & two_way['lanes:backward'].notnull(), 'backward_tot_lanes'] = two_way['lanes:backward']
+        two_way.loc[type5_idx & two_way['lanes:backward'].notnull(), 'forward_tot_lanes'] = two_way['lanes'] - two_way['lanes:backward']
+
+    # CASE 6: links have 'lanes' but are missing either 'lanes:backward' or 'lanes:forward'; have 'lanes:both_way'
+    type6_idx = two_way.lanes.notnull() & (    # have 'lanes'
+          (two_way['lanes:forward'].isnull() & two_way['lanes:backward'].notnull()) | (    # only have backward
+           two_way['lanes:forward'].notnull() & two_way['lanes:backward'].isnull())) & (   # only have forward
+          two_way['lanes:both_ways'].notnull())
+    WranglerLogger.debug('{} links of type6:\n{}'.format(type6_idx.sum(), two_way.loc[type6_idx]))
+    # add tag
+    two_way.loc[type6_idx, 'lane_cnt_tag'] = 'type6'
+
+    if type6_idx.sum() > 0:
+        # cannot impute
+        pass
+
+    # CASE 7: links have 'lanes' but are missing both 'lanes:backward' and 'lanes:forward'; no 'lanes:both_way'
+    type7_idx = two_way.lanes.notnull() & (    # have 'lanes'
+                two_way['lanes:forward'].isnull() & two_way['lanes:backward'].isnull()) & (  # missing both
+                two_way['lanes:both_ways'].isnull())
+    WranglerLogger.debug('{} links of type7:\n{}'.format(type7_idx.sum(), two_way.loc[type7_idx]))
+    WranglerLogger.debug('lanes count stats:\n{}'.format(two_way.loc[type7_idx].lanes.value_counts()))
+    # add tag
+    two_way.loc[type7_idx, 'lane_cnt_tag'] = 'type7'
+
+    if type7_idx.sum() > 0:
+        # if 'lanes' is an even number, split 'lanes' equally between 'lanes:backward' and 'lanes:forward'
+        two_way.loc[type7_idx & (two_way.lanes % 2 == 0), 'forward_tot_lanes'] = two_way['lanes'] / 2
+        two_way.loc[type7_idx & (two_way.lanes % 2 == 0), 'backward_tot_lanes'] = two_way['lanes'] / 2
+        # if 'lanes' is an odd number, cannot impute
+
+    # CASE 8: links have 'lanes' but are missing both 'lanes:backward' and 'lanes:forward'; have 'lanes:both_way'
+    type8_idx = two_way.lanes.notnull() & (    # have 'lanes'
+                two_way['lanes:forward'].isnull() & two_way['lanes:backward'].isnull()) & (  # missing both
+                two_way['lanes:both_ways'].notnull())
+    WranglerLogger.debug('{} links of type8:\n{}'.format(type8_idx.sum(), two_way.loc[type8_idx]))
+    WranglerLogger.debug('lanes count stats:\n{}'.format(two_way.loc[type8_idx].lanes.value_counts()))
+    # add tag
+    two_way.loc[type8_idx, 'lane_cnt_tag'] = 'type8'
+
+    if type8_idx.sum() > 0:
+        # if 'lanes' is an odd number, plus 1 (middle turn lane) and then split equally between 'forward' and 'backward'
+        two_way.loc[type8_idx & (two_way.lanes % 2 != 0), 'forward_tot_lanes'] = (two_way['lanes']+1)/2
+        two_way.loc[type8_idx & (two_way.lanes % 2 != 0), 'backward_tot_lanes'] = (two_way['lanes']+1)/2
+        # also, create middle turn lane
+        two_way.loc[type8_idx & (two_way.lanes % 2 != 0), 'forward_middleTurn_lanes'] = 1
+        two_way.loc[type8_idx & (two_way.lanes % 2 != 0), 'backward_middleTurn_lanes'] = 1
+        # if "lanes" is an even number, cannot impute
+
+    # CASE 9: links have 'lanes', 'lanes:backward' and 'lanes:forward', and 'lanes:forward'+'lanes:backward'=='lanes';
+    # no 'lanes:both_way'
+    type9_idx = two_way.lanes.notnull() & (  # have 'lanes'
+                two_way['lanes:forward'].notnull() & two_way['lanes:backward'].notnull()) & (    # have both
+                two_way['lanes:forward'] + two_way['lanes:backward'] == two_way['lanes']) & (    # lane counts add up
+                two_way['lanes:both_ways'].isnull())
+    WranglerLogger.debug('{} links of type9:\n{}'.format(type9_idx.sum(), two_way.loc[type9_idx]))
+    # add tag
+    two_way.loc[type9_idx, 'lane_cnt_tag'] = 'type9'
+
+    if type9_idx.sum() > 0:
+        # Impute: tot_lanes_forward = lanes:forward, tot_lanes_backward = lanes:backward
+        two_way.loc[type9_idx, 'forward_tot_lanes'] = two_way['lanes:forward']
+        two_way.loc[type9_idx, 'backward_tot_lanes'] = two_way['lanes:backward']
+
+    # CASE 10: links have 'lanes', 'lanes:backward' and 'lanes:forward', no 'lanes:both_way',
+    # but 'lanes:forward' + 'lanes:backward' != 'lanes'
+    type10_idx = two_way.lanes.notnull() & (    # have 'lanes'
+                 two_way['lanes:forward'].notnull() & two_way['lanes:backward'].notnull()) & (  # have both
+                 two_way['lanes:forward'] + two_way['lanes:backward'] != two_way['lanes']) & (  # lane counts not add up
+                 two_way['lanes:both_ways'].isnull())
+    WranglerLogger.debug('{} links of type10:\n{}'.format(type10_idx.sum(), two_way.loc[type10_idx]))
+    # add tag
+    two_way.loc[type10_idx, 'lane_cnt_tag'] = 'type10'
+
+    # cannot impute
+    if type10_idx.sum() > 0:
+        # cannot impute
+        pass
+
+    # CASE 11: links have 'lanes', 'lanes:backward' and 'lanes:forward', have 'lanes:both_way', and lane counts add up
+    type11_idx = two_way.lanes.notnull() & (  # have 'lanes'
+                 two_way['lanes:forward'].notnull() & two_way['lanes:backward'].notnull()) & (  # have both
+                 two_way['lanes:both_ways'].notnull()) & (
+                 two_way['lanes:forward'] + two_way['lanes:backward'] + two_way['lanes:both_ways'] == two_way['lanes']) # lane counts add up
+    WranglerLogger.debug('{} links of type11:\n{}'.format(type11_idx.sum(), two_way.loc[type11_idx]))
+    # add tag
+    two_way.loc[type11_idx, 'lane_cnt_tag'] = 'type11'
+
+    if type11_idx.sum() > 0:
+        # Impute: add 1 lane to each direction, and create middle turn lane
+        two_way.loc[type11_idx, 'forward_tot_lanes'] = two_way['lanes:forward'] + 1
+        two_way.loc[type11_idx, 'forward_middleTurn_lanes'] = 1
+        two_way.loc[type11_idx, 'backward_tot_lanes'] = two_way['lanes:backward'] + 1
+        two_way.loc[type11_idx, 'backward_middleTurn_lanes'] = 1
+
+    # CASE 12: links have 'lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_way', but lane counts don't add up
+    type12_idx = two_way.lanes.notnull() & (    # have 'lanes'
+                 two_way['lanes:forward'].notnull() & two_way['lanes:backward'].notnull()) & (  # have both
+                 two_way['lanes:both_ways'].notnull()) & (
+                 two_way['lanes:forward'] + two_way['lanes:backward'] + two_way['lanes:both_ways'] != two_way['lanes']) # lane counts not add up
+    WranglerLogger.debug('{} links of type12:\n{}'.format(type12_idx.sum(), two_way.loc[type12_idx]))
+    # add tag
+    two_way.loc[type12_idx, 'lane_cnt_tag'] = 'type12'
+
+    if type12_idx.sum() > 0:
+        # cannot impute
+        pass
+
+    WranglerLogger.info('Finished imputing lane counts for two-way links, lane counts stats:\n{}\n{}\n{}\n{}'.format(
+        'forward_tot_lanes', two_way['forward_tot_lanes'].value_counts(dropna=False),
+        'backward_tot_lanes', two_way['backward_tot_lanes'].value_counts(dropna=False)))
+
+    WranglerLogger.info('Impute lanes for one-way links')
+    # when 'lanes' data available
+    one_way.loc[one_way.lanes.notnull(), 'oneway_tot_lanes'] = one_way['lanes']
+    # when 'lanes' data is missing, use 'lanes:forward' when available
+    one_way.loc[one_way.lanes.isnull() & one_way['lanes:forward'].notnull(),
+                'oneway_tot_lanes'] = one_way['lanes:forward']
+    # add tag
+    one_way['lane_cnt_tag'] = 'one-way-lanes'
+    WranglerLogger.info('Finished imputing lane counts for one-way links, lane counts stats:\n{}\n{}'.format(
+        'oneway_tot_lanes', one_way['oneway_tot_lanes'].value_counts(dropna=False)))
+
+    # merge two-way and one-way links back
+    link_gdf_lane_imputed = pd.concat([two_way, one_way])
+    WranglerLogger.info('Merge two-way and one-way links into {} rows, with fields:\n{}'.format(
+        link_gdf_lane_imputed.shape[0],
+        list(link_gdf_lane_imputed)
+    ))
+
+    return link_gdf_lane_imputed
+
+
+def cleanup_turns_attributes(link_gdf):
+    """
+    Cleans up OSM extract's link attributes 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward':
+        - typos:
+            "throught" -> "through"
+            "revese" -> "reverse"
+            "revesre" -> "reverse"
+            "mege" -> "merge"
+            "sligth" -> "slight"
+        - non-turn values: 'none' or (empty) can be used for lanes with no turn indication (e.g. '||right' or
+          'none|none|right' represents a 3-lane road (one-way or two-way), with '|' as the lane divider mark).
+          Replace 'none' or (empty) with 'non_turn', so 'non_turn|non_turn|right'.
+
+    Parameters
+    -----------
+    link_gdf: osm Ways with link attributes 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward'
+
+    Return
+    -----------
+    """
+    WranglerLogger.info('Clean up turn-related attributes')
+    WranglerLogger.debug('...fix typos in turn:lanes related values')
+    for col in ['turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward']:
+        link_gdf[col] = link_gdf[col].apply(lambda x: x.replace('throught', 'through'))
+        link_gdf[col] = link_gdf[col].apply(lambda x: x.replace('revese', 'reverse'))
+        link_gdf[col] = link_gdf[col].apply(lambda x: x.replace('revesre', 'reverse'))
+        link_gdf[col] = link_gdf[col].apply(lambda x: x.replace('mege', 'merge'))
+        link_gdf[col] = link_gdf[col].apply(lambda x: x.replace('sligth', 'slight'))
+
+    WranglerLogger.info('...clean up non-turn values')
+    # first, replace 'none' with 'non_turn'
+    for col in ['turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward']:
+        link_gdf[col] = link_gdf[col].apply(lambda x: x.replace('none', 'non_turn'))
+
+    # second, replace (empty) with 'non_turn'
+    link_gdf['turn:lanes'] = link_gdf['turn:lanes'].apply(lambda x: _fill_non_turn(x))
+    link_gdf['turn:lanes:forward'] = link_gdf['turn:lanes:forward'].apply(lambda x: _fill_non_turn(x))
+    link_gdf['turn:lanes:backward'] = link_gdf['turn:lanes:backward'].apply(lambda x: _fill_non_turn(x))
+
+    WranglerLogger.info('...completed turns attributes cleanup.')
+    return link_gdf
+
+
+def _fill_non_turn(turn_str):
+    """
+    cleans up strings in OSM extract's turns:lanes-related attributes.
+    """
+    # if not turn lanes value, pass
+    if len(turn_str) == 0:
+        pass
+    else:
+        # fill in all (empty) between each pair of lane divider marks
+        while '||' in turn_str:
+            turn_str = turn_str.replace('||', '|non_turn|')
+        # fill in (empty) of the first lane
+        if turn_str[0] == '|':
+            turn_str = 'non_turn' + turn_str
+        # fill in (empty) of the last lane
+        if turn_str[-1] == '|':
+            turn_str = turn_str + 'non_turn'
+    return turn_str
 
 
 def add_two_way_osm(link_gdf):
@@ -326,11 +665,7 @@ def add_two_way_osm(link_gdf):
     """
     WranglerLogger.debug("add_two_way_osm with type(link_gdf): {}".format(type(link_gdf)))
     # get two-way links
-    reverse_osm_link_gdf = link_gdf.loc[
-        (link_gdf.oneWay == False) &
-        (link_gdf.forwardReferenceId != link_gdf.backReferenceId) &
-        (link_gdf.u != link_gdf.v)
-        ].copy()
+    reverse_osm_link_gdf = link_gdf.loc[link_gdf['osm_dir_tag'] == 'two_way'].copy()
 
     WranglerLogger.debug('osmnx_shst_gdf has {} two-way OSM ways, which contain {} geometries'.format(
         len(reverse_osm_link_gdf),
@@ -361,6 +696,18 @@ def add_two_way_osm(link_gdf):
         reverse_coordinates = list(forward_linestring.coords)[::-1]
         reverse_linestrings.append(LineString(reverse_coordinates))
     reverse_osm_link_gdf['geometry'] = reverse_linestrings
+
+    # add variables to represent imputed lanes for each direction and turns for each direction
+    # for reversed osm links, use 'backward_tot_lanes' and 'turn:lanes:backward'
+    reverse_osm_link_gdf['lanes_osmSplit'] = reverse_osm_link_gdf['backward_tot_lanes']
+    reverse_osm_link_gdf['turns:lanes_osmSplit'] = reverse_osm_link_gdf['turn:lanes:backward']
+    # for the initial rows for two-way links, use 'forward_tot_lanes' and 'turn:lanes:forward'
+    link_gdf.loc[link_gdf.osm_dir_tag == 'two_way', 'lanes_osmSplit'] = link_gdf['forward_tot_lanes']
+    link_gdf.loc[link_gdf.osm_dir_tag == 'two_way', 'turns:lanes_osmSplit'] = link_gdf['turn:lanes:forward']
+    # for one-way links, use 'oneway_tot_lanes' and 'turn:lanes'
+    link_gdf.loc[link_gdf.osm_dir_tag == 'one_way', 'lanes_osmSplit'] = link_gdf['oneway_tot_lanes']
+    link_gdf.loc[link_gdf.osm_dir_tag == 'one_way', 'turns:lanes_osmSplit'] = link_gdf['turn:lanes']
+    # TODO (?): drop initial lane and turn fields with 'forward' and 'backward' info
 
     # add variable to note that it's a reverse that we've created
     link_gdf["reverse"] = 0
@@ -397,6 +744,12 @@ def add_two_way_osm(link_gdf):
         "add_two_way_osm returning link_all_gdf with type(link_all_gdf): {}".format(type(link_all_gdf)))
 
     return link_all_gdf
+
+
+def turn_lane_accounting(link_gdf):
+    """
+    Split total lane count into turn lanes and general purpose lanes based on OSM attributes related to turn lanes.
+    """
 
 
 def consolidate_osm_way_to_shst_link(osm_link):
