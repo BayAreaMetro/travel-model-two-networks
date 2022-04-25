@@ -379,10 +379,12 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf):
     """
 
     # these are the new columns we'll be setting; initialize them now to be the right type
-    osmnx_shst_gdf['lane_count_type']    = np.int8(-1) # unset
-    osmnx_shst_gdf['forward_tot_lanes']  = np.int8(-1) # unset
-    osmnx_shst_gdf['backward_tot_lanes'] = np.int8(-1) # unset
-    osmnx_shst_gdf['oneway_tot_lanes']   = np.int8(-1) # unset
+    osmnx_shst_gdf['lane_count_type']           = np.int8(-1) # unset
+    osmnx_shst_gdf['forward_tot_lanes']         = np.int8(-1) # unset
+    osmnx_shst_gdf['backward_tot_lanes']        = np.int8(-1) # unset
+    osmnx_shst_gdf['oneway_tot_lanes']          = np.int8(-1) # unset
+    osmnx_shst_gdf['forward_middleTurn_lanes']  = np.int8(-1) # unset
+    osmnx_shst_gdf['backward_middleTurn_lanes'] = np.int8(-1) # unset
 
     # split the links gdf into two-way links and one-way links
     two_way = osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag'] == 2]
