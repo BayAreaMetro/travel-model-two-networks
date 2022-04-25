@@ -45,28 +45,32 @@ Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 * County shapefile, `[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`
 * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 #### Output:
-* OSMNx link and node extract geofeather, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/[link,node].feather[.crs]`
+* OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/[link,node].feather[.crs]`
 * Geopackage, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/osmnx_extracts.gpkg` with layers 'link', 'node' corresponding to the geofeather output files above; this format is useful for visualization
    
-Link data are fetched using [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon) using `simplify=False`, so there are typically multiple links per OSM way.  (This is because if `simplify=True`, OSMNx will aggregate some OSM ways into a single link, which we don't want. 
+Data is fetched using [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon) using `simplify=False`, so there are typically multiple links per OSM way.  (This is because if `simplify=True`, OSMnx will aggregate some OSM ways into a single link, which we don't want; see a nice explanation of this process in [OSMnx: Python for Street Networks](https://geoffboeing.com/2016/11/osmnx-python-street-networks/))
 
 Link data includes columns:
 * osmid: the OpenStreetMap way ID (e.g. 619590730 for this link: https://www.openstreetmap.org/way/619590730)
 * geometry: the shape of the link
-* length: the length of the link, in meters; this is added by OSMNx
-* u, v: the OSM node ID of the start and end of the link.  However, OSMNx seems to still be doing some simplification
+* length: the length of the link, in meters; this is added by OSMnx
+* u, v: the OSM node ID of the start and end of the link.  However, OSMnx seems to still be doing some simplification
   under the hood, so these are often 0 rather than corresponding the the OSM values. For example, for OSM way [619590730 referenced above](https://www.openstreetmap.org/way/619590730), the way is split into two links, and only one has the the u value, [1723738865](https://www.openstreetmap.org/node/1723738865); the rest are zeros.
-* key: this is an OSMNx identifier for when multiple parallel links exist with the same u,v; key then distinguishes between them so
-  that (u,v,key) is unique.  I believe this is only relevant if `simplify=True`, however, as there are many links with (u,v,key)=(0,0,0)
-* all the other columns are specified in [`methods.OSM_WAY_TAGS`](methods.py#14)
+* key: this is an OSMnx identifier for when multiple parallel links exist with the same u,v; key then distinguishes between them so that (u,v,key) is unique.  I believe this is only relevant if `simplify=True`, however, as there are many links with (u,v,key)=(0,0,0)
+* all the other columns are specified in [`methods.OSM_WAY_TAGS`](methods.py#L14)
+
+Node data include columns:
+* osmid: the OpenStreetMap node ID (e.g. 1723738865 for https://www.openstreetmap.org/node/1723738865).  However, this is often missing and set to 0 even when real node IDs exist; see the discussion on the u,v columns in the link dataset above. **Because of this, this dataset isn't used subsequently.**
+* y, x: latitude and longitude of the node
+* some of the tags in methods.OSM_WAY_TAGS also have corresponding data for nodes so they're included here.  For the set of tags we're using, this looks like it's only 'highway' and 'ref'
 
 ### [Step 3: Process SharedStreets Extraction to Network Standard and Conflate with OSM](step3_join_shst_extraction_with_osm.py)
 
 Add OSM attributes to extracted SharedStreets network and convert to Network Standard data formats. 
 
 #### Input:
-* OSM link extract (from step2), `[INPUT_DATA_DIR]/external/external/step2_osmnx_extracts/link.feather[.crs]`
 * Shared Street extract (from step1), `[INPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].feather[.crs]`
+* OSM link extract (from step2), `[INPUT_DATA_DIR]/external/external/step2_osmnx_extracts/link.feather[.crs]`
 #### Output:
 * Shared Street links with OSMNX attributes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_link.feather[.crs]`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
 * Network nodes derived from the above, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather[.crs]`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
