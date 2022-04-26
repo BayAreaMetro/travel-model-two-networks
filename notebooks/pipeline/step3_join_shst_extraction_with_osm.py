@@ -92,8 +92,8 @@ if __name__ == '__main__':
     geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
-    # 5. impute lanes counts and turn values to prepare for adding reverse links in the next step, because OSM data uses
-    #    different attributes to represent lane count and turn value for two-way and one-way links
+    # 5. impute lanes counts and clean up turn values to prepare for adding reverse links in the next step, because
+    #    OSM data uses different attributes to represent lane count and turn value for two-way and one-way links
     # first, clean up the field types and NAs of lane, turn related attributes
     methods.modify_osmway_lane_accounting_field_type(osmnx_shst_gdf)
     # second, add 'osm_dir_tag' to label two-way and one-way OSM ways
@@ -102,6 +102,10 @@ if __name__ == '__main__':
     osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf)
     # also, clean up the strings used in 'turn' values
     methods.cleanup_turns_attributes(osmnx_shst_gdf)
+    # impute bus-only lanes
+    osmnx_shst_gdf = methods.count_bus_lanes(osmnx_shst_gdf)
+    # impute hov lane count
+    methods.count_hov_lanes(osmnx_shst_gdf)
     WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
 
     # 6. add reverse links for two-way OSM ways

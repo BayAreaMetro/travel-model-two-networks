@@ -653,6 +653,103 @@ def _fill_non_turn(turn_str):
     return turn_str
 
 
+def count_bus_lanes(osmnx_shst_gdf):
+    """
+    Add bus-only lane basd on OSM 'bus' attribute
+    """
+
+    WranglerLogger.info('Count bus-only lanes')
+
+    # initialize new columns we'll be setting
+    osmnx_shst_gdf['forward_bus_lane']  = np.int8(-1)  # unset
+    osmnx_shst_gdf['backward_bus_lane'] = np.int8(-1)  # unset
+    osmnx_shst_gdf['oneway_bus_lane']   = np.int8(-1)  # unset
+
+    # split the links gdf into two-way links and one-way links
+    two_way = osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag'] == 2]
+    one_way = osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag'] == 1]
+
+    # for one-way links, bus = 'designated' indicating one bus-only lane
+    one_way.loc[one_way.bus == 'designated', 'oneway_bus_lane'] = 1
+    # if there is no 'lanes' information, set it to be 1 to represent the bus-only lane
+    one_way.loc[(one_way.bus == 'designated') & one_way['oneway_tot_lanes'].isnull(),
+                'oneway_tot_lanes'] = 1
+
+    # if 'bus' is na, but 'lanes:bus' or 'lanes:bus:forward' has value (1), set oneway_bus_lane as 1
+    one_way.loc[(one_way.bus == '') & (one_way['lanes:bus'] == 1), 'oneway_bus_lane'] = 1
+    one_way.loc[(one_way.bus == '') & one_way['lanes:bus'].isnull() & (one_way['lanes:bus:forward'] == 1), 'oneway_bus_lane'] = 1
+
+    # for two-way links, bus = 'designated' indicating one bus-only lane for each direction
+    two_way.loc[two_way.bus == 'designated', 'forward_bus_lane'] = 1
+    two_way.loc[two_way.bus == 'designated', 'backward_bus_lane'] = 1
+    # if there is no 'lanes' info from osmnx, set tot_lanes to be 1 in each direction
+    two_way.loc[(two_way.bus == 'designated') & \
+                 two_way['lanes'].isnull() & \
+                 two_way['lanes:forward'].isnull() & \
+                 two_way['lanes:backward'].isnull() & \
+                 two_way['lanes:both_ways'].isnull(),
+                 'forward_tot_lanes'] = 1
+    two_way.loc[(two_way.bus == 'designated') & \
+                two_way['lanes'].isnull() & \
+                two_way['lanes:forward'].isnull() & \
+                two_way['lanes:backward'].isnull() & \
+                two_way['lanes:both_ways'].isnull(),
+                'backward_tot_lanes'] = 1
+
+    # if 'bus' is na, but 'lanes:bus:forward' or 'lanes:bus:backward' has value (1), set bus lane for both direction
+    two_way.loc[(two_way.bus == '') & (two_way['lanes:bus:forward'] == 1), 'forward_bus_lane'] = 1
+    two_way.loc[(two_way.bus == '') & (two_way['lanes:bus:backward'] == 1), 'backward_bus_lane'] = 1
+
+    # merge one-way and two-way links back
+    osmnx_shst_gdf_bus_imputed = pd.concat([two_way, one_way])
+    WranglerLogger.info('Merge two-way and one-way links into {} rows, with fields:\n{}'.format(
+        osmnx_shst_gdf_bus_imputed.shape[0],
+        list(osmnx_shst_gdf_bus_imputed)
+    ))
+    WranglerLogger.debug('{:,} of {:,} links have designated bus lanes'.format(
+        (osmnx_shst_gdf_bus_imputed['oneway_bus_lane'] == 1).sum() + \
+        (osmnx_shst_gdf_bus_imputed['forward_bus_lane'] == 1).sum() + \
+        (osmnx_shst_gdf_bus_imputed['backward_bus_lane'] == 1).sum(),
+        osmnx_shst_gdf_bus_imputed.shape[0]
+        ))
+
+    return osmnx_shst_gdf_bus_imputed
+
+
+def count_hov_lanes(osmnx_shst_gdf):
+    """
+    Add hov-only lane based on OSM attributes 'hov:lanes' and 'hov'.
+    If 'hov:lanes' available (e.g. 'designated|yes|yes'), count the occurrence of 'designated' or 'lane' in the string;
+    if 'hov' not available, use 'hov': if hov = 'designated' or 'lane', set 1 hov-only lane.
+
+    Does not return anything; modifies the passed DataFrame.
+    """
+
+    WranglerLogger.info('Count hov-only lanes')
+
+    # initialize new columns we'll be setting
+    # it appears that in our data, 'hov:lanes' and 'hov' are only available for one-way links
+    WranglerLogger.debug('one-way or two-way stats for links with hov info:\n{}'.format(
+        osmnx_shst_gdf.loc[(osmnx_shst_gdf['hov:lanes'] != '') & (osmnx_shst_gdf['hov'] != '')].osm_dir_tag.value_counts(dropna=False)
+    ))
+    osmnx_shst_gdf['oneway_hov_lane'] = np.int8(-1)  # unset
+
+    # count occurrences of 'designated' or 'lane' in 'hov:lanes'
+    osmnx_shst_gdf['cnt_occur'] = osmnx_shst_gdf['hov:lanes'].apply(lambda x: x.count('designated') + x.count('lane'))
+    # set 'oneway_hov_lane' for one-way links with 'hov:lanes' info
+    osmnx_shst_gdf.loc[(osmnx_shst_gdf['osm_dir_tag'] == 1) & (osmnx_shst_gdf['hov:lanes'] != ''),
+                       'oneway_hov_lane'] = osmnx_shst_gdf['cnt_occur']
+    # when 'hov:lanes' is missing, use 'hov'
+    osmnx_shst_gdf.loc[(osmnx_shst_gdf['osm_dir_tag'] == 1) & \
+                       (osmnx_shst_gdf['hov:lanes'] == '') & \
+                       ((osmnx_shst_gdf['hov'] == 'designated') | (osmnx_shst_gdf['hov'] == 'lane')),
+                       'oneway_hov_lane'] = 1
+    WranglerLogger.debug('{:,} of {:,} links have hov lanes'.format(
+        osmnx_shst_gdf.loc[osmnx_shst_gdf['oneway_hov_lane'] > 0].shape[0],
+        osmnx_shst_gdf.shape[0]
+    ))
+
+
 def add_two_way_osm(osmnx_shst_gdf):
     """
     Selects rows that represent two-way links, and adds the reverse direction of that link
@@ -704,15 +801,21 @@ def add_two_way_osm(osmnx_shst_gdf):
     reverse_osmnx_shst_gdf['geometry'] = reverse_linestrings
 
     # add variables to represent imputed lanes for each direction and turns for each direction
-    # for reversed osm links, use 'backward_tot_lanes' and 'turn:lanes:backward'
+    # for reversed osm links, use 'backward_tot_lanes', 'turn:lanes:backward', 'backward_bus_lane'
     reverse_osmnx_shst_gdf['lanes_osmSplit'] = reverse_osmnx_shst_gdf['backward_tot_lanes']
     reverse_osmnx_shst_gdf['turns:lanes_osmSplit'] = reverse_osmnx_shst_gdf['turn:lanes:backward']
-    # for the initial rows for two-way links, use 'forward_tot_lanes' and 'turn:lanes:forward'
+    reverse_osmnx_shst_gdf['busOnly_lane_osmSplit'] = reverse_osmnx_shst_gdf['backward_bus_lane']
+
+    # for the initial rows for two-way links, use 'forward_tot_lanes', 'turn:lanes:forward', 'forward_bus_lane'
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'lanes_osmSplit'] = osmnx_shst_gdf['forward_tot_lanes']
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'turns:lanes_osmSplit'] = osmnx_shst_gdf['turn:lanes:forward']
-    # for one-way links, use 'oneway_tot_lanes' and 'turn:lanes'
+    osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'busOnly_lane_osmSplit'] = osmnx_shst_gdf['forward_bus_lane']
+
+    # for one-way links, use 'oneway_tot_lanes', 'turn:lanes', 'oneway_hov_lane', 'oneway_bus_lane'
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'lanes_osmSplit'] = osmnx_shst_gdf['oneway_tot_lanes']
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'turns:lanes_osmSplit'] = osmnx_shst_gdf['turn:lanes']
+    osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'busOnly_lane_osmSplit'] = osmnx_shst_gdf['oneway_bus_lane']
+    osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'hov_lane_osmSplit'] = osmnx_shst_gdf['oneway_hov_lane']
     # TODO (?): drop initial lane and turn fields with 'forward' and 'backward' info
 
     # add variable to note that it's a reverse that we've created
