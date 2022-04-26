@@ -15,45 +15,44 @@ LAT_LONG_EPSG = 4326
 # osmnx defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
 # and configurable as useful_tags_way
 # These are used in step2_osmnx_extraction.py
-OSM_WAY_TAGS = [
-    'highway',            # https://wiki.openstreetmap.org/wiki/Key:highway
-    'tunnel',             # https://wiki.openstreetmap.org/wiki/Key:tunnel
-    'bridge',             # https://wiki.openstreetmap.org/wiki/Key:bridge
-    'junction',           # https://wiki.openstreetmap.org/wiki/Key:junction
-    'oneway',             # https://wiki.openstreetmap.org/wiki/Key:oneway
-    'name',               # https://wiki.openstreetmap.org/wiki/Key:name
-    'ref',                # https://wiki.openstreetmap.org/wiki/Key:ref
-    'width',              # https://wiki.openstreetmap.org/wiki/Key:width
-    'est_width',          # https://wiki.openstreetmap.org/wiki/Key:est_width
-    'access',             # https://wiki.openstreetmap.org/wiki/Key:access
-    'area',               # https://wiki.openstreetmap.org/wiki/Key:area
-    'service',            # https://wiki.openstreetmap.org/wiki/Key:service
-    'maxspeed',           # https://wiki.openstreetmap.org/wiki/Key:maxspeed
+TAG_NUMERIC = 1
+TAG_STRING  = 2
+OSM_WAY_TAGS = {
+    'highway'            : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:highway
+    'tunnel'             : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:tunnel
+    'bridge'             : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:bridge
+    'junction'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:junction
+    'oneway'             : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:oneway
+    'name'               : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:name
+    'ref'                : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:ref
+    'width'              : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:width
+    'est_width'          : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:est_width
+    'access'             : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:access
+    'area'               : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:area
+    'service'            : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:service
+    'maxspeed'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:maxspeed
     # lanes accounting
-    'lanes',              # https://wiki.openstreetmap.org/wiki/Key:lanes
-    'lanes:backward',     # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'lanes:forward',      # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'lanes:both_ways',    # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
-    'bus',                # https://wiki.openstreetmap.org/wiki/Key:bus
-    'lanes:bus',          # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'lanes:bus:forward',  # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'lanes:bus:backward', # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
-    'hov',                # https://wiki.openstreetmap.org/wiki/Key:hov
-    'hov:lanes',          # https://wiki.openstreetmap.org/wiki/Key:hov
-    'hov:lanes:forward',  # https://wiki.openstreetmap.org/wiki/Key:hov
-    'hov:lanes:backward', # https://wiki.openstreetmap.org/wiki/Key:hov
-    'taxi',               # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:taxi',         # https://wiki.openstreetmap.org/wiki/Key:taxi
-    'lanes:hov',          # https://wiki.openstreetmap.org/wiki/Key:hov
-    'shoulder',           # https://wiki.openstreetmap.org/wiki/Key:shoulder
-    'turn',               # https://wiki.openstreetmap.org/wiki/Key:turn
-    'turn:lanes',         # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
-    'turn:lanes:forward', # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
-    'turn:lanes:backward',# https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
+    'lanes'              : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes
+    'lanes:backward'     : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'lanes:forward'      : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'lanes:both_ways'    : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes#Lanes_in_different_directions
+    'bus'                : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:bus
+    'lanes:bus'          : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
+    'lanes:bus:forward'  : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
+    'lanes:bus:backward' : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:lanes:psv
+    'hov'                : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:hov
+    'hov:lanes'          : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:hov
+    'taxi'               : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:taxi
+    'lanes:hov'          : TAG_NUMERIC,  # https://wiki.openstreetmap.org/wiki/Key:hov
+    'shoulder'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:shoulder
+    'turn'               : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:turn
+    'turn:lanes'         : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
+    'turn:lanes:forward' : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
+    'turn:lanes:backward': TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:turn#Turning_indications_per_lane
     # active modes
-    'sidewalk',             # https://wiki.openstreetmap.org/wiki/Key:sidewalk
-    'cycleway',             # https://wiki.openstreetmap.org/wiki/Key:cycleway
-]
+    'sidewalk'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:sidewalk
+    'cycleway'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:cycleway
+}
 
 def extract_osm_links_from_shst_metadata(shst_gdf):
     """
@@ -321,24 +320,19 @@ def modify_osmway_lane_accounting_field_type(osmnx_shst_gdf):
 
     Does not return anything; modifies the passed DataFrame.
     """
-    lane_acct_att_numeric = ['lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',
-                             'lanes:hov',
-                             'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward']
-    lane_acct_att_str     = ['turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',
-                             'hov', 'hov:lanes',
-                             'bus',
-                             'shoulder', 'cycleway']
+    WranglerLogger.info('Clean up fields type for attributes related to lane accounting')
 
-    WranglerLogger.info('Clean up fields type for attributes related to lane accounting, '
-                        'including numeric attributes: {}\n and str attributes: {}'.format(lane_acct_att_numeric,
-                                                                                           lane_acct_att_str))
-    for col in lane_acct_att_numeric:
-        osmnx_shst_gdf[col] = pd.to_numeric(osmnx_shst_gdf[col], errors='coerce')
-        WranglerLogger.debug('converted {} to numeric, with unique values: {}'.format(col, osmnx_shst_gdf[col].unique()))
+    for col in sorted(OSM_WAY_TAGS.keys()):
+        # this one is special and has been renamed to oneway_osmnx and it's a bool already
+        if col=='oneway': continue
 
-    for col in lane_acct_att_str:
-        osmnx_shst_gdf[col].fillna('', inplace=True)
-        WranglerLogger.debug('cleaned up {}, with unique values: {}'.format(col, osmnx_shst_gdf[col].unique()))
+        if OSM_WAY_TAGS[col] == TAG_NUMERIC:
+            osmnx_shst_gdf[col] = pd.to_numeric(osmnx_shst_gdf[col], errors='coerce')
+            WranglerLogger.debug('converted {} to numeric, with value_counts:\n{}'.format(col, osmnx_shst_gdf[col].value_counts(dropna=False)))
+
+        elif OSM_WAY_TAGS[col] == TAG_STRING:
+            osmnx_shst_gdf[col].fillna('', inplace=True)
+            WranglerLogger.debug('fillna for {}, with unique values_counts:\n{}'.format(col, osmnx_shst_gdf[col].value_counts(dropna=False)))
 
 
 def tag_osm_ways_oneway_twoway(osmnx_shst_gdf):

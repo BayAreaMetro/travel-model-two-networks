@@ -94,8 +94,8 @@ if __name__ == '__main__':
     WranglerLogger.info('dissolved into one polygon')
 
     # Request specific way tags from OSM
-    WranglerLogger.info("Requesting the following way tags from OSM: {}".format(methods.OSM_WAY_TAGS))
-    ox.utils.config(useful_tags_way=methods.OSM_WAY_TAGS)
+    WranglerLogger.info("Requesting the following way tags from OSM: {}".format(methods.OSM_WAY_TAGS.keys()))
+    ox.utils.config(useful_tags_way=methods.OSM_WAY_TAGS.keys())
 
     # OSM extraction - Note: this is memory intensive (~15GB) and time-consuming (~50 min)
     WranglerLogger.info('starting osmnx extraction')
