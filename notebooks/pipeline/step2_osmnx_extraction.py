@@ -58,7 +58,7 @@ WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
 
 INPUT_DATA_DIR      = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR     = os.environ['OUTPUT_DATA_DIR']
-INPUT_POLYGON       = os.path.join(INPUT_DATA_DIR,  'external', 'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
+INPUT_POLYGON       = os.path.join(INPUT_DATA_DIR,  'external', 'step0_boundaries', 'San_Francisco_Bay_Region_Counties.shp')
 OUTPUT_DIR          = os.path.join(OUTPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
 OUTPUT_FEATHER_LINK = os.path.join(OUTPUT_DIR, "link.feather")
 OUTPUT_FEATHER_NODE = os.path.join(OUTPUT_DIR, "node.feather")
@@ -131,7 +131,7 @@ if __name__ == '__main__':
         WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts()))
 
     # writing out OSM node data to geopackage
-    WranglerLogger.info('writing out OSM links to gpkg at {}'.format(OUTPUT_DIR))
+    WranglerLogger.info('writing out OSM nodes to gpkg at {}'.format(OUTPUT_DIR))
     node_gdf.to_file(OUTPUT_GPKG, layer="node", driver="GPKG")
     # write nodes to geofeather
     WranglerLogger.info('writing out OSM nodes to geofeather at {}'.format(OUTPUT_FEATHER_NODE))

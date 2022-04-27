@@ -42,7 +42,7 @@ This is much faster to read/write so will be used for subsequent steps instead o
 Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 
 #### Input:
-* County shapefile, `[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`
+* County shapefile, [`[INPUT_DATA_DIR]/external/step0_boundaries/San_Francisco_Bay_Region_Counties.shp`](https://opendata.mtc.ca.gov/datasets/MTC::san-francisco-bay-region-counties-1/about), which covers water areas to ensure that OSMnx extract includes bridges. 
 * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 #### Output:
 * OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/[link,node].feather[.crs]`
