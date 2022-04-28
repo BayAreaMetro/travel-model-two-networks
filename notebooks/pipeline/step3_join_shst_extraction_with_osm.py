@@ -132,6 +132,27 @@ if __name__ == '__main__':
     # lane accounting
     methods.consolidate_lane_accounting(osmnx_shst_gdf)
 
+    # write this to look at it
+    OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf_lane_accounting_QAQC.feather")
+    geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
+
+    # drop interim fields before continue
+    osmnx_shst_gdf.drop(columns=[
+        'lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',      # raw OSMnx lane count
+        'turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',  # raw OSMnx turn info
+        'hov', 'hov:lanes', 'lanes:hov',                                    # raw OSMnx hov info
+        'bus', 'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward',      # raw OSMnx bus info
+        'forward_tot_lanes', 'backward_tot_lanes', 'oneway_tot_lanes',      # interim lane count
+        'forward_middleTurn_lanes', 'backward_middleTurn_lanes',            # interim middle turn count
+        'backward_bus_lane', 'forward_bus_lane', 'oneway_bus_lane',         # interim bus lane count
+        'oneway_hov_lane',                                                  # interim hov lane count
+        'turns:lanes_osmSplit', 'middleTurn_lane_osmSplit',                 # interim turn info
+        'through_only', 'turns_ls', 'turns_dict',                           # interim turn lane counts
+        'lane_cnt_from_turns', 'lanes_non_gp'                               # validation lane count
+        ], inplace=True)
+
+
     # 9. fill NAs for ShSt-derived OSM Ways that do not have complete osm info
     # lmz: why is this necessary??
     # WranglerLogger.info('6. Filling NAs for ShSt-derived OSM Ways missing complete osm info')

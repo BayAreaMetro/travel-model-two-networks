@@ -741,13 +741,13 @@ def add_two_way_osm(osmnx_shst_gdf):
     reverse_osmnx_shst_gdf['lanes_osmSplit'] = reverse_osmnx_shst_gdf['backward_tot_lanes']
     reverse_osmnx_shst_gdf['turns:lanes_osmSplit'] = reverse_osmnx_shst_gdf['turn:lanes:backward']
     reverse_osmnx_shst_gdf['busOnly_lane_osmSplit'] = reverse_osmnx_shst_gdf['backward_bus_lane']
-    reverse_osmnx_shst_gdf['middleTurn_lane'] = reverse_osmnx_shst_gdf['backward_middleTurn_lanes']
+    reverse_osmnx_shst_gdf['middleTurn_lane_osmSplit'] = reverse_osmnx_shst_gdf['backward_middleTurn_lanes']
 
     # for the initial rows for two-way links, use 'forward_tot_lanes', 'turn:lanes:forward', 'forward_bus_lane', 'forward_middleTurn_lanes'
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'lanes_osmSplit'] = osmnx_shst_gdf['forward_tot_lanes']
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'turns:lanes_osmSplit'] = osmnx_shst_gdf['turn:lanes:forward']
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'busOnly_lane_osmSplit'] = osmnx_shst_gdf['forward_bus_lane']
-    osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'middleTurn_lane'] = osmnx_shst_gdf['forward_middleTurn_lanes']
+    osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 2, 'middleTurn_lane_osmSplit'] = osmnx_shst_gdf['forward_middleTurn_lanes']
 
     # for one-way links, use 'oneway_tot_lanes', 'turn:lanes', 'oneway_hov_lane', 'oneway_bus_lane'
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'lanes_osmSplit'] = osmnx_shst_gdf['oneway_tot_lanes']
@@ -951,15 +951,15 @@ def turn_lane_accounting(osmnx_shst_gdf, OUTPUT_DIR):
         link_with_turns_counted.shape[0]))
 
     # debug: inconsistency between implied total lane count from 'turn' values and from osm 'lanes' values,
-    # including 'lanes_from_turns' != 'lanes_osmSplit', and lanes_osmSplit is missing
+    # including 'lane_cnt_from_turns' != 'lanes_osmSplit', and lanes_osmSplit is missing
     # first, calculate implied lane counts from turns data
-    link_with_turns_counted['lanes_from_turns'] = link_with_turns_counted['turns_ls'].apply(lambda x: len(x))
+    link_with_turns_counted['lane_cnt_from_turns'] = link_with_turns_counted['turns_ls'].apply(lambda x: len(x))
     # note that the 'turns' values in OSM doesn't consider middle turn lane, therefore, when there is middle turn lane,
-    # 'lanes_from_turns' should +1
-    link_with_turns_counted.loc[link_with_turns_counted['middleTurn_lane'] == 1,
-                                'lanes_from_turns'] = link_with_turns_counted['lanes_from_turns'] + 1
+    # 'lane_cnt_from_turns' should +1
+    link_with_turns_counted.loc[link_with_turns_counted['middleTurn_lane_osmSplit'] == 1,
+                                'lane_cnt_from_turns'] = link_with_turns_counted['lane_cnt_from_turns'] + 1
     lane_count_debug = link_with_turns_counted.loc[
-        link_with_turns_counted['lanes_from_turns'] != link_with_turns_counted['lanes_osmSplit']]
+        link_with_turns_counted['lane_cnt_from_turns'] != link_with_turns_counted['lanes_osmSplit']]
     # export to inspect on a map
     lane_count_debug.reset_index(drop=True, inplace=True)
     WranglerLogger.debug(
@@ -974,9 +974,9 @@ def turn_lane_accounting(osmnx_shst_gdf, OUTPUT_DIR):
                                     osmnx_shst_gdf.loc[osmnx_shst_gdf['turns:lanes_osmSplit'] == '']])
     osmnx_shst_gdf_new.reset_index(drop=True, inplace=True)
 
-    # finally, there are links with 'middleTurn_lane' = 1 but are missing 'turns' info, set 'middle_turn' = 1
+    # finally, there are links with 'middleTurn_lane_osmSplit' = 1 but are missing 'turns' info, set 'middle_turn' = 1
     osmnx_shst_gdf_new.loc[(osmnx_shst_gdf_new['turns:lanes_osmSplit'] == '') & \
-                           (osmnx_shst_gdf_new['middleTurn_lane'] == 1), 'middle_turn'] = 1
+                           (osmnx_shst_gdf_new['middleTurn_lane_osmSplit'] == 1), 'middle_turn'] = 1
 
     WranglerLogger.info('Finished turn lane accounting, return {:,} links with following fields: {}'.format(
         osmnx_shst_gdf_new.shape[0],
@@ -989,21 +989,26 @@ def reconcile_lane_count_inconsistency(osmnx_shst_gdf):
     Resolve two cases:
     - Some links are missing 'lanes_osmSplit' data (either the data not available in OSMnx, or there was no sufficient
     infomation to imputate lane count by direction in step 'impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf)'),
-    but have 'lanes_from_turns'. Set 'lanes_osmSplit' = 'lanes_from_turns'.
-    - links with both 'lanes_osmSplit' and 'lanes_from_turns', but the values differ.
+    but have 'lane_cnt_from_turns'. Set 'lanes_osmSplit' = 'lane_cnt_from_turns'.
+    - links with both 'lanes_osmSplit' and 'lane_cnt_from_turns', but the values differ.
 
     Does not return anything; modifies the passed DataFrame.
     """
     WranglerLogger.info('Reconciling lane count inconsistency')
 
     # links missing 'lanes_osmSplit'
-    WranglerLogger.debug('...{} links are missing lanes_osmSplit but have lanes_from_turns'.format(
-        ((osmnx_shst_gdf['lanes_osmSplit'] == -1) & (osmnx_shst_gdf['lanes_from_turns'].notnull())).sum()
+    WranglerLogger.debug('...{} links are missing lanes_osmSplit but have lane_cnt_from_turns'.format(
+        ((osmnx_shst_gdf['lanes_osmSplit'] == -1) & (osmnx_shst_gdf['lane_cnt_from_turns'].notnull())).sum()
     ))
-    osmnx_shst_gdf.loc[(osmnx_shst_gdf['lanes_osmSplit'] == -1) & osmnx_shst_gdf['lanes_from_turns'].notnull(),
-                       'lanes_osmSplit'] = osmnx_shst_gdf['lanes_from_turns']
+    osmnx_shst_gdf.loc[(osmnx_shst_gdf['lanes_osmSplit'] == -1) & osmnx_shst_gdf['lane_cnt_from_turns'].notnull(),
+                       'lanes_osmSplit'] = osmnx_shst_gdf['lane_cnt_from_turns']
 
-    # TODO: reconcile 'lanes_osmSplit' != 'lanes_from_turns'
+    # checked a few 'lanes_osmSplit' != 'lane_cnt_from_turns' examples, 'lane_cnt_from_turns' tends to be more accurate
+    osmnx_shst_gdf.loc[
+            (osmnx_shst_gdf['lanes_osmSplit'] != -1) & \
+            osmnx_shst_gdf['lane_cnt_from_turns'].notnull() & \
+            (osmnx_shst_gdf['lanes_osmSplit'] != osmnx_shst_gdf['lane_cnt_from_turns']),
+        'lanes_osmSplit'] = osmnx_shst_gdf['lane_cnt_from_turns']
 
 
 def consolidate_lane_accounting(osmnx_shst_gdf):
