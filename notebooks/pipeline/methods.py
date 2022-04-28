@@ -218,10 +218,11 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
         osm_way_match_cols.remove(remove_col)
 
     # Log some debug info about this
-    osmnx_link_gdf['dupes'] = osmnx_link_gdf.duplicated(subset=osm_way_match_cols, keep=False)
-    WranglerLogger.debug("duplicates in osmnx_link_gdf based on {}: {} rows; " \
-        "head(50):\n{}".format(osm_way_match_cols, osmnx_link_gdf['dupes'].sum(), 
-        osmnx_link_gdf.loc[ osmnx_link_gdf['dupes'] == True].head(50)))
+    # commented this out since it's not very useful; shows that only length/geometry/u/v are changing
+    # osmnx_link_gdf['dupes'] = osmnx_link_gdf.duplicated(subset=osm_way_match_cols, keep=False)
+    # WranglerLogger.debug("duplicates in osmnx_link_gdf based on {}: {} rows; " \
+    #    "head(50):\n{}".format(osm_way_match_cols, osmnx_link_gdf['dupes'].sum(), 
+    #    osmnx_link_gdf.loc[ osmnx_link_gdf['dupes'] == True].head(50)))
 
     # And consolidate to the each OSM; way we will drop the geometry here so it's a df now. The "geometry" field in the
     # merged "osmnx_shst_gdf" is from sharedstreets, therefore multiple OSM ways derived from one sharedstreet record
@@ -246,8 +247,9 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
         indicator = True,
         suffixes  = ['_shst', '_osmnx']
     )
-    # recode indicator to be more clear
-    osmnx_shst_gdf['_merge'] = osmnx_shst_gdf['_merge'].cat.rename_categories({
+    # rename and recode indicator to be more clear
+    osmnx_shst_gdf.rename(columns={'_merge':'osmnx_shst_merge'}, inplace=True)
+    osmnx_shst_gdf['osmnx_shst_merge'] = osmnx_shst_gdf['osmnx_shst_merge'].cat.rename_categories({
         'both'      : 'both',
         'left_only' : 'shst_only',
         'right_only': 'osmnx_only'
@@ -263,14 +265,14 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     #     pass network_type='all' rather than 'all_private' to osmnx.graph.graph_from_polygon() in step2.
     #   - "osmnx_only" rows: osm links in the osmnx extracts only, mostly likely roads added to the OSM network after
     #      the sharedstreets network was built. They also have geometry as None.
-    WranglerLogger.debug("merge indicator statistics:\n{}".format(osmnx_shst_gdf['_merge'].value_counts()))
+    WranglerLogger.debug("merge indicator statistics:\n{}".format(osmnx_shst_gdf['osmnx_shst_merge'].value_counts()))
 
     #   Log rows with geometry as None (row count should be the same as 'osmnx_only') and remove
     null_shst_geom_df = osmnx_shst_gdf.loc[pd.isnull(osmnx_shst_gdf.geometry)].copy()
     WranglerLogger.debug("osmnx_shst_gdf has {} rows with null geometry; head:\n{}".format(
         len(null_shst_geom_df), null_shst_geom_df.head()
     ))
-    WranglerLogger.debug('null_shst_geom_df._merge.value_counts():\n{}'.format(null_shst_geom_df._merge.value_counts()))
+    WranglerLogger.debug('null_shst_geom_df.osmnx_shst_merge.value_counts():\n{}'.format(null_shst_geom_df.osmnx_shst_merge.value_counts()))
     # temporary(?): drop null shst columns, and add geometry from osmnx extracts, and save them to look at
     null_shst_geom_df.drop(
         columns=['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'],
@@ -288,10 +290,10 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
 
     # remove those rows which didn't correspond to osmnx ways
     osmnx_shst_gdf = osmnx_shst_gdf.loc[pd.notnull(osmnx_shst_gdf.geometry)]
-    # double check '_merge' indicator should only have 'both' and 'shst_only', not 'osmnx_only'
+    # double check 'osmnx_shst_merge' indicator should only have 'both' and 'shst_only', not 'osmnx_only'
     WranglerLogger.debug(
-        'Double check _merge indicator - should only have "both" and "shst_only":\n{}'.format(
-            osmnx_shst_gdf['_merge'].value_counts()
+        'Double check osmnx_shst_merge indicator - should only have "both" and "shst_only":\n{}'.format(
+            osmnx_shst_gdf['osmnx_shst_merge'].value_counts()
         ))
     osmnx_shst_gdf.reset_index(drop=True, inplace=True)
 
@@ -312,6 +314,95 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
 
     return osmnx_shst_gdf
 
+def recode_osmnx_highway_tag(osmnx_shst_gdf):
+    """"
+    OSMnx 'highway' tags have a multitude of values that are too detailed for us;
+    Simplify the tag to a new column, 'roadway'
+    Additionally, add boolean columns 'drive_access', 'walk_access', 'bike_access' representing
+    whether these links have this type of access.
+    """
+    HIGHWAY_TO_ROADWAY = [
+        # highway               # roadway           # hierarchy
+        ('bridleway',           'cycleway',         13),
+        ('closed:path',         'cycleway',         13),
+        ('cycleway',            'cycleway',         13),
+        ('other',               'cycleway',         13), # ?
+        ('path',                'cycleway',         13),
+        ('socail_path',         'cycleway',         13),
+        ('track',               'cycleway',         13),
+        ('corridor',            'footway',          14),
+        ('footpath',            'footway',          14),
+        ('footway',             'footway',          14),
+        ('pedestrian',          'footway',          14),
+        ('steps',               'footway',          14),
+        ('motorway',            'motorway',          1),
+        ('motorway_link',       'motorway_link',     2),
+        ('primary',             'primary',           5),
+        ('primary_link',        'primary_link',      6),
+        ('access',              'residential',      11),
+        ('junction',            'residential',      11),
+        ('residential',         'residential',      11),
+        ('road',                'residential',      11),
+        ('unclassified',        'residential',      11),
+        ('unclassified_link',   'residential',      11),
+        ('secondary',           'secondary',         7),
+        ('secondary_link',      'secondary_link',    8),
+        ('busway',              'service',          12),
+        ('living_street',       'service',          12),
+        ('service',             'service',          12),
+        ('tertiary',            'tertiary',          9),
+        ('tertiary_link',       'tertiary_link',    10),
+        ('trunk',               'trunk',             3),
+        ('trunk_link',          'trunk_link',        4),
+    ]
+    # OSMnx 'highway' tags have a multitude of values that are too detailed for us;
+    # Simplify the tag to a new column, 'roadway'
+    WranglerLogger.info('4a. Converting OSM highway variable into standard roadway variable')
+    highway_to_roadway_df = pd.DataFrame.from_records(HIGHWAY_TO_ROADWAY, columns=['highway','roadway','hierarchy'])
+    osmnx_shst_gdf = pd.merge(
+        left      = osmnx_shst_gdf, 
+        right     = highway_to_roadway_df,
+        how       = 'left',
+        on        = 'highway',
+        indicator = True,
+    )
+    osmnx_shst_gdf.fillna(value={'roadway':'unknown'}, inplace=True)
+    WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
+    WranglerLogger.debug('osmnx_shst_gdf[["highway","roadway","_merge"]].value_counts():\n{}'.format(
+        osmnx_shst_gdf[['highway','roadway','_merge']].value_counts(dropna=False)))
+    osmnx_shst_gdf.drop(columns="_merge", inplace=True)
+
+    ROADWAY_TO_ACCESS = [
+        # roadway,          drive_access,   walk_access,    bike_access
+        ('cycleway',        False,          True,           True ),
+        ('footway',         False,          True,           False),
+        ('motorway',        True,           False,          False),
+        ('motorway_link',   True,           True,           True ),
+        ('primary',         True,           True,           True ),
+        ('primary_link',    True,           True,           True ),
+        ('residential',     True,           True,           True ),
+        ('secondary',       True,           True,           True ),
+        ('secondary_link',  True,           True,           True ),
+        ('service',         True,           True,           True ),
+        ('tertiary',        True,           True,           True ),
+        ('tertiary_link',   True,           True,           True ),
+        ('trunk',           True,           True,           True ),
+        ('trunk_link',      True,           True,           True ),
+        ('uknown',          False,          False,          False), # check this
+    ]
+    # add network type variables "drive_access", "walk_access", "bike_access" based on roadway
+    WranglerLogger.info('Adding network type variables "drive_access", "walk_access", "bike_access"')
+    network_type_df = pd.DataFrame.from_records(ROADWAY_TO_ACCESS, columns=['roadway','drive_access','walk_access','bike_access'])
+    osmnx_shst_gdf = pd.merge(
+        left  = osmnx_shst_gdf,
+        right = network_type_df,
+        how   = 'left',
+        on    = 'roadway')
+    WranglerLogger.debug('osmnx_shst_gdf.drive_access.value_counts():\n{}'.format(osmnx_shst_gdf.drive_access.value_counts(dropna=False)))
+    WranglerLogger.debug('osmnx_shst_gdf.walk_access.value_counts():\n{}'.format(osmnx_shst_gdf.drive_access.value_counts(dropna=False)))
+    WranglerLogger.debug('osmnx_shst_gdf.bike_access.value_counts():\n{}'.format(osmnx_shst_gdf.drive_access.value_counts(dropna=False)))
+
+    return osmnx_shst_gdf
 
 def modify_osmway_lane_accounting_field_type(osmnx_shst_gdf):
     """
@@ -345,7 +436,6 @@ def tag_osm_ways_oneway_twoway(osmnx_shst_gdf):
 
     # default to 1-way
     osmnx_shst_gdf['osm_dir_tag'] = np.int8(1)
-    osmnx_shst_gdf
 
     # label 'two-way' links
     osmnx_shst_gdf.loc[(osmnx_shst_gdf.oneway_shst == False) & 
@@ -355,7 +445,7 @@ def tag_osm_ways_oneway_twoway(osmnx_shst_gdf):
     WranglerLogger.debug('osmnx_shst_gdf has {:,} links: \n{}'.format(osmnx_shst_gdf.shape[0], (osmnx_shst_gdf.osm_dir_tag.value_counts())))
 
 
-def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf):
+def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     """
     In OSM data, 'lanes' represents the total number of lanes of a given road, so for links representing two-way roads,
     lanes = lanes:forward + lanes:backward + lanes:both_ways, with 'lanes:forward' and 'lane:backward' representing lane
@@ -369,8 +459,30 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf):
     For two-way links, 12 cases were identified based on data availabilities and imputation method. A 'lane_count_type' of
     case type is also added to the link_gdf for QAQC. For cases without sufficient data to impute, skip for now.
     For one-way links, use 'lanes'; if 'lanes' is missing, use 'lanes:forward' if available
-
     """
+
+    # let's tally the permutation of these columns (for drive_access links only)
+    osmnx_lane_tag_permutations_df = pd.DataFrame(osmnx_shst_gdf.loc[ osmnx_shst_gdf.drive_access == True]. \
+        value_counts(subset=['osm_dir_tag','lanes','lanes:forward','lanes:backward','lanes:both_ways'], dropna=False)).reset_index(drop=False)
+    osmnx_lane_tag_permutations_df.rename(columns={0:'lane_count_type_numrows'},inplace=True)  # the count column is named 0 by default
+    # give it a new index and write it
+    osmnx_lane_tag_permutations_df['lane_count_type'] = osmnx_lane_tag_permutations_df.index
+    WranglerLogger.debug('osmnx_lane_tag_permutations_df:\n{}'.format(osmnx_lane_tag_permutations_df))
+    OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'osmnx_lane_tag_permutations.csv')
+    osmnx_lane_tag_permutations_df.to_csv(OUTPUT_FILE, header=True, index=False)
+    WranglerLogger.debug('Wrote {}'.format(OUTPUT_FILE))
+
+    # join to the geodataframe and write that
+    osmnx_lane_tag_permutations_df['drive_access'] = True
+    osmnx_shst_gdf = pd.merge(
+        left  = osmnx_shst_gdf,
+        right = osmnx_lane_tag_permutations_df,
+        on    = ['drive_access','osm_dir_tag','lanes','lanes:forward','lanes:backward','lanes:both_ways'],
+        how   = 'left'
+    )
+    OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'osmnx_shst_lane_tag_permutations.feather')
+    geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
+    WranglerLogger.debug('Wrote {}'.format(OUTPUT_FILE))
 
     # these are the new columns we'll be setting; initialize them now to be the right type
     osmnx_shst_gdf['lane_count_type']           = np.int8(-1) # unset
@@ -564,6 +676,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf):
         'backward_tot_lanes', two_way['backward_tot_lanes'].value_counts(dropna=False)))
 
     WranglerLogger.info('Impute lanes for one-way links')
+    WranglerLogger.info('one_way.value_counts:\n{}'.format(one_way.value_counts(subset=['lanes','lanes:forward','lanes:both_ways'], dropna=False)))
 
     # when 'lanes' data available
     one_way.loc[one_way.lanes.notnull(), 'oneway_tot_lanes'] = one_way['lanes']

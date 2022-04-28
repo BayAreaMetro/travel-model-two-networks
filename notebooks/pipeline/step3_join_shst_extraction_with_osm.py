@@ -28,9 +28,6 @@ OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step1_shst_extracts')
 OSM_EXTRACT_DIR  = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
 OSM_LINK_FILE    = os.path.join(OSM_EXTRACT_DIR, 'link.feather')
-# lookups for roadway type and network type
-HIGHWAY_TO_ROADWAY_CROSSWALK_FILE = os.path.join(INPUT_DATA_DIR, 'lookups', 'highway_to_roadway.csv')
-NETWORK_TYPE_LOOKUP_FILE = os.path.join(INPUT_DATA_DIR, 'lookups', 'network_type_indicator.csv')
 
 # This script will write to this directory
 SHST_WITH_OSM_DIR = os.path.join(OUTPUT_DATA_DIR, 'interim', 'step3_join_shst_with_osm')
@@ -87,10 +84,9 @@ if __name__ == '__main__':
     # 4. merge link attributes from OSM extracts with ShSt-derived OSM ways dataframe
     WranglerLogger.info('4. Merging link attributes from OSM extracts with ShSt-derived OSM ways dataframe')
     osmnx_shst_gdf = methods.merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, SHST_WITH_OSM_DIR)
-    
-    OUTPUT_FILE= os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst.feather")
-    geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
+
+    # 4a. Record OSMnx 'highway' tag; add columns 'roadway', 'hierarchy' (?), 'drive_access', 'bike_access', 'walk_access'
+    osmnx_shst_gdf = methods.recode_osmnx_highway_tag(osmnx_shst_gdf)
 
     # 5. impute total lane count, bus-only lane count, hov lane count by link direction
     WranglerLogger.info('5. Imputing total lane count and bus-only/hov lane counts')
@@ -99,7 +95,7 @@ if __name__ == '__main__':
     # second, add 'osm_dir_tag' to label two-way and one-way OSM ways
     methods.tag_osm_ways_oneway_twoway(osmnx_shst_gdf)
     # then, impute lane count for each direction
-    osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf)
+    osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
     # impute bus-only lanes
     osmnx_shst_gdf = methods.count_bus_lanes(osmnx_shst_gdf)
     # impute hov lane count
@@ -167,40 +163,11 @@ if __name__ == '__main__':
     #    list(link_gdf)))
     # WranglerLogger.debug(link_gdf.head())
 
-    # Convert osm "highway" values into standard roadway property based on
-    #     the highway_roadway_lookup. For ShSt links containing multiple OSM Ways therefore a list of roadway values,
-    #     simplify "highway" value based on the following assumptions:
-    #         - if the multiple OSM Ways have the same roadway type, use that type
-    #         - if the multiple OSM Ways have different roadway type, use the type with the smallest "hierarchy" value,
-    #           i.e. the highest hierarchy. For example, a ShSt link with roadway that contains a 'motorway' OSM Way and
-    #           a "footway" OSM Way (['motorway', 'footway']) would be labeled as 'motorway'.
-    #         - if missing OSM 'highway' info, use the 'roadClass' field from ShSt extract.
-    WranglerLogger.info('7. Converting OSM highway variable into standard roadway variable')
-    highway_to_roadway_df = pd.read_csv(HIGHWAY_TO_ROADWAY_CROSSWALK_FILE)
-
-    osmnx_shst_gdf = pd.merge(
-        left  = osmnx_shst_gdf, 
-        right = highway_to_roadway_df,
-        how   = 'left',
-        on    = 'highway'
-    )
-    WranglerLogger.debug('osmnx_shst_gdf.highway.value_counts():\n{}'.format(osmnx_shst_gdf.highway.value_counts()))
-    WranglerLogger.debug('osmnx_shst_gdf.roadway_value_counts():\n{}'.format(osmnx_shst_gdf.roadway.value_counts()))
-
-    # 11. clean up: there are links with different shstGeometryId, but same shstReferenceId and to/from nodes. Drop one
+    # 10. clean up: there are links with different shstGeometryId, but same shstReferenceId and to/from nodes. Drop one
     #     of the links with two shstGeometryId. The resulting link table has unique shstReferenceId and to/from nodes.
     ## wait, why?
     # WranglerLogger.info('Dropping link duplicates based on ShstRefenceID and from/to nodes')
     # osmnx_shst_gdf.drop_duplicates(subset=["shstReferenceId"], inplace=True)
-
-    # 12. add network type variables "drive_access", "walk_access", "bike_access" based on pre-defined lookup
-    WranglerLogger.info('Adding network type variables "drive_access", "walk_access", "bike_access"')
-    network_type_df = pd.read_csv(NETWORK_TYPE_LOOKUP_FILE)
-    osmnx_shst_gdf = pd.merge(
-        left  = osmnx_shst_gdf,
-        right = network_type_df,
-        how   = 'left',
-        on    = 'roadway')
 
     WranglerLogger.info('Finished converting SHST extraction into standard network links,' \
         'network has {:,} links, which are based on {:,} geometrics'.format(
