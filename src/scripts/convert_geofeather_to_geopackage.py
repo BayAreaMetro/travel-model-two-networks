@@ -50,7 +50,7 @@ if __name__ == '__main__':
         (dirname, filename) = os.path.split(full_filename)
         if len(args.input_geofeather_files) > 0 and filename not in args.input_geofeather_files: 
             continue
-        
+
         WranglerLogger.info("Reading {}".format(full_filename))
         input_gdf = geofeather.from_geofeather(full_filename)
         WranglerLogger.info("Initial dtypes:\n{}".format(input_gdf.dtypes))
@@ -119,6 +119,7 @@ if __name__ == '__main__':
         (dir,filename) = os.path.split(full_filename)
         layer_name = filename.replace(".feather","")
         layer_name = layer_name.replace(".","_")
+        WranglerLogger.info("Starting to write {:,} rows to {}".format(len(input_gdf), layer_name))
         input_gdf.to_file(args.output_gpkg, layer=layer_name, driver="GPKG")
         WranglerLogger.info("Wrote {} to {}".format(layer_name, args.output_gpkg))
 
