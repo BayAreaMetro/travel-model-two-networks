@@ -83,6 +83,6 @@ shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --ou
 echo "Matching SFCTA Stick Network to shst network using car rules not following direction"
 shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --out=interim/step4b_third_party_shst_match/sfcta/reverse_dir/sfcta.out.geojson --tile-hierarchy=8
 
-
-echo "Matching PEMS to shst network using best direction rules"
-shst match external/step4a_third_party_data/modified/pems/pems.in.geojson --search-radius=250 --out=interim/step4b_third_party_shst_match/pems/pems.out.geojson --best-direction
+# TODO: decide if need to run shst_match on PEMS data
+#echo "Matching PEMS to shst network using best direction rules"
+#shst match external/step4a_third_party_data/modified/pems/pems.in.geojson --search-radius=250 --out=interim/step4b_third_party_shst_match/pems/pems.out.geojson --best-direction

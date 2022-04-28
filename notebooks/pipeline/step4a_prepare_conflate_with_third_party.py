@@ -45,6 +45,7 @@ INPUT_TM2_Marin_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'TM2_Marin', 'mtc_
 INPUT_SFCTA_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'sfcta', 'SanFrancisco_links.shp')
 INPUT_CCTA_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'ccta_model', 'ccta_2015_network', 'ccta_2015_network.shp')
 INPUT_ACTC_FILE = os.path.join(THIRD_PARTY_RAW_DATA_DIR, 'actc_model', 'AlamedaCo_MASTER_20190410_no_cc.shp')
+# TODO: decide if need to run shst_match on PEMS data
 
 # sub-region boundary polygons to split third-party data
 BOUNDARY_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', 'modified')

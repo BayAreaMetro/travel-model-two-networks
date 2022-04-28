@@ -867,7 +867,6 @@ def add_two_way_osm(osmnx_shst_gdf):
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'turns:lanes_osmSplit'] = osmnx_shst_gdf['turn:lanes']
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'busOnly_lane_osmSplit'] = osmnx_shst_gdf['oneway_bus_lane']
     osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag == 1, 'hov_lane_osmSplit'] = osmnx_shst_gdf['oneway_hov_lane']
-    # TODO: drop initial lane and turn fields with 'forward' and 'backward' info
 
     # add variable to note that it's a reverse that we've created
     osmnx_shst_gdf["reverse"] = False
