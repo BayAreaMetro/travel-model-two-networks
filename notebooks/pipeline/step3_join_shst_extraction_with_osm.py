@@ -92,16 +92,14 @@ if __name__ == '__main__':
     geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
-    # 5. impute lanes counts and clean up turn values to prepare for adding reverse links in the next step, because
-    #    OSM data uses different attributes to represent lane count and turn value for two-way and one-way links
+    # 5. impute total lane count, bus-only lane count, hov lane count by link direction
+    WranglerLogger.info('5. Imputing total lane count and bus-only/hov lane counts')
     # first, clean up the field types and NAs of lane, turn related attributes
     methods.modify_osmway_lane_accounting_field_type(osmnx_shst_gdf)
     # second, add 'osm_dir_tag' to label two-way and one-way OSM ways
     methods.tag_osm_ways_oneway_twoway(osmnx_shst_gdf)
     # then, impute lane count for each direction
     osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf)
-    # also, clean up the strings used in 'turn' values
-    methods.cleanup_turns_attributes(osmnx_shst_gdf)
     # impute bus-only lanes
     osmnx_shst_gdf = methods.count_bus_lanes(osmnx_shst_gdf)
     # impute hov lane count
@@ -109,7 +107,7 @@ if __name__ == '__main__':
     WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
 
     # 6. add reverse links for two-way OSM ways
-    WranglerLogger.info('5. Adding reversed links for two-way OSM ways')
+    WranglerLogger.info('6. Adding reversed links for two-way OSM ways')
     osmnx_shst_gdf = methods.add_two_way_osm(osmnx_shst_gdf)
     WranglerLogger.debug('after adding two-way links, osm_from_shst_link_gdf has the following fields: {}'.format(
         osmnx_shst_gdf.dtypes))
@@ -121,15 +119,26 @@ if __name__ == '__main__':
     WranglerLogger.info("Wrote {} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
     # 7. impute turn lane counts from 'turn:lanes' string
+    WranglerLogger.info('7. Imputing turn lane counts')
+    # first, clean up the strings used in 'turn' values
+    methods.cleanup_turns_attributes(osmnx_shst_gdf)
+    # then, impute
+    osmnx_shst_gdf = methods.turn_lane_accounting(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
 
+    # 8. consolidate lane accounting
+    WranglerLogger.info('8. Consolidating lane accounting')
+    # first, reconcile total lane count
+    methods.reconcile_lane_count_inconsistency(osmnx_shst_gdf)
+    # lane accounting
+    methods.consolidate_lane_accounting(osmnx_shst_gdf)
 
-    # 8. fill NAs for ShSt-derived OSM Ways that do not have complete osm info
+    # 9. fill NAs for ShSt-derived OSM Ways that do not have complete osm info
     # lmz: why is this necessary??
     # WranglerLogger.info('6. Filling NAs for ShSt-derived OSM Ways missing complete osm info')
     # osm_ways_from_shst_non_na_gdf = methods.fill_na(osmnx_shst_gdf)
 
-    # 9. aggregate osm segments back to shst geometry based links
-    # WranglerLogger.info('7. Aggregating OSM ways back to shst geometry based links')
+    # 10. aggregate osm segments back to shst geometry based links
+    # WranglerLogger.info('10. Aggregating OSM ways back to shst geometry based links')
     # link_gdf = methods.consolidate_osm_way_to_shst_link(osm_ways_from_shst_non_na_gdf)
     # WranglerLogger.info('......after aggregating back to shst geometry, network has {} links,\
     # which are based on {} geometries'.format(link_gdf.shape[0], link_gdf.shstGeometryId.nunique()))
@@ -157,13 +166,13 @@ if __name__ == '__main__':
     WranglerLogger.debug('osmnx_shst_gdf.highway.value_counts():\n{}'.format(osmnx_shst_gdf.highway.value_counts()))
     WranglerLogger.debug('osmnx_shst_gdf.roadway_value_counts():\n{}'.format(osmnx_shst_gdf.roadway.value_counts()))
 
-    # 10. clean up: there are links with different shstGeometryId, but same shstReferenceId and to/from nodes. Drop one
+    # 11. clean up: there are links with different shstGeometryId, but same shstReferenceId and to/from nodes. Drop one
     #     of the links with two shstGeometryId. The resulting link table has unique shstReferenceId and to/from nodes.
     ## wait, why?
     # WranglerLogger.info('Dropping link duplicates based on ShstRefenceID and from/to nodes')
     # osmnx_shst_gdf.drop_duplicates(subset=["shstReferenceId"], inplace=True)
 
-    # 11. add network type variables "drive_access", "walk_access", "bike_access" based on pre-defined lookup
+    # 12. add network type variables "drive_access", "walk_access", "bike_access" based on pre-defined lookup
     WranglerLogger.info('Adding network type variables "drive_access", "walk_access", "bike_access"')
     network_type_df = pd.read_csv(NETWORK_TYPE_LOOKUP_FILE)
     osmnx_shst_gdf = pd.merge(
