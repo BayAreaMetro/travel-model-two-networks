@@ -10,6 +10,7 @@ import geofeather
 
 # some parameters shared by Pipeline scripts
 LAT_LONG_EPSG = 4326
+NEAREST_MATCH_EPSG = 26915
 
 # way (link) tags we want from OpenStreetMap (OSM)
 # osmnx defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
@@ -1328,6 +1329,101 @@ def create_node_gdf(link_gdf):
     return point_gdf
 
 
+def pems_station_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
+    """
+
+    """
+    WranglerLogger.info('Start matching PEMS stations to links using nearest match')
+    offset = 100
+
+    pems_route_list = pems_gdf.route.unique().tolist()
+
+    pems_match_gdf = gpd.GeoDataFrame()
+
+    # iterate through each route
+    for route in pems_route_list:
+        WranglerLogger.debug('...pems route id {}'.format(route))
+        pems_route_gdf = pems_gdf.loc[pems_gdf.route == route]
+        dir_list = pems_route_gdf.direction.unique().tolist()
+
+        # iterate through each direction
+        for direction in dir_list:
+            WranglerLogger.debug('\t ...pems direction {}'.format(direction))
+            pems_route_dir_gdf = pems_route_gdf.loc[pems_route_gdf.direction == direction]
+            type_list = pems_route_dir_gdf['type'].unique().tolist()
+
+            # iterate through each road type
+            for ptype in type_list:
+                WranglerLogger.debug('\t\t ...pems type {}'.format(ptype))
+                pems_route_dir_ptype_gdf = pems_route_dir_gdf.loc[pems_route_dir_gdf['type'] == ptype]
+                # create a bounding box around each station with the set offset;
+                # bbox is a dataframe with columns 'minx', 'miny', 'maxx', 'maxy'
+                bbox = pems_route_dir_ptype_gdf.bounds + [-offset, -offset, offset, offset]
+
+                # get links with the same shieldnum, rtedir, roadway
+                link_candidates = link_gdf.loc[(link_gdf.tomtom_shieldnum == str(route)) &
+                                               (link_gdf.tomtom_rtedir == direction) &
+                                               (link_gdf.roadway.isin(pems_type_roadway_crosswalk[ptype]))]
+                # if no link, use links with the same roadway type (regardless of name/direction) as candidates instead
+                if link_candidates.shape[0] == 0:
+                    WranglerLogger.debug('\t\t ...there is no link with tomtom label direction {}, route {}, roadway {},'
+                                        'matching to the closest {}'.format(
+                        direction, route, ptype, pems_type_roadway_crosswalk[ptype]))
+                    link_candidates = link_gdf.loc[link_gdf.roadway.isin(pems_type_roadway_crosswalk[ptype])]
+
+                # use GeoPandas R-tree spatial indexing (sindex) to intersect each PEMS point's bbox with all candidate
+                # links; the result "hit" has the same length as bbox, the values are the index of candidate link(s)
+                # that are intersect with each bbox row (each PEMS point's bbox)
+                hits = bbox.apply(lambda row: list(link_candidates.sindex.intersection(row)),
+                                  axis=1)
+                # convert hits into a dataframe with two columns: 'pt_idx' and 'link_i'
+                tmp = pd.DataFrame({
+                    # index of points table 'pems_route_dir_ptype_gdf' (also bbox)
+                    "pt_idx": np.repeat(hits.index, hits.apply(len)),
+                    # ordinal position of link - access via iloc later
+                    "link_i": np.concatenate(hits.values)
+                })
+
+                # set pt_idx as index and join with pems_route_dir_ptype_gdf
+                tmp.set_index(["pt_idx"], inplace=True)
+                tmp = tmp.join(
+                    pems_route_dir_ptype_gdf[[
+                        'station', 'longitude', 'latitude', 'route', 'direction', 'type', 'geometry'
+                    ]].rename(
+                        columns={"geometry": "point"}),
+                    how='left')
+
+                # rest link_condidates index and join tmp to it
+                tmp.set_index(['link_i'], inplace=True)
+                tmp = tmp.join(
+                    link_candidates[[
+                        'shstReferenceId', 'roadway', 'tomtom_shieldnum', 'tomtom_rtedir', 'geometry'
+                    ]].reset_index(drop=True),
+                    how='left')
+
+                # find closest link to point
+                # 1st, convert it to geodataframe with link's geometry as geometry
+                tmp_gdf = gpd.GeoDataFrame(tmp, geometry=tmp['geometry'], crs=pems_gdf.crs)
+                # 2nd, calculate the snap distance between each point (PEMS station) and the hitted link
+                tmp_gdf['snap_distance'] = tmp_gdf.geometry.distance(gpd.GeoSeries(tmp_gdf.point))
+                # 3rd, sort by snap_distance
+                tmp_gdf.sort_values(by=['snap_distance'], inplace=True)
+                # 4th, for each station, keep the link with the shortest snap distance
+                closest_gdf = tmp.groupby(["station", "longitude", "latitude"]).first().reset_index()
+
+                # add it to the matching result gdf
+                pems_match_gdf = pd.concat([pems_match_gdf, closest_gdf],
+                                           sort=False,
+                                           ignore_index=True)
+
+    WranglerLogger.debug(
+        'finished matching PEMS stations to links using nearest match, {} rows with following fields:\n{}'.format(
+            pems_match_gdf.shape[0], list(pems_match_gdf)
+        ))
+
+    return pems_match_gdf
+
+
 def link_df_to_geojson(df, properties):
     """
     Author: Geoff Boeing:
@@ -1407,7 +1503,7 @@ def identify_dead_end_nodes(links):
 
 def read_shst_extract(path, suffix):
     """
-    read all shst extraction geojson file
+    read all shst extraction geofeather file
     """
     shst_gdf = pd.DataFrame()
 
@@ -1430,6 +1526,33 @@ def read_shst_extract(path, suffix):
     WranglerLogger.debug("shst extraction head:{}\n".format(shst_gdf.head(10)))
 
     return shst_gdf
+
+
+def read_shst_matched(path, suffix):
+    """
+    read shst match results
+    """
+
+    shst_matched_gdf = pd.DataFrame()
+
+    shst_matched_files = glob.glob(path + "/**/" + suffix, recursive=True)
+
+    # raise an error if no files are found
+    if len(shst_matched_files) == 0:
+        raise FileNotFoundError(errno.ENOENT, path + "/**/" + suffix)
+
+    WranglerLogger.debug('...start reading shst matching result data')
+    for shst_matched in shst_matched_files:
+        WranglerLogger.debug('......reading shst matching result {}'.format(shst_matched))
+        new_gdf = gpd.read_file(shst_matched)
+        new_gdf['source'] = shst_matched
+        shst_matched_gdf = pd.concat([shst_matched_gdf, new_gdf],
+                                     ignore_index=True,
+                                     sort=False)
+    WranglerLogger.debug('...finished reading shst matching result')
+    WranglerLogger.debug('shst matched head: {}\n'.format(shst_matched_gdf.head(10)))
+
+    return shst_matched_gdf
 
 
 def highway_attribute_list_to_value(x, highway_to_roadway_dict, roadway_hierarchy_dict):

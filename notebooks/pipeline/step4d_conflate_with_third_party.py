@@ -14,6 +14,7 @@ import methods
 import pandas as pd
 import geopandas as gpd
 import geofeather
+from pyproj import CRS
 import os, datetime
 import numpy as np
 import requests
@@ -31,10 +32,10 @@ from network_wrangler import WranglerLogger, setupLogging
 #####################################
 # EPSG requirement
 # TARGET_EPSG = 4326
-lat_lon_epsg_str = 'EPSG:{}'.format(str(methods.LAT_LONG_EPSG))
-WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
-nearest_match_epsg_str = 'epsg:{}'.format(str(26915))
-WranglerLogger.info('nearest match ESPG: ', nearest_match_epsg_str)
+lat_lon_epsg_str = 'EPSG:{}'.format(methods.LAT_LONG_EPSG)
+WranglerLogger.info('standard ESPG: {}'.format(lat_lon_epsg_str))
+nearest_match_epsg_str = 'epsg:{}'.format(methods.NEAREST_MATCH_EPSG)
+WranglerLogger.info('nearest match ESPG: {}'.format(nearest_match_epsg_str))
 
 #####################################
 # inputs and outputs
@@ -110,8 +111,8 @@ if __name__ == '__main__':
     # TomTom conflation
 
     # Read tomtom ShSt match result
-    WranglerLogger.info('loading TomTom conflation result')
-    tomtom_match_gdf = methods.read_shst_extract(TOMTOM_MATCHED_DIR, 'tomtom_*.out.matched.geojson')
+    WranglerLogger.info('loading TomTom conflation result from {}'.format(TOMTOM_MATCHED_DIR))
+    tomtom_match_gdf = methods.read_shst_matched(TOMTOM_MATCHED_DIR, 'tomtom_*.out.matched.geojson')
 
     tomtom_match_gdf.rename(columns={'shstFromIntersectionId': 'fromIntersectionId',
                                      'shstToIntersectionId'  : 'toIntersectionId',
@@ -123,7 +124,7 @@ if __name__ == '__main__':
     # read TomTom raw data with all link attributes
     WranglerLogger.info('loading TomTom all-attribute link data')
     tomtom_attr_gdf = gpd.read_file(THIRD_PARTY_ALL_ATTRS, layer=TOMTOM_LAYER)
-    WranglerLogger.info('TomTom raw data has {} rows with columns: \n{}'.format(
+    WranglerLogger.debug('TomTom raw data has {} rows with columns: \n{}'.format(
         tomtom_attr_gdf.shape[0], list(tomtom_attr_gdf)))
 
     WranglerLogger.info('Sharedstreets matched {} out of {} total TomTom Links.'.format(
@@ -137,12 +138,13 @@ if __name__ == '__main__':
                                                           'LANES', 'FRC', 'NAME', 'SHIELDNUM', 'RTEDIR']],
                                          how='left',
                                          on='tomtom_link_id')
-    WranglerLogger.info('{} base network links have TomTom attributes'.format(tomtom_match_with_att_gdf.shape[0]))
 
-    # drop duplicates - duplicates may come from links crossing the subregion boundaries
+    # drop duplicates - duplicates may come from links crossing the subregion boundaries; also, when more than one
+    # TomTom links are matched to the same sharedstreets link.
+    # TODO: there are cases when two TomTom links were matched to the same shst link, it is possible to use the 'score' field to chose one?
     unique_tomtom_match_gdf = tomtom_match_with_att_gdf.drop_duplicates(
         subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
-    WranglerLogger.info('after dropping duplicates, {} links have TomTom attributes'.format(
+    WranglerLogger.info('after dropping duplicates, {} TomTom links remain'.format(
         unique_tomtom_match_gdf.shape[0]))
 
     # add data source prefix to column names
@@ -153,6 +155,14 @@ if __name__ == '__main__':
                                             "SHIELDNUM": "tomtom_shieldnum",
                                             "RTEDIR": "tomtom_rtedir"},
                                    inplace=True)
+
+    # print out unique values for each key attribute to help fix typos
+    for attribute in ['tomtom_lanes', 'tomtom_FRC', 'tomtom_shieldnum', 'tomtom_rtedir']:
+        WranglerLogger.debug('{} unique values:\n{}'.format(attribute,
+                                                            unique_tomtom_match_gdf.unique()))
+    # fix 'tomtom_shielfnum' = ' ' and tomtom_rtedir = ' '
+    unique_tomtom_match_gdf.loc[unique_tomtom_match_gdf.tomtom_shieldnum == ' ', 'tomtom_shieldnum'] = ''
+    unique_tomtom_match_gdf.loc[unique_tomtom_match_gdf.tomtom_rtedir == ' ', 'tomtom_rtedir'] = ''
 
     # join tomtom data with base network
     WranglerLogger.info('add TomTom attributes to base network from step3')
@@ -166,7 +176,8 @@ if __name__ == '__main__':
                                     on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId']
                                     )
 
-    WranglerLogger.debug('base network (ShSt+OSM) with TomTom attributes: \n{}'.format(link_with_tomtom_gdf.info()))
+    WranglerLogger.debug('{:,} base network links have TomTom attributes'.format(
+        (link_with_tomtom_gdf.tomtom_link_id.notnull()).sum()))
 
     ####################################
     # Load and process other third-party data conflation results
@@ -178,7 +189,7 @@ if __name__ == '__main__':
     # TM2 nonMarin data
     # read shst match result
     WranglerLogger.info('read TM2 nonMarin conflation result from folder {}'.format(TM2_nonMarin_MATCHED_DIR))
-    tm2nonMarin_match_gdf = methods.read_shst_extract(TM2_nonMarin_MATCHED_DIR, "tm2nonMarin_*.out.matched.geojson")
+    tm2nonMarin_match_gdf = methods.read_shst_matched(TM2_nonMarin_MATCHED_DIR, "tm2nonMarin_*.out.matched.geojson")
     # rename columns
     tm2nonMarin_match_gdf.rename(columns={'shstFromIntersectionId': 'fromIntersectionId',
                                           'shstToIntersectionId'  : 'toIntersectionId',
@@ -210,7 +221,7 @@ if __name__ == '__main__':
     # TM2 Marin data
     # read shst match result
     WranglerLogger.info('read TM2 Marin conflation result from folder {}'.format(TM2_Marin_MATCHED_DIR))
-    tm2marin_match_gdf = methods.read_shst_extract(TM2_Marin_MATCHED_DIR, "tm2Marin_*.out.matched.geojson")
+    tm2marin_match_gdf = methods.read_shst_matched(TM2_Marin_MATCHED_DIR, "tm2Marin_*.out.matched.geojson")
     # rename columns
     tm2marin_match_gdf.rename(columns={'shstFromIntersectionId': 'fromIntersectionId',
                                        'shstToIntersectionId'  : 'toIntersectionId',
@@ -242,7 +253,7 @@ if __name__ == '__main__':
     # SFCTA data
     # read shst match result
     WranglerLogger.info('read sfcta stick network conflation result from folder {}'.format(SFCTA_MATCHED_DIR))
-    sfcta_stick_match_gdf = methods.read_shst_extract(SFCTA_MATCHED_DIR, "*sfcta.out.matched.geojson")
+    sfcta_stick_match_gdf = methods.read_shst_matched(SFCTA_MATCHED_DIR, "*sfcta.out.matched.geojson")
     # rename columns
     sfcta_stick_match_gdf.rename(columns={'shstFromIntersectionId': 'fromIntersectionId',
                                           'shstToIntersectionId'  : 'toIntersectionId',
@@ -276,7 +287,7 @@ if __name__ == '__main__':
     # CCTA data
     # read shst match result
     WranglerLogger.info('read CCTA conflation result from folder {}'.format(CCTA_MATCHED_DIR))
-    ccta_match_gdf = methods.read_shst_extract(CCTA_MATCHED_DIR, 'ccta_*.out.matched.geojson')
+    ccta_match_gdf = methods.read_shst_matched(CCTA_MATCHED_DIR, 'ccta_*.out.matched.geojson')
     # rename columns
     ccta_match_gdf.rename(columns={'shstFromIntersectionId': 'fromIntersectionId',
                                    'shstToIntersectionId'  : 'toIntersectionId',
@@ -322,7 +333,7 @@ if __name__ == '__main__':
     # ACTC data
     # read shst match result
     WranglerLogger.info('read ACTC all-attribute link data')
-    actc_match_gdf = methods.read_shst_extract(ACTC_MATCHED_DIR, 'actc_*.out.matched.geojson')
+    actc_match_gdf = methods.read_shst_matched(ACTC_MATCHED_DIR, 'actc_*.out.matched.geojson')
     # rename columns
     actc_match_gdf.rename(columns={'shstFromIntersectionId': 'fromIntersectionId',
                                    'shstToIntersectionId': 'toIntersectionId',
@@ -381,6 +392,93 @@ if __name__ == '__main__':
 
     ####################################
     # TODO: Conflate PEMS data
+
+    # load PEMS raw data
+    WranglerLogger.info('Loading PEMS raw data from {}'.format(INPUT_PEMS_FILE))
+    pems_raw_df = pd.read_csv(INPUT_PEMS_FILE)
+
+    WranglerLogger.info('drop points without complete longitude and latitude info')
+    pems_df = pems_raw_df[~((pems_raw_df.longitude.isnull()) | (pems_raw_df.latitude.isnull()))]
+    WranglerLogger.debug('after dropping, PEMS data went from {} rows to {} rows'.format(pems_raw_df.shape[0],
+                                                                                         pems_df.shape[0]))
+
+    # generate 'geometry' and convert to geodataframe
+    WranglerLogger.info('create "geometry" from longitude and latitude')
+    pems_df['geometry'] = [Point(xy) for xy in zip(pems_df.longitude, pems_df.latitude)]
+    pems_gdf = gpd.GeoDataFrame(pems_df,
+                                geometry=pems_df['geometry'],
+                                crs={'init': lat_lon_epsg_str})
+
+    # convert crs to meter-based for nearest match algorithm
+    WranglerLogger.info('convert to meter-based epsg:26915')
+    pems_gdf = pems_gdf.to_crs(CRS(nearest_match_epsg_str))
+
+    # get TomTom 'tomtom_shieldnum', 'tomtom_rtedir' in the correct crs
+    WranglerLogger.info('Preparing TomTom Shieldnum and rtedir for conflation with PEMS')
+    # subset link_with_tomtom_gdf
+    tomtom_for_pems_conflation_gdf = link_with_tomtom_gdf[list(link_gdf) + ['tomtom_shieldnum', 'tomtom_rtedir']]
+    # convert crs to meter-based for nearest match algorithm
+    tomtom_for_pems_conflation_gdf = tomtom_for_pems_conflation_gdf.to_crs(CRS(nearest_match_epsg_str))
+
+    # To match PEMS to the nearest link with the same shieldnum and direction, examine these values first
+    WranglerLogger.info('Matching PEMS to the nearest link with the same shieldnum and direction')
+    WranglerLogger.debug('PEMS road "type" value counts:\n{}'.format(pems_gdf['type'].value_counts(dropna=False)))
+    WranglerLogger.debug('base network "roadway" value counts:\n{}'.format(
+        tomtom_for_pems_conflation_gdf['roadway'].value_counts(dropna=False)))
+    WranglerLogger.debug('PEMS route value counts:\n{}'.format(pems_gdf['route'].value_counts(dropna=False)))
+    WranglerLogger.debug('TomTom shieldnum value counts:\n{}'.format(
+        tomtom_for_pems_conflation_gdf['tomtom_shieldnum'].value_counts(dropna=False)))
+
+    # only for QAQC: write out links whose shieldnum is include in PEMS routes - these are candidates for nearest match
+    candidate_links_for_PEMS_match_QAQC_gdf = tomtom_for_pems_conflation_gdf.loc[
+        tomtom_for_pems_conflation_gdf['tomtom_shieldnum'].isin(pems_gdf['route'].unique().astype(str))]
+    candidate_links_for_PEMS_match_QAQC_gdf.reset_index(drop=True, inplace=True)
+
+    WranglerLogger.debug('TomTom unique shieldnum+tomtom_rtedir comb:\n{}'.format(
+        tomtom_for_pems_conflation_gdf.groupby(['tomtom_shieldnum', 'tomtom_rtedir'])['shstReferenceId'].count()))
+    WranglerLogger.debug('PEMS unique route+direction comb:\n{}'.format(
+        pems_gdf.groupby(['route', 'direction'])['station'].count()))
+
+    OUTPUT_FILE = os.path.join(CONFLATION_RESULT_DIR, 'candidate_links_for_PEMS_match_QAQC.feather')
+    geofeather.to_geofeather(candidate_links_for_PEMS_match_QAQC_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {} rows to {}".format(candidate_links_for_PEMS_match_QAQC_gdf.shape[0], OUTPUT_FILE))
+
+    # 1. create a PEMS road "type" to base network "roadway" dictionary
+    WranglerLogger.debug('PEMS "type" field value counts:\n{}'.format(pems_gdf.type.value_counts(dropna=False)))
+    WranglerLogger.debug('base network "roadway" field value counts:\n{}'.format(
+        tomtom_for_pems_conflation_gdf.roadway.value_counts(dropna=False)))
+
+    roadway_types = tomtom_for_pems_conflation_gdf.loc[tomtom_for_pems_conflation_gdf['roadway'].notnull()]['roadway'].unique()
+    pems_type_roadway_crosswalk = {'ML': ['tertiary', 'primary', 'secondary', 'motorway', 'trunk'],
+                                   'HV': [c for c in roadway_types if c.endswith("_link")],
+                                   'FF': [c for c in roadway_types if c.endswith("_link")],
+                                   'OR': [c for c in roadway_types if c.endswith("_link")],
+                                   'FR': [c for c in roadway_types if c.endswith("_link")]}
+
+    # 2. match PEMS stations to base network links based on PEMS route + direction, and TomTom shieldnum + rtedir
+    pems_nearest_match = methods.pems_station_nearest_match(pems_gdf,
+                                                            tomtom_for_pems_conflation_gdf,
+                                                            pems_type_roadway_crosswalk)
+
+    # 3. merge it back to pems_gdf
+    WranglerLogger.info('Merging PEMS nearest matching result back to pems_gdf')
+    pems_nearest_gdf = pd.merge(pems_gdf,
+                                pems_nearest_match.drop(['point', 'geometry'], axis=1),
+                                how='left',
+                                on=['station', 'longitude', 'latitude', 'route', 'direction', 'type'])
+    WranglerLogger.info('Finished PEMS nearest matching')
+    WranglerLogger.debug('{} out of {} rows of PEMS data found a matching link, with "type" value counts:\n{}'.format(
+        (pems_nearest_gdf.shstReferenceId.notnull()).sum(),
+        pems_nearest_gdf.shape[0],
+        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()]['type'].value_counts()
+    ))
+    WranglerLogger.debug('{} rows of PEMS data failed to find a matching link, with "type" value counts:\n{}'.format(
+        (pems_nearest_gdf.shstReferenceId.isnull()).sum(),
+        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]['type'].value_counts()
+    ))
+
+    # TODO (?) for these that failed in nearest match, use sharedstreets conflation result
+
 
     ####################################
     # Join link attributes from other third-party data to base+TomTom network
