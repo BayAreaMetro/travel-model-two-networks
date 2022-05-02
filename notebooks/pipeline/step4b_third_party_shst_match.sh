@@ -40,48 +40,48 @@ do
     echo "Matching tomtom_$i to shst network using car rules following direction"
     shst match external/step4a_third_party_data/modified/TomTom/tomtom_$i.in.geojson --out=interim/step4b_third_party_shst_match/TomTom/car_rules/tomtom_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction
 
-    echo "Matching tomtom_$i to shst network using bike rules following direction"
-    shst match external/step4a_third_party_data/modified/TomTom/tomtom_$i.in.geojson --out=interim/step4b_third_party_shst_match/TomTom/bike_rules/tomtom_$i.out.geojson --tile-hierarchy=8  --match-bike --follow-line-direction
-
-    echo "Matching tomtom_$i to shst network using pedestrian rules following direction"
-    shst match external/step4a_third_party_data/modified/TomTom/tomtom_$i.in.geojson --out=interim/step4b_third_party_shst_match/TomTom/ped_rules/tomtom_$i.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
-
+#    echo "Matching tomtom_$i to shst network using bike rules following direction"
+#    shst match external/step4a_third_party_data/modified/TomTom/tomtom_$i.in.geojson --out=interim/step4b_third_party_shst_match/TomTom/bike_rules/tomtom_$i.out.geojson --tile-hierarchy=8  --match-bike --follow-line-direction
+#
+#    echo "Matching tomtom_$i to shst network using pedestrian rules following direction"
+#    shst match external/step4a_third_party_data/modified/TomTom/tomtom_$i.in.geojson --out=interim/step4b_third_party_shst_match/TomTom/ped_rules/tomtom_$i.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
+#
 
     echo "Matching TM2nonMarin_$i to shst network using car rules following direction"
     shst match external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_nonMarin/car_rules/tm2nonMarin_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction
 
-    echo "Matching TM2nonMarin_$i to shst network using pedestrian rules following direction"
-    shst match external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_nonMarin/ped_rules/tm2nonMarin_$i.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
-
-    echo "Matching TM2nonMarin_$i to shst network using car rules not following direction"
-    shst match external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_nonMarin/reverse_dir/tm2nonMarin_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections
+#    echo "Matching TM2nonMarin_$i to shst network using pedestrian rules following direction"
+#    shst match external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_nonMarin/ped_rules/tm2nonMarin_$i.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
+#
+#    echo "Matching TM2nonMarin_$i to shst network using car rules not following direction"
+#    shst match external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_nonMarin/reverse_dir/tm2nonMarin_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections
 
 
     echo "Matching TM2Marin_$i to shst network using car rules following direction"
     shst match external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_Marin/car_rules/tm2Marin_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction
 
-    echo "Matching TM2Marin_$i to shst network using pedestrian rules following direction"
-    shst match external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_Marin/ped_rules/tm2Marin_$i.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
+#    echo "Matching TM2Marin_$i to shst network using pedestrian rules following direction"
+#    shst match external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_Marin/ped_rules/tm2Marin_$i.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
+#
+#    echo "Matching TM2Marin_$i to shst network using car rules not following direction"
+#    shst match external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_Marin/reverse_dir/tm2Marin_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections
 
-    echo "Matching TM2Marin_$i to shst network using car rules not following direction"
-    shst match external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_$i.in.geojson --out=interim/step4b_third_party_shst_match/TM2_Marin/reverse_dir/tm2Marin_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections
 
-
-    echo "Matching actc_$i to shst network"
+    echo "Matching actc_$i to shst network using car rules following direction"
     shst match external/step4a_third_party_data/modified/actc/actc_$i.in.geojson --out=interim/step4b_third_party_shst_match/actc/actc_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction
 
-    echo "Matching ccta_$i to shst network"
+    echo "Matching ccta_$i to shst network using car rules following direction"
     shst match external/step4a_third_party_data/modified/ccta/ccta_$i.in.geojson --out=interim/step4b_third_party_shst_match/ccta/ccta_$i.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction
 done
 
 echo "Matching SFCTA Stick Network to shst network using car rules following direction"
 shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --out=interim/step4b_third_party_shst_match/sfcta/car_rules/sfcta.out.geojson --tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction
 
-echo "Matching SFCTA Stick Network to shst network using pedestrian rules following direction"
-shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --out=interim/step4b_third_party_shst_match/sfcta/ped_rules/sfcta.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
-
-echo "Matching SFCTA Stick Network to shst network using car rules not following direction"
-shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --out=interim/step4b_third_party_shst_match/sfcta/reverse_dir/sfcta.out.geojson --tile-hierarchy=8
+#echo "Matching SFCTA Stick Network to shst network using pedestrian rules following direction"
+#shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --out=interim/step4b_third_party_shst_match/sfcta/ped_rules/sfcta.out.geojson --tile-hierarchy=8 --match-pedestrian --follow-line-direction
+#
+#echo "Matching SFCTA Stick Network to shst network using car rules not following direction"
+#shst match external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson --out=interim/step4b_third_party_shst_match/sfcta/reverse_dir/sfcta.out.geojson --tile-hierarchy=8
 
 # TODO: decide if need to run shst_match on PEMS data
 #echo "Matching PEMS to shst network using best direction rules"
