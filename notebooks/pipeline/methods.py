@@ -3,8 +3,12 @@ import pandas as pd
 import numpy as np
 import geopandas as gpd
 import osmnx as ox
-from shapely.geometry import Point, shape, LineString
+from shapely.geometry import Point, shape, LineString, Polygon
+from shapely.ops import transform
+import pyproj
+from pyproj import CRS
 from scipy.spatial import cKDTree
+from functools import partial
 from network_wrangler import WranglerLogger
 import geofeather
 
@@ -1329,15 +1333,14 @@ def create_node_gdf(link_gdf):
     return point_gdf
 
 
-def pems_station_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
+def pems_station_sheild_dir_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
     """
 
     """
-    WranglerLogger.info('Start matching PEMS stations to links using nearest match')
+    WranglerLogger.info('Start matching PEMS stations to links using nearest sheildnum+direction match')
     offset = 100
 
     pems_route_list = pems_gdf.route.unique().tolist()
-
     pems_match_gdf = gpd.GeoDataFrame()
 
     # iterate through each route
@@ -1361,6 +1364,7 @@ def pems_station_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
                 bbox = pems_route_dir_ptype_gdf.bounds + [-offset, -offset, offset, offset]
 
                 # get links with the same shieldnum, rtedir, roadway
+                # str(route) because 'route' is numeric in PEMS data but 'tomtom_shieldnum' is string
                 link_candidates = link_gdf.loc[(link_gdf.tomtom_shieldnum == str(route)) &
                                                (link_gdf.tomtom_rtedir == direction) &
                                                (link_gdf.roadway.isin(pems_type_roadway_crosswalk[ptype]))]
@@ -1417,11 +1421,100 @@ def pems_station_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
                                            ignore_index=True)
 
     WranglerLogger.debug(
-        'finished matching PEMS stations to links using nearest match, {} rows with following fields:\n{}'.format(
+        'finished matching PEMS stations to links using nearest sheildnum+direction match, '
+        '{} rows with following fields:\n{}'.format(
             pems_match_gdf.shape[0], list(pems_match_gdf)
         ))
 
     return pems_match_gdf
+
+
+def _geodesic_point_buffer(lat, lon, buffer_radius):
+    """
+    Create a buffer of point, based on point lat/lon
+    """
+    # Azimuthal equidistant projection
+    proj_wgs84 = pyproj.Proj('+proj=longlat +datum=WGS84')
+    aeqd_proj = '+proj=aeqd +lat_0={lat} +lon_0={lon} +x_0=0 +y_0=0'
+    project = partial(
+        pyproj.transform,
+        pyproj.Proj(aeqd_proj.format(lat=lat, lon=lon)),
+        proj_wgs84)
+    buf = Point(0, 0).buffer(buffer_radius)  # distance in meters
+    return Polygon(transform(project, buf).exterior.coords[:])
+
+
+def _links_within_point_buffer(link_gdf, point_df, buffer_radius=25):
+    """
+    find the links that intersect within the buffer of each point
+    """
+
+    point_buffer_gdf = point_df.copy()
+
+    # set the geometry to be the buffered area of each point and convert the data into a geodataframe
+    point_buffer_gdf['geometry'] = point_buffer_gdf.apply(
+        lambda x: _geodesic_point_buffer(x.latitude, x.longitude, buffer_radius),
+        axis=1)
+    lat_lon_epsg_str = 'EPSG:{}'.format(LAT_LONG_EPSG)
+    point_buffer_gdf = gpd.GeoDataFrame(point_buffer_gdf,
+                                        geometry=point_buffer_gdf['geometry'],
+                                        crs={'init': lat_lon_epsg_str})
+    point_buffer_gdf = point_buffer_gdf.to_crs(CRS(lat_lon_epsg_str))
+    link_gdf = link_gdf.to_crs(CRS(lat_lon_epsg_str))
+    point_buffer_link_df = gpd.sjoin(link_gdf,
+                                     point_buffer_gdf[['geometry', 'type']],
+                                     how='left',
+                                     op='intersects')
+
+    point_buffer_link_df = point_buffer_link_df.loc[point_buffer_link_df['type'].notnull()]
+
+    return point_buffer_link_df['shstReferenceId'].tolist()
+
+
+def pems_match_ft(pems_station_df, link_gdf, pems_type_roadway_crosswalk):
+    """
+    match each PEMS station to a base roadway link of the same facility type
+
+    pems_station_df has to have fields 'latitude' and 'longitude'
+    link_gdf has to be in lat/lon epsg (4326)
+    """
+    WranglerLogger.info('Starting matching PEMS stations to links of the same facility type')
+
+    pems_stations_ft_matched_gdf = gpd.GeoDataFrame()
+
+    for i in range(len(pems_station_df)):
+        row_df = pems_station_df.iloc[[i]]
+        station_type = row_df['type'].iloc[0]
+        station_num = row_df['station'].iloc[0]
+        WranglerLogger.debug('...process station {}, type {}'.format(station_num, station_type))
+        # get all links with the same facility types
+        links = link_gdf.loc[(link_gdf.roadway.isin(pems_type_roadway_crosswalk[station_type]))]
+        # get all links within the buffer of the station
+        links_within_buffer = _links_within_point_buffer(links, row_df, 100)
+
+        # add other link attributes to the links within the buffer
+        links_within_buffer_gdf = link_gdf.loc[link_gdf.shstReferenceId.isin(links_within_buffer)]
+        links_within_buffer_gdf.loc[:, 'station'] = station_num
+        links_within_buffer_gdf.loc[:, 'type'] = station_type
+        links_within_buffer_gdf.loc[:, 'latitude'] = row_df['latitude'].iloc[0]
+        links_within_buffer_gdf.loc[:, 'longitude'] = row_df['longitude'].iloc[0]
+        row_df.loc[:, 'geometry'] = row_df.apply(lambda x: Point(x.longitude, x.latitude), axis=1)
+        links_within_buffer_gdf['point'] = row_df['geometry'].iloc[0]
+
+        # calculate the distance between the station point and each matched link
+        links_within_buffer_gdf['snap_distance'] = links_within_buffer_gdf.geometry.distance(
+            gpd.GeoSeries(links_within_buffer_gdf.point)
+        )
+        # sort by distance, and groupby to keep the link with the shortest distance
+        links_within_buffer_gdf.sort_values(by=['snap_distance'], inplace=True)
+        closest_link_gdf = links_within_buffer_gdf.groupby(['station', 'longitude', 'latitude']).first().reset_index()
+
+        pems_stations_ft_matched_gdf = pd.concat([pems_stations_ft_matched_gdf, closest_link_gdf],
+                                                 sort=False,
+                                                 ignore_index=True)
+
+    WranglerLogger.info('finished matching PEMS stations')
+    return pems_stations_ft_matched_gdf
 
 
 def link_df_to_geojson(df, properties):

@@ -391,7 +391,7 @@ if __name__ == '__main__':
                                  inplace=True)
 
     ####################################
-    # TODO: Conflate PEMS data
+    # Conflate PEMS data
 
     # load PEMS raw data
     WranglerLogger.info('Loading PEMS raw data from {}'.format(INPUT_PEMS_FILE))
@@ -401,6 +401,12 @@ if __name__ == '__main__':
     pems_df = pems_raw_df[~((pems_raw_df.longitude.isnull()) | (pems_raw_df.latitude.isnull()))]
     WranglerLogger.debug('after dropping, PEMS data went from {} rows to {} rows'.format(pems_raw_df.shape[0],
                                                                                          pems_df.shape[0]))
+    # PEMS data contains multiple years
+    for yr in pems_df.year.unique():
+        WranglerLogger.debug('for year {}: PEMS data contains {} stations, {} unique route+direction comb'.format(
+            yr,
+            pems_df.loc[pems_df.year == yr]['station'].nunique(),
+            pems_df[['route', 'direction']].drop_duplicates().shape[0]))
 
     # generate 'geometry' and convert to geodataframe
     WranglerLogger.info('create "geometry" from longitude and latitude')
@@ -435,9 +441,9 @@ if __name__ == '__main__':
     candidate_links_for_PEMS_match_QAQC_gdf.reset_index(drop=True, inplace=True)
 
     WranglerLogger.debug('TomTom unique shieldnum+tomtom_rtedir comb:\n{}'.format(
-        tomtom_for_pems_conflation_gdf.groupby(['tomtom_shieldnum', 'tomtom_rtedir'])['shstReferenceId'].count()))
+        tomtom_for_pems_conflation_gdf.groupby(['tomtom_shieldnum', 'tomtom_rtedir'])['shstReferenceId'].count().reset_index().rename(columns={'station': 'row_count'})))
     WranglerLogger.debug('PEMS unique route+direction comb:\n{}'.format(
-        pems_gdf.groupby(['route', 'direction'])['station'].count()))
+        pems_gdf.groupby(['route', 'direction'])['station'].count().reset_index().rename(columns={'station': 'row_count'})))
 
     OUTPUT_FILE = os.path.join(CONFLATION_RESULT_DIR, 'candidate_links_for_PEMS_match_QAQC.feather')
     geofeather.to_geofeather(candidate_links_for_PEMS_match_QAQC_gdf, OUTPUT_FILE)
@@ -456,29 +462,108 @@ if __name__ == '__main__':
                                    'FR': [c for c in roadway_types if c.endswith("_link")]}
 
     # 2. match PEMS stations to base network links based on PEMS route + direction, and TomTom shieldnum + rtedir
-    pems_nearest_match = methods.pems_station_nearest_match(pems_gdf,
+    pems_nearest_match = methods.pems_station_sheild_dir_nearest_match(pems_gdf,
                                                             tomtom_for_pems_conflation_gdf,
                                                             pems_type_roadway_crosswalk)
 
     # 3. merge it back to pems_gdf
-    WranglerLogger.info('Merging PEMS nearest matching result back to pems_gdf')
+    WranglerLogger.info('Merging PEMS nearest sheildnum+direction matching result back to pems_gdf')
     pems_nearest_gdf = pd.merge(pems_gdf,
                                 pems_nearest_match.drop(['point', 'geometry'], axis=1),
                                 how='left',
                                 on=['station', 'longitude', 'latitude', 'route', 'direction', 'type'])
-    WranglerLogger.info('Finished PEMS nearest matching')
-    WranglerLogger.debug('{} out of {} rows of PEMS data found a matching link, with "type" value counts:\n{}'.format(
+    WranglerLogger.info('Finished PEMS nearest sheildnum+direction matching')
+    WranglerLogger.debug('{} out of {} PEMS records found a matching link, {} stations, with "type" value counts:\n{}'.format(
         (pems_nearest_gdf.shstReferenceId.notnull()).sum(),
         pems_nearest_gdf.shape[0],
+        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()].station.nunique(),
         pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()]['type'].value_counts()
     ))
-    WranglerLogger.debug('{} rows of PEMS data failed to find a matching link, with "type" value counts:\n{}'.format(
+    WranglerLogger.debug('{} PEMS records failed to find a matching link, representing {} stations, with "type" value counts:\n{}'.format(
         (pems_nearest_gdf.shstReferenceId.isnull()).sum(),
+        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()].station.nunique(),
         pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]['type'].value_counts()
     ))
 
-    # TODO (?) for these that failed in nearest match, use sharedstreets conflation result
+    # QAQC: write out PEMS data not able to find nearest sheildnum+direction match for debugging
+    pems_nearest_debug_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]
+    pems_nearest_debug_gdf.reset_index(drop=True, inplace=True)
+    OUTPUT_FILE = os.path.join(CONFLATION_RESULT_DIR, 'PEMS_no_nearest_match_QAQC.feather')
+    geofeather.to_geofeather(pems_nearest_debug_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {} rows to {}".format(pems_nearest_debug_gdf.shape[0], OUTPUT_FILE))
 
+    # 4. (TODO: decide if this step is useful) For those that failed in nearest sheildnum+direction match, use nearest match only based on facility type
+    # get PEMS station+type+location that failed to find nearest match
+    pems_sheild_dir_unmatched_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]
+    pems_sheild_dir_unmatched_station_df = pems_sheild_dir_unmatched_gdf[['station', 'type', 'latitude', 'longitude']].drop_duplicates()
+    WranglerLogger.debug('PEMS records not find a nearest sheildnum+direction match represent {} '
+                         'unique PEMS station/type/location'.format(pems_sheild_dir_unmatched_station_df.shape[0]))
+    # convert all links to lat/lon epsg (epsg:4326)
+    link_for_pems_ft_match_gdf = tomtom_for_pems_conflation_gdf.to_crs(CRS(lat_lon_epsg_str))
+
+    # call the function to do facility type based shortest distance match
+    pems_stations_ft_matched_gdf = methods.pems_match_ft(pems_sheild_dir_unmatched_station_df,
+                                                         link_for_pems_ft_match_gdf,
+                                                         pems_type_roadway_crosswalk)
+
+    # join the result back to pems_sheild_dir_unmatched_gdf
+    pems_ft_matched_df = pd.merge(pems_sheild_dir_unmatched_gdf.drop('shstReferenceId', axis=1),
+                                  pems_stations_ft_matched_gdf[['shstReferenceId', 'station', 'longitude', 'latitude', 'type']],
+                                  how='left',
+                                  on=['station', 'type', 'longitude', 'latitude'])
+    WranglerLogger.info('facility type based matching matched {} additional stations'.format(
+        pems_ft_matched_df.station.nunique()))
+    WranglerLogger.info('facility types of still unmatched PEMS records:\n{}'.format(
+        pems_ft_matched_df.loc[pems_ft_matched_df.shstReferenceId.isnull()]['type'].value_counts()))
+
+    # TODO: decide if need ShSt match
+
+    # 5. concatenate matching results from the two methods
+    pems_sheild_dir_matched_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()]
+    pems_conflation_result = pd.concat([pems_sheild_dir_matched_gdf, pems_ft_matched_df],
+                                       sort=False,
+                                       ignore_index=True)
+
+    # post-process PEMS matching results
+    # link can have multiple pems station on it, so trying to get the mode of #lanes by station type
+    # TODO: the initial code uses three years' PEMS data 2014, 2015, 2016 to represent 2015 lane count. Decide if want to apply the year filter before running matching, which would have reduce run time.
+    # first, get lane count for each unique comb of shstReferenceId and PEMS type
+    pems_lanes_by_shstRef_type_df = pems_conflation_result.loc[
+        (pems_conflation_result['year'].isin([2014, 2015, 2016]))].groupby(
+        ['shstReferenceId', 'type', 'lanes'])['station'].count().sort_values(ascending=False).reset_index()[[
+            'shstReferenceId', 'type', 'lanes']].drop_duplicates(subset=['shstReferenceId', 'type'])
+    WranglerLogger.debug('pems_lanes_by_shstRef_type_df has {} rows, with header:\n{}'.format(
+        pems_lanes_by_shstRef_type_df.shape[0],
+        pems_lanes_by_shstRef_type_df.head(10)
+    ))
+    # then, expand the dataframe so 'type' is in columns
+    pems_lanes_by_shstRef_type_df = pems_lanes_by_shstRef_type_df.pivot_table(
+        index=['shstReferenceId'], values='lanes', columns='type').fillna(0).reset_index()
+
+    # get a dataframe of all PEMS stations matched to each shstReferenceId
+    link_pems_station_df = pems_conflation_result.loc[
+        (pems_conflation_result['year'].isin([2014, 2015, 2016]))].drop_duplicates(
+            subset=['shstReferenceId', 'station']).groupby(
+                ['shstReferenceId'])['station'].apply(list).reset_index().rename(columns={'station': 'PEMS_station_ID'})
+    WranglerLogger.debug('link_pems_station_df has {} rows, with header:\n{}'.format(
+        link_pems_station_df.shape[0],
+        link_pems_station_df.head(10)
+    ))
+    # merge the two
+    pems_lanes_df = pd.merge(pems_lanes_by_shstRef_type_df,
+                             link_pems_station_df,
+                             how='left',
+                             on='shstReferenceId')
+    # rename
+    pems_lanes_df.rename(columns={'FF': 'pems_lanes_FF',
+                                  'FR': 'pems_lanes_FR',
+                                  'HV': 'pems_lanes_HV',
+                                  'ML': 'pems_lanes_ML',
+                                  'OR': 'pems_lanes_OR'},
+                         inplace=True)
+    WranglerLogger.info('Finished conflating PEMS lane counts, got PEMS lane counts for {} unique shst links'.format(
+        pems_lanes_df.shstReferenceId.nunique()
+    ))
 
     ####################################
     # Join link attributes from other third-party data to base+TomTom network
@@ -512,23 +597,18 @@ if __name__ == '__main__':
         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId']
     )
 
+    link_all_conflated_gdf = pd.merge(
+        link_all_conflated_gdf,
+        pems_lanes_df,
+        how='left',
+        on='shstReferenceId')
+
     WranglerLogger.info('after conflation, {:,} links with the follow columns: \n{}'.format(
         link_all_conflated_gdf.shape[0],
         list(link_all_conflated_gdf)))
 
     ####################################
-    # TODO: resolve duplicated shstReferenceId
-
-    ####################################
-    # Write out standard links
-    # TODO: decide which columns to include.
-    # Note: the initial pipeline method only writes out columns included in the input shst_osmnx_gdf; all columns
-    # from third-party are exported as a .csv file.
-    WranglerLogger.info('Saving links to {}'.format(CONFLATED_LINK_GEOFEATHER_FILE))
-    geofeather.to_geofeather(link_all_conflated_gdf, CONFLATED_LINK_GEOFEATHER_FILE)
-
-
-    ####################################
+    # TODO: resolve duplicated shstReferenceId; do lane/name heuristics here instead of exporting
     # Write out conflation result data base - this will be used to create a number of 'lookup' tables to be used in
     # lane heuristics and QAQC
     WranglerLogger.info('Write out third-party conflation result data base')
@@ -570,18 +650,29 @@ if __name__ == '__main__':
         'tomtom_FRC', 'tomtom_FRC_def', 'tomtom_lanes', 'tomtom_link_id', 'F_JNCTID', 'T_JNCTID',
         'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir',
         'TM2Marin_A', 'TM2Marin_B', 'TM2Marin_FT', 'TM2Marin_LANES', 'TM2Marin_ASSIGNABLE',
-        'TM2nonMarin_A', 'TM2nonMarin_B', 'TM2nonMarin_FT', 'TM2nonMarin_FT_def', 'TM2nonMarin_LANES', 'TM2nonMarin_ASSIGNABLE',
+        'TM2nonMarin_A', 'TM2nonMarin_B', 'TM2nonMarin_FT', 'TM2nonMarin_FT_def', 'TM2nonMarin_LANES',
+        'TM2nonMarin_ASSIGNABLE',
         'sfcta_A', 'sfcta_B', "sfcta_STREETNAME", 'sfcta_FT', 'sfcta_LANE_AM', 'sfcta_LANE_OP', 'sfcta_LANE_PM',
         'ACTC_A', 'ACTC_B', 'ACTC_base_lanes_min', 'ACTC_base_lanes_max', 'ACTC_nmt2010_min', 'ACTC_nmt2010_max',
         'ACTC_nmt2020_min', 'ACTC_nmt2020_max',
-        'CCTA_A', 'CCTA_B', 'CCTA_base_lanes_min', 'CCTA_base_lanes_max'
+        'CCTA_A', 'CCTA_B', 'CCTA_base_lanes_min', 'CCTA_base_lanes_max',
+        'pems_lanes_FF', 'pems_lanes_FR', 'pems_lanes_HV', 'pems_lanes_ML',
+        'pems_lanes_OR', 'PEMS_station_ID',
     ]
-    
+
     link_conflation_fields_gdf = link_all_conflated_gdf[conflation_result_fields].rename(
         columns={'lanes_tot': 'lanes_tot_osm',
                  'tomtom_link_id': 'tomtom_unique_id'})
-    
+
     WranglerLogger.info('export conflation fields to {}'.format(CONFLATION_SUMMARY_FILE))
     link_conflation_fields_gdf.to_csv(CONFLATION_SUMMARY_FILE, index=False)
-    
+
+    ####################################
+    # Write out standard links
+    # TODO: decide which columns to include.
+    # Note: the initial pipeline method only writes out columns included in the input shst_osmnx_gdf; all columns
+    # from third-party are exported as a .csv file.
+    WranglerLogger.info('Saving links to {}'.format(CONFLATED_LINK_GEOFEATHER_FILE))
+    geofeather.to_geofeather(link_all_conflated_gdf, CONFLATED_LINK_GEOFEATHER_FILE)
+
     WranglerLogger.info('Done')
