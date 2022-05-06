@@ -148,6 +148,30 @@ if __name__ == '__main__':
         'lane_cnt_from_turns', 'lanes_non_gp'                               # validation lane count
         ], inplace=True)
 
+    # 9. consolidate osm ways back to ShSt based links ('shstReferenceId')
+    # At this point, osmnx_shst_gdf has duplicated shstReferenceId because some sharedstreets links contain more than
+    # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row
+
+    # separate the attributes into different groups based on what consolidation methodology to apply
+        # 'attrs_shst_level': attributes that already represent the entire sharedstreets links
+    attrs_shst_level = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'shstGeometryId']
+        # 'attrs_length_based_update': OSM Way attributes; will use the values of the longest OSM way of each
+        # sharedstreets link to represent the entire shst link
+    attrs_length_based_update = ['link', 'oneway_shst', 'oneway_osmnx', 'osm_dir_tag', 'name_shst_metadata',
+                                 'roadClass', 'roundabout', 'highway', 'name',
+                                 'maxspeed', 'sidewalk', 'cycleway', 'bridge', 'service', 'width', 'tunnel', 'access',
+                                 'ref', 'junction', 'shoulder', 'est_width', 'taxi', 'area', 'lane_count_type',
+                                 'lanes_tot', 'lanes_bus', 'lanes_hov', 'lanes_turn', 'lanes_merge_turn', 'lanes_aux',
+                                 'lanes_through_turn', 'lanes_middleturn', 'lanes_gp', 'roadway', 'hierarchy',
+                                 'drive_access', 'walk_access', 'bike_access']
+        # 'attrs_location_based_update': OSM Way attributes; will need to update based on their location in the ShSt link
+    attrs_location_based_update = ['nodeIds', 'wayId', 'waySections_len', 'u', 'v', 'osmid', 'length',
+                                   '_merge', 'reverse', 'index']
+
+    # length-based updates
+    osmnx_shst_gdf = methods.update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_length_based_update)
+    # TODO: location-based updates
+
 
     # 9. fill NAs for ShSt-derived OSM Ways that do not have complete osm info
     # lmz: why is this necessary??

@@ -1177,6 +1177,36 @@ def consolidate_lane_accounting(osmnx_shst_gdf):
         osmnx_shst_gdf['lanes_tot'] - osmnx_shst_gdf['lanes_non_gp']
 
 
+def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_length_based_update):
+    """
+    When multiple OSM ways are matched to a same shst link, update certain attributes to use the values of the longest
+     OSM way.
+    """
+    WranglerLogger.info('Starting updating attribute values for base on OSM way length')
+    WranglerLogger.debug('... the following attributes will be updates: {}'.format(attrs_length_based_update))
+
+    # sort by shstReferenceId and length
+    osmnx_shst_gdf_sorted = osmnx_shst_gdf.sort_values(['shstReferenceId', 'length'], ascending=False)
+
+    # group by 'shstReferenceId' and keep the first (longest OSM way) of each group
+    WranglerLogger.debug('...osmnx_shst_gdf has {} unique sharedstreets links'.format(
+        osmnx_shst_gdf.shstReferenceId.nunique()))
+    osmnx_new_values_by_shst = osmnx_shst_gdf_sorted.groupby(
+        'shstReferenceId').first().reset_index()[['shstReferenceId'] + attrs_length_based_update]
+    # check the row count of osmnx_new_values_by_shst == unique shst link count
+    WranglerLogger.debug('...groupby resulted in {} rows of shst-link-level attributes'.format(
+        osmnx_new_values_by_shst.shape[0]))
+
+    # join the updated value back to the dataframe
+    osmnx_shst_other_attrs_gdf = osmnx_shst_gdf.loc[:, ~osmnx_shst_gdf.columns.isin(attrs_length_based_update)]
+    osmnx_shst_gdf_updated = osmnx_shst_other_attrs_gdf.merge(osmnx_new_values_by_shst,
+                                                              on='shstReferenceId',
+                                                              how='left')
+    WranglerLogger.debug('Finished updating attributes based on osm way length')
+
+    return osmnx_shst_gdf_updated
+
+
 def consolidate_osm_way_to_shst_link(osm_link):
     """
     if a shst link has more than one osm ways, aggregate info into one, e.g. series([1,2,3]) to cell value [1,2,3]
