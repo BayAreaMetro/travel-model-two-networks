@@ -854,6 +854,18 @@ def add_two_way_osm(osmnx_shst_gdf):
         reverse_linestrings.append(LineString(reverse_coordinates))
     reverse_osmnx_shst_gdf['geometry'] = reverse_linestrings
 
+    # also reverse nodeIds
+    forward_nodeIds = reverse_osmnx_shst_gdf['nodeIds'].tolist()
+    WranglerLogger.debug('forward_nodeIds len={} type(forward_nodeIds[0])={} first 5={}'.format(
+        len(forward_nodeIds), type(forward_nodeIds[0]), forward_nodeIds[:5]
+    ))
+    reverse_nodeIds = []
+    for forward_nodes in forward_nodeIds:
+        # forward_linstring is a shapely.geometry.LineString object
+        reverse_nodes = list(forward_nodes)[::-1]
+        reverse_nodeIds.append(reverse_nodes)
+    reverse_osmnx_shst_gdf['nodeIds'] = reverse_nodeIds
+
     # add variables to represent imputed lanes for each direction and turns for each direction
     # for reversed osm links, use 'backward_tot_lanes', 'turn:lanes:backward', 'backward_bus_lane', 'backward_middleTurn_lanes'
     reverse_osmnx_shst_gdf['lanes_osmSplit'] = reverse_osmnx_shst_gdf['backward_tot_lanes']
