@@ -94,12 +94,13 @@ if __name__ == '__main__':
     methods.modify_osmway_lane_accounting_field_type(osmnx_shst_gdf)
     # second, add 'osm_dir_tag' to label two-way and one-way OSM ways
     methods.tag_osm_ways_oneway_twoway(osmnx_shst_gdf)
-    # then, impute lane count for each direction
-    osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
-    # impute bus-only lanes
-    osmnx_shst_gdf = methods.count_bus_lanes(osmnx_shst_gdf)
-    # impute hov lane count
+    # count bus-only lanes - add 'forward_bus_lane', 'backward_bus_lane'
+    methods.count_bus_lanes(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
+    # impute hov lane count - add 'forward_hov_lane'
     methods.count_hov_lanes(osmnx_shst_gdf)
+    # then, impute lane count for each direction -- adds 'lane_count_type', 'forward_tot_lanes','backward_tot_lanes','bothways_tot_lanes'
+    osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
+
     WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
 
     # 6. add reverse links for two-way OSM ways
@@ -112,7 +113,7 @@ if __name__ == '__main__':
     # write this to look at it
     OUTPUT_FILE= os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf.feather")
     geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
     # 7. impute turn lane counts from 'turn:lanes' string
     WranglerLogger.info('7. Imputing turn lane counts')
@@ -139,12 +140,12 @@ if __name__ == '__main__':
         'turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',  # raw OSMnx turn info
         'hov', 'hov:lanes', 'lanes:hov',                                    # raw OSMnx hov info
         'bus', 'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward',      # raw OSMnx bus info
-        'forward_tot_lanes', 'backward_tot_lanes', 'oneway_tot_lanes',      # interim lane count
-        'forward_middleTurn_lanes', 'backward_middleTurn_lanes',            # interim middle turn count
-        'backward_bus_lane', 'forward_bus_lane', 'oneway_bus_lane',         # interim bus lane count
-        'oneway_hov_lane',                                                  # interim hov lane count
-        'turns:lanes_osmSplit', 'middleTurn_lane_osmSplit',                 # interim turn info
-        'through_only', 'turns_ls', 'turns_dict',                           # interim turn lane counts
+        'forward_tot_lanes', 'backward_tot_lanes',                          # interim lane count
+        'bothways_tot_lanes',                                               # interim middle turn count
+        'backward_bus_lane', 'forward_bus_lane',                            # interim bus lane count
+        'forward_hov_lane',                                                 # interim hov lane count
+        'turns:lanes_osmSplit', 'bothways_lane_osmSplit',                   # interim turn info
+        'through_only', 'turns_list', 'turns_dict',                         # interim turn lane counts
         'lane_cnt_from_turns', 'lanes_non_gp'                               # validation lane count
         ], inplace=True)
 
@@ -225,8 +226,8 @@ if __name__ == '__main__':
     #####################################
     # export link, node, shape
 
-    WranglerLogger.info('Final network links have the following fields: {}'.format(list(osmnx_shst_gdf)))
-    WranglerLogger.info('Final network nodes have the following fields: {}'.format(list(node_gdf)))
+    WranglerLogger.info('Final network links have the following fields:\n{}'.format(osmnx_shst_gdf.dtypes))
+    WranglerLogger.info('Final network nodes have the following fields:\n{}'.format(node_gdf.dtypes))
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
