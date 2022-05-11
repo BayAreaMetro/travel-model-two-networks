@@ -99,7 +99,7 @@ if __name__ == '__main__':
     # impute hov lane count - add 'forward_hov_lane'
     methods.count_hov_lanes(osmnx_shst_gdf)
     # then, impute lane count for each direction -- adds 'lane_count_type', 'forward_tot_lanes','backward_tot_lanes','bothways_tot_lanes'
-    osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
+    methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
 
     WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
 
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     WranglerLogger.info('7. Imputing turn lane counts')
     # first, clean up the strings used in 'turn' values
     methods.cleanup_turns_attributes(osmnx_shst_gdf)
-    # then, impute
+    # then, count turn lanes from 'turns:lanes_osmSplit'; this adds columns 'through_turn','merge_only','through_only',turn_only','lane_count_from_turns','middle_turn'
     osmnx_shst_gdf = methods.turn_lane_accounting(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
 
     # 8. consolidate lane accounting
@@ -132,7 +132,7 @@ if __name__ == '__main__':
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf_lane_accounting_QAQC.feather")
     geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
     # drop interim fields before continue
     osmnx_shst_gdf.drop(columns=[
@@ -145,8 +145,8 @@ if __name__ == '__main__':
         'backward_bus_lane', 'forward_bus_lane',                            # interim bus lane count
         'forward_hov_lane',                                                 # interim hov lane count
         'turns:lanes_osmSplit', 'bothways_lane_osmSplit',                   # interim turn info
-        'through_only', 'turns_list', 'turns_dict',                         # interim turn lane counts
-        'lane_cnt_from_turns', 'lanes_non_gp'                               # validation lane count
+        'through_only',                                                     # interim turn lane counts
+        'lane_count_from_turns', 'lanes_non_gp'                             # validation lane count
         ], inplace=True)
 
     # 9. consolidate osm ways back to ShSt based links ('shstReferenceId')
@@ -162,7 +162,7 @@ if __name__ == '__main__':
                                  'roadClass', 'roundabout', 'highway', 'name',
                                  'maxspeed', 'sidewalk', 'cycleway', 'bridge', 'service', 'width', 'tunnel', 'access',
                                  'ref', 'junction', 'shoulder', 'est_width', 'taxi', 'area', 'lane_count_type',
-                                 'lanes_tot', 'lanes_bus', 'lanes_hov', 'lanes_turn', 'lanes_merge_turn', 'lanes_aux',
+                                 'lanes_tot', 'lanes_bus', 'lanes_hov', 'lanes_turn', 'lanes_aux',
                                  'lanes_through_turn', 'lanes_middleturn', 'lanes_gp', 'roadway', 'hierarchy',
                                  'drive_access', 'walk_access', 'bike_access']
         # 'attrs_location_based_update': OSM Way attributes; will need to update based on their location in the ShSt link
