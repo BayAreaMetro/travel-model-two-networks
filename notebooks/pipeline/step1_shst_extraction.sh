@@ -1,5 +1,8 @@
 #!/bin/bash
-#
+################################################################################
+# NOTE: step0_preepare_for_shst_extraction.py now includes this functionality
+# SO THIS SCRIPT IS JUST FOR REFERENCE
+################################################################################
 # This script should run in a shst docker
 # 
 # To build the docker image using the Dockerfile in this directory use (only need to run once):

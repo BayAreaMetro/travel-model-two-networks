@@ -15,6 +15,12 @@ import geofeather
 # some parameters shared by Pipeline scripts
 LAT_LONG_EPSG = 4326
 NEAREST_MATCH_EPSG = 26915
+# number of polygons used for SharedStreet extraction
+# == number of rows in step0 INPUT_POLYGON
+# == number of geojson files in step0 OUTPUT_BOUNDARY_DIR
+NUM_SHST_BOUNDARIES = 14
+# for ShSt docker work
+DOCKER_SHST_IMAGE_NAME = 'shst:latest'
 
 # way (link) tags we want from OpenStreetMap (OSM)
 # osmnx defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
@@ -59,6 +65,88 @@ OSM_WAY_TAGS = {
     'cycleway'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:cycleway
 }
 
+def create_docker_container(mount_e: bool, mount_home: bool):
+    """
+    Uses docker python package to:
+    1) If it doesn't already exist, create docker image from Dockerfile in local directory named DOCKER_SHST_IMAGE_NAME
+    2) If mount_e is True, creates mount for E: so that it is accessible at /usr/e_volume 
+    3) If mount_home is True, creates mount for C:\\Users\\{USERNAME} so that it is acceessible at /usr/home
+    3) Starts docker container from the given image with given mounts
+
+    Returns (docker.Client instance, 
+             running docker.models.containers.Container instance)
+
+    See https://docker-py.readthedocs.io/en/stable/containers.html?highlight=prune#docker.models.containers.ContainerCollection.prune
+    """
+    import docker
+    client = docker.from_env()
+
+    # check if the docker image exists
+    shst_image = None
+    try:
+        shst_image = client.images.get('shst:latest')
+        WranglerLogger.info('shst image {} found; skipping docker image build'.format(shst_image))
+    except docker.errors.ImageNotFound:
+        # if not, create one using the local Dockerfile
+        dockerfile_dir = os.path.abspath(os.path.dirname(__file__))
+        WranglerLogger.info('Creating image using dockerfile dir {}'.format(dockerfile_dir))
+        shst_image = client.images.build(path=dockerfile_dir, tag='shst', rm=True)
+        WranglerLogger.info('Created docker image {}'.format(shst_image))
+
+    docker_mounts = []
+    if mount_e:
+        # check if the docker volume exists
+        try:
+            E_volume = client.volumes.get('E_volume')
+            WranglerLogger.info('E_volume volume {} found; skipping docker volume create'.format(E_volume))
+        except docker.errors.NotFound:
+            # if not, create one
+            # first we need our IP address
+            import socket
+            hostname = socket.gethostname()
+            IPAddr   = socket.gethostbyname(hostname)
+
+            # and the Windows username, password
+            import getpass
+            username = getpass.getuser()
+            password = getpass.getpass(prompt='To create a docker volume for your E drive, please enter your password: ')
+            # print('username={} password={}'.format(username,password))
+
+            # create the docker volume
+            E_volume = client.volumes.create(
+                name        = 'E_volume', 
+                driver      = 'local', 
+                driver_opts = {'type'  :'cifs',
+                               'device':'//{}/e'.format(IPAddr),
+                               'o':'user={},password={},file_mode=0777,dir_mode=0777'.format(username,password)
+                              })
+            WranglerLogger.info('Created docker volume {}'.format(E_volume))
+
+        e_mount = docker.types.Mount(target='/usr/e_volume', source='E_volume', type='volume')
+        docker_mounts.append(e_mount)
+            
+    if mount_home:
+        # mount Users home dir
+        WranglerLogger.info('Mouting C:/Users/{} as /usr/home'.format(os.environ['USERNAME']))
+        output_mount_target = '/usr/home'
+        home_mount = docker.types.Mount(target=output_mount_target, source=os.environ['USERPROFILE'], type='bind')
+        docker_mounts.append(home_mount)
+
+
+    # docker create
+    container = client.containers.create(
+        image       = 'shst:latest',
+        command     = '/bin/bash',
+        tty         = True,
+        stdin_open  = True,
+        auto_remove = False, 
+        mounts      = docker_mounts)
+    WranglerLogger.info('docker container {} named {} created'.format(container, container.name))
+    container.start()
+    WranglerLogger.info('docker container {} started; status: '.format(container.name, container.status))
+
+    return (client, container)
+    
 def extract_osm_links_from_shst_metadata(shst_gdf):
     """
     Expand each shst extract record into osm ways; the information from this is within the metadata for the row:
