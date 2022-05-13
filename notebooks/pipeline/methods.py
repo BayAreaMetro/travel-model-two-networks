@@ -69,11 +69,11 @@ def create_docker_container(mount_e: bool, mount_home: bool):
     """
     Uses docker python package to:
     1) If it doesn't already exist, create docker image from Dockerfile in local directory named DOCKER_SHST_IMAGE_NAME
-    2) If mount_e is True, creates mount for E: so that it is accessible at /usr/e_volume 
+    2) If mount_e is True, creates mount for E: so that it is accessible at /usr/e_volume
     3) If mount_home is True, creates mount for C:\\Users\\{USERNAME} so that it is acceessible at /usr/home
     3) Starts docker container from the given image with given mounts
 
-    Returns (docker.Client instance, 
+    Returns (docker.Client instance,
              running docker.models.containers.Container instance)
 
     See https://docker-py.readthedocs.io/en/stable/containers.html?highlight=prune#docker.models.containers.ContainerCollection.prune
@@ -114,8 +114,8 @@ def create_docker_container(mount_e: bool, mount_home: bool):
 
             # create the docker volume
             E_volume = client.volumes.create(
-                name        = 'E_volume', 
-                driver      = 'local', 
+                name        = 'E_volume',
+                driver      = 'local',
                 driver_opts = {'type'  :'cifs',
                                'device':'//{}/e'.format(IPAddr),
                                'o':'user={},password={},file_mode=0777,dir_mode=0777'.format(username,password)
@@ -124,7 +124,7 @@ def create_docker_container(mount_e: bool, mount_home: bool):
 
         e_mount = docker.types.Mount(target='/usr/e_volume', source='E_volume', type='volume')
         docker_mounts.append(e_mount)
-            
+
     if mount_home:
         # mount Users home dir
         WranglerLogger.info('Mouting C:/Users/{} as /usr/home'.format(os.environ['USERNAME']))
@@ -139,14 +139,15 @@ def create_docker_container(mount_e: bool, mount_home: bool):
         command     = '/bin/bash',
         tty         = True,
         stdin_open  = True,
-        auto_remove = False, 
+        auto_remove = False,
         mounts      = docker_mounts)
     WranglerLogger.info('docker container {} named {} created'.format(container, container.name))
     container.start()
     WranglerLogger.info('docker container {} started; status: '.format(container.name, container.status))
 
     return (client, container)
-    
+
+
 def extract_osm_links_from_shst_metadata(shst_gdf):
     """
     Expand each shst extract record into osm ways; the information from this is within the metadata for the row:
@@ -213,18 +214,22 @@ def extract_osm_links_from_shst_metadata(shst_gdf):
         name = metadata.get('osmMetadata').get('name')
         waySections_len = len(metadata.get('osmMetadata').get('waySections'))
         geometryId = metadata.get('geometryId')
+        waySections_order = 1
         for osm_way in metadata.get('osmMetadata').get('waySections'):
             osm_dict = osm_way
             osm_dict['name'] = name
             osm_dict['waySections_len'] = waySections_len
+            osm_dict['waySection_ord'] = waySections_order
             osm_dict['geometryId'] = geometryId
             osm_from_shst_link_list.append(osm_dict)
+            waySections_order = waySections_order + 1
     WranglerLogger.debug("osm_from_shst_link_list has length {}".format(len(osm_from_shst_link_list)))
 
     osm_from_shst_link_df = pd.DataFrame.from_records(osm_from_shst_link_list)
     # convert wayId to numeric and waySections_len to int8
     osm_from_shst_link_df["wayId"]           = osm_from_shst_link_df["wayId"].astype(int)
     osm_from_shst_link_df["waySections_len"] = osm_from_shst_link_df["waySections_len"].astype(np.int8)
+    osm_from_shst_link_df["waySection_ord"] = osm_from_shst_link_df["waySection_ord"].astype(np.int8)
 
     WranglerLogger.debug("osm_from_shst_link_df has length {} and dtypes:\n{}".format(len(osm_from_shst_link_df),
         osm_from_shst_link_df.dtypes))
@@ -1317,34 +1322,146 @@ def consolidate_lane_accounting(osmnx_shst_gdf):
     osmnx_shst_gdf['lanes_gp' ] = osmnx_shst_gdf['lanes_gp' ].astype(np.int8)
     WranglerLogger.debug('consolidate_lane_accounting complete; dtypes=\n{}'.format(osmnx_shst_gdf.dtypes))
 
-def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_length_based_update):
+
+def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby_cols):
     """
     When multiple OSM ways are matched to a same shst link, update certain attributes to use the values of the longest
      OSM way.
     """
-    WranglerLogger.info('Starting updating attribute values for base on OSM way length')
-    WranglerLogger.debug('... the following attributes will be updated: {}'.format(attrs_length_based_update))
+    WranglerLogger.debug('......the following attributes will be updated: {}'.format(attrs_longest))
 
     # sort by shstReferenceId and length
     osmnx_shst_gdf_sorted = osmnx_shst_gdf.sort_values(['shstReferenceId', 'length'], ascending=False)
 
     # group by 'shstReferenceId' and keep the first (longest OSM way) of each group
-    WranglerLogger.debug('...osmnx_shst_gdf has {:,} unique sharedstreets links'.format(
+    WranglerLogger.debug('......osmnx_shst_gdf has {:,} unique sharedstreets links'.format(
         osmnx_shst_gdf.shstReferenceId.nunique()))
     osmnx_new_values_by_shst = osmnx_shst_gdf_sorted.groupby(
-        'shstReferenceId').first().reset_index()[['shstReferenceId'] + attrs_length_based_update]
+        groupby_cols).first().reset_index()[groupby_cols + attrs_longest]
     # check the row count of osmnx_new_values_by_shst == unique shst link count
-    WranglerLogger.debug('...groupby resulted in {:,} rows of shst-link-level attributes'.format(
+    WranglerLogger.debug('......groupby resulted in {:,} rows of shst-link-level attributes'.format(
         osmnx_new_values_by_shst.shape[0]))
 
     # join the updated value back to the dataframe
-    osmnx_shst_other_attrs_gdf = osmnx_shst_gdf.loc[:, ~osmnx_shst_gdf.columns.isin(attrs_length_based_update)]
+    osmnx_shst_other_attrs_gdf = osmnx_shst_gdf.loc[:, ~osmnx_shst_gdf.columns.isin(attrs_longest)]
     osmnx_shst_gdf_updated = osmnx_shst_other_attrs_gdf.merge(osmnx_new_values_by_shst,
-                                                              on='shstReferenceId',
+                                                              on=groupby_cols,
                                                               how='left')
-    WranglerLogger.debug('Finished updating attributes based on osm way length')
+    WranglerLogger.debug('......finished updating attributes based on osm way length')
 
     return osmnx_shst_gdf_updated
+
+
+def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
+    """
+    when multiple OSM Ways comprise one sharedstreets link:
+    """
+    WranglerLogger.info('Starting aggregated osm ways back to shst links')
+
+    # 1, separate the attributes into different groups based on what consolidation methodology to apply
+    WranglerLogger.debug('... osmnx_shst_gdf link attributes are grouped into the following sets:')
+    # 'attrs_shst_level' fields: already represent the values of the entire sharedstreet link, no change
+    attrs_shst_level = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'shstGeometryId']
+    # 'attrs_sum' fields: sum the values of each OSM way
+    attrs_sum = ['length']
+    # 'attrs_max' fields: use the largest value of all OSM ways in the same shst link
+    attrs_max = ['waySections_len']
+    # 'attrs_concat' fields: concatenate
+    attrs_concat = ['wayId', 'waySection_ord', 'osmid', 'osmnx_shst_merge', 'reverse', 'index']
+    # 'attrs_merge' fields: node-related merge
+    attrs_merge = ['nodeIds', 'u', 'v']
+    # 'attrs_longest' fields: use the values of the longest OSM way
+    attrs_longest = list(
+        set(list(osmnx_shst_gdf)) - set(attrs_shst_level) - set(attrs_sum) - set(attrs_max) - set(attrs_merge) - set(
+            attrs_concat))
+    WranglerLogger.debug('aggregate using sum: {}'.format(attrs_sum))
+    WranglerLogger.debug('aggregate using max: {}'.format(attrs_max))
+    WranglerLogger.debug('aggregate using concatenation: {}'.format(attrs_concat))
+    WranglerLogger.debug('aggregate by merging nodes: {}'.format(attrs_merge))
+    WranglerLogger.debug('aggregate by using the value of the longest osm way: {}'.format(attrs_longest))
+
+    # 2, for 'attrs_longest', set the value of all osm ways of the same shst to be the same as the longest osm way
+    groupby_cols = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'shstGeometryId']
+    WranglerLogger.debug('...updating values for osm-way-length-based link attribute')
+    osmnx_shst_gdf_longest_update = update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby_cols)
+
+    # 3, create an agg dictionary for grouping by osm ways by shst link
+    def _make_tuple(x):
+        """ Agregation function, tuple-izes series with multiple values
+        """
+        T = tuple(x)
+        # if it's a series with one object, e.g.
+        # 0    [2401244716, 2401244713, 2401244712]
+        # dtype: object
+        if isinstance(x, pd.Series) and x.dtype == object and len(x) == 1:
+            return T
+
+        if len(T) > 1:
+            if isinstance(T, (pd.Series, pd.Index, np.ndarray)) and len(T) != 1:
+                WranglerLogger.debug("T:{} type:{} len:{}".format(T, type(T), len(T)))
+            return T
+
+        if isinstance(T[0], (pd.Series, pd.Index, np.ndarray)) and len(T[0]) != 1:
+            WranglerLogger.debug("T[0]:{} type:{} len:{}".format(T[0], type(T[0]), len(T[0])))
+            WranglerLogger.debug("=> T:{} type:{} len:{}".format(T, type(T), len(T)))
+            WranglerLogger.debug("=> x:{} type:{} len:{}".format(x, type(x), len(x)))
+        return T[0]
+
+    def _merge_nodeIds(x):
+        """
+        Aggregation function for merging nodeIds, e.g. two OSM ways of the same ShSt link have nodeIds:
+        ['4717667145', '4717667151'], ['4717667151', '4717667176', '4717667189', '4717667193', '4717667196'],
+        the merged nodeIds is ['4717667145', '4717667151', '4717667176', '4717667189', '4717667193', '4717667196']
+        """
+        # get all series into a nested list of series
+        nodeIds_ls = list(x)
+        # expand to one list
+        nodeIds_ls_expand = [item for sublist in nodeIds_ls for item in sublist]
+        # remove duplicates while keep node order; duplicated nodes appear at connecting osm ways
+        nodeIds_ls_expand_nodup = list(dict.fromkeys(nodeIds_ls_expand))
+        return nodeIds_ls_expand_nodup
+
+    # set initial agg dictionary
+    agg_dict = {
+        'geometry'       : 'first',
+        'u'              : 'first',         # 'u' of the shst link is the u of the first osm way
+        'v'              : 'last',          # 'v' of the shst link is the v of the last osm way
+        'nodeIds'        : _merge_nodeIds,  # 'nodeIds' apply the aggregation function
+        'length'         : 'sum',           # 'length' of the shst link is the sum of all osm ways
+        'waySections_len': 'max'            # 'waySections_len' of the shst link is the max of all osm ways
+    }
+    # add other fields
+    # for fields to be aggregated into tuples, set them to be object dtypes
+    object_columns = {}
+    # fields that need to concatenate into tuples
+    for c in attrs_concat:
+        agg_dict[c] = _make_tuple
+        object_columns[c] = object
+    # fields whose values are already updated
+    for c in attrs_longest:
+        agg_dict[c] = 'first'
+
+    WranglerLogger.debug('...aggregation dict:\n{}'.format(agg_dict))
+
+    # 4, apply the aggregation method to forward links and backward links separately. This is because 'waySection_ord'
+    # represents the order of an OSM way in a shst link in the initial shst metadata; after adding two-way OSM ways (
+    # 'reverse=True' links), the order should be reversed, in other words, descending.
+    forward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse']==False]
+    forward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], inplace=True)
+    WranglerLogger.debug('...aggregating forward links')
+    forward_link_gdf_agg = forward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
+
+    backward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse']==True]
+    backward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], ascending=False, inplace=True)
+    WranglerLogger.debug('...aggregating backward links')
+    backward_link_gdf_agg = backward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
+
+    # put them together
+    shst_link_gdf = pd.concat([forward_link_gdf_agg, backward_link_gdf_agg],
+                              sort=False,
+                              ignore_index=True)
+
+    return shst_link_gdf
 
 
 def consolidate_osm_way_to_shst_link(osm_link):

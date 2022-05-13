@@ -62,16 +62,16 @@ if __name__ == '__main__':
 
     # 2. Expand ShSt extract's metadata field into OSM Ways
     #    This step is needed because is come cases, one ShSt extract record (one geometry) contain multiple OSM Ways.
-    #    Creates dataframe "osm_ways_from_shst_df" with fields: 
-    #       ['nodeIds', 'wayId', 'roadClass', 'oneWay', 'roundabout', 'link', 'name', 'geometryId', 'u', 'v',
-    #        'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry']
+    #    Creates dataframe "osm_ways_from_shst_gdf" with fields:
+    #     ['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'link',
+    #      'name', 'nodeIds', 'oneWay', 'roadClass', 'roundabout', 'wayId', 'waySections_len', 'waySection_ord', 'geometryId', 'u', 'v']
     WranglerLogger.info('2. Expanding ShSt extract into OSM Ways with ShSt-specific link attributes')
     osm_ways_from_shst_gdf = methods.extract_osm_links_from_shst_metadata(shst_link_gdf)
     WranglerLogger.info('shst extracts has {} geometries, {} OSM Ways'.format(
         osm_ways_from_shst_gdf.geometryId.nunique(),
         osm_ways_from_shst_gdf.shape[0])
     )
-    WranglerLogger.debug('osm_ways_from_shst_gdf has the following OSM fields: {}'.format(list(osm_ways_from_shst_gdf)))
+    WranglerLogger.debug('osm_ways_from_shst_gdf has the following fields: {}'.format(list(osm_ways_from_shst_gdf)))
 
     # 3. Read OSM data from step2_osmnx_extraction.py
     WranglerLogger.info('3. Reading osmnx links from {}'.format(OSM_LINK_FILE))
@@ -152,27 +152,19 @@ if __name__ == '__main__':
     # 9. consolidate osm ways back to ShSt based links ('shstReferenceId')
     # At this point, osmnx_shst_gdf has duplicated shstReferenceId because some sharedstreets links contain more than
     # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row
+    shst_consolidated_gdf = methods.aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf)
+    WranglerLogger.info('Before aggregating osm ways back to sharedstreets-based links, osmnx_shst_gdf has {} links, '
+                        'representing {} unique sharedstreets links; after aggregating, shst_consolidated_gdf has {} links'.format(
+                            osmnx_shst_gdf.shape[0],
+                            osmnx_shst_gdf.drop_duplicates(subset=['id', 'fromIntersectionId',
+                                                                   'toIntersectionId', 'shstReferenceId',
+                                                                   'shstGeometryId']).shape[0],
+                            shst_consolidated_gdf.shape[0]))
 
-    # separate the attributes into different groups based on what consolidation methodology to apply
-        # 'attrs_shst_level': attributes that already represent the entire sharedstreets links
-    attrs_shst_level = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'shstGeometryId']
-        # 'attrs_length_based_update': OSM Way attributes; will use the values of the longest OSM way of each
-        # sharedstreets link to represent the entire shst link
-    attrs_length_based_update = ['link', 'oneway_shst', 'oneway_osmnx', 'osm_dir_tag', 'name_shst_metadata',
-                                 'roadClass', 'roundabout', 'highway', 'name',
-                                 'maxspeed', 'sidewalk', 'cycleway', 'bridge', 'service', 'width', 'tunnel', 'access',
-                                 'ref', 'junction', 'shoulder', 'est_width', 'taxi', 'area', 'lane_count_type',
-                                 'lanes_tot', 'lanes_bus', 'lanes_hov', 'lanes_turn', 'lanes_aux',
-                                 'lanes_through_turn', 'lanes_middleturn', 'lanes_gp', 'roadway', 'hierarchy',
-                                 'drive_access', 'walk_access', 'bike_access']
-        # 'attrs_location_based_update': OSM Way attributes; will need to update based on their location in the ShSt link
-    attrs_location_based_update = ['nodeIds', 'wayId', 'waySections_len', 'u', 'v', 'osmid', 'length',
-                                   '_merge', 'reverse', 'index']
-
-    # length-based updates
-    osmnx_shst_gdf = methods.update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_length_based_update)
-    # TODO: location-based updates
-
+    # write this to look at it
+    OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_consolidated_gdf_QAQC.feather")
+    geofeather.to_geofeather(shst_consolidated_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_consolidated_gdf), OUTPUT_FILE))
 
     # 9. fill NAs for ShSt-derived OSM Ways that do not have complete osm info
     # lmz: why is this necessary??
