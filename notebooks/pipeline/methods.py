@@ -1335,7 +1335,7 @@ def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby
 
     # group by 'shstReferenceId' and keep the first (longest OSM way) of each group
     WranglerLogger.debug('......osmnx_shst_gdf has {:,} unique sharedstreets links'.format(
-        osmnx_shst_gdf.shstReferenceId.nunique()))
+        osmnx_shst_gdf.drop_duplicates(subset=groupby_cols).shape[0]))
     osmnx_new_values_by_shst = osmnx_shst_gdf_sorted.groupby(
         groupby_cols).first().reset_index()[groupby_cols + attrs_longest]
     # check the row count of osmnx_new_values_by_shst == unique shst link count
