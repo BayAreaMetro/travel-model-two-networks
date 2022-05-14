@@ -416,6 +416,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
 
     return osmnx_shst_gdf
 
+
 def recode_osmnx_highway_tag(osmnx_shst_gdf):
     """"
     OSMnx 'highway' tags have a multitude of values that are too detailed for us;
@@ -550,9 +551,12 @@ def tag_osm_ways_oneway_twoway(osmnx_shst_gdf):
                        (osmnx_shst_gdf.u != osmnx_shst_gdf.v), 'osm_dir_tag'] = np.int8(2)
     # However, there are some places where SharedStreets got it wrong, or there were two-way conversions.
     # Having lanes:backward > 1 is a strong signal that the link is actually two way so override here
+    # Note: these links are labelled as two-way but without 'backReferenceId', therefore, after adding reverse links
+    # for two-way links, they will be missing 'shstReferenceId'.
     osmnx_shst_gdf.loc[(osmnx_shst_gdf.oneway_osmnx == False) & (osmnx_shst_gdf['lanes:backward'] > 0), 'osm_dir_tag'] = np.int8(2)
     
-    WranglerLogger.debug('osmnx_shst_gdf has {:,} links: \n{}'.format(osmnx_shst_gdf.shape[0], (osmnx_shst_gdf.osm_dir_tag.value_counts())))
+    WranglerLogger.debug('osmnx_shst_gdf has {:,} links: \n{}'.format(
+        osmnx_shst_gdf.shape[0], (osmnx_shst_gdf.osm_dir_tag.value_counts())))
 
 
 def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
@@ -1328,8 +1332,6 @@ def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby
     When multiple OSM ways are matched to a same shst link, update certain attributes to use the values of the longest
      OSM way.
     """
-    WranglerLogger.debug('......the following attributes will be updated: {}'.format(attrs_longest))
-
     # sort by shstReferenceId and length
     osmnx_shst_gdf_sorted = osmnx_shst_gdf.sort_values(['shstReferenceId', 'length'], ascending=False)
 
@@ -1357,23 +1359,26 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     when multiple OSM Ways comprise one sharedstreets link:
     """
     WranglerLogger.info('Starting aggregated osm ways back to shst links')
+    WranglerLogger.debug('...osmnx_shst_gdf field types:\n{}'.format(osmnx_shst_gdf.dtypes))
 
     # 1, separate the attributes into different groups based on what consolidation methodology to apply
     WranglerLogger.debug('... osmnx_shst_gdf link attributes are grouped into the following sets:')
-    # 'attrs_shst_level' fields: already represent the values of the entire sharedstreet link, no change
-    attrs_shst_level = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'shstGeometryId']
+    # 'attrs_shst_level' fields: already represent the values of the entire sharedstreet link, no change;
+    # though 'reverse' is created at OSM way level, but all OSM ways of the same shst link have the same 'reverse' value
+    attrs_shst_level = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'shstGeometryId', 'geometry', 'reverse']
     # 'attrs_sum' fields: sum the values of each OSM way
     attrs_sum = ['length']
     # 'attrs_max' fields: use the largest value of all OSM ways in the same shst link
     attrs_max = ['waySections_len']
     # 'attrs_concat' fields: concatenate
-    attrs_concat = ['wayId', 'waySection_ord', 'osmid', 'osmnx_shst_merge', 'reverse', 'index']
+    attrs_concat = ['wayId', 'waySection_ord', 'osmid', 'osmnx_shst_merge', 'index']
     # 'attrs_merge' fields: node-related merge
     attrs_merge = ['nodeIds', 'u', 'v']
     # 'attrs_longest' fields: use the values of the longest OSM way
     attrs_longest = list(
         set(list(osmnx_shst_gdf)) - set(attrs_shst_level) - set(attrs_sum) - set(attrs_max) - set(attrs_merge) - set(
             attrs_concat))
+    WranglerLogger.debug('no need to aggregate: {}'.format(attrs_shst_level))
     WranglerLogger.debug('aggregate using sum: {}'.format(attrs_sum))
     WranglerLogger.debug('aggregate using max: {}'.format(attrs_max))
     WranglerLogger.debug('aggregate using concatenation: {}'.format(attrs_concat))
@@ -1386,26 +1391,13 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     osmnx_shst_gdf_longest_update = update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby_cols)
 
     # 3, create an agg dictionary for grouping by osm ways by shst link
-    def _make_tuple(x):
-        """ Agregation function, tuple-izes series with multiple values
+    def _concat_way_values(x):
         """
-        T = tuple(x)
-        # if it's a series with one object, e.g.
-        # 0    [2401244716, 2401244713, 2401244712]
-        # dtype: object
-        if isinstance(x, pd.Series) and x.dtype == object and len(x) == 1:
-            return T
-
-        if len(T) > 1:
-            if isinstance(T, (pd.Series, pd.Index, np.ndarray)) and len(T) != 1:
-                WranglerLogger.debug("T:{} type:{} len:{}".format(T, type(T), len(T)))
-            return T
-
-        if isinstance(T[0], (pd.Series, pd.Index, np.ndarray)) and len(T[0]) != 1:
-            WranglerLogger.debug("T[0]:{} type:{} len:{}".format(T[0], type(T[0]), len(T[0])))
-            WranglerLogger.debug("=> T:{} type:{} len:{}".format(T, type(T), len(T)))
-            WranglerLogger.debug("=> x:{} type:{} len:{}".format(x, type(x), len(x)))
-        return T[0]
+        Aggregation function for concatenating values of OSM ways into a string, e.g. one ShSt link contains two OSM
+        ways with 'wayId' 394112485 and 393899244, the aggregated ShSt link 'wayId' = '394112485,393899244'
+        """
+        values = x.str.cat(sep=",")
+        return values
 
     def _merge_nodeIds(x):
         """
@@ -1424,6 +1416,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     # set initial agg dictionary
     agg_dict = {
         'geometry'       : 'first',
+        'reverse'        : 'first',
         'u'              : 'first',         # 'u' of the shst link is the u of the first osm way
         'v'              : 'last',          # 'v' of the shst link is the v of the last osm way
         'nodeIds'        : _merge_nodeIds,  # 'nodeIds' apply the aggregation function
@@ -1431,27 +1424,45 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
         'waySections_len': 'max'            # 'waySections_len' of the shst link is the max of all osm ways
     }
     # add other fields
-    # for fields to be aggregated into tuples, set them to be object dtypes
-    object_columns = {}
     # fields that need to concatenate into tuples
     for c in attrs_concat:
-        agg_dict[c] = _make_tuple
-        object_columns[c] = object
+        agg_dict[c] = _concat_way_values
     # fields whose values are already updated
     for c in attrs_longest:
         agg_dict[c] = 'first'
 
     WranglerLogger.debug('...aggregation dict:\n{}'.format(agg_dict))
 
-    # 4, apply the aggregation method to forward links and backward links separately. This is because 'waySection_ord'
+    # TODO: decide if 4. fill NaN is needed
+    # 4, fill NaN and modify field type before aggregating. This fills NAs for ShSt-derived OSM Ways that do not have
+    # complete osm info, so that these osm ways won't be omitted when aggregating back to ShSt links using aggregation
+    # rules such as 'first' (will keep the first non-na value). However, if not all OSM Ways have info, we may want to
+    # use the next non-na value instead of having no value, in this case, skip this step.
+    WranglerLogger.debug('...fill na for numeric and string fields')
+    _fill_na(osmnx_shst_gdf_longest_update)
+
+    # 5, convert 'attrs_concat' fields to string so they can be concatenated into a string
+    WranglerLogger.debug('...modify concatenation fields to type string')
+    for col_name in attrs_concat:
+        # 'osmnx_shst_merge' is categorical value
+        if col_name == 'osmnx_shst_merge':
+            pass
+        else:
+            # for 'wayId', 'waySection_ord', 'osmid', 'index', make sure it is integer, not float
+            osmnx_shst_gdf_longest_update[col_name].fillna(0, inplace=True)
+            osmnx_shst_gdf_longest_update[col_name] = osmnx_shst_gdf_longest_update[col_name].astype(int)
+        # convert all to string
+        osmnx_shst_gdf_longest_update[col_name] = osmnx_shst_gdf_longest_update[col_name].astype(str)
+
+    # 6, apply the aggregation method to forward links and backward links separately. This is because 'waySection_ord'
     # represents the order of an OSM way in a shst link in the initial shst metadata; after adding two-way OSM ways (
     # 'reverse=True' links), the order should be reversed, in other words, descending.
-    forward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse']==False]
+    forward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == False]
     forward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], inplace=True)
     WranglerLogger.debug('...aggregating forward links')
     forward_link_gdf_agg = forward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
 
-    backward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse']==True]
+    backward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == True]
     backward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], ascending=False, inplace=True)
     WranglerLogger.debug('...aggregating backward links')
     backward_link_gdf_agg = backward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
@@ -1462,6 +1473,32 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
                               ignore_index=True)
 
     return shst_link_gdf
+
+
+def _fill_na(df):
+    """
+    fill str NaN with ""
+    fill numeric NaN with 0
+    TODO: what about boolean fields?
+
+    Does not return anything; modifies the passed DataFrame by filling in na.
+    """
+
+    num_col = list(df.select_dtypes([np.number]).columns)
+    WranglerLogger.debug('numeric columns: {}'.format(num_col))
+
+    object_col = list(df.select_dtypes(['object']).columns)
+    # remove 'oneway_shst', 'oneway_osmnx' from 'object_col' because they should be boolean fields
+    for remove_col in ['oneway_shst', 'oneway_osmnx']:
+        if remove_col in object_col:
+            object_col.remove(remove_col)
+    WranglerLogger.debug('str columns: {}'.format(object_col))
+
+    for x in list(df.columns):
+        if x in num_col:
+            df[x].fillna(0, inplace=True)
+        elif x in object_col:
+            df[x].fillna("", inplace=True)
 
 
 def consolidate_osm_way_to_shst_link(osm_link):
@@ -1840,26 +1877,6 @@ def point_df_to_geojson(df: pd.DataFrame, properties: list):
             feature["properties"][prop] = row[prop]
         geojson["features"].append(feature)
     return geojson
-
-
-def fill_na(df_na):
-    """
-    fill str NaN with ""
-    fill numeric NaN with 0
-    """
-    df = df_na.copy()
-    num_col = list(df.select_dtypes([np.number]).columns)
-    print("numeric columns: ", num_col)
-    object_col = list(df.select_dtypes(['object']).columns)
-    print("str columns: ", object_col)
-
-    for x in list(df.columns):
-        if x in num_col:
-            df[x].fillna(0, inplace=True)
-        elif x in object_col:
-            df[x].fillna("", inplace=True)
-
-    return df
 
 
 def identify_dead_end_nodes(links):

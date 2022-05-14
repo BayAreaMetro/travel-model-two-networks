@@ -104,6 +104,8 @@ if __name__ == '__main__':
     WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
 
     # 6. add reverse links for two-way OSM ways
+    # Note: after adding reverse links, a link and its reverse link have different 'fromIntersectionId', 'toIntersectionId',
+    # 'shstReferenceId', 'geometry', but still the same 'id' and 'shstGeometryId'
     WranglerLogger.info('6. Adding reversed links for two-way OSM ways')
     osmnx_shst_gdf = methods.add_two_way_osm(osmnx_shst_gdf)
     WranglerLogger.debug('after adding two-way links, osm_from_shst_link_gdf has the following fields: {}'.format(
@@ -149,56 +151,46 @@ if __name__ == '__main__':
         'lane_count_from_turns', 'lanes_non_gp'                             # validation lane count
         ], inplace=True)
 
-    # 9. consolidate osm ways back to ShSt based links ('shstReferenceId')
+    # 9. aggregate osm ways back to ShSt based links
     # At this point, osmnx_shst_gdf has duplicated shstReferenceId because some sharedstreets links contain more than
-    # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row
-    shst_consolidated_gdf = methods.aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf)
+    # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row.
+    shst_aggregated_gdf = methods.aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf)
     WranglerLogger.info('Before aggregating osm ways back to sharedstreets-based links, osmnx_shst_gdf has {} links, '
                         'representing {} unique sharedstreets links; after aggregating, shst_consolidated_gdf has {} links'.format(
                             osmnx_shst_gdf.shape[0],
                             osmnx_shst_gdf.drop_duplicates(subset=['id', 'fromIntersectionId',
                                                                    'toIntersectionId', 'shstReferenceId',
                                                                    'shstGeometryId']).shape[0],
-                            shst_consolidated_gdf.shape[0]))
+                            shst_aggregated_gdf.shape[0]))
 
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_consolidated_gdf_QAQC.feather")
-    geofeather.to_geofeather(shst_consolidated_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_consolidated_gdf), OUTPUT_FILE))
+    geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_aggregated_gdf), OUTPUT_FILE))
 
-    # 9. fill NAs for ShSt-derived OSM Ways that do not have complete osm info
-    # lmz: why is this necessary??
-    # WranglerLogger.info('6. Filling NAs for ShSt-derived OSM Ways missing complete osm info')
-    # osm_ways_from_shst_non_na_gdf = methods.fill_na(osmnx_shst_gdf)
+    WranglerLogger.info('Finished converting SHST extraction into standard network links with {:,} links'.format(
+        shst_aggregated_gdf.shape[0]))
+    WranglerLogger.debug('Standard network links have the following attributes: \n{}'.format(list(shst_aggregated_gdf)))
 
-    # 10. aggregate osm segments back to shst geometry based links
-    # WranglerLogger.info('10. Aggregating OSM ways back to shst geometry based links')
-    # link_gdf = methods.consolidate_osm_way_to_shst_link(osm_ways_from_shst_non_na_gdf)
-    # WranglerLogger.info('......after aggregating back to shst geometry, network has {} links,\
-    # which are based on {} geometries'.format(link_gdf.shape[0], link_gdf.shstGeometryId.nunique()))
-    # WranglerLogger.debug('the current network link table has the following fields: {}'.format(
-    #    list(link_gdf)))
-    # WranglerLogger.debug(link_gdf.head())
+    # TODO: clean up: there are links with different 'shstGeometryId' and 'id', but same shstReferenceId and to/from nodes.
+    # note that at this point, a link and its reverse link have the same 'shstGeometryId' and 'id'.
+    # export to debug
+    shst_link_geometryId_debug = shst_aggregated_gdf.copy()
+    shst_link_geometryId_debug.loc[:, 'shst_link_cnt'] = shst_link_geometryId_debug.groupby(
+        ['fromIntersectionId', 'toIntersectionId', 'shstReferenceId'])['id'].transform('size')
+    OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_link_geometryId_QAQC.feather")
+    geofeather.to_geofeather(shst_link_geometryId_debug, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_link_geometryId_debug), OUTPUT_FILE))
+    del shst_link_geometryId_debug
 
-    # 10. clean up: there are links with different shstGeometryId, but same shstReferenceId and to/from nodes. Drop one
-    #     of the links with two shstGeometryId. The resulting link table has unique shstReferenceId and to/from nodes.
-    ## wait, why?
-    # WranglerLogger.info('Dropping link duplicates based on ShstRefenceID and from/to nodes')
-    # osmnx_shst_gdf.drop_duplicates(subset=["shstReferenceId"], inplace=True)
-
-    WranglerLogger.info('Finished converting SHST extraction into standard network links,' \
-        'network has {:,} links, which are based on {:,} geometrics'.format(
-        osmnx_shst_gdf.shape[0], osmnx_shst_gdf.shstGeometryId.nunique()))
-    WranglerLogger.debug('The standard network links have the following attributes: \n{}'.format(list(osmnx_shst_gdf)))
-
-    # create node gdf from links and attach network type variable
+    # 10. create node gdf from links and attach network type variable
     WranglerLogger.info('Creating nodes from links')
-    node_gdf = methods.create_node_gdf(osmnx_shst_gdf)
+    node_gdf = methods.create_node_gdf(shst_aggregated_gdf)
 
     WranglerLogger.info('Adding network type variable for node')
     A_B_df = pd.concat(
-        [osmnx_shst_gdf[["u", "drive_access", "walk_access", "bike_access"]].rename(columns={"u": "osm_node_id"}),
-         osmnx_shst_gdf[["v", "drive_access", "walk_access", "bike_access"]].rename(columns={"v": "osm_node_id"})],
+        [shst_aggregated_gdf[["u", "drive_access", "walk_access", "bike_access"]].rename(columns={"u": "osm_node_id"}),
+         shst_aggregated_gdf[["v", "drive_access", "walk_access", "bike_access"]].rename(columns={"v": "osm_node_id"})],
         sort=False,
         ignore_index=True)
     A_B_df.drop_duplicates(inplace=True)
@@ -208,22 +200,22 @@ if __name__ == '__main__':
                         how="left",
                         on="osm_node_id")
 
-    WranglerLogger.info('{:,} network nodes created from {:,} unique osm from/to nodes'.format(
-        node_gdf.osm_node_id.nunique(), len(set(osmnx_shst_gdf.u.tolist() + osmnx_shst_gdf.v.tolist()))
+    WranglerLogger.info('{:,} network nodes created from {:,} unique osm way from/to nodes'.format(
+        node_gdf.osm_node_id.nunique(), len(set(shst_aggregated_gdf.u.tolist() + shst_aggregated_gdf.v.tolist()))
     ))
     WranglerLogger.debug('mis-match between network nodes and osm from/to nodes:')
-    WranglerLogger.debug(osmnx_shst_gdf[~osmnx_shst_gdf.v.isin(node_gdf.osm_node_id.tolist())])
-    WranglerLogger.debug(osmnx_shst_gdf[~osmnx_shst_gdf.u.isin(node_gdf.osm_node_id.tolist())])
+    WranglerLogger.debug(shst_aggregated_gdf[~shst_aggregated_gdf.v.isin(node_gdf.osm_node_id.tolist())])
+    WranglerLogger.debug(shst_aggregated_gdf[~shst_aggregated_gdf.u.isin(node_gdf.osm_node_id.tolist())])
 
     #####################################
     # export link, node, shape
 
-    WranglerLogger.info('Final network links have the following fields:\n{}'.format(osmnx_shst_gdf.dtypes))
+    WranglerLogger.info('Final network links have the following fields:\n{}'.format(shst_aggregated_gdf.dtypes))
     WranglerLogger.info('Final network nodes have the following fields:\n{}'.format(node_gdf.dtypes))
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
-    geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
+    geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_node.feather')
     WranglerLogger.info('Saving nodes to {}'.format(OUTPUT_FILE))
