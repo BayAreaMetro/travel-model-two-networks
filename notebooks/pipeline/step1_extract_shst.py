@@ -31,15 +31,19 @@ lat_lon_epsg_str = 'epsg:{}'.format(str(methods.LAT_LONG_EPSG))
 WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
 
 if __name__ == '__main__':
-    # create output folder if it does not exist
+    # create output folders if it does not exist
     if not os.path.exists(OUTPUT_BOUNDARY_DIR):
         WranglerLogger.info('create output folder: {}'.format(OUTPUT_BOUNDARY_DIR))
         os.makedirs(OUTPUT_BOUNDARY_DIR)
 
+    if not os.path.exists(OUTPUT_SHSTEXTRACT_DIR):
+        WranglerLogger.info('create output folder: {}'.format(OUTPUT_SHSTEXTRACT_DIR))
+        os.makedirs(OUTPUT_SHSTEXTRACT_DIR)
+
     # setup logging
     LOG_FILENAME = os.path.join(
-        OUTPUT_BOUNDARY_DIR,
-        "step0_prepare_for_shst_extraction_{}.info.log".format(datetime.now().strftime("%Y%m%d_%H%M")),
+        OUTPUT_SHSTEXTRACT_DIR,
+        "step1_extract_shst_{}.info.log".format(datetime.now().strftime("%Y%m%d_%H%M")),
     )
     setupLogging(LOG_FILENAME, LOG_FILENAME.replace('info', 'debug'))
 
@@ -95,11 +99,6 @@ if __name__ == '__main__':
 
     LINUX_SEP = '/'
     docker_output_path = LINUX_SEP.join(output_data_dir_list)
-
-    # create output folder if it does not exist
-    if not os.path.exists(OUTPUT_SHSTEXTRACT_DIR):
-        WranglerLogger.info('create output folder: {}'.format(OUTPUT_SHSTEXTRACT_DIR))
-        os.makedirs(OUTPUT_SHSTEXTRACT_DIR)
 
     # do the shared street extraction
     for boundary_num in range(1, methods.NUM_SHST_BOUNDARIES+1):

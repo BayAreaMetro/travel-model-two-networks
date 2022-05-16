@@ -1,29 +1,22 @@
 
 <img src="https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/TM2_network_rebuild_flow.png" width="800">
 
-### [Step 0: Prepare for SharedStreets extraction](step0_prepare_for_shst_extraction.py)
+### [Step 1: Extract SharedStreets](step1_extract_shst.py)
 
-Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
+Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson boundary polygons.
+which are used for SharedStreets networrk extraction.  Performs extraction using [Docker](https://www.docker.com/) 
+through python docker package.  See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker)
 
 #### Input:
 * County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pieces, resulting in 14 rows: [`[INPUT_DATA_DIR]/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+* [Dockerfile](Dockerfile) which defines Docker image to use for SharedStreets extraction
+
 #### Output:
-* 14 county/sub-county boundaries, `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[1-14].json`
-
-### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
-
-Use [Docker](https://www.docker.com/) to build an image as instructed by the [Dockerfile](Dockerfile).
-See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker), and extract SharedStreet networks data by the boundaries defined in step 0.
-
-Installing Docker Desktop and getting Docker to run on an Mac machine is straightforward. Setting up Docker on a Windows machine requires BIOS configuration. Path referencing and line-ending format are also different in Mac versus Windows. See the inline comments for examples. 
-
-#### Input:
-* [Dockerfile](github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/Dockerfile), used to build the shst image  
-* 14 county/sub-county boundaries (Step 0 output), `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[1-14].json`
-#### Output: 
+* 14 county/sub-county boundaries, `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[1-14].geojson`
 * Shared Street extract, `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[1-14].out.geojson` with columns: 
    'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
 * Shared Street extract logs: `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[1-14].tiles.txt`
+* Log file: `[OUTPUT_DATA_DIR]/step1_shst_extracts/step1_extract_shst_[YYmmdd_HHMM].[info,debug].log`
 
 See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-geometries)
 
