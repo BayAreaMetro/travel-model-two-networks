@@ -68,14 +68,8 @@ if __name__ == '__main__':
         WranglerLogger.info('Creating boundary file  {}'.format(output_file))
         boundary_gdf.to_file(output_file, driver="GeoJSON")
 
-    # set these based on create_docker_container()
-    if OUTPUT_DATA_DIR.startswith('E:'):
-        output_mount_target = '/usr/e_volume'
-    elif OUTPUT_DATA_DIR.startswith('C:/Users/{}'.format(os.environ['USERNAME'])):
-        output_mount_target = '/usr/home'
-    else:
-        WranglerLogger.error('Only USERPROFILE dir and E: are currently supported for OUTPUT_DATA_DIR')
-        sys.exit(1)
+    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
+    docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
 
     # use docker python package (https://docker-py.readthedocs.io/en/stable/index.html) to run SharedStreets extraction
     (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
@@ -83,22 +77,6 @@ if __name__ == '__main__':
     # run these and check exec_log[1] to if test mounts were successful
     # exec_log = container.exec_run("/bin/bash -c 'cd /usr/e_volume; ls -l'", stdout=True, stderr=True, stream=True)
     # exec_log = container.exec_run("/bin/bash -c 'cd /usr/home; ls -l'", stdout=True, stderr=True, stream=True)
-
-    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-    output_data_dir_list = OUTPUT_DATA_DIR.split(os.path.sep)  # e.g. ['E:','tm2_network_version13']
-    if OUTPUT_DATA_DIR.startswith('E:'):
-        # drop the E: part only
-        output_data_dir_list = output_data_dir_list[1:]
-    elif OUTPUT_DATA_DIR.startswith('C:/Users/{}'.format(os.environ['USERNAME'])):
-        # drop the C:/Users/[USERRNAME]
-        output_data_dir_list = output_data_dir_list[4:]
-
-    # prepare the path to cd into (OUTPUT_DATA_DIR) -- [output_mount_target]\[rest of OUTPUT_DATA_DIR]
-    output_data_dir_list.insert(0, output_mount_target)
-    WranglerLogger.info('output_data_dir_list: {}'.format(output_data_dir_list))
-
-    LINUX_SEP = '/'
-    docker_output_path = LINUX_SEP.join(output_data_dir_list)
 
     # do the shared street extraction
     for boundary_num in range(1, methods.NUM_SHST_BOUNDARIES+1):

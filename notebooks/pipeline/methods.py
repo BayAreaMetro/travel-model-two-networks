@@ -65,6 +65,36 @@ OSM_WAY_TAGS = {
     'cycleway'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:cycleway
 }
 
+def docker_path(non_docker_path):
+    """
+    Simple script to transform a non docker path to a docker path for use with the docker container
+    created by create_docker_container(); returns that path
+
+    Supported non_docker_paths are in C:/Users/[USERNAME] or E:
+    Raises NotImplementedError otherwise
+    """
+    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
+    non_docker_path_list = non_docker_path.split(os.path.sep)  # e.g. ['E:','tm2_network_version13']
+
+    if non_docker_path.startswith('E:'):
+        output_mount_target = '/usr/e_volume'
+        # drop the E: part only
+        non_docker_path_list = non_docker_path_list[1:]
+    elif non_docker_path.startswith('C:/Users/{}'.format(os.environ['USERNAME'])):
+        output_mount_target = '/usr/home'
+        # drop the C:/Users/[USERRNAME]
+        non_docker_path_list = non_docker_path_list[4:]
+    else:
+        WranglerLogger.error("docker_path() doesn't support non_docker_path {}".format(non_docker_path))
+        raise NotImplementedError
+
+    # prepare the path to cd into (OUTPUT_DATA_DIR) -- [output_mount_target]\[rest of OUTPUT_DATA_DIR]
+    non_docker_path_list.insert(0, output_mount_target)
+    WranglerLogger.debug('non_docker_path_list: {}'.format(non_docker_path_list))
+
+    LINUX_SEP = '/'
+    return LINUX_SEP.join(non_docker_path_list)
+
 def create_docker_container(mount_e: bool, mount_home: bool):
     """
     Uses docker python package to:
