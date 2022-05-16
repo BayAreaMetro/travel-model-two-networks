@@ -8,9 +8,9 @@ Subsequently uses the docker python package to create a sharedstreets docker ima
 and runs the shared street extraction for each subregion.
 
 set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
-Input:  [INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp: polygons of Bay Area counties
-Output: [OUTPUT_DATA_DIR]/external/step0_boundaries/boundary_[01-14].json
-        [OUTPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[01-14].out.geojson
+Input:  [INPUT_DATA_DIR]/step0_boundaries/cb_2018_us_county_5m_BayArea.shp: polygons of Bay Area counties
+Output: [OUTPUT_DATA_DIR]/step0_boundaries/boundary_[01-14].json
+        [OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[01-14].out.geojson
 """
 import methods
 import geopandas as gpd
@@ -22,9 +22,9 @@ from datetime import datetime
 # input/output directory and files
 INPUT_DATA_DIR         = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR        = os.environ['OUTPUT_DATA_DIR']
-INPUT_POLYGON          = os.path.join(INPUT_DATA_DIR, 'external', 'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
-OUTPUT_BOUNDARY_DIR    = os.path.join(OUTPUT_DATA_DIR, 'external', 'step0_boundaries')
-OUTPUT_SHSTEXTRACT_DIR = os.path.join(OUTPUT_DATA_DIR, 'external', 'step1_shst_extracts')
+INPUT_POLYGON          = os.path.join(INPUT_DATA_DIR,  'step0_boundaries', 'cb_2018_us_county_5m_BayArea.shp')
+OUTPUT_BOUNDARY_DIR    = os.path.join(OUTPUT_DATA_DIR, 'step0_boundaries')
+OUTPUT_SHSTEXTRACT_DIR = os.path.join(OUTPUT_DATA_DIR, 'step1_shst_extracts')
 
 # EPSG requirement
 lat_lon_epsg_str = 'epsg:{}'.format(str(methods.LAT_LONG_EPSG))
@@ -64,7 +64,7 @@ if __name__ == '__main__':
         WranglerLogger.info('Creating boundary file  {}'.format(output_file))
         boundary_gdf.to_file(output_file, driver="GeoJSON")
 
-    # set these based on create_docker_container_with_directory()
+    # set these based on create_docker_container()
     if OUTPUT_DATA_DIR.startswith('E:'):
         output_mount_target = '/usr/e_volume'
     elif OUTPUT_DATA_DIR.startswith('C:/Users/{}'.format(os.environ['USERNAME'])):
@@ -80,7 +80,7 @@ if __name__ == '__main__':
     # exec_log = container.exec_run("/bin/bash -c 'cd /usr/e_volume; ls -l'", stdout=True, stderr=True, stream=True)
     # exec_log = container.exec_run("/bin/bash -c 'cd /usr/home; ls -l'", stdout=True, stderr=True, stream=True)
 
-    # we're going to need to cd into OUTPUT_DATA_DIR\external -- create that path (on UNIX)
+    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
     output_data_dir_list = OUTPUT_DATA_DIR.split(os.path.sep)  # e.g. ['E:','tm2_network_version13']
     if OUTPUT_DATA_DIR.startswith('E:'):
         # drop the E: part only
@@ -89,13 +89,12 @@ if __name__ == '__main__':
         # drop the C:/Users/[USERRNAME]
         output_data_dir_list = output_data_dir_list[4:]
 
-    # prepare the path to cd into (OUTPUT_DATA_DIR\external) -- [output_mount_target]\[rest of OUTPUT_DATA_DIR]\external
+    # prepare the path to cd into (OUTPUT_DATA_DIR) -- [output_mount_target]\[rest of OUTPUT_DATA_DIR]
     output_data_dir_list.insert(0, output_mount_target)
-    output_data_dir_list.append('external')
     WranglerLogger.info('output_data_dir_list: {}'.format(output_data_dir_list))
 
     LINUX_SEP = '/'
-    docker_external_path = LINUX_SEP.join(output_data_dir_list)
+    docker_output_path = LINUX_SEP.join(output_data_dir_list)
 
     # create output folder if it does not exist
     if not os.path.exists(OUTPUT_SHSTEXTRACT_DIR):
@@ -106,7 +105,7 @@ if __name__ == '__main__':
     for boundary_num in range(1, methods.NUM_SHST_BOUNDARIES+1):
         command = ("/bin/bash -c 'cd {}; shst extract step0_boundaries/boundary_{:02d}.geojson "
                    "--out=step1_shst_extracts/mtc_{:02d}.geojson --metadata --tile-hierarchy=8 --tiles'".format(
-                       docker_external_path,boundary_num,boundary_num))
+                       docker_output_path,boundary_num,boundary_num))
         WranglerLogger.info('Executing docker command: {}'.format(command))
         
         (exec_code,exec_output) = container.exec_run(command, stdout=True, stderr=True, stream=True)

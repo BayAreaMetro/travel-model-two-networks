@@ -6,9 +6,9 @@
 Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
 
 #### Input:
-* County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pieces, resulting in 14 rows: [`[INPUT_DATA_DIR]/external/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+* County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pieces, resulting in 14 rows: [`[INPUT_DATA_DIR]/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
 #### Output:
-* 14 county/sub-county boundaries, `[ROOT_OUTPUT_DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
+* 14 county/sub-county boundaries, `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[1-14].json`
 
 ### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
 
@@ -19,34 +19,34 @@ Installing Docker Desktop and getting Docker to run on an Mac machine is straigh
 
 #### Input:
 * [Dockerfile](github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/Dockerfile), used to build the shst image  
-* 14 county/sub-county boundaries (Step 0 output), `[ROOT_OUTPUT_DATA_DIR]/external/step0_boundaries/boundary_[1-14].json`
+* 14 county/sub-county boundaries (Step 0 output), `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[1-14].json`
 #### Output: 
-* Shared Street extract, `[ROOT_OUTPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].out.geojson` with columns: 
+* Shared Street extract, `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[1-14].out.geojson` with columns: 
    'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
-* Shared Street extract logs: `[ROOT_OUTPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].tiles.txt`
+* Shared Street extract logs: `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[1-14].tiles.txt`
 
 See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-geometries)
 
 **Conversion to geofeather using [convert_geojson_to_geofeather.py](../../src/scripts/convert_geojson_to_geofeather.py)**:
 
-`python convert_geojson_to_geofeather.py "%ROOT_OUTPUT_DATA_DIR%\external\step1_shst_extracts"`
+`python convert_geojson_to_geofeather.py "%OUTPUT_DATA_DIR%\step1_shst_extracts"`
 
 This is much faster to read/write so will be used for subsequent steps instead of the geojson files.
 
 **Optional conversion to geopackage using [convert_geojson_to_geopackage.py](../../src/scripts/convert_geojson_to_geopackage.py)**:
 
-`python convert_geojson_to_geopackage.py "%ROOT_OUTPUT_DATA_DIR%\external\step1_shst_extracts" "%ROOT_OUTPUT_DATA_DIR\external\step1_shst_extracts\mtc_all_out.gpkg"`
+`python convert_geojson_to_geopackage.py "%OUTPUT_DATA_DIR%\step1_shst_extracts" "%OUTPUT_DATA_DIR\step1_shst_extracts\mtc_all_out.gpkg"`
 
 ### [Step 2: OSMnx extraction](step2_osmnx_extraction.py)
 
 Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 
 #### Input:
-* County shapefile, [`[INPUT_DATA_DIR]/external/step0_boundaries/San_Francisco_Bay_Region_Counties.shp`](https://opendata.mtc.ca.gov/datasets/MTC::san-francisco-bay-region-counties-1/about), which covers water areas to ensure that OSMnx extract includes bridges. 
+* County shapefile, [`[INPUT_DATA_DIR]/step0_boundaries/San_Francisco_Bay_Region_Counties.shp`](https://opendata.mtc.ca.gov/datasets/MTC::san-francisco-bay-region-counties-1/about), which covers water areas to ensure that OSMnx extract includes bridges. 
 * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 #### Output:
-* OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/[link,node].feather[.crs]`
-* Geopackage, `[OUTPUT_DATA_DIR]/external/step2_osmnx_extracts/osmnx_extracts.gpkg` with layers 'link', 'node' corresponding to the geofeather output files above; this format is useful for visualization
+* OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/[link,node].feather[.crs]`
+* Geopackage, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/osmnx_extracts.gpkg` with layers 'link', 'node' corresponding to the geofeather output files above; this format is useful for visualization
    
 Data is fetched using [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon) using `simplify=False`, so there are typically multiple links per OSM way.  (This is because if `simplify=True`, OSMnx will aggregate some OSM ways into a single link, which we don't want; see a nice explanation of this process in [OSMnx: Python for Street Networks](https://geoffboeing.com/2016/11/osmnx-python-street-networks/))
 

@@ -46,8 +46,8 @@
 #  --mount type=volume,source=e_volume,destination=/usr/e_volume \
 #  shst:latest /bin/bash
 #
-# First, create folder "data/external/step1_shst_extracts" to store the extracted data
-# cd /usr/e_volume/external
+# First, create folder "data/step1_shst_extracts" to store the extracted data
+# cd /usr/e_volume
 # mkdir step1_shst_extracts
 # 
 # Then you can cd to this directory, make this script executable, and run this script:
