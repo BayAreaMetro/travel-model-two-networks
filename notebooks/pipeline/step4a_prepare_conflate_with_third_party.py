@@ -452,7 +452,7 @@ def conflate_ACTC():
     WranglerLogger.debug('After join, actc_matched_gdf.dtypes:\n{}'.format(actc_matched_gdf.dtypes))
 
     # output for debugging
-    matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'matched.geofeather')
+    matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'matched.feather')
     geofeather.to_geofeather(actc_matched_gdf, matched_geofeather)
     WranglerLogger.info('Wrote {:,} lines to {}'.format(len(actc_matched_gdf), matched_geofeather))
 
@@ -465,7 +465,7 @@ def conflate_ACTC():
     WranglerLogger.debug('After join, actc_unmatched_gdf.dtypes:\n{}'.format(actc_matched_gdf.dtypes))
 
     # output for debugging
-    unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'unmatched.geofeather')
+    unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'unmatched.feather')
     geofeather.to_geofeather(actc_unmatched_gdf, unmatched_geofeather)
     WranglerLogger.info('Wrote {:,} lines to {}'.format(len(actc_unmatched_gdf), unmatched_geofeather))
 
