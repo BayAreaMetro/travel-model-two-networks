@@ -8,5 +8,11 @@ FROM node:12-bullseye-slim
 ENV NPM_CONFIG_PREFIX=/home/node/.npm-global
 ENV PATH=$PATH:/home/node/.npm-global/bin
 
+# give node (shst) more memory
+ENV NODE_OPTIONS=--max_old_space_size=8192
+# note: if running docker on windows, give your virtual machine more memory as well:
+# for example, you may need to create a .wslconfig file with memory=16GB
+# https://docs.microsoft.com/en-us/windows/wsl/wsl-config#configure-global-options-with-wslconfig
+
 USER node
 RUN npm install -g sharedstreets@0.12.4
