@@ -65,13 +65,14 @@ THIRD_PARTY_OUTPUT_DIR  = os.path.join(OUTPUT_DATA_DIR, 'step4_third_party_data'
 # conflation will be done in [THIRD_PARTY_OUTPUT_DIR]/[third_party]/conflation_shst
 CONFLATION_SHST = 'conflation_shst'
 
-def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame):
+def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns):
     """
     Generic conflation method.  Does the following:
     1) Creates conflation directory (if it doesn't exist)
-    2) Writes the third_party_gdf for conflation
+    2) Writes the third_party_gdf (id_columns and geometry) for conflation
     3) Runs the conflation in a docker container
-    4) Returns the resulting GeoDataFrame
+    4) Merges the resulting matched and unmatched results back with the full third_party_gdf and writes them for debugging
+    4) Returns the resulting GeoDataFrames (matched and unmatched)
     """
     # create conflation directory
     conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST)
@@ -98,7 +99,8 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame):
 
         # Partitioning by the boundaries is not necessary with NODE_OPTIONS==--max_old_space_size=8192
         WranglerLogger.info('Exporting {:,} rows of {} data to {}'.format(len(third_party_gdf), third_party, shst_input_file))
-        third_party_gdf.to_file(shst_input_file, driver="GeoJSON")
+        # write id columns and geometry
+        third_party_gdf[id_columns + ['geometry']].to_file(shst_input_file, driver="GeoJSON")
 
         command = ("/bin/bash -c 'cd {}; shst match step4_third_party_data/{}/conflation_shst/{}.in.geojson "
                    "--out=step4_third_party_data/{}/conflation_shst/{}.out.geojson "
@@ -124,9 +126,53 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame):
     matched_gdf   = gpd.read_file(shst_matched_file)
     WranglerLogger.debug('Read {:,} rows from {}; dtypes:\n{}'.format(len(matched_gdf), shst_matched_file, matched_gdf.dtypes))
     
+    # rename id columns back to original; shst match will lowercase and prepend with pp_
+    rename_columns = {
+        'shstFromIntersectionId': 'fromIntersectionId',
+        'shstToIntersectionId'  : 'toIntersectionId',
+    }
+    for id_column in id_columns:
+        rename_columns['pp_{}'.format(id_column.lower())] = id_column
+    WranglerLogger.debug('Renaming columns: {}'.format(rename_columns))
+    matched_gdf.rename(columns=rename_columns, inplace=True)
+
+    # merge back with original
+    matched_gdf = pd.merge(
+        left     = matched_gdf,
+        right    = third_party_gdf.drop(columns=['geometry']),  # we already have this
+        how      = 'left',
+        on       = id_columns)
+    WranglerLogger.debug('After join, matched_gdf.dtypes:\n{}'.format(matched_gdf.dtypes))
+
+    # output for debugging
+    matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, 'matched.feather')
+    geofeather.to_geofeather(matched_gdf, matched_geofeather)
+    WranglerLogger.info('Wrote {:,} lines to {}'.format(len(matched_gdf), matched_geofeather))
+
     if os.path.exists(shst_unmatched_file):
         unmatched_gdf = gpd.read_file(shst_unmatched_file)
         WranglerLogger.debug('Read {:,} rows from {}; dtypes:\n{}'.format(len(unmatched_gdf), shst_unmatched_file, unmatched_gdf.dtypes))
+
+        # shst lowercases columns -- rename back if needed
+        rename_columns = {}
+        for id_column in id_columns:
+            if id_column.lower() != id_column: rename_columns[id_column.lower()] = id_column
+        if len(rename_columns) > 0:
+            WranglerLogger.debug('Renaming columns: {}'.format(rename_columns))
+            unmatched_gdf.rename(columns=rename_columns, inplace=True)
+
+        unmatched_gdf = pd.merge(
+            left     = unmatched_gdf,
+            right    = third_party_gdf.drop(columns=['geometry']),  # we already have this
+            how      = 'left',
+            on       = id_columns)
+        WranglerLogger.debug('After join, unmatched_gdf.dtypes:\n{}'.format(unmatched_gdf.dtypes))
+
+        # output for debugging
+        unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, 'unmatched.feather')
+        geofeather.to_geofeather(unmatched_gdf, unmatched_geofeather)
+        WranglerLogger.info('Wrote {:,} lines to {}'.format(len(unmatched_gdf), unmatched_geofeather))
+
     else:
         unmatched_gdf = None
         WranglerLogger.debug('No unmached file {} found'.format(shst_unmatched_file))
@@ -136,7 +182,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame):
 def conflate_TOMTOM():
     """
     Conflate TomTom data with sharedstreets
-    TODO: What files are written?
+    TODO: What files are written?  Where is documentation on TomTom columns?
     """
     # Prepare tomtom for conflation
     WranglerLogger.info('preparing TomTom data from {}'.format(THIRD_PARTY_INPUT_FILES[TOMTOM]))
@@ -160,34 +206,10 @@ def conflate_TOMTOM():
         len(tomtom_raw_gdf.groupby(["ID", "F_JNCTID", "T_JNCTID"]).count())))
 
     # generating unique handle for tomtom
-    tomtom_raw_gdf["tomtom_link_id"] = range(1, len(tomtom_raw_gdf) + 1)
+    tomtom_raw_gdf['tomtom_link_id'] = range(1, len(tomtom_raw_gdf) + 1)
 
-    # create conflation directory
-    conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, TOMTOM, CONFLATION_SHST)
-    if not os.path.exists(conflation_dir):
-        WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
-        os.makedirs(conflation_dir)
+    (tomtom_matched_gdf, tomtom_unmatched_gdf) = conflate(TOMTOM, tomtom_raw_gdf, ['tomtom_link_id'])
 
-    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-    docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
-    # create docker container to do the shst matchting
-    (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
-
-    # Partition tomtom by sub-region boundaries for shst match
-    WranglerLogger.info('exporting partitioned TomTom data to {}'.format(conflation_dir))
-    for boundary_num in range(1, methods.NUM_SHST_BOUNDARIES+1):
-        boundary_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_{:02d}.geojson'.format(boundary_num)))
-        sub_tomtom_gdf = tomtom_raw_gdf[tomtom_raw_gdf.intersects(boundary_gdf.geometry.unary_union)].copy()
-
-        sub_tomtom_gdf[["tomtom_link_id", "geometry"]].to_file(
-            os.path.join(conflation_dir, 'tomtom_{}.in.geojson'.format(boundary_num)),
-            driver="GeoJSON")
-
-    # export modified raw data for merging the conflation results back
-    output_file = os.path.join(conflation_dir, "tomtom.feather")
-    WranglerLogger.info('exporting TomTom with all attributes to {}'.format(output_file))
-    geofeather.to_geofeather(tomtom_raw_gdf, output_file)
-    
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_raw_gdf.dtypes))
     WranglerLogger.info('finished preparing TomTom data')
 
@@ -405,8 +427,7 @@ def conflate_CCTA():
         ccta_gdf.shape[0], ccta_gdf.ID.nunique()))
 
     # conflate
-    ID_geometry_cols = ['ID','geometry']
-    (matched_gdf, unmatched_gdf) = conflate(CCTA, ccta_gdf[ID_geometry_cols])
+    (matched_gdf, unmatched_gdf) = conflate(CCTA, ccta_gdf, ['ID'])
 
     #TODO: whatever we do next
 
@@ -434,40 +455,7 @@ def conflate_ACTC():
 
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 2.5-3 hours
-    (actc_matched_gdf, actc_unmatched_gdf) = conflate(ACTC, actc_raw_gdf[["A","B","geometry"]])
-    
-    # rename columns
-    actc_matched_gdf.rename(columns={
-        'shstFromIntersectionId': 'fromIntersectionId',
-        'shstToIntersectionId'  : 'toIntersectionId',
-        'pp_a'                  : 'A',
-        'pp_b'                  : 'B'},
-        inplace=True)
-
-    actc_matched_gdf = pd.merge(
-        left     = actc_matched_gdf,
-        right    = actc_raw_gdf.drop(columns=['geometry']),  # we already have this
-        how      = 'left',
-        on       = ['A','B'])
-    WranglerLogger.debug('After join, actc_matched_gdf.dtypes:\n{}'.format(actc_matched_gdf.dtypes))
-
-    # output for debugging
-    matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'matched.feather')
-    geofeather.to_geofeather(actc_matched_gdf, matched_geofeather)
-    WranglerLogger.info('Wrote {:,} lines to {}'.format(len(actc_matched_gdf), matched_geofeather))
-
-    actc_unmatched_gdf.rename(columns={'a':'A', 'b':'B'}, inplace=True)
-    actc_unmatched_gdf = pd.merge(
-        left     = actc_unmatched_gdf,
-        right    = actc_raw_gdf.drop(columns=['geometry']),  # we already have this
-        how      = 'left',
-        on       = ['A','B'])
-    WranglerLogger.debug('After join, actc_unmatched_gdf.dtypes:\n{}'.format(actc_matched_gdf.dtypes))
-
-    # output for debugging
-    unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'unmatched.feather')
-    geofeather.to_geofeather(actc_unmatched_gdf, unmatched_geofeather)
-    WranglerLogger.info('Wrote {:,} lines to {}'.format(len(actc_unmatched_gdf), unmatched_geofeather))
+    (actc_matched_gdf, actc_unmatched_gdf) = conflate(ACTC, actc_raw_gdf, ['A','B'])
 
     # TODO: reconcile different methodologies for dropping duplicates
     unique_actc_match_gdf = actc_matched_gdf.drop_duplicates()
@@ -507,14 +495,14 @@ def conflate_ACTC():
     WranglerLogger.info('Finished conflating ACTC data')
 
 if __name__ == '__main__':
-    if not os.path.exists(THIRD_PARTY_OUTPUT_DIR):
-        os.makedirs(THIRD_PARTY_OUTPUT_DIR)
-
     # do one dataset at a time
     # We could split this up into multiple scripts but I think there's enough in common that it's helpful to see in one script
     parser = argparse.ArgumentParser(description=USAGE)
     parser.add_argument('third_party', choices=[TOMTOM,TM2_NON_MARIN,TM2_MARIN,SFCTA,CCTA,ACTC,PEMS], help='Third party data to conflate')
     args = parser.parse_args()
+
+    if not os.path.exists(os.path.join(THIRD_PARTY_OUTPUT_DIR, args.third_party)):
+        os.makedirs(os.path.join(THIRD_PARTY_OUTPUT_DIR, args.third_party))
 
     # setup logging
     pd.set_option("display.max_rows", 500)
