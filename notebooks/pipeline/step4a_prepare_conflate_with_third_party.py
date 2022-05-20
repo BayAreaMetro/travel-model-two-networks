@@ -170,7 +170,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns):
                 list(unmatched_gdf.columns)))
 
     # all possible conflation is done
-    if (client == None):
+    if (client != None):
         WranglerLogger.info('stopping container {}'.format(container.name))
         container.stop()
         client.containers.prune()
@@ -491,9 +491,7 @@ def conflate_ACTC():
         actc_raw_gdf.shape[0], len(actc_raw_gdf.groupby(['A', 'B']).count())
     ))
     WranglerLogger.debug('ACTC raw data dtypes:\n{}'.format(actc_raw_gdf.dtypes))
-
-    # define initial ESPG
-    actc_raw_gdf.crs = CRS("EPSG:26910")
+    WranglerLogger.debug('ACTC crs:\n{}'.format(actc_raw_gdf.crs))
 
     # convert to ESPG lat-lon
     actc_raw_gdf = actc_raw_gdf.to_crs(CRS(lat_lon_epsg_str))
