@@ -58,8 +58,8 @@ WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
 
 INPUT_DATA_DIR      = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR     = os.environ['OUTPUT_DATA_DIR']
-INPUT_POLYGON       = os.path.join(INPUT_DATA_DIR,  'external', 'step0_boundaries', 'San_Francisco_Bay_Region_Counties.shp')
-OUTPUT_DIR          = os.path.join(OUTPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
+INPUT_POLYGON       = os.path.join(INPUT_DATA_DIR,  'step0_boundaries', 'San_Francisco_Bay_Region_Counties.shp')
+OUTPUT_DIR          = os.path.join(OUTPUT_DATA_DIR, 'step2_osmnx_extracts')
 OUTPUT_FEATHER_LINK = os.path.join(OUTPUT_DIR, "link.feather")
 OUTPUT_FEATHER_NODE = os.path.join(OUTPUT_DIR, "node.feather")
 OUTPUT_GPKG         = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")

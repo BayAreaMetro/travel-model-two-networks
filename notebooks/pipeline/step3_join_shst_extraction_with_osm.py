@@ -25,12 +25,12 @@ INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 
 # OSM extraction and SharedStreet extraction
-SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'external', 'step1_shst_extracts')
-OSM_EXTRACT_DIR  = os.path.join(INPUT_DATA_DIR, 'external', 'step2_osmnx_extracts')
+SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'step1_shst_extracts')
+OSM_EXTRACT_DIR  = os.path.join(INPUT_DATA_DIR, 'step2_osmnx_extracts')
 OSM_LINK_FILE    = os.path.join(OSM_EXTRACT_DIR, 'link.feather')
 
 # This script will write to this directory
-SHST_WITH_OSM_DIR = os.path.join(OUTPUT_DATA_DIR, 'interim', 'step3_join_shst_with_osm')
+SHST_WITH_OSM_DIR = os.path.join(OUTPUT_DATA_DIR, 'step3_join_shst_with_osm')
 
 
 if __name__ == '__main__':
