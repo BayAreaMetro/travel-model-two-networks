@@ -1502,6 +1502,10 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
                               sort=False,
                               ignore_index=True)
 
+    # assign EPSG
+    shst_link_gdf = gpd.GeoDataFrame(shst_link_gdf,
+                                     crs={'init': 'epsg:{}'.format(LAT_LONG_EPSG)})
+
     return shst_link_gdf
 
 
