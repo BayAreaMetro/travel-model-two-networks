@@ -42,3 +42,9 @@ notebooks/pipeline/network_wrangler_*.log
 *.sbx
 *.shp
 *.shx
+*.xml
+*.zip
+*.url
+interim/step3_join_shst_with_osm/osmnx_lane_tag_permutations.csv
+interim/step3_join_shst_with_osm/osmnx_bus_permutations.csv
+interim/step3_join_shst_with_osm/osmnx_turn_permutations.csv
