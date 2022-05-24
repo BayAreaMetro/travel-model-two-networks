@@ -14,6 +14,8 @@ set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
 import pandas as pd
 import geopandas as gpd
 import geofeather  # this is fast
+from scipy.spatial import cKDTree
+from pyproj import CRS
 import datetime, json, os, sys
 
 import methods
@@ -28,6 +30,8 @@ OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'step1_shst_extracts')
 OSM_EXTRACT_DIR  = os.path.join(INPUT_DATA_DIR, 'step2_osmnx_extracts')
 OSM_LINK_FILE    = os.path.join(OSM_EXTRACT_DIR, 'link.feather')
+# county shapefile
+COUNTY_FILE = os.path.join(INPUT_DATA_DIR, 'step0_boundaries', 'cb_2018_us_county_500k', 'cb_2018_us_county_500k.shp')
 
 # This script will write to this directory
 SHST_WITH_OSM_DIR = os.path.join(OUTPUT_DATA_DIR, 'step3_join_shst_with_osm')
@@ -48,6 +52,10 @@ if __name__ == '__main__':
         "step3_join_shst_extraction_with_osm_{}.info.log".format(datetime.datetime.now().strftime("%Y%m%d_%H%M")),
     )
     setupLogging(LOG_FILENAME, LOG_FILENAME.replace('info', 'debug'))
+
+    # EPSG for nearest match: TARGET_EPSG = 26915
+    nearest_match_epsg_str = 'epsg:{}'.format(str(26915))
+    WranglerLogger.info('nearest match ESPG: ', nearest_match_epsg_str)
 
     # 1. Load and consolidate ShSt extracts (from step1_shst_extraction.sh) by reading and combining geofeather files
     WranglerLogger.info('1. Loading SharedStreets extracts from {}'.format(SHST_EXTRACT_DIR))
@@ -154,6 +162,7 @@ if __name__ == '__main__':
     # 9. aggregate osm ways back to ShSt based links
     # At this point, osmnx_shst_gdf has duplicated shstReferenceId because some sharedstreets links contain more than
     # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row.
+    WranglerLogger.info('9. Aggregating OSM ways back to SharedStreets-based links')
     shst_aggregated_gdf = methods.aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf)
     WranglerLogger.info('Before aggregating osm ways back to sharedstreets-based links, osmnx_shst_gdf has {} links, '
                         'representing {} unique sharedstreets links; after aggregating, shst_consolidated_gdf has {} links'.format(
@@ -184,7 +193,7 @@ if __name__ == '__main__':
     del shst_link_geometryId_debug
 
     # 10. create node gdf from links and attach network type variable
-    WranglerLogger.info('Creating nodes from links')
+    WranglerLogger.info('10. Creating nodes from links')
     node_gdf = methods.create_node_gdf(shst_aggregated_gdf)
 
     WranglerLogger.info('Adding network type variable for node')
@@ -207,19 +216,69 @@ if __name__ == '__main__':
     WranglerLogger.debug(shst_aggregated_gdf[~shst_aggregated_gdf.v.isin(node_gdf.osm_node_id.tolist())])
     WranglerLogger.debug(shst_aggregated_gdf[~shst_aggregated_gdf.u.isin(node_gdf.osm_node_id.tolist())])
 
-    #####################################
-    # export link, node, shape
+    # 11. label links and nodes with county names, and remove out-of-region links and nodes
+    WranglerLogger.info('11. Tagging links and nodes by county and removing out-of-region links and nodes')
 
-    WranglerLogger.info('Final network links have the following fields:\n{}'.format(shst_aggregated_gdf.dtypes))
-    WranglerLogger.info('Final network nodes have the following fields:\n{}'.format(node_gdf.dtypes))
+    # load Bay Area counties shapefile
+    WranglerLogger.info('loading county shapefile {}'.format(COUNTY_FILE))
+    counties_gdf = gpd.read_file(COUNTY_FILE)
+    WranglerLogger.info('convert to link_gdf CRS')
+    counties_gdf = counties_gdf.to_crs(shst_aggregated_gdf.crs)
+
+    # tag nodes and links by county
+    node_gdf, shst_aggregated_gdf = methods.tag_nodes_links_by_county_name(node_gdf, shst_aggregated_gdf, counties_gdf)
+    WranglerLogger.info('finished tagging nodes with county names. Total {:,} nodes, counts by county:\n{}'.format(
+        node_gdf.shape[0],
+        node_gdf['county'].value_counts(dropna=False)))
+    WranglerLogger.info('finished tagging links with county names. Total {:,} links, counts by county:\n{}'.format(
+        shst_aggregated_gdf.shape[0],
+        shst_aggregated_gdf['county'].value_counts(dropna=False)))
+    
+    # write to QAQC
+    OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_county_tag_QAQC.feather")
+    geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_aggregated_gdf), OUTPUT_FILE))
+    OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "node_county_tag_QAQC.feather")
+    geofeather.to_geofeather(node_gdf, OUTPUT_FILE)
+    WranglerLogger.info("Wrote {:,} rows to {}".format(len(node_gdf), OUTPUT_FILE))
+
+    # remove out-of-region links and nodes
+    # for nodes that are out-of-region but used in cross-region links, keep them and re-label to Bay Area counties
+    WranglerLogger.info('dropping out-of-the-region links and nodes')
+    link_BayArea_gdf, node_BayArea_gdf = methods.remove_out_of_region_links_nodes(shst_aggregated_gdf, node_gdf)
+    WranglerLogger.info('after dropping, {:,} Bay Area links and {:,} Bay Area nodes remain'.format(
+        link_BayArea_gdf.shape[0], 
+        node_BayArea_gdf.shape[0]))
+
+    # (?) 12. reconcile link length
+    # note: the initial Pipeline process didn't extract "length" from OSMnx, but calculated meter length based on geometry.
+    # may comapre the two and decide which one to use
+    WranglerLogger.info('12. Reconciling OSMnx extraction link length and geometry-based meter link length')
+    # add '_osmnx' suffix to 'length' field from OSMNX
+    if 'length' in link_BayArea_gdf.columns:
+        link_BayArea_gdf.rename(columns={'length': 'length_osmnx'}, inplace=True)
+    
+    geom_length = link_BayArea_gdf[['geometry']]
+    # convert to EPSG 26915 for meter unit
+    geom_length = geom_length.to_crs(CRS(nearest_match_epsg_str))
+    # calculate meter length
+    geom_length.loc[:, 'length_meter'] = geom_length.length
+    # add to link_BayArea_gdf
+    link_BayArea_gdf['length_meter'] = geom_length['length_meter']
+
+    #####################################
+    # export link, node
+
+    WranglerLogger.info('Final network links have the following fields:\n{}'.format(link_BayArea_gdf.dtypes))
+    WranglerLogger.info('Final network nodes have the following fields:\n{}'.format(node_BayArea_gdf.dtypes))
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
-    geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
+    geofeather.to_geofeather(link_BayArea_gdf, OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_node.feather')
     WranglerLogger.info('Saving nodes to {}'.format(OUTPUT_FILE))
-    geofeather.to_geofeather(node_gdf, OUTPUT_FILE)
+    geofeather.to_geofeather(node_BayArea_gdf, OUTPUT_FILE)
 
     WranglerLogger.info('Done')
 

@@ -21,6 +21,9 @@ NEAREST_MATCH_EPSG = 26915
 NUM_SHST_BOUNDARIES = 14
 # for ShSt docker work
 DOCKER_SHST_IMAGE_NAME = 'shst:latest'
+# Bay Area Counties
+BayArea_COUNTIES = ['San Francisco', 'Santa Clara', 'Sonoma', 'Marin', 'San Mateo',
+                    'Contra Costa', 'Solano', 'Napa', 'Alameda']
 
 # way (link) tags we want from OpenStreetMap (OSM)
 # osmnx defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
@@ -883,6 +886,7 @@ def count_bus_lanes(osmnx_shst_gdf, OUTPUT_DIR):
 
     WranglerLogger.debug('Bus lane imputation summary: \n{}'.format(bus_lane_permutations_df))
 
+
 def count_hov_lanes(osmnx_shst_gdf):
     """
     Add hov-only lane based on OSM attributes 'hov:lanes' and 'hov'.
@@ -1689,6 +1693,213 @@ def create_node_gdf(link_gdf):
                                  crs={'init': 'epsg:{}'.format(LAT_LONG_EPSG)})
 
     return point_gdf
+
+
+def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
+    """
+    Tag network nodes and links by county.
+    Nodes: first spatially join nodes with counties shapes; for nodes failed to join (e.g. in the Bay), 
+           match to the nearest joined node based on cKDTree. cKDTree requires meter-based CRS. 
+    Links: first spatially join links with counties shapes based on link centroids. For links failed to join, 
+           match to the nearest nodes which already have county tags.
+    """
+
+    ###### tag nodes 
+    WranglerLogger.info('tagging nodes with county names')
+
+    WranglerLogger.debug('...spatially joining nodes with county shape')
+    node_county_gdf = gpd.sjoin(node_gdf, counties_gdf, how='left', op='intersects')
+
+    # some nodes may get joined to more than one county, e.g. geometry on the boundary. Drop duplicates
+    WranglerLogger.debug('# of unique nodes: {}'.format(node_gdf.shape[0]))
+    WranglerLogger.debug('# of nodes in spatial join result: {}'.format(node_county_gdf.shape[0]))
+    WranglerLogger.debug('# of unique nodes in spatial join result: {}'.format(node_county_gdf.shst_node_id.nunique()))
+    WranglerLogger.info('...drop duplicates due to nodes on county boundaries getting more than one math')
+    node_county_gdf.drop_duplicates(subset=['shst_node_id'], inplace=True)
+
+    # use nearest match to fill in names for nodes that did not get county match (e.g. in the Bay)
+    # first, use cKDTree to construct k-dimensional points based on the matched nodes; then, for each unmatched node,
+    # find its nearest neighborhood within the matched nodes; last, fill out missing county names
+    WranglerLogger.debug('...running nearest match for nodes that did not get county join')
+    node_county_matched_gdf = node_county_gdf.loc[node_county_gdf.NAME.notnull()]
+    node_county_unmatched_gdf = node_county_gdf.loc[node_county_gdf.NAME.isnull()]
+    WranglerLogger.debug('{} unmatched nodes'.format(node_county_unmatched_gdf.shape[0]))
+
+    WranglerLogger.debug('......construct k-dimensional points on matched nodes')
+    node_county_matched_gdf = node_county_matched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+    node_county_matched_gdf['X'] = node_county_matched_gdf.geometry.map(lambda g: g.x)
+    node_county_matched_gdf['Y'] = node_county_matched_gdf.geometry.map(lambda g: g.y)
+    node_matched_inventory_ref = node_county_matched_gdf[['X', 'Y']].values
+    node_matched_tree = cKDTree(node_matched_inventory_ref)
+
+    node_county_unmatched_gdf = node_county_unmatched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+    node_county_unmatched_gdf['X'] = node_county_unmatched_gdf['geometry'].apply(lambda p: p.x)
+    node_county_unmatched_gdf['Y'] = node_county_unmatched_gdf['geometry'].apply(lambda p: p.y)
+
+    WranglerLogger.debug('......look for nearest neighbor for the unmatched nodes')
+    node_county_rematch_gdf = pd.DataFrame()
+
+    for i in range(len(node_county_unmatched_gdf)):
+        point = node_county_unmatched_gdf.iloc[i][['X', 'Y']].values
+        dd, ii = node_matched_tree.query(point, k=1)
+        add_snap_gdf = gpd.GeoDataFrame(node_county_matched_gdf.iloc[ii][["NAME"]]).transpose().reset_index(drop=True)
+
+        add_snap_gdf['shst_node_id'] = node_county_unmatched_gdf.iloc[i]['shst_node_id']
+
+        if i == 0:
+            node_county_rematch_gdf = add_snap_gdf.copy()
+        else:
+            node_county_rematch_gdf = node_county_rematch_gdf.append(add_snap_gdf, ignore_index=True, sort=False)
+    WranglerLogger.debug('found nearest neighbor for {} nodes'.format(node_county_rematch_gdf.shape[0]))
+
+    WranglerLogger.debug('......fill out missing county names based on nearest neighbor')
+    node_county_rematch_dict = dict(zip(node_county_rematch_gdf.shst_node_id, node_county_rematch_gdf.NAME))
+    node_county_gdf["NAME"] = node_county_gdf["NAME"].fillna(node_county_gdf.shst_node_id.map(node_county_rematch_dict))
+
+    # merge county name into node_gdf
+    node_with_county_gdf = pd.merge(
+        node_gdf,
+        node_county_gdf[['shst_node_id', 'NAME']].rename(columns={'NAME': 'county'}),
+        how='left',
+        on='shst_node_id')
+
+    ###### tag links 
+    WranglerLogger.info('tagging links with county names')
+
+    # spatial join links with county shape based on link centroids
+    WranglerLogger.debug('...spatially joining links with county shape using link centroids')
+
+    # first, create a temporary unique link identifier for convenience in merging; at this point, link_gdf unique
+    # link identifier is based on ['fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'shstGeometryId']
+    link_gdf.loc[:, 'temp_link_id'] = range(len(link_gdf))
+
+    # get link centroids
+    link_centroid_gdf = link_gdf.copy()
+    link_centroid_gdf["geometry"] = link_centroid_gdf["geometry"].centroid
+
+    # spatial join
+    link_centroid_gdf_join = gpd.sjoin(link_centroid_gdf, counties_gdf, how="left", op="intersects")
+    WranglerLogger.debug('{} unique links'.format(link_gdf.shape[0]))
+    WranglerLogger.debug('{} links in spatial join result, representing {} unique links'.format(
+        link_centroid_gdf_join.shape[0],
+        link_centroid_gdf_join['temp_link_id'].nunique()))
+    WranglerLogger.debug('...drop duplicates due to links on county boundaries getting more than one math')
+    link_centroid_gdf_join.drop_duplicates(subset=['temp_link_id'], inplace=True)
+
+    # merge name to link_gdf
+    link_county_gdf = pd.merge(
+        link_gdf,
+        link_centroid_gdf_join[['temp_link_id', 'NAME']].rename(columns={'NAME': 'county'}),
+        how='left',
+        on='temp_link_id'
+    )
+
+    link_county_unmatched_gdf = link_county_gdf.loc[link_county_gdf['county'].isnull()]
+    WranglerLogger.debug('{} links failed to get a county match through spatial join'.format(
+        link_county_unmatched_gdf.shape[0]))
+
+    # use nearest method for links that did not get county match through spatial join
+    # using link centroids to find node-based build k-dimensional points
+    WranglerLogger.debug('...running nearest match for links that did not get county join')
+
+    WranglerLogger.debug('......construct k-dimensional points on matched nodes')
+    node_county_matched_gdf = node_with_county_gdf.loc[node_with_county_gdf['county'].notnull()][['geometry', 'county']]
+    node_county_matched_gdf = node_county_matched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+    node_county_matched_gdf['X'] = node_county_matched_gdf.geometry.map(lambda g: g.x)
+    node_county_matched_gdf['Y'] = node_county_matched_gdf.geometry.map(lambda g: g.y)
+    node_matched_inventory_ref = node_county_matched_gdf[['X', 'Y']].values
+    node_matched_tree = cKDTree(node_matched_inventory_ref)
+ 
+    link_county_unmatched_gdf = link_county_unmatched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+    link_county_unmatched_gdf["geometry"] = link_county_unmatched_gdf["geometry"].centroid
+    link_county_unmatched_gdf['X'] = link_county_unmatched_gdf['geometry'].apply(lambda p: p.x)
+    link_county_unmatched_gdf['Y'] = link_county_unmatched_gdf['geometry'].apply(lambda p: p.y)
+
+    WranglerLogger.debug('......look for nearest neighbor')
+    link_county_rematch_gdf = pd.DataFrame()
+
+    for i in range(len(link_county_unmatched_gdf)):
+        point = link_county_unmatched_gdf.iloc[i][['X', 'Y']].values
+        dd, ii = node_matched_tree.query(point, k=1)
+        add_snap_gdf = gpd.GeoDataFrame(node_county_matched_gdf.iloc[ii][["county"]]).transpose().reset_index(drop=True)
+
+        add_snap_gdf['temp_link_id'] = link_county_unmatched_gdf.iloc[i]['temp_link_id']
+
+        if i == 0:
+            link_county_rematch_gdf = add_snap_gdf.copy()
+        else:
+            link_county_rematch_gdf = link_county_rematch_gdf.append(add_snap_gdf, ignore_index=True, sort=False)
+    WranglerLogger.debug('found nearest neighbor for {} links'.format(link_county_rematch_gdf.shape[0]))
+
+    WranglerLogger.debug('......fill out missing county names')
+    link_county_rematch_dict = dict(zip(link_county_rematch_gdf.temp_link_id, link_county_rematch_gdf.county))
+    link_county_gdf['county'] = link_county_gdf['county'].fillna(
+        link_county_gdf.temp_link_id.map(link_county_rematch_dict))
+
+    # merge it back to link_gdf
+    link_with_county_gdf = pd.merge(
+        link_gdf,
+        link_county_gdf[['temp_link_id', 'county']],
+        how='left',
+        on='temp_link_id')
+
+    return node_with_county_gdf, link_with_county_gdf
+
+
+def remove_out_of_region_links_nodes(link_gdf, node_gdf):
+    """
+    Remove out-of-region links and nodes used by out-of-region links; 
+    for nodes that are out-of-region but used by cross-region links (therefore not removed), re-label them to Bay Area counties.
+    """
+
+    # first, remove out-of-region links
+    WranglerLogger.debug('...dropping out-of-region links')
+    link_BayArea_gdf = link_gdf.loc[link_gdf['county'].isin(BayArea_COUNTIES)]
+    WranglerLogger.debug('...after dropping out-of-region links, {:,} Bay Area links remain'.format(link_BayArea_gdf.shape[0]))
+    
+    # then, remove nodes not use by BayArea links
+    WranglerLogger.debug('...dropping nodes not used by Bay Area links')
+    node_BayArea_gdf = node_gdf[node_gdf.shst_node_id.isin(link_BayArea_gdf.fromIntersectionId.tolist() +
+                                                           link_BayArea_gdf.toIntersectionId.tolist())]
+    
+    # for nodes that are outside the Bay Area but used by BayArea links, need to give them the
+    # internal county names:
+    WranglerLogger.debug('...updating county names of out-of-region nodes that are used by Bay Area links')
+    # select these nodes
+    node_BayArea_rename_county_gdf = node_BayArea_gdf.loc[~node_BayArea_gdf.county.isin(BayArea_COUNTIES)]
+    # get all the nodes (fromIntersectionId, toIntersectionId) used by BayArea links, and their BayArea county names
+    node_link_county_names_df = pd.concat(
+        [
+            link_BayArea_gdf[['fromIntersectionId', 'county']].drop_duplicates().rename(
+                columns={'fromIntersectionId': 'shst_node_id'}),
+            link_BayArea_gdf[['toIntersectionId', 'county']].drop_duplicates().rename(
+                columns={"toIntersectionId": "shst_node_id"})
+        ],
+        sort=False,
+        ignore_index=True
+    )
+
+    # then, merge these internal county names to the out-of-county nodes
+    node_BayArea_rename_county_gdf = pd.merge(
+        node_BayArea_rename_county_gdf.drop(['county'], axis=1),
+        node_link_county_names_df[['shst_node_id', 'county']],
+        how='left',
+        on='shst_node_id'
+    )
+    # then, drop duplicates
+    node_BayArea_rename_county_gdf.drop_duplicates(subset=['osm_node_id', 'shst_node_id'], inplace=True)
+
+    # finally, add these nodes back to node_BayArea_gdf to replace the initial ones with out-of-the-region names
+    node_BayArea_gdf = pd.concat(
+        [
+            node_BayArea_gdf.loc[node_BayArea_gdf.county.isin(BayArea_COUNTIES)],
+            node_BayArea_rename_county_gdf
+        ],
+        sort=False,
+        ignore_index=True
+    )
+
+    return link_BayArea_gdf, node_BayArea_gdf
 
 
 def pems_station_sheild_dir_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
