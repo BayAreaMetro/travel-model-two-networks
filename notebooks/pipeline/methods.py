@@ -340,7 +340,28 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     osm_ways_from_shst_gdf.rename(columns={"name": "name_shst_metadata",
                                            "oneWay": "oneway"}, inplace=True)
 
-    # OSM way links can be chopped up into many nodes, presumably to give it shape
+    # the merge is based on "wayId" in osm_ways_from_shst_gdf and "osmid" in osmnx_link_gdf, so first examine duplicated 'osmid'
+    osmnx_link_gdf['osmid_cnt'] = osmnx_link_gdf.groupby(['osmid'])['length'].transform('size')
+    WranglerLogger.debug('stats on osmid occurances: {}'.format(osmnx_link_gdf['osmid_cnt'].value_counts()))
+    # export some examples with duplicated osmid to check on a map
+    chk_osmid_dup_gdf = osmnx_link_gdf.loc[(osmnx_link_gdf['osmid_cnt'] > 1) & \
+                                            osmnx_link_gdf['lanes:backward'].notnull() & \
+                                            osmnx_link_gdf['lanes:forward'].notnull()].sort_values('osmid')
+    chk_osmid_dup_gdf.reset_index(drop=True, inplace=True)
+    OSMID_DUP_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'osmnx_osmid_dup.feather')
+    geofeather.to_geofeather(chk_osmid_dup_gdf, OSMID_DUP_DEBUG_FILE)
+    WranglerLogger.debug('Wrote chk_osmid_dup_gdf to {}'.format(OSMID_DUP_DEBUG_FILE))    
+                            
+    # Two reasons for duplicated osmid:
+    # 1. when osmnx generates a graph, it adds edges in both directions for two-way links, tags the reversed link in the
+    # boolean field "reversed", and copies link attributes to both edges. Since our osmnx extraction method already includes 
+    # direction-dependent attributes, e.g. "lanes:forward", "lanes:backward", "turn:lanes:forward", "turn:lanes:backward",
+    # osm way links with "reversed==False" contain link attributes of reversed links, and are consistent with the direction
+    # of osm ways in sharedstreets metadata, therefore, drop reversed osm ways links before merging with shst.
+    osmnx_link_gdf = osmnx_link_gdf.loc[osmnx_link_gdf['reversed'] == False]
+    osmnx_link_gdf.drop(columns=['osmid_cnt'], inplace=True)
+
+    # 2. OSM way links can be chopped up into many nodes, presumably to give it shape
     # for example, this link has a single osmid but 10 nodes:
     # https://www.openstreetmap.org/way/5149900
     # consolidate these -- we expect all the columns to be the same except for length, u, v, key and the geometry
@@ -1855,7 +1876,6 @@ def remove_out_of_region_links_nodes(link_gdf, node_gdf):
     # first, remove out-of-region links
     WranglerLogger.debug('...dropping out-of-region links')
     link_BayArea_gdf = link_gdf.loc[link_gdf['county'].isin(BayArea_COUNTIES)]
-    WranglerLogger.debug('...after dropping out-of-region links, {:,} Bay Area links remain'.format(link_BayArea_gdf.shape[0]))
     
     # then, remove nodes not use by BayArea links
     WranglerLogger.debug('...dropping nodes not used by Bay Area links')
