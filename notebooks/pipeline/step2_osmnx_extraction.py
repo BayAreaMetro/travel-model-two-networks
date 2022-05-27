@@ -41,6 +41,7 @@ Output:
 """
 import datetime, os, sys
 import methods
+import pandas as pd
 import geopandas as gpd
 import osmnx as ox
 import geofeather
@@ -68,6 +69,9 @@ OUTPUT_GPKG         = os.path.join(OUTPUT_DIR, "osmnx_extracts.gpkg")
 
 
 if __name__ == '__main__':
+    pd.set_option("display.max_columns", 500)
+    pd.set_option("display.width", 50000)
+    
     # create output folder if not exist
     if not os.path.exists(OUTPUT_DIR):
         # need to print since logger isn't setup yet
@@ -105,8 +109,16 @@ if __name__ == '__main__':
     # these are very large datasets to do links first and then delete, then nodes
     WranglerLogger.info('getting links from osmnx data')
     link_gdf = ox.graph_to_gdfs(osmnx_graph, nodes=False, edges=True)
-    WranglerLogger.info('link_gdf has {} records, with columns: \n{}'.format(
-        link_gdf.shape[0], list(link_gdf)))
+    WranglerLogger.info('link_gdf has {} records, with dtypes: \n{}'.format(
+        link_gdf.shape[0], link_gdf.dtypes))
+    WranglerLogger.info('link_gdf head: \n{}'.format(link_gdf.head()))
+    link_gdf.reset_index(drop=False, inplace=True)  # geofeather requires reset index
+  
+    # warn if reversed column isn't present
+    # added in osmnx-1.2.0 (https://github.com/gboeing/osmnx/blob/main/CHANGELOG.md)
+    if 'reversed' not in list(link_gdf.columns):
+        WranglerLogger.warn('Column reversed not found in link_gdf; this was added in osmnx-1.2.0')
+
     # report value_types for ordinal columns
     for column in link_gdf.select_dtypes([object]):
         WranglerLogger.info("column {} value_counts:\n{}".format(column, link_gdf[column].value_counts()))
@@ -120,12 +132,14 @@ if __name__ == '__main__':
     del link_gdf
     WranglerLogger.info('link objects deleted')
 
-    # writing out OSM node data to geojson
+    # pull the osmnx nodes
     WranglerLogger.info('getting nodes from osmnx data')
     node_gdf = ox.graph_to_gdfs(osmnx_graph, nodes=True, edges=False)
-    node_gdf.reset_index(inplace=True) # geofeather requires reset index
-    WranglerLogger.info('node_gdf has {} records, with columns: \n{}'.format(
-        node_gdf.shape[0], list(node_gdf)))
+    WranglerLogger.info('node_gdf has {} records, with dtypes: \n{}'.format(
+        node_gdf.shape[0], node_gdf.dtypes))
+    WranglerLogger.info('node_gdf head: \n{}'.format(node_gdf.head()))
+    node_gdf.reset_index(drop=False, inplace=True) # geofeather requires reset index
+
     # report value_types for ordinal columns
     for column in node_gdf.select_dtypes([object]):
         WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts()))
