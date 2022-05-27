@@ -109,7 +109,7 @@ if __name__ == '__main__':
         link_gdf.shape[0], list(link_gdf)))
     # report value_types for ordinal columns
     for column in link_gdf.select_dtypes([object]):
-        WranglerLogger.info("column {} value_counts:\n{}".format(column, link_gdf[column].value_counts()))
+        WranglerLogger.info("column {} value_counts:\n{}".format(column, link_gdf[column].value_counts(dropna=False)))
 
     # write links to geopackage
     WranglerLogger.info('writing out OSM links to gpkg at {}'.format(OUTPUT_DIR))
@@ -128,7 +128,7 @@ if __name__ == '__main__':
         node_gdf.shape[0], list(node_gdf)))
     # report value_types for ordinal columns
     for column in node_gdf.select_dtypes([object]):
-        WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts()))
+        WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts(dropna=False)))
 
     # writing out OSM node data to geopackage
     WranglerLogger.info('writing out OSM nodes to gpkg at {}'.format(OUTPUT_DIR))
