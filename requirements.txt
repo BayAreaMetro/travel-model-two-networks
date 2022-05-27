@@ -1,0 +1,9 @@
+network-wrangler
+# used for sharedstreets extraction and matching
+docker
+# 1.2.0 needed for this feature:
+osmnx >= 1.2.0
+# we use this for intermediate files
+geofeather
+# cKDTree used in methods
+scipy
