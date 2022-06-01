@@ -359,7 +359,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     # osm way links with "reversed==False" contain link attributes of reversed links, and are consistent with the direction
     # of osm ways in sharedstreets metadata, therefore, drop reversed osm ways links before merging with shst.
     osmnx_link_gdf = osmnx_link_gdf.loc[osmnx_link_gdf['reversed'] == False]
-    osmnx_link_gdf.drop(columns=['osmid_cnt'], inplace=True)
+    osmnx_link_gdf.drop(columns=['osmid_cnt', 'reversed'], inplace=True)
 
     # 2. OSM way links can be chopped up into many nodes, presumably to give it shape
     # for example, this link has a single osmid but 10 nodes:
@@ -1770,7 +1770,7 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
         if i == 0:
             node_county_rematch_gdf = add_snap_gdf.copy()
         else:
-            node_county_rematch_gdf = node_county_rematch_gdf.append(add_snap_gdf, ignore_index=True, sort=False)
+            node_county_rematch_gdf = pd.concat([node_county_rematch_gdf, add_snap_gdf], ignore_index=True, sort=False)
     WranglerLogger.debug('found nearest neighbor for {} nodes'.format(node_county_rematch_gdf.shape[0]))
 
     WranglerLogger.debug('......fill out missing county names based on nearest neighbor')
@@ -1830,7 +1830,27 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
     node_county_matched_gdf['Y'] = node_county_matched_gdf.geometry.map(lambda g: g.y)
     node_matched_inventory_ref = node_county_matched_gdf[['X', 'Y']].values
     node_matched_tree = cKDTree(node_matched_inventory_ref)
- 
+    
+    # TODO: find a long-term solution for the following temporary work-around
+    # --- start of work-around
+
+    # I got "ValueError: Cannot transform naive geometries. Please set a crs on the object first." in the next step 
+    # "link_county_unmatched_gdf.to_crs()", even when calling "link_county_unmatched_gdf.crs" gives "+init=epsg:4326".
+    # Adding a step "link_county_unmatched_gdf = gpd.GeoDataFrame(link_county_unmatched_gdf, crs={'init': 'epsg:4326'})"
+    # didn't resolve the error.
+    # This appears to be due to the link data having corrupted geometry, because trying to write out the geodataframe
+    # gives the error "Cannot interpret '<geopandas.array.GeometryDtype object at 0x00000286F4ECCD60>' as a data type".
+    # The work-around separates 'geometry' from other attributes, converts the geometry to str, reconstructs geometry 
+    # from it, and joins it back to other link attributes. 
+    geoms = link_county_unmatched_gdf.geometry.astype(str)
+    link_county_unmatched_attrs = pd.DataFrame(link_county_unmatched_gdf.drop('geometry', axis = 1))
+    link_county_unmatched_attrs.to_parquet('link_county_unmatched_attrs.parquet')
+    geoms_new = gpd.GeoSeries.from_wkt(geoms).reset_index(drop = True)
+    link_county_unmatched_attrs_new = pd.read_parquet('link_county_unmatched_attrs.parquet').reset_index(drop = True)
+    link_county_unmatched_gdf = gpd.GeoDataFrame(link_county_unmatched_attrs_new.copy(), 
+                                                 geometry = geoms_new, crs = LAT_LONG_EPSG)
+    # --- end of work-around
+
     link_county_unmatched_gdf = link_county_unmatched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
     link_county_unmatched_gdf["geometry"] = link_county_unmatched_gdf["geometry"].centroid
     link_county_unmatched_gdf['X'] = link_county_unmatched_gdf['geometry'].apply(lambda p: p.x)

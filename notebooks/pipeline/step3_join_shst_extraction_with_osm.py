@@ -55,7 +55,7 @@ if __name__ == '__main__':
 
     # EPSG for nearest match: TARGET_EPSG = 26915
     nearest_match_epsg_str = 'epsg:{}'.format(str(26915))
-    WranglerLogger.info('nearest match ESPG: ', nearest_match_epsg_str)
+    WranglerLogger.info('nearest match ESPG: '.format(nearest_match_epsg_str))
 
     # 1. Load and consolidate ShSt extracts (from step1_shst_extraction.sh) by reading and combining geofeather files
     WranglerLogger.info('1. Loading SharedStreets extracts from {}'.format(SHST_EXTRACT_DIR))
