@@ -1896,6 +1896,7 @@ def remove_out_of_region_links_nodes(link_gdf, node_gdf):
     # first, remove out-of-region links
     WranglerLogger.debug('...dropping out-of-region links')
     link_BayArea_gdf = link_gdf.loc[link_gdf['county'].isin(BayArea_COUNTIES)]
+    link_BayArea_gdf.reset_index(drop=True, inplace=True)
     
     # then, remove nodes not use by BayArea links
     WranglerLogger.debug('...dropping nodes not used by Bay Area links')
