@@ -38,9 +38,12 @@ PEMS          = 'PeMS'
 
 #####################################
 # EPSG requirement
-# TARGET_EPSG = 4326
+# LAT_LONG_EPSG = 4326
 lat_lon_epsg_str = 'epsg:{}'.format(str(methods.LAT_LONG_EPSG))
 WranglerLogger.info('standard ESPG: ', lat_lon_epsg_str)
+# NEAREST_MATCH_EPSG = 26915
+nearest_match_epsg_str = 'epsg:{}'.format(methods.NEAREST_MATCH_EPSG)
+WranglerLogger.info('nearest match ESPG: {}'.format(nearest_match_epsg_str))
 
 #####################################
 # inputs and outputs
@@ -59,171 +62,14 @@ THIRD_PARTY_INPUT_FILES = {
     SFCTA           : os.path.join(THIRD_PARTY_INPUT_DIR, SFCTA,         'input', 'SanFrancisco_links.shp'),
     CCTA            : os.path.join(THIRD_PARTY_INPUT_DIR, CCTA,          'input', 'ccta_2015_network.shp'),
     ACTC            : os.path.join(THIRD_PARTY_INPUT_DIR, ACTC,          'input', 'AlamedaCo_MASTER_20190410_no_cc.shp'),
-    PEMS            : 'todo'
+    PEMS            : os.path.join(THIRD_PARTY_INPUT_DIR, PEMS,          'input', 'pems_period.csv')
 }
 THIRD_PARTY_OUTPUT_DIR  = os.path.join(OUTPUT_DATA_DIR, 'step4_third_party_data')
-# conflation will be done in [THIRD_PARTY_OUTPUT_DIR]/[third_party]/conflation_shst
+# conflation will be done in [THIRD_PARTY_OUTPUT_DIR]/[third_party]/conflation_shst except for PEMS which uses nearest point method
 CONFLATION_SHST = 'conflation_shst'
+CONFLATION_PEMS_= os.path.join(THIRD_PARTY_OUTPUT_DIR, PEMS, 'nearest_match')
 
-def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns):
-    """
-    Generic conflation method.  Does the following:
-    1) Creates conflation directory (if it doesn't exist)
-    2) If the dataset is large, does the following by partitioning the dataset by the subregion boundaries established in step1_extract_shst
-       and iterating through them, doing the following steps.  Otherwise, this is done in one go
-       a) If this partition is already conflated (input and output files exist) skip to step d)
-       b) Writes the third_party_gdf (id_columns and geometry) for conflation
-       c) Runs the conflation in a docker container
-       d) Reads the resulting matched and unmatched results, concat with previous partition results (if relevant)
-    3) Merges the full results back with the full third_party_gdf and writes them for debugging
-    4) Returns the resulting GeoDataFrames (matched and unmatched)
-    """
-    WranglerLogger.info('Running conflate() for {} with id_columns {}; third_party_gdf.dtypes:\n{}'.format(
-        third_party, id_columns, third_party_gdf.dtypes))
 
-    # create conflation directory
-    conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST)
-    if not os.path.exists(conflation_dir):
-        WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
-        os.makedirs(conflation_dir)
-
-    # For smaller datasets, partitioning by the boundaries is not necessary with NODE_OPTIONS==--max_old_space_size=8192
-    # For larger datasets, I'm not getting crashing but the 'optimizing graph...' step takes many hours; I gave up at 20
-    # So far, 50k (ACTC, CCTA) has been fine without partitioning and 950k (TomTom) has not
-    boundary_partitions = ['']
-    if len(third_party_gdf) > 800000:
-        boundary_partitions = ['_{:02d}'.format(boundary_num) for boundary_num in range(1, methods.NUM_SHST_BOUNDARIES+1)]
-    WranglerLogger.debug('boundary_partitions = {}'.format(boundary_partitions))
-    
-    client        = None
-    matched_gdf   = gpd.GeoDataFrame()
-    unmatched_gdf = gpd.GeoDataFrame()
-
-    # boundary_partition is either '' or '_01','_02', etc
-    for boundary_partition in boundary_partitions:
-        # input / output file for this boundary_partition
-        shst_input_file     = os.path.join(conflation_dir, '{}{}.in.geojson'.format(third_party, boundary_partition))
-        shst_matched_file   = os.path.join(conflation_dir, '{}{}.out.matched.geojson'.format(third_party, boundary_partition))
-        shst_unmatched_file = os.path.join(conflation_dir, '{}{}.out.unmatched.geojson'.format(third_party, boundary_partition))
-
-        # NOTE: skip shst conflation of this partition if it was already done and if the files are in place since this process is slow....
-        if os.path.exists(shst_input_file) and os.path.exists(shst_matched_file):
-            WranglerLogger.info('{} conflation files {} and {} exist -- skipping conflation'.format(
-                third_party, shst_input_file, shst_matched_file))
-
-        else:
-            # do this onely once, not for every partition
-            if (client == None):
-                # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-                docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
-                # create docker container to do the shst matchting
-                (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
-
-            # no partitioning
-            if boundary_partition == '':
-                # export the whole dataset
-                WranglerLogger.info('Exporting {:,} rows of {} data to {}'.format(len(third_party_gdf), third_party, shst_input_file))
-                third_party_gdf[id_columns + ['geometry']].to_file(shst_input_file, driver="GeoJSON") # write id columns and geometry
-            else:
-                # export the partition dataset
-                boundary_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary{}.geojson'.format(boundary_partition)))
-                third_party_partition_gdf = third_party_gdf.loc[third_party_gdf.intersects(boundary_gdf.geometry.unary_union)]
-                WranglerLogger.info('Exporting {:,} rows of {} data to {}'.format(len(third_party_partition_gdf), third_party, shst_input_file))
-                third_party_partition_gdf[id_columns + ['geometry']].to_file(shst_input_file, driver="GeoJSON")
-
-            # run the conflation
-            command = ("/bin/bash -c 'cd {path}; shst match step4_third_party_data/{third_party}/conflation_shst/{third_party}{boundary_partition}.in.geojson "
-                        "--out=step4_third_party_data/{third_party}/conflation_shst/{third_party}{boundary_partition}.out.geojson "
-                        "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction'".format(
-                            path=docker_output_path, third_party=third_party, boundary_partition=boundary_partition))
-            WranglerLogger.info('Executing docker command: {}'.format(command))
-        
-            (exec_code,exec_output) = container.exec_run(command, stdout=True, stderr=True, stream=True)
-            while True:
-                try:
-                    line = next(exec_output)
-                    # note: this looks a little funny because it's a byte string
-                    WranglerLogger.debug(line.strip())
-                except StopIteration:
-                    # done
-                    WranglerLogger.info('...Completed command. exec_code: {}'.format(exec_code))
-                    break
-            
-        # read the results
-        matched_partition_gdf   = gpd.read_file(shst_matched_file)
-        WranglerLogger.debug('Read {:,} rows from {}; dtypes:\n{}'.format(len(matched_partition_gdf), 
-            shst_matched_file, matched_partition_gdf.dtypes))
-            
-        # combine with previous
-        matched_gdf = pd.concat([matched_gdf, matched_partition_gdf], axis='index')
-        WranglerLogger.debug('matched_gdf has {:,} rows and columns:{}'.format(len(matched_gdf), 
-            list(matched_gdf.columns)))
-
-        if os.path.exists(shst_unmatched_file):
-            unmatched_partition_gdf = gpd.read_file(shst_unmatched_file)
-            WranglerLogger.debug('Read {:,} rows from {}; dtypes:\n{}'.format(len(unmatched_partition_gdf), 
-                shst_unmatched_file, unmatched_partition_gdf.dtypes))
-
-            # combine with previous
-            unmatched_gdf = pd.concat([unmatched_gdf, unmatched_partition_gdf], axis='index')
-            WranglerLogger.debug('unmatched_gdf has {:,} rows and columns:{}'.format(len(unmatched_gdf), 
-                list(unmatched_gdf.columns)))
-
-    # all possible conflation is done
-    if (client != None):
-        WranglerLogger.info('stopping container {}'.format(container.name))
-        container.stop()
-        client.containers.prune()
-
-    # rename id columns back to original; shst match will lowercase and prepend with pp_
-    rename_columns = {
-        'shstFromIntersectionId': 'fromIntersectionId',
-        'shstToIntersectionId'  : 'toIntersectionId',
-    }
-    for id_column in id_columns:
-        rename_columns['pp_{}'.format(id_column.lower())] = id_column
-    WranglerLogger.debug('Renaming columns: {}'.format(rename_columns))
-    matched_gdf.rename(columns=rename_columns, inplace=True)
-
-    # merge back with original
-    matched_gdf = pd.merge(
-        left     = matched_gdf,
-        right    = third_party_gdf.drop(columns=['geometry']),  # we already have this
-        how      = 'left',
-        on       = id_columns)
-    WranglerLogger.debug('After join, matched_gdf.dtypes:\n{}'.format(matched_gdf.dtypes))
-
-    # output for debugging
-    matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'matched.feather')
-    geofeather.to_geofeather(matched_gdf, matched_geofeather)
-    WranglerLogger.info('Wrote {:,} lines to {}'.format(len(matched_gdf), matched_geofeather))
-
-    if len(unmatched_gdf) > 0:
-        # shst lowercases columns -- rename back if needed
-        rename_columns = {}
-        for id_column in id_columns:
-            if id_column.lower() != id_column: rename_columns[id_column.lower()] = id_column
-        if len(rename_columns) > 0:
-            WranglerLogger.debug('Renaming columns: {}'.format(rename_columns))
-            unmatched_gdf.rename(columns=rename_columns, inplace=True)
-
-        unmatched_gdf = pd.merge(
-            left     = unmatched_gdf,
-            right    = third_party_gdf.drop(columns=['geometry']),  # we already have this
-            how      = 'left',
-            on       = id_columns)
-        WranglerLogger.debug('After join, unmatched_gdf.dtypes:\n{}'.format(unmatched_gdf.dtypes))
-
-        # output for debugging
-        unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'unmatched.feather')
-        geofeather.to_geofeather(unmatched_gdf, unmatched_geofeather)
-        WranglerLogger.info('Wrote {:,} lines to {}'.format(len(unmatched_gdf), unmatched_geofeather))
-
-    else:
-        unmatched_gdf = None
-        WranglerLogger.debug('No unmatched file(s) found')
-
-    return (matched_gdf, unmatched_gdf)
 
 def conflate_TOMTOM():
     """
@@ -253,7 +99,9 @@ def conflate_TOMTOM():
     # generating unique handle for tomtom
     tomtom_raw_gdf['tomtom_link_id'] = range(1, len(tomtom_raw_gdf) + 1)
 
-    (tomtom_matched_gdf, tomtom_unmatched_gdf) = conflate(TOMTOM, tomtom_raw_gdf, ['tomtom_link_id'])
+    (tomtom_matched_gdf, tomtom_unmatched_gdf) = methods.conflate(
+        TOMTOM, tomtom_raw_gdf, ['tomtom_link_id'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_raw_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
@@ -410,34 +258,40 @@ def conflcate_SFCTA():
     boundary_4_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_4.geojson'))
     sfcta_SF_gdf = sfcta_stick_gdf[
         sfcta_stick_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
-    WranglerLogger.info('{:,} SF links, with following fields: \n{}'.format(
-        sfcta_SF_gdf.shape[0], list(sfcta_SF_gdf)))
 
     # remove "special facility" (FT 6)
     sfcta_SF_roadway_gdf = sfcta_SF_gdf[~(sfcta_SF_gdf.FT == 6)]
 
-    # create conflation directory
-    conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, SFCTA, CONFLATION_SHST)
-    if not os.path.exists(conflation_dir):
-        WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
-        os.makedirs(conflation_dir)
+    WranglerLogger.info('after removing links outside bounary_4 and FT=6, SF network has {:,} links, {:,} unique A-B combination'.format(
+        sfcta_SF_roadway_gdf.shape[0], len(sfcta_SF_roadway_gdf.groupby(['A', 'B']).count())))
 
-    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-    docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
-    # create docker container to do the shst matchting
-    (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
+    # conflate the given dataframe with SharedStreets
+    (matched_gdf, unmatched_gdf) = methods.conflate(
+        SFCTA, sfcta_SF_roadway_gdf, ['A','B'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    # Write out SFCTA stick network for conflation
-    sfcta_SF_roadway_gdf[['A', 'B', "geometry"]].to_file(
-        os.path.join(conflation_dir, 'sfcta_in.geojson'), driver="GeoJSON")
+    # # create conflation directory
+    # conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, SFCTA, CONFLATION_SHST)
+    # if not os.path.exists(conflation_dir):
+    #     WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
+    #     os.makedirs(conflation_dir)
 
-    # export modified raw data for merging the conflation results back
-    output_file = os.path.join(conflation_dir, "sfcta.feather")
-    WranglerLogger.info('exporting SFCTA with all attributes to {}'.format(output_file))
-    geofeather.to_geofeather(sfcta_SF_roadway_gdf, output_file)
+    # # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
+    # docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
+    # # create docker container to do the shst matchting
+    # (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
 
-    WranglerLogger.debug('SFTCA data has the following dtypes: {}'.format(sfcta_SF_roadway_gdf.dtypes))
-    WranglerLogger.info('finished conflating SFCTA data')
+    # # Write out SFCTA stick network for conflation
+    # sfcta_SF_roadway_gdf[['A', 'B', "geometry"]].to_file(
+    #     os.path.join(conflation_dir, 'sfcta_in.geojson'), driver="GeoJSON")
+
+    # # export modified raw data for merging the conflation results back
+    # output_file = os.path.join(conflation_dir, "sfcta.feather")
+    # WranglerLogger.info('exporting SFCTA with all attributes to {}'.format(output_file))
+    # geofeather.to_geofeather(sfcta_SF_roadway_gdf, output_file)
+
+    # WranglerLogger.debug('SFTCA data has the following dtypes: {}'.format(sfcta_SF_roadway_gdf.dtypes))
+    WranglerLogger.info('Finished conflating SFCTA data')
 
 def conflate_CCTA():
     """
@@ -473,11 +327,13 @@ def conflate_CCTA():
 
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 3 hours
-    (matched_gdf, unmatched_gdf) = conflate(CCTA, ccta_gdf, ['ID'])
+    (matched_gdf, unmatched_gdf) = methods.conflate(
+        CCTA, ccta_gdf, ['ID'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
     #TODO: whatever we do next
 
-    WranglerLogger.debug('CCTA data has the following dtypes: {}'.format(ccta_gdf.dtypes))
+    # WranglerLogger.debug('CCTA data has the following dtypes: {}'.format(ccta_gdf.dtypes))
     WranglerLogger.info('finished conflating CCTA data')
 
 def conflate_ACTC():
@@ -499,44 +355,48 @@ def conflate_ACTC():
 
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 2.5-3 hours
-    (actc_matched_gdf, actc_unmatched_gdf) = conflate(ACTC, actc_raw_gdf, ['A','B'])
+    (matched_gdf, unmatched_gdf) = methods.conflate(
+        ACTC, actc_raw_gdf, ['A','B'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    # TODO: reconcile different methodologies for dropping duplicates
-    unique_actc_match_gdf = actc_matched_gdf.drop_duplicates()
+    # # TODO: reconcile different methodologies for dropping duplicates
+    # unique_actc_match_gdf = actc_matched_gdf.drop_duplicates()
 
-    # in conflation df, aggregate based on shstReferenceId, get all number of lanes for each shstReferenceId
-    actc_lanes_conflation_df = unique_actc_match_gdf.loc[unique_actc_match_gdf['BASE_LN'] > 0].groupby(
-        ['shstReferenceId'])['BASE_LN'].apply(list).to_frame().reset_index()
+    # # in conflation df, aggregate based on shstReferenceId, get all number of lanes for each shstReferenceId
+    # actc_lanes_conflation_df = unique_actc_match_gdf.loc[unique_actc_match_gdf['BASE_LN'] > 0].groupby(
+    #     ['shstReferenceId'])['BASE_LN'].apply(list).to_frame().reset_index()
 
-    actc_lanes_conflation_df['base_lanes_min'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: min(set(x)))
-    actc_lanes_conflation_df['base_lanes_max'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: max(set(x)))
+    # actc_lanes_conflation_df['base_lanes_min'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: min(set(x)))
+    # actc_lanes_conflation_df['base_lanes_max'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: max(set(x)))
 
-    # TODO: decide if export or merge into the base network
-    actc_lanes_conflation_df.to_csv(os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'actcmodel_legacy_lanes.csv'), index=False)
+    # # TODO: decide if export or merge into the base network
+    # actc_lanes_conflation_df.to_csv(os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'actcmodel_legacy_lanes.csv'), index=False)
 
-    # same for bike lane
-    actc_bike_conflation_df = unique_actc_match_gdf.groupby(['shstReferenceId'])[['NMT2010', 'NMT2020']].agg(lambda x: list(x)).reset_index()
+    # # same for bike lane
+    # actc_bike_conflation_df = unique_actc_match_gdf.groupby(['shstReferenceId'])[['NMT2010', 'NMT2020']].agg(lambda x: list(x)).reset_index()
 
-    actc_bike_conflation_df['nmt2010_min'] = actc_bike_conflation_df['NMT2010'].apply(lambda x: min(set(x)))
-    actc_bike_conflation_df['nmt2010_max'] = actc_bike_conflation_df['NMT2010'].apply(lambda x: max(set(x)))
-    actc_bike_conflation_df['nmt2020_min'] = actc_bike_conflation_df['NMT2020'].apply(lambda x: min(set(x)))
-    actc_bike_conflation_df['nmt2020_max'] = actc_bike_conflation_df['NMT2020'].apply(lambda x: max(set(x)))
+    # actc_bike_conflation_df['nmt2010_min'] = actc_bike_conflation_df['NMT2010'].apply(lambda x: min(set(x)))
+    # actc_bike_conflation_df['nmt2010_max'] = actc_bike_conflation_df['NMT2010'].apply(lambda x: max(set(x)))
+    # actc_bike_conflation_df['nmt2020_min'] = actc_bike_conflation_df['NMT2020'].apply(lambda x: min(set(x)))
+    # actc_bike_conflation_df['nmt2020_max'] = actc_bike_conflation_df['NMT2020'].apply(lambda x: max(set(x)))
 
-    # TODO: decide if export or merge into the base network
-    actc_bike_conflation_df.to_csv(os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'actcmodel_legacy_bike.csv'), index=False)
+    # # TODO: decide if export or merge into the base network
+    # actc_bike_conflation_df.to_csv(os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'actcmodel_legacy_bike.csv'), index=False)
 
-    # add data source prefix to column names
-    unique_actc_match_gdf.rename(columns={'A': 'ACTC_A',
-                                          'B': 'ACTC_B',
-                                          'base_lanes_min': 'ACTC_base_lanes_min',
-                                          'base_lanes_max': 'ACTC_base_lanes_max',
-                                          'nmt2010_min': 'ACTC_nmt2010_min',
-                                          'nmt2010_max': 'ACTC_nmt2010_max',
-                                          'nmt2020_min': 'ACTC_nmt2020_min',
-                                          'nmt2020_max': 'ACTC_nmt2020_max'},
-                                 inplace=True)
+    # # add data source prefix to column names
+    # unique_actc_match_gdf.rename(columns={'A': 'ACTC_A',
+    #                                       'B': 'ACTC_B',
+    #                                       'base_lanes_min': 'ACTC_base_lanes_min',
+    #                                       'base_lanes_max': 'ACTC_base_lanes_max',
+    #                                       'nmt2010_min': 'ACTC_nmt2010_min',
+    #                                       'nmt2010_max': 'ACTC_nmt2010_max',
+    #                                       'nmt2020_min': 'ACTC_nmt2020_min',
+    #                                       'nmt2020_max': 'ACTC_nmt2020_max'},
+    #                              inplace=True)
 
     WranglerLogger.info('Finished conflating ACTC data')
+
+# TODO: def conflate_pums():
 
 if __name__ == '__main__':
     # do one dataset at a time

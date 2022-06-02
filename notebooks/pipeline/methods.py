@@ -1943,6 +1943,204 @@ def remove_out_of_region_links_nodes(link_gdf, node_gdf):
     return link_BayArea_gdf, node_BayArea_gdf
 
 
+def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, third_party_type,
+             THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR):
+    """
+    Generic conflation method.  Does the following:
+    1) Creates conflation directory (if it doesn't exist)
+    2) If the dataset is large, does the following by partitioning the dataset by the subregion boundaries established in step1_extract_shst
+       and iterating through them, doing the following steps.  Otherwise, this is done in one go
+       a) If this partition is already conflated (input and output files exist) skip to step d)
+       b) Writes the third_party_gdf (id_columns and geometry) for conflation
+       c) Runs the conflation in a docker container
+       d) Reads the resulting matched and unmatched results, concat with previous partition results (if relevant)
+    3) Merges the full results back with the full third_party_gdf and writes them for debugging
+    4) Returns the resulting GeoDataFrames (matched and unmatched)
+    
+    Args:
+        - third_party: string name of the data source, need to be consistent with folder name.
+        - third_party_gdf: geodataframe of third-party network data, already convert to CRS, with (one or more) id column(s). 
+        - id_columns: unique identifier of each row.
+        - third_party_type: 'roadway_link' or 'transit', as different shst match commands apply.
+        - THIRD_PARTY_OUTPUT_DIR: where all the third-party datasets' shst match outputs will be written to.
+        - OUTPUT_DATA_DIR: the top level of output data dir, where the Docker contained will be created.
+        - CONFLATION_SHST: sub-folder for the current third-party dataset's shst match outputs will be written to.
+        - BOUNDARY_DIR: dir of th boundary files used to split the third-party dataset before shst matching if it is too large.
+    
+    """
+    WranglerLogger.info('Running conflate() for {} with id_columns {}; third_party_gdf.dtypes:\n{}'.format(
+        third_party, id_columns, third_party_gdf.dtypes))
+
+    # create conflation directory
+    if third_party_type == 'roadway_link':
+        conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST)
+    elif third_party_type == 'transit':
+        conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, CONFLATION_SHST)
+    if not os.path.exists(conflation_dir):
+        WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
+        os.makedirs(conflation_dir)
+
+    # For smaller datasets, partitioning by the boundaries is not necessary with NODE_OPTIONS==--max_old_space_size=8192
+    # For larger datasets, I'm not getting crashing but the 'optimizing graph...' step takes many hours; I gave up at 20
+    # So far, 50k (ACTC, CCTA) has been fine without partitioning and 950k (TomTom) has not.
+    # Whether "shst match" will run out of memory depends on the number of target links (or nodes) in the underlying
+    # shst network, not the side of the third-party dataset, but the latter is a good approximation in this case.
+    # For the same reason, the partitioning slipts the dataset by geographic boundaries, not by some criteria such as FT.
+    boundary_partitions = ['']
+    if len(third_party_gdf) > 800000:
+        boundary_partitions = ['_{:02d}'.format(boundary_num) for boundary_num in range(1, NUM_SHST_BOUNDARIES+1)]
+    WranglerLogger.debug('boundary_partitions = {}'.format(boundary_partitions))
+    
+    client        = None
+    matched_gdf   = gpd.GeoDataFrame()
+    unmatched_gdf = gpd.GeoDataFrame()
+
+    # boundary_partition is either '' or '_01','_02', etc
+    for boundary_partition in boundary_partitions:
+        # input / output file for this boundary_partition
+        shst_input_file     = os.path.join(conflation_dir, '{}{}.in.geojson'.format(third_party, boundary_partition))
+        shst_matched_file   = os.path.join(conflation_dir, '{}{}.out.matched.geojson'.format(third_party, boundary_partition))
+        shst_unmatched_file = os.path.join(conflation_dir, '{}{}.out.unmatched.geojson'.format(third_party, boundary_partition))
+
+        # NOTE: skip shst conflation of this partition if it was already done and if the files are in place since this process is slow....
+        if os.path.exists(shst_input_file) and os.path.exists(shst_matched_file):
+            WranglerLogger.info('{} conflation files {} and {} exist -- skipping conflation'.format(
+                third_party, shst_input_file, shst_matched_file))
+
+        else:
+            # do this onely once, not for every partition
+            if (client == None):
+                # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
+                docker_output_path = docker_path(OUTPUT_DATA_DIR)
+                # create docker container to do the shst matchting
+                (client, container) = create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
+
+            # no partitioning
+            if boundary_partition == '':
+                # export the whole dataset
+                WranglerLogger.info('Exporting {:,} rows of {} data to {}'.format(len(third_party_gdf), third_party, shst_input_file))
+                third_party_gdf[id_columns + ['geometry']].to_file(shst_input_file, driver="GeoJSON") # write id columns and geometry
+            else:
+                # export the partition dataset
+                boundary_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary{}.geojson'.format(boundary_partition)))
+                third_party_partition_gdf = third_party_gdf.loc[third_party_gdf.intersects(boundary_gdf.geometry.unary_union)]
+                WranglerLogger.info('Exporting {:,} rows of {} data to {}'.format(len(third_party_partition_gdf), third_party, shst_input_file))
+                third_party_partition_gdf[id_columns + ['geometry']].to_file(shst_input_file, driver="GeoJSON")
+
+            # run the conflation
+            if third_party_type == 'roadway_link':
+                command = ("/bin/bash -c 'cd {path}; shst match step4_third_party_data/{third_party}/conflation_shst/{third_party}{boundary_partition}.in.geojson "
+                            "--out=step4_third_party_data/{third_party}/conflation_shst/{third_party}{boundary_partition}.out.geojson "
+                            "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction'".format(
+                                path=docker_output_path, third_party=third_party, boundary_partition=boundary_partition))
+            elif third_party_type == 'transit':
+                command = ("/bin/bash -c 'cd {path}; shst match step6_gtfs/output/conflation_shst/{third_party}{boundary_partition}.in.geojson "
+                            "--out=step6_gtfs/output/conflation_shst/{third_party}{boundary_partition}.out.geojson "
+                            "--tile-hierarchy=8 --follow-line-direction'".format(
+                                path=docker_output_path, third_party=third_party, boundary_partition=boundary_partition))
+                
+            WranglerLogger.info('Executing docker command: {}'.format(command))
+        
+            (exec_code,exec_output) = container.exec_run(command, stdout=True, stderr=True, stream=True)
+            while True:
+                try:
+                    line = next(exec_output)
+                    # note: this looks a little funny because it's a byte string
+                    WranglerLogger.debug(line.strip())
+                except StopIteration:
+                    # done
+                    WranglerLogger.info('...Completed command. exec_code: {}'.format(exec_code))
+                    break
+            
+        # read the results
+        if os.path.exists(shst_matched_file):
+            matched_partition_gdf   = gpd.read_file(shst_matched_file)
+            WranglerLogger.debug('Read {:,} rows from {}; dtypes:\n{}'.format(len(matched_partition_gdf), 
+                shst_matched_file, matched_partition_gdf.dtypes))
+            
+            # combine with previous
+            matched_gdf = pd.concat([matched_gdf, matched_partition_gdf], axis='index')
+            WranglerLogger.debug('matched_gdf has {:,} rows and columns:{}'.format(len(matched_gdf), 
+                list(matched_gdf.columns)))
+
+        if os.path.exists(shst_unmatched_file):
+            unmatched_partition_gdf = gpd.read_file(shst_unmatched_file)
+            WranglerLogger.debug('Read {:,} rows from {}; dtypes:\n{}'.format(len(unmatched_partition_gdf), 
+                shst_unmatched_file, unmatched_partition_gdf.dtypes))
+
+            # combine with previous
+            unmatched_gdf = pd.concat([unmatched_gdf, unmatched_partition_gdf], axis='index')
+            WranglerLogger.debug('unmatched_gdf has {:,} rows and columns:{}'.format(len(unmatched_gdf), 
+                list(unmatched_gdf.columns)))
+
+    # all possible conflation is done
+    if (client != None):
+        WranglerLogger.info('stopping container {}'.format(container.name))
+        container.stop()
+        client.containers.prune()
+
+    if len(matched_gdf) > 0:
+        # rename id columns back to original; shst match will lowercase and prepend with pp_
+        rename_columns = {
+            'shstFromIntersectionId': 'fromIntersectionId',
+            'shstToIntersectionId'  : 'toIntersectionId',
+        }
+        for id_column in id_columns:
+            rename_columns['pp_{}'.format(id_column.lower())] = id_column
+        WranglerLogger.debug('Renaming columns: {}'.format(rename_columns))
+        matched_gdf.rename(columns=rename_columns, inplace=True)
+
+        # merge back with original
+        matched_gdf = pd.merge(
+            left     = matched_gdf,
+            right    = third_party_gdf.drop(columns=['geometry']),  # we already have this
+            how      = 'left',
+            on       = id_columns)
+        WranglerLogger.debug('After join, matched_gdf.dtypes:\n{}'.format(matched_gdf.dtypes))
+
+        # output for debugging
+        if third_party_type == 'roadway_link':
+            matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'matched.feather')
+        elif third_party_type == 'transit':
+            matched_geofeather = os.path.join(CONFLATION_SHST, '{}_matched.feather'.format(third_party))
+        geofeather.to_geofeather(matched_gdf, matched_geofeather)
+        WranglerLogger.info('Wrote {:,} lines to {}'.format(len(matched_gdf), matched_geofeather))
+    
+    else:
+        matched_gdf = None
+        WranglerLogger.debug('No matched file(s) found')        
+
+    if len(unmatched_gdf) > 0:
+        # shst lowercases columns -- rename back if needed
+        rename_columns = {}
+        for id_column in id_columns:
+            if id_column.lower() != id_column: rename_columns[id_column.lower()] = id_column
+        if len(rename_columns) > 0:
+            WranglerLogger.debug('Renaming columns: {}'.format(rename_columns))
+            unmatched_gdf.rename(columns=rename_columns, inplace=True)
+
+        unmatched_gdf = pd.merge(
+            left     = unmatched_gdf,
+            right    = third_party_gdf.drop(columns=['geometry']),  # we already have this
+            how      = 'left',
+            on       = id_columns)
+        WranglerLogger.debug('After join, unmatched_gdf.dtypes:\n{}'.format(unmatched_gdf.dtypes))
+
+        # output for debugging
+        if third_party_type == 'roadway_link':
+            unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'unmatched.feather')
+        elif third_party_type == 'transit':
+            unmatched_geofeather = os.path.join(CONFLATION_SHST, '{}_unmatched.feather'.format(third_party))
+        geofeather.to_geofeather(unmatched_gdf, unmatched_geofeather)
+        WranglerLogger.info('Wrote {:,} lines to {}'.format(len(unmatched_gdf), unmatched_geofeather))
+
+    else:
+        unmatched_gdf = None
+        WranglerLogger.debug('No unmatched file(s) found')
+
+    return (matched_gdf, unmatched_gdf)
+
+
 def pems_station_sheild_dir_nearest_match(pems_gdf, link_gdf, pems_type_roadway_crosswalk):
     """
 
@@ -2125,6 +2323,35 @@ def pems_match_ft(pems_station_df, link_gdf, pems_type_roadway_crosswalk):
 
     WranglerLogger.info('finished matching PEMS stations')
     return pems_stations_ft_matched_gdf
+
+
+def gtfs_point_shapes_to_link_gdf(gtfs_shape_file, gtfs_name):
+
+    """
+    Create a transit line geodataframe from 'shapes.txt' in GTFS data, which contains lat/lon of transit stops/stations:
+        shape_id         : line name
+        shape_pt_sequence: sequence of stop/station in the line
+        shape_pt_lat     : stop/station latitude
+        shape_pt_lon     : stop/station longitude
+
+    """
+    WranglerLogger.debug('read shape.txt')
+    gtfs_shape_df = pd.read_csv(gtfs_shape_file)
+
+    try:
+        # get station/stop points from lat/lon
+        gtfs_geometry = [Point(xy) for xy in zip(gtfs_shape_df.shape_pt_lon, gtfs_shape_df.shape_pt_lat)]
+        gtfs_shape_gdf = gpd.GeoDataFrame(gtfs_shape_df, geometry = gtfs_geometry)
+
+        # group stations/stops to get line 
+        line_df = gtfs_shape_gdf.groupby(['shape_id'])['geometry'].apply(lambda x:LineString(x.tolist())).reset_index()
+        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry')
+
+        return line_gdf  
+
+    except:
+        WranglerLogger.info('failed to create line geojson')
+        return None
 
 
 def link_df_to_geojson(df, properties):
