@@ -93,12 +93,13 @@ if __name__ == '__main__':
 
             WranglerLogger.info("Column {:<20} has type {}".format(col, input_gdf.dtypes[col]))            
             # fix column names for geopackage
-            if ':' in col:   # rename columns with ":"
-                col_new = col.replace(':','_')
+            if ':' in col:   # rename columns with ":", also appending "_rename" to avoid duplicates in col names caused by renaming, 
+                             # which is not covered by the last "elif", e.g. when input_gdf has 'lanes:bus' and 'lanes_bus'. 
+                col_new = col.replace(':','_') + '_rename'
                 input_gdf.rename(columns={col:col_new}, inplace=True)
                 WranglerLogger.info("    => renamed to {}".format(col_new))
             elif col.startswith("_"): # don't start with _; prepend alpha character 'x'
-                col_new = 'x' + col
+                col_new = 'x' + col + '_rename'
                 input_gdf.rename(columns={col:col_new}, inplace=True)
                 WranglerLogger.info("    => renamed to {}".format(col_new))
             elif col == 'id':
