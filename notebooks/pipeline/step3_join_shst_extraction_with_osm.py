@@ -258,13 +258,16 @@ if __name__ == '__main__':
     if 'length' in link_BayArea_gdf.columns:
         link_BayArea_gdf.rename(columns={'length': 'length_osmnx'}, inplace=True)
     
-    geom_length = link_BayArea_gdf[['geometry']]
+    # geom_length = link_BayArea_gdf[['geometry']].copy()
     # convert to EPSG 26915 for meter unit
-    geom_length = geom_length.to_crs(CRS(nearest_match_epsg_str))
+    geom_length_gdf = gpd.GeoDataFrame(link_BayArea_gdf[['geometry']].copy(),
+                                       geometry = 'geometry',
+                                       crs=link_BayArea_gdf.crs)
+    geom_length_gdf.to_crs(CRS(nearest_match_epsg_str))
     # calculate meter length
-    geom_length.loc[:, 'length_meter'] = geom_length.length
+    geom_length_gdf.loc[:, 'length_meter'] = geom_length_gdf.length
     # add to link_BayArea_gdf
-    link_BayArea_gdf['length_meter'] = geom_length['length_meter']
+    link_BayArea_gdf['length_meter'] = geom_length_gdf['length_meter']
 
     #####################################
     # export link, node
