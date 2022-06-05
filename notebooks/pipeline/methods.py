@@ -1884,6 +1884,8 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
         how='left',
         on='temp_link_id')
 
+    link_with_county_gdf.drop(['temp_link_id'], axis=1, inplace=True)
+
     return node_with_county_gdf, link_with_county_gdf
 
 
