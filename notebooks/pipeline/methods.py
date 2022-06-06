@@ -12,8 +12,11 @@ from functools import partial
 from network_wrangler import WranglerLogger
 import geofeather
 
-# some parameters shared by Pipeline scripts
+# World Geodetic System 1984 (WGS84) used py GPS (latitude/longitude)
+# https://epsg.io/4326
 LAT_LONG_EPSG = 4326
+# Planar CRS that can be used to measure distances in meters
+# NAD83 / UTM zone 15N https://epsg.io/26915
 NEAREST_MATCH_EPSG = 26915
 # number of polygons used for SharedStreet extraction
 # == number of rows in step0 INPUT_POLYGON
@@ -941,6 +944,51 @@ def count_hov_lanes(osmnx_shst_gdf):
        osmnx_shst_gdf[['drive_access','osm_dir_tag','hov:lanes','hov','forward_hov_lane']].value_counts(dropna=False)
     ))
 
+def reverse_geometry(to_reverse_gdf):
+    """
+    Reverses the geometry of the given LineString GeoDataFrame and returns it as an array of LineStrings
+    """
+    geom_types = to_reverse_gdf.geom_type.value_counts(dropna=False)  # this is a series
+    WranglerLogger.debug('reverse_geometry: to_reverse_gdf.geom_types:\n{}'.format(geom_types))
+
+    # for MultiLineString, do special processing
+    # https://shapely.readthedocs.io/en/stable/manual.html?highlight=MultiLineString#MultiLineString
+    if geom_types['MultiLineString'] == len(to_reverse_gdf):
+        # if they're all MultiLineStrings
+
+        # geometry is a MultiLineString, geoms is a list of LineString instances
+        # Get lengths (e.g. number of LineStrings per MultiLineString)
+        to_reverse_gdf['multilinestring length'] = -1
+        to_reverse_gdf.loc[ to_reverse_gdf.geom_type == 'MultiLineString', 'multilinestring length'] = to_reverse_gdf['geometry'].apply(lambda mls: len(mls.geoms))
+        multlinestring_lengths_value_counts = to_reverse_gdf['multilinestring length'].value_counts(dropna=False)
+        WranglerLogger.debug('reverse_geometry: MultiLineString lengths:\n{}'.format(multlinestring_lengths_value_counts))
+
+        # handle MultiLineString with count of 1 LineString by converting to LineString
+        to_reverse_gdf.loc[ (to_reverse_gdf.geom_type == 'MultiLineString') & \
+                            (to_reverse_gdf['multilinestring length'] == 1), 
+                            'geometry'] = to_reverse_gdf['geometry'].apply(lambda mls: list(mls.geoms)[0])
+
+        geom_types = to_reverse_gdf.geom_type.value_counts(dropna=False)  # this is a series
+        WranglerLogger.debug('reverse_geometry: to_reverse_gdf.geom_types:\n{}'.format(geom_types))
+    
+    if geom_types['LineString'] == len(to_reverse_gdf):
+        # all geometries are single line strings now
+        pass
+    else:
+        # todo: handle remaining MultiLineStrings or other types of geometries
+        raise NotImplementedError
+    
+    # reverse the geometries themselves, enabling offset and arrows to work when this is drawn in GIS
+    forward_linestrings = to_reverse_gdf['geometry'].tolist()
+    WranglerLogger.debug('reverse_geometry: forward_linestrings len={} type(forward_linestrings[0])={} first 5={}'.format(
+        len(forward_linestrings), type(forward_linestrings[0]), forward_linestrings[:5]
+    ))
+    reverse_linestrings = []
+    for forward_linestring in forward_linestrings:
+        # forward_linstring is a shapely.geometry.LineString object
+        reverse_coordinates = list(forward_linestring.coords)[::-1]
+        reverse_linestrings.append(LineString(reverse_coordinates))
+    return reverse_linestrings
 
 def add_two_way_osm(osmnx_shst_gdf):
     """
@@ -981,16 +1029,7 @@ def add_two_way_osm(osmnx_shst_gdf):
     )
     # reverse the geometries themselves, enabling offset and arrows to work when this is drawn in GIS
     reverse_osmnx_shst_gdf.reset_index(inplace=True)
-    forward_linestrings = reverse_osmnx_shst_gdf['geometry'].tolist()
-    WranglerLogger.debug('forward_linestrings len={} type(forward_linestrings[0])={} first 5={}'.format(
-        len(forward_linestrings), type(forward_linestrings[0]), forward_linestrings[:5]
-    ))
-    reverse_linestrings = []
-    for forward_linestring in forward_linestrings:
-        # forward_linstring is a shapely.geometry.LineString object
-        reverse_coordinates = list(forward_linestring.coords)[::-1]
-        reverse_linestrings.append(LineString(reverse_coordinates))
-    reverse_osmnx_shst_gdf['geometry'] = reverse_linestrings
+    reverse_osmnx_shst_gdf['geometry'] = reverse_geometry(reverse_osmnx_shst_gdf)
 
     # also reverse nodeIds
     forward_nodeIds = reverse_osmnx_shst_gdf['nodeIds'].tolist()
@@ -1512,12 +1551,12 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     # 6, apply the aggregation method to forward links and backward links separately. This is because 'waySection_ord'
     # represents the order of an OSM way in a shst link in the initial shst metadata; after adding two-way OSM ways (
     # 'reverse=True' links), the order should be reversed, in other words, descending.
-    forward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == False]
+    forward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == False].copy()
     forward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], inplace=True)
     WranglerLogger.debug('...aggregating forward links')
     forward_link_gdf_agg = forward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
 
-    backward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == True]
+    backward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == True].copy()
     backward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], ascending=False, inplace=True)
     WranglerLogger.debug('...aggregating backward links')
     backward_link_gdf_agg = backward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
@@ -1528,8 +1567,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
                               ignore_index=True)
 
     # assign EPSG
-    shst_link_gdf = gpd.GeoDataFrame(shst_link_gdf,
-                                     crs={'init': 'epsg:{}'.format(LAT_LONG_EPSG)})
+    shst_link_gdf = gpd.GeoDataFrame(shst_link_gdf, crs=LAT_LONG_EPSG)
 
     return shst_link_gdf
 
@@ -1668,8 +1706,7 @@ def consolidate_osm_way_to_shst_link(osm_link):
                                   sort=False,
                                   ignore_index=True)
 
-    shst_link_gdf = gpd.GeoDataFrame(shst_link_gdf,
-                                     crs={'init': 'epsg:{}'.format(LAT_LONG_EPSG)})
+    shst_link_gdf = gpd.GeoDataFrame(shst_link_gdf, crs=LAT_LONG_EPSG)
 
     return shst_link_gdf
 
@@ -1710,8 +1747,7 @@ def create_node_gdf(link_gdf):
     # drop duplicates
     point_gdf.drop_duplicates(subset=["osm_node_id", "shst_node_id"], inplace=True)
 
-    point_gdf = gpd.GeoDataFrame(point_gdf,
-                                 crs={'init': 'epsg:{}'.format(LAT_LONG_EPSG)})
+    point_gdf = gpd.GeoDataFrame(point_gdf, crs=LAT_LONG_EPSG)
 
     return point_gdf
 
@@ -2075,9 +2111,11 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
 
     # all possible conflation is done
     if (client != None):
-        WranglerLogger.info('stopping container {}'.format(container.name))
-        container.stop()
-        client.containers.prune()
+        pass
+        # don't stop the container; reusing it for subsequent shst matching will be more efficient since it'll use cached shst tiles
+        # WranglerLogger.info('stopping container {}'.format(container.name))
+        # container.stop()
+        # client.containers.prune()
 
     if len(matched_gdf) > 0:
         # rename id columns back to original; shst match will lowercase and prepend with pp_
@@ -2263,12 +2301,11 @@ def _links_within_point_buffer(link_gdf, point_df, buffer_radius=25):
     point_buffer_gdf['geometry'] = point_buffer_gdf.apply(
         lambda x: _geodesic_point_buffer(x.latitude, x.longitude, buffer_radius),
         axis=1)
-    lat_lon_epsg_str = 'EPSG:{}'.format(LAT_LONG_EPSG)
     point_buffer_gdf = gpd.GeoDataFrame(point_buffer_gdf,
                                         geometry=point_buffer_gdf['geometry'],
-                                        crs={'init': lat_lon_epsg_str})
-    point_buffer_gdf = point_buffer_gdf.to_crs(CRS(lat_lon_epsg_str))
-    link_gdf = link_gdf.to_crs(CRS(lat_lon_epsg_str))
+                                        crs=LAT_LONG_EPSG)
+    point_buffer_gdf = point_buffer_gdf.to_crs(epsg=LAT_LONG_EPSG)
+    link_gdf = link_gdf.to_crs(epsg=LAT_LONG_EPSG)
     point_buffer_link_df = gpd.sjoin(link_gdf,
                                      point_buffer_gdf[['geometry', 'type']],
                                      how='left',
@@ -2721,9 +2758,9 @@ def generate_centroid_connectors(run_type, existing_drive_cc_df, node_gdf, exist
     # remove duplicates
     new_cc_gdf.drop_duplicates(['A', 'B'], inplace=True)
 
-    new_cc_gdf.crs = {'init': 'epsg:26915'}
+    new_cc_gdf.set_crs(epsg = 26915)
     new_cc_gdf = new_cc_gdf.to_crs(epsg=4326)
-    new_centroid_gdf.crs = {'init': 'epsg:26915'}
+    new_centroid_gdf.set_crs(epsg = 26915)
     new_centroid_gdf = new_centroid_gdf.to_crs(epsg=4326)
 
     return new_cc_gdf, new_centroid_gdf
@@ -2857,7 +2894,7 @@ def project_gdf(gdf, to_crs=None, to_latlong=False):
 
     # if to_latlong is True, project the gdf to latlong
     if to_latlong:
-        gdf_proj = gdf.to_crs({"init": "epsg:4326"})
+        gdf_proj = gdf.to_crs(epsg = LAT_LONG_EPSG)
         # utils.log(f"Projected GeoDataFrame to {settings.default_crs}")
 
     # else if to_crs was passed-in, project gdf to this CRS

@@ -71,10 +71,50 @@ CONFLATION_PEMS_= os.path.join(THIRD_PARTY_OUTPUT_DIR, PEMS, 'nearest_match')
 
 
 
+def reverse_TomTom(to_reverse_gdf):
+    """
+    Reverse the given links, in place, by:
+
+    1. Adds column, reversed = True
+    2. Reversing the geometry
+    ? Check Route Directional Validity Direction?
+    """
+    to_reverse_gdf['reversed'] = True
+    
+    to_reverse_gdf.reset_index(inplace=True)
+    to_reverse_gdf.geometry =  methods.reverse_geometry(to_reverse_gdf)
+
+    WranglerLogger.debug('reverse_TomTom(): RTEDIRVD (Route Directional Validity Direction):\n{}'.format(
+        to_reverse_gdf['RTEDIRVD'].value_counts(dropna=False)))
+
+
 def conflate_TOMTOM():
     """
-    Conflate TomTom data with sharedstreets
-    TODO: What files are written?  Where is documentation on TomTom columns?
+    Conflate TomTom data with sharedstreets.
+    See TomTom documentation by loading web page from Box: https://mtcdrive.box.com/s/f4ytbcfesy3jc71nscjvaho79ygjcetw
+    Specifically, please see multinetCore_2020/specifications/mn_format_spec/shp_osl/tables/nw.html
+
+    Subset the data to only those links that have meaningful data that we want, which for now is:
+    * ONEWAY    = Direction of Traffic Flow
+                  blank: two-way
+                  FT: Open in positive direction
+                  N: Closed in both directions
+                  TF: Open in Negative Direction
+    * RAMP      = 1: Exit Ramp, 2: Entrance Ramp
+    * FREEWAY   = 0: No Part of Freeway, 1: Part of Freeway
+    * FRC       = Functional Road Class
+    * METERS    = Network Feature Length in meters
+    * FEATTYP   = Network Feature Type
+    * ID        = Network Identifier
+    * LANES     = Number of Lanes
+    * RTEDIR    = Route Directional
+    * RTEDIRVD  = Route Directional Validity
+    * SHIELDNUM = Route Number on Shield
+    * RTETYPE   = Route Number Type
+    * TOLLRD    = Toll Road
+    * 
+
+    TODO: What files are written?
     """
     # Prepare tomtom for conflation
     WranglerLogger.info('Reading TomTom data from {}'.format(THIRD_PARTY_INPUT_FILES[TOMTOM]))
@@ -82,28 +122,136 @@ def conflate_TOMTOM():
     # print out all the layers from the .gdb file
     layers = fiona.listlayers(THIRD_PARTY_INPUT_FILES[TOMTOM])
     WranglerLogger.info('TomTom gdb has the following layers: {}'.format(layers))
-    # load tomtom data, use the street link layer
+    # load tomtom data, use MultiNet Network (NW) layer
     WranglerLogger.info('loading TomTom raw data from layer mn_nw')
-    tomtom_raw_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TOMTOM], layer='mn_nw')
+    tomtom_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TOMTOM], layer='mn_nw')
+    WranglerLogger.debug('Read {:,} rows from Network layer; dtypes:\n{}'.format(len(tomtom_gdf), tomtom_gdf.dtypes))
+
+    # filter irrelevant links
+    # FEATTYP (Network Feature Type): 4110 = Road Element, 4130 = Ferry Connection, 4165: Adress Area Boundary Element
+    # => Filter to 4110 = Road Element
+    WranglerLogger.debug('FEATTYP (Network Feature Type) values:\n{}'.format(tomtom_gdf['FEATTYP'].value_counts(dropna=False)))
+    tomtom_gdf = tomtom_gdf.loc[ tomtom_gdf.FEATTYP == 4110]
+    WranglerLogger.debug('Filtered to FEATTYP=4110, have {:,} rows'.format(len(tomtom_gdf)))
+
+    # FRC (Functional Road Type):
+    # -1: Not Applicable
+    #  0: Main Road Motorways
+    #  1: Roads Not Belonging to Main Road Major Importance
+    #  2: Other Major Roads
+    #  3: Secondary Roads
+    #  4: Local Connecting Roads
+    #  5: Local Roads of High Importance
+    #  6: Local Roads
+    #  7: Local Roads of Minor Importance
+    #  8: Others
+    # => Filter out 8: Others since they appearr to be foot paths, etc, and we get these from other sources
+    WranglerLogger.debug('FRC (Functional Road Type) values:\n{}'.format(tomtom_gdf['FRC'].value_counts(dropna=False)))
+    tomtom_gdf = tomtom_gdf.loc[ tomtom_gdf.FRC != 8]
+    WranglerLogger.debug('Filtered to FRC != 8, have {:,} rows'.format(len(tomtom_gdf)))
+
+    # ONEWAY (Direction of Traffic Flow)
+    #      FT: Open in Positive Direction
+    #       N: Closed in Both Directions
+    #      TF: Open in Negative Direction
+    #     ' ': Open in Both Directions
+    WranglerLogger.debug('ONEWAY (Direction of Traffic Flow) list = {} values:\n{}'.format(
+        tomtom_gdf['ONEWAY'].value_counts(dropna=False).index.tolist(),
+        tomtom_gdf['ONEWAY'].value_counts(dropna=False)))
+    # drop N: Closed in Both Directions
+    tomtom_gdf = tomtom_gdf.loc[ tomtom_gdf.ONEWAY != 'N']
+    WranglerLogger.debug('Filtered to ONEWAY != N, have {:,} rows'.format(len(tomtom_gdf)))
+
+    # Reverse TF: Open in Negative Directions and [blank]: Open in Both Directions
+    tomtom_to_reverse_gdf = tomtom_gdf.loc[ (tomtom_gdf.ONEWAY==' ') | (tomtom_gdf.ONEWAY=='TF')].copy()
+    WranglerLogger.debug('Reversing NULL and TF ONEWAY links, or {:,} rows'.format(len(tomtom_to_reverse_gdf)))
+    # reverse the links
+    reverse_TomTom(tomtom_to_reverse_gdf)
+
+    # put them back together, dropping the TF since they're retained in the reverse set
+    tomtom_gdf['reversed'] = False
+    tomtom_gdf = pd.concat([
+        tomtom_gdf.loc[tomtom_gdf.ONEWAY != 'TF'],
+        tomtom_to_reverse_gdf],
+        axis='index'
+    )
+    WranglerLogger.debug('Full set: {:,} rows:\n{}'.format(len(tomtom_gdf), tomtom_gdf.ONEWAY.value_counts(dropna=False)))
+
+    # How many of these have LANES data?
+    WranglerLogger.debug('LANES (Number of Lanes) values:\n{}'.format(tomtom_gdf['LANES'].value_counts(dropna=False)))
+    # By Functional Road Type
+    WranglerLogger.debug('FRC x LANES values:\n{}'.format(tomtom_gdf[['FRC','LANES']].value_counts(dropna=False)))
+
+    # load the 'Speed Restrictions' table
+    tomtom_sr_df = pd.DataFrame(gpd.read_file(THIRD_PARTY_INPUT_FILES[TOMTOM], layer='mn_sr'))
+    tomtom_sr_df.drop(columns='geometry', inplace=True) # this is empty
+    WranglerLogger.debug('Read {:,} rows from Speed Restrictions table; dtypes:\n{}'.format(len(tomtom_sr_df), tomtom_sr_df.dtypes))
+
+    # speedtyp: 0 = Undefined, 1 = Maximum Speed, 2 = Recommended Speed, 3 = Land Dependent Maximum Speed, 4 = Speed Bump
+    # => Filter to 1 = Maximum Speed
+    WranglerLogger.debug('SR speedtyp (Speed Type) values:\n{}'.format(tomtom_sr_df['speedtyp'].value_counts(dropna=False)))
+    tomtom_sr_df = tomtom_sr_df.loc[ tomtom_sr_df.speedtyp == "1"]
+    WranglerLogger.debug('Filtered to speedtyp=="1", have {:,} rows'.format(len(tomtom_sr_df)))
+
+    # vt: -1 = Not Applicable, 0 = All Vehicle Types, 11 = Passenger Cars, 12 = Residential Vehicle, 16 = Taxi, 17 = Public Bus
+    # There are very few that are not 0 = All Vehicle Types, let's dump them
+    WranglerLogger.debug('SR vt (Vehicle Type) values:\n{}'.format(tomtom_sr_df['vt'].value_counts(dropna=False)))
+    tomtom_sr_df = tomtom_sr_df.loc[ tomtom_sr_df.vt == 0]
+    WranglerLogger.debug('Filtered to vt==0, have {:,} rows'.format(len(tomtom_sr_df)))
+
+    # check id -- assert no null values.  Report on duplicates.
+    assert(pd.isnull(tomtom_sr_df.id).sum() == 0)
+    tomtom_sr_df['duplicated_id'] = tomtom_sr_df.id.duplicated(keep=False) # mark all duplicates as true
+    WranglerLogger.debug('SR duplicated id: \n{}'.format(tomtom_sr_df.loc[ tomtom_sr_df.duplicated_id == True].head(30)))
+
+    # debugging - let's see what these look like
+    WranglerLogger.debug('SR seqnr (Sequential Number of the restriction on the Feature) values:\n{}'.format(tomtom_sr_df['seqnr'].value_counts(dropna=False)))
+    WranglerLogger.debug('SR speed (Speed Restriction) values:\n{}'.format(tomtom_sr_df['speed'].value_counts(dropna=False)))
+    WranglerLogger.debug('SR valdir (Validity Direction) values:\n{}'.format(tomtom_sr_df['valdir'].value_counts(dropna=False)))
+    WranglerLogger.debug('SR verified values:\n{}'.format(tomtom_sr_df['verified'].value_counts(dropna=False)))
+
+    # join speed restrictions to links based on id and valdir (Validity Direction)
+    # join valdir==1 (Valid in Both Directions) first
+    tomtom_gdf = pd.merge(
+        left      = tomtom_gdf,
+        right     = tomtom_sr_df.loc[tomtom_sr_df.valdir == 1]
+        left_on   = 'ID', 
+        right_on  = 'id',
+        how       = 'left',
+        indicator = True
+    )
+    tomtom_gdf.rename(columns = {'_merge':'merge sr_valdir1'}, inplace=True)
+    WranglerLogger.debug('After merging, tomtom_gdf["merge sr_valdir1"].value_counts()\n{}'.format(tomtom_gdf["merge sr_valdir1"].value_counts()))
+    sys.exit()
+
 
     # convert to ESPG lat-lon
-    tomtom_raw_gdf = tomtom_raw_gdf.to_crs(CRS(lat_lon_epsg_str))
-    WranglerLogger.info('converted to projection: ' + str(tomtom_raw_gdf.crs))
+    tomtom_gdf = tomtom_gdf.to_crs(epsg=methods.LAT_LONG_EPSG)
+    WranglerLogger.info('converted to projection: ' + str(tomtom_gdf.crs))
 
-    WranglerLogger.info('total {:,} tomtom links'.format(tomtom_raw_gdf.shape[0]))
-
+    WranglerLogger.info('total {:,} tomtom links'.format(tomtom_gdf.shape[0]))
+    sys.exit()
+    # notes: 
+    #   oneway links may be the wrong way if ONEWAY=TF: Open in Negative direction
+    #   if ONEWAY='' then it's two way but reverse link needs to be created
+    #   filter to FEATTYPE=4110 (Road Element)?
+    #   check others too (F_JNCTTYP, T_JNCTTYP, FRC, FOW)
+    #   check LANES; seems not set a lot?
+    #   check POSCACCUR ?
+    #   FRAMP/FREEWAY summary?
+    #   SPEEDCAT seems useful...
     # There is no existing unique tomtom handle for Bay Area, thus we need to create unique handle
     WranglerLogger.info('ID + F_JNCTID + T_JNCTID: {}'.format(
-        len(tomtom_raw_gdf.groupby(["ID", "F_JNCTID", "T_JNCTID"]).count())))
+        len(tomtom_gdf.groupby(["ID", "F_JNCTID", "T_JNCTID"]).count())))
 
     # generating unique handle for tomtom
-    tomtom_raw_gdf['tomtom_link_id'] = range(1, len(tomtom_raw_gdf) + 1)
+    tomtom_gdf['tomtom_link_id'] = range(1, len(tomtom_gdf) + 1)
 
     (tomtom_matched_gdf, tomtom_unmatched_gdf) = methods.conflate(
         TOMTOM, tomtom_raw_gdf, ['tomtom_link_id'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_raw_gdf.dtypes))
+    WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
 
 def conflate_TM2_NON_MARIN():
