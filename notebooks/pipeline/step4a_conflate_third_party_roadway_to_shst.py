@@ -214,7 +214,7 @@ def conflate_TOMTOM():
     # join valdir==1 (Valid in Both Directions) first
     tomtom_gdf = pd.merge(
         left      = tomtom_gdf,
-        right     = tomtom_sr_df.loc[tomtom_sr_df.valdir == 1]
+        right     = tomtom_sr_df.loc[tomtom_sr_df.valdir == 1],
         left_on   = 'ID', 
         right_on  = 'id',
         how       = 'left',
