@@ -263,7 +263,7 @@ if __name__ == '__main__':
     geom_length_gdf = gpd.GeoDataFrame(link_BayArea_gdf[['geometry']].copy(),
                                        geometry = 'geometry',
                                        crs=link_BayArea_gdf.crs)
-    geom_length_gdf.to_crs(CRS(nearest_match_epsg_str))
+    geom_length_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
     # calculate meter length
     geom_length_gdf.loc[:, 'length_meter'] = geom_length_gdf.length
     # add to link_BayArea_gdf

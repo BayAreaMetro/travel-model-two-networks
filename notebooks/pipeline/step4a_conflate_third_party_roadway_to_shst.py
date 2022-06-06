@@ -253,6 +253,8 @@ def conflate_TOMTOM():
 
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
+    WranglerLogger.info('Sharedstreets matched {} out of {} total TomTom Links.'.format(
+        tomtom_matched_gdf.tomtom_link_id.nunique(), tomtom_raw_gdf.shape[0]))
 
 def conflate_TM2_NON_MARIN():
     """
@@ -262,7 +264,7 @@ def conflate_TM2_NON_MARIN():
     # Prepare TM2 non-Marin for conflation
     WranglerLogger.info('loading TM2_nonMarin data from {}'.format(THIRD_PARTY_INPUT_FILES[TM2_NON_MARIN]))
     tm2_link_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TM2_NON_MARIN])
-    WranglerLogger.debug('TM2_Marin data info: \n{}'.format(tm2_link_gdf.info()))
+    WranglerLogger.debug('TM2_Marin raw data dtypes: \n{}'.format(tm2_link_gdf.dtypes))
 
     # define initial ESPG
     tm2_link_gdf.crs = "esri:102646"
@@ -276,48 +278,19 @@ def conflate_TM2_NON_MARIN():
         tm2_link_gdf.CNTYPE.value_counts(dropna=False)))
 
     tm2_link_roadway_gdf = tm2_link_gdf.loc[tm2_link_gdf.CNTYPE.isin(["BIKE", "PED", "TANA"])]
-    WranglerLogger.info('\n out of {:,} links in TM2_non-Marin network, {:,} are roadway links'.format(
-        tm2_link_gdf.shape[0],
-        tm2_link_roadway_gdf.shape[0]))
 
-    # double check with AB node pairs
-    WranglerLogger.info('# of unique AB node pairs: {:,}'.format(
-        tm2_link_roadway_gdf.groupby(["A", "B"]).count().shape[0]))
+    WranglerLogger.info('TM2_nonMarin has {:,} roadway links, {:,}  unique A-B combination'.format(
+        tm2_link_roadway_gdf.shape[0], len(tm2_link_roadway_gdf.groupby(["A", "B"]).count())))
 
-    # create conflation directory
-    conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, TM2_NON_MARIN, CONFLATION_SHST)
-    if not os.path.exists(conflation_dir):
-        WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
-        os.makedirs(conflation_dir)
+    # conflate the given dataframe with SharedStreets
+    (matched_gdf, unmatched_gdf) = methods.conflate(
+        TM2_NON_MARIN, tm2_link_roadway_gdf, ['A','B'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-    docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
-    # create docker container to do the shst matchting
-    (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
-
-    # Partition TM2 Non Marin for shst Match
-    WranglerLogger.info('exporting TM2_nonMarin partitioned data to {}'.format(conflation_dir))
-    for boundary_num in range(1,methods.NUM_SHST_BOUNDARIES+1):
-        boundary_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_{:02d}.geojson'.format(boundary_num)))
-        sub_gdf = tm2_link_roadway_gdf[tm2_link_roadway_gdf.intersects(boundary_gdf.geometry.unary_union)].copy()
-        sub_gdf[["A", "B", "geometry"]].to_file(
-            os.path.join(conflation_dir, 'tm2nonMarin_{}.in.geojson'.format(boundary_num)),
-            driver="GeoJSON")
-
-    # export raw network data for merging back the conflation result
-    # before exporting, fix NAME that would cause encoding error
-    tm2_link_roadway_gdf.loc[
-        tm2_link_roadway_gdf.NAME.notnull() & \
-        (tm2_link_roadway_gdf.NAME.str.contains('Vista Monta')) & \
-        (tm2_link_roadway_gdf.NAME != 'Vista Montara C'), 'NAME'] = 'Vista Montana'
-
-    # export modified raw data for merging the conflation results back
-    output_file = os.path.join(conflation_dir, "tm2nonMarin.feather")
-    WranglerLogger.info('exporting TM2_nonMarin with all attributes to {}'.format(output_file))
-    geofeather.to_geofeather(tm2_link_roadway_gdf, output_file)
-
-    WranglerLogger.debug('TM2_nonMarin data has the following dtypes:\n{}'.format(tm2_link_roadway_gdf.dtypes))
     WranglerLogger.info('finished conflating TM2_nonMarin data')
+    WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_nonMarin Links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), tm2_link_roadway_gdf.shape[0]))
+        
 
 def conflate_TM2_MARIN():
     """
@@ -327,7 +300,7 @@ def conflate_TM2_MARIN():
     # Prepare TM2 Marin for conflation
     WranglerLogger.info('loading TM2_Marin data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[TM2_MARIN])))
     tm2_marin_link_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TM2_MARIN])
-    WranglerLogger.debug('TM2_Marin data info: \n{}'.format(tm2_marin_link_gdf.info()))
+    WranglerLogger.debug('TM2_Marin raw data dtypes: \n{}'.format(tm2_marin_link_gdf.dtypes))
 
     # define initial ESPG
     tm2_marin_link_gdf.crs = CRS("esri:102646")
@@ -342,49 +315,17 @@ def conflate_TM2_MARIN():
 
     tm2_marin_link_roadway_gdf = tm2_marin_link_gdf.loc[
         tm2_marin_link_gdf.CNTYPE.isin(["BIKE", "PED", "TANA"])]
-    WranglerLogger.info('\n out of {:,} links in TM2_Marin network, {:,} are roadway links'.format(
-        tm2_marin_link_gdf.shape[0],
-        tm2_marin_link_roadway_gdf.shape[0]))
+    WranglerLogger.info('TM2_Marin has {:,} roadway links, {:,}  unique A-B combination'.format(
+        tm2_marin_link_roadway_gdf.shape[0], len(tm2_marin_link_roadway_gdf.groupby(["A", "B"]).count())))
 
-    # double check with AB node pairs
-    WranglerLogger.info('# of unique AB node pairs: {:,}'.format(
-        tm2_marin_link_roadway_gdf.groupby(["A", "B"]).count().shape[0]))
+    # conflate the given dataframe with SharedStreets
+    (matched_gdf, unmatched_gdf) = methods.conflate(
+        TM2_MARIN, tm2_marin_link_roadway_gdf, ['A','B'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)    
 
-    # create conflation directory
-    conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, TM2_MARIN, CONFLATION_SHST)
-    if not os.path.exists(conflation_dir):
-        WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
-        os.makedirs(conflation_dir)
-
-    # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-    docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
-    # create docker container to do the shst matchting
-    (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
-
-    # Partition TM2 Marin for shst Match
-    WranglerLogger.info('exporting TM2_Marin partitioned data to {}'.format(conflation_dir))
-    for boundary_num in range(1,methods.NUM_SHST_BOUNDARIES+1):
-        boundary_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_{:02d}.geojson'.format(boundary_num)))
-        sub_gdf = tm2_marin_link_roadway_gdf[
-            tm2_marin_link_roadway_gdf.intersects(boundary_gdf.geometry.unary_union)].copy()
-        sub_gdf[["A", "B", "geometry"]].to_file(
-            os.path.join(conflation_dir, 'tm2Marin_{}.in.geojson'.format(boundary_num)),
-            driver="GeoJSON")
-
-    # export raw network data for merging back the conflation result
-    # before exporting, fix NAME that would cause encoding error
-    tm2_marin_link_roadway_gdf.loc[
-        tm2_marin_link_roadway_gdf.NAME.notnull() & \
-        (tm2_marin_link_roadway_gdf.NAME.str.contains('Vista Monta')) & \
-        (tm2_marin_link_roadway_gdf.NAME != 'Vista Montara C'), 'NAME'] = 'Vista Montana'
-
-    # export modified raw data for merging the conflation results back
-    output_file = os.path.join(conflation_dir, "tm2Marin.feather")
-    WranglerLogger.info('exporting TM2_Marin with all attributes to {}'.format(output_file))
-    geofeather.to_geofeather(tm2_marin_link_roadway_gdf, output_file)
-
-    WranglerLogger.debug('TM2_Marin data has the following dtypes:\n{}'.format(tm2_marin_link_roadway_gdf.dtypes))
     WranglerLogger.info('finished conflating TM2_Marin data')
+    WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_Marin Links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), tm2_marin_link_roadway_gdf.shape[0]))
 
 def conflcate_SFCTA():
     """
@@ -394,7 +335,7 @@ def conflcate_SFCTA():
     # Prepare SFCTA for conflation
     WranglerLogger.info('loading SFCTA data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[SFCTA])))
     sfcta_stick_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[SFCTA])
-    WranglerLogger.debug('SFCTA data info: \n{}'.format(sfcta_stick_gdf.info()))
+    WranglerLogger.debug('SFCTA raw data dtypes: \n{}'.format(sfcta_stick_gdf.dtypes))
 
     # set initial ESPG
     sfcta_stick_gdf.crs = CRS("EPSG:2227")
@@ -403,7 +344,7 @@ def conflcate_SFCTA():
     WranglerLogger.info('converted to projection: ' + str(sfcta_stick_gdf.crs))
 
     # only conflate SF part of the network
-    boundary_4_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_4.geojson'))
+    boundary_4_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_04.geojson'))
     sfcta_SF_gdf = sfcta_stick_gdf[
         sfcta_stick_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
 
@@ -418,28 +359,9 @@ def conflcate_SFCTA():
         SFCTA, sfcta_SF_roadway_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    # # create conflation directory
-    # conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, SFCTA, CONFLATION_SHST)
-    # if not os.path.exists(conflation_dir):
-    #     WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
-    #     os.makedirs(conflation_dir)
-
-    # # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-    # docker_output_path = methods.docker_path(OUTPUT_DATA_DIR)
-    # # create docker container to do the shst matchting
-    # (client, container) = methods.create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
-
-    # # Write out SFCTA stick network for conflation
-    # sfcta_SF_roadway_gdf[['A', 'B', "geometry"]].to_file(
-    #     os.path.join(conflation_dir, 'sfcta_in.geojson'), driver="GeoJSON")
-
-    # # export modified raw data for merging the conflation results back
-    # output_file = os.path.join(conflation_dir, "sfcta.feather")
-    # WranglerLogger.info('exporting SFCTA with all attributes to {}'.format(output_file))
-    # geofeather.to_geofeather(sfcta_SF_roadway_gdf, output_file)
-
-    # WranglerLogger.debug('SFTCA data has the following dtypes: {}'.format(sfcta_SF_roadway_gdf.dtypes))
-    WranglerLogger.info('Finished conflating SFCTA data')
+    WranglerLogger.info('finished conflating SFCTA data')
+    WranglerLogger.info('Sharedstreets matched {} out of {} total SFCTA Links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), sfcta_SF_roadway_gdf.shape[0]))
 
 def conflate_CCTA():
     """
@@ -449,9 +371,8 @@ def conflate_CCTA():
     # Prepare CCTA for conflation
     WranglerLogger.info('loading CCTA data from {}'.format(THIRD_PARTY_INPUT_FILES[CCTA]))
     ccta_raw_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[CCTA])
-    WranglerLogger.debug('CCTA data info: \n{}'.format(ccta_raw_gdf.info()))
-
-    WranglerLogger.info('CCTA data projection: ' + str(ccta_raw_gdf.crs))
+    WranglerLogger.debug('CCTA raw data dtypes: \n{}'.format(ccta_raw_gdf.dtypes))
+    WranglerLogger.info('CCTA crs:\n{}'.format(ccta_raw_gdf.crs))
 
     # filter out connectors
     ccta_gdf = ccta_raw_gdf.loc[(ccta_raw_gdf.AB_FT != 6) & (ccta_raw_gdf.BA_FT != 6)]
@@ -461,11 +382,18 @@ def conflate_CCTA():
     # this network is from transcad, for one way streets, dir=1;
     # for two-way streets, there is only one links with dir=0, need to create other direction
     # from shapely.geometry import LineString
+    WranglerLogger.debug('creating reversed links')
     two_way_links_gdf = ccta_gdf.loc[ccta_gdf.DIR == 0].copy()
     two_way_links_gdf["geometry"] = two_way_links_gdf.apply(
         lambda g: LineString(list(g["geometry"].coords)[::-1]),
         axis=1)
-    two_way_links_gdf.rename(columns={'AB_LANES': 'BA_LANES', 'BA_LANES': 'AB_LANES'}, inplace=True)
+    # rename all link attributes for 'AB_' into 'BA_'
+    rename_columns = {}
+    for colname in [x for x in ccta_gdf.columns if ('AB_' in x)]:
+        rename_columns[colname] = colname.replace('AB', 'BA')
+    WranglerLogger.debug('renaming columns for reversed links: {}'.format(rename_columns))
+    two_way_links_gdf.rename(columns=rename_columns, inplace=True)
+    # TODO: why "9000000"? I assume the goal is to exceed the existing largest ID number, so need to be more generic
     two_way_links_gdf['ID'] = two_way_links_gdf['ID'] + 9000000
 
     ccta_gdf = pd.concat([ccta_gdf, two_way_links_gdf], sort=False, ignore_index=True)
@@ -479,10 +407,9 @@ def conflate_CCTA():
         CCTA, ccta_gdf, ['ID'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    #TODO: whatever we do next
-
-    # WranglerLogger.debug('CCTA data has the following dtypes: {}'.format(ccta_gdf.dtypes))
     WranglerLogger.info('finished conflating CCTA data')
+    WranglerLogger.info('Sharedstreets matched {} out of {} total CCTA Links.'.format(
+        matched_gdf['ID'].nunique(), ccta_gdf.shape[0]))
 
 def conflate_ACTC():
     """
@@ -507,42 +434,9 @@ def conflate_ACTC():
         ACTC, actc_raw_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
-    # # TODO: reconcile different methodologies for dropping duplicates
-    # unique_actc_match_gdf = actc_matched_gdf.drop_duplicates()
-
-    # # in conflation df, aggregate based on shstReferenceId, get all number of lanes for each shstReferenceId
-    # actc_lanes_conflation_df = unique_actc_match_gdf.loc[unique_actc_match_gdf['BASE_LN'] > 0].groupby(
-    #     ['shstReferenceId'])['BASE_LN'].apply(list).to_frame().reset_index()
-
-    # actc_lanes_conflation_df['base_lanes_min'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: min(set(x)))
-    # actc_lanes_conflation_df['base_lanes_max'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: max(set(x)))
-
-    # # TODO: decide if export or merge into the base network
-    # actc_lanes_conflation_df.to_csv(os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'actcmodel_legacy_lanes.csv'), index=False)
-
-    # # same for bike lane
-    # actc_bike_conflation_df = unique_actc_match_gdf.groupby(['shstReferenceId'])[['NMT2010', 'NMT2020']].agg(lambda x: list(x)).reset_index()
-
-    # actc_bike_conflation_df['nmt2010_min'] = actc_bike_conflation_df['NMT2010'].apply(lambda x: min(set(x)))
-    # actc_bike_conflation_df['nmt2010_max'] = actc_bike_conflation_df['NMT2010'].apply(lambda x: max(set(x)))
-    # actc_bike_conflation_df['nmt2020_min'] = actc_bike_conflation_df['NMT2020'].apply(lambda x: min(set(x)))
-    # actc_bike_conflation_df['nmt2020_max'] = actc_bike_conflation_df['NMT2020'].apply(lambda x: max(set(x)))
-
-    # # TODO: decide if export or merge into the base network
-    # actc_bike_conflation_df.to_csv(os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, 'actcmodel_legacy_bike.csv'), index=False)
-
-    # # add data source prefix to column names
-    # unique_actc_match_gdf.rename(columns={'A': 'ACTC_A',
-    #                                       'B': 'ACTC_B',
-    #                                       'base_lanes_min': 'ACTC_base_lanes_min',
-    #                                       'base_lanes_max': 'ACTC_base_lanes_max',
-    #                                       'nmt2010_min': 'ACTC_nmt2010_min',
-    #                                       'nmt2010_max': 'ACTC_nmt2010_max',
-    #                                       'nmt2020_min': 'ACTC_nmt2020_min',
-    #                                       'nmt2020_max': 'ACTC_nmt2020_max'},
-    #                              inplace=True)
-
-    WranglerLogger.info('Finished conflating ACTC data')
+    WranglerLogger.info('finished conflating ACTC data')
+    WranglerLogger.info('Sharedstreets matched {} out of {} total ACTC Links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), actc_raw_gdf.shape[0]))
 
 # TODO: def conflate_pums():
 
