@@ -42,7 +42,8 @@ WranglerLogger.info('nearest match ESPG: {}'.format(nearest_match_epsg_str))
 INPUT_DATA_DIR = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 # base standard network data
-SHST_OSMNX_LINK_FILE = os.path.join(INPUT_DATA_DIR, 'step3_join_shst_with_osm', 'step3_link.feather')
+# SHST_OSMNX_LINK_FILE = os.path.join(INPUT_DATA_DIR, 'step3_join_shst_with_osm', 'step3_link.feather')
+SHST_OSMNX_LINK_FILE = 'C:\\Users\\ywang\\Documents\\GitHub\\travel-model-two-networks\\step3_join_shst_with_osm\\step3_link.feather'
 # third-party data matching results
 THIRD_PARTY_MATCHED_DIR = os.path.join(INPUT_DATA_DIR, 'step4_third_party_data')
 TOMTOM_MATCHED_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'TomTom', 'conflation_shst', 'matched.feather')
