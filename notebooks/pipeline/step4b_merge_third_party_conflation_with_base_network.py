@@ -42,8 +42,7 @@ WranglerLogger.info('nearest match ESPG: {}'.format(nearest_match_epsg_str))
 INPUT_DATA_DIR = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 # base standard network data
-# SHST_OSMNX_LINK_FILE = os.path.join(INPUT_DATA_DIR, 'step3_join_shst_with_osm', 'step3_link.feather')
-SHST_OSMNX_LINK_FILE = 'C:\\Users\\ywang\\Documents\\GitHub\\travel-model-two-networks\\step3_join_shst_with_osm\\step3_link.feather'
+SHST_OSMNX_LINK_FILE = os.path.join(INPUT_DATA_DIR, 'step3_join_shst_with_osm', 'step3_link.feather')
 # third-party data matching results
 THIRD_PARTY_MATCHED_DIR = os.path.join(INPUT_DATA_DIR, 'step4_third_party_data')
 TOMTOM_MATCHED_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'TomTom', 'conflation_shst', 'matched.feather')
@@ -658,6 +657,21 @@ if __name__ == '__main__':
     WranglerLogger.info('export conflation fields to {}'.format(CONFLATION_SUMMARY_FILE))
     link_conflation_fields_gdf.to_csv(CONFLATION_SUMMARY_FILE, index=False)
 
+    ####################################
+    # Apply road name heuristics to finalize road names
+    # Sources of name:
+    #  - osmnx        : 'ref' (freeway shield number, e.g. 'I 80', 'CA 4')
+    #                   'name' (less-used freeway name, e.g. 'Shoreline Highway', and names of other streets)
+    #  - sharedstreets: 'name_shst_metadata' (name in the metadata)
+    #  - TomTom       : 'tomtom_name' (less-used freeway name, and names of other streets)
+    #                   'tomtom_shieldnum' (freeway shield number, but without the letter, e.g. 80, 580)
+    #  - SFCTA        : 'sfcta_STREETNAME'
+
+    # osmnx: if 'ref' not null, use 'ref', otherwise use 'name'
+    # sfcta_STREETNAME: if not null, use it
+
+
+    
     ####################################
     # Write out standard links
     # TODO: decide which columns to include.
