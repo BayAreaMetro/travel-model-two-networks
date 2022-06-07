@@ -953,27 +953,29 @@ def reverse_geometry(to_reverse_gdf):
 
     # for MultiLineString, do special processing
     # https://shapely.readthedocs.io/en/stable/manual.html?highlight=MultiLineString#MultiLineString
-    if geom_types['MultiLineString'] == len(to_reverse_gdf):
+    if 'MultiLineString' in geom_types.index.values:
+        if geom_types['MultiLineString'] == len(to_reverse_gdf):
         # if they're all MultiLineStrings
 
-        # geometry is a MultiLineString, geoms is a list of LineString instances
-        # Get lengths (e.g. number of LineStrings per MultiLineString)
-        to_reverse_gdf['multilinestring length'] = -1
-        to_reverse_gdf.loc[ to_reverse_gdf.geom_type == 'MultiLineString', 'multilinestring length'] = to_reverse_gdf['geometry'].apply(lambda mls: len(mls.geoms))
-        multlinestring_lengths_value_counts = to_reverse_gdf['multilinestring length'].value_counts(dropna=False)
-        WranglerLogger.debug('reverse_geometry: MultiLineString lengths:\n{}'.format(multlinestring_lengths_value_counts))
+            # geometry is a MultiLineString, geoms is a list of LineString instances
+            # Get lengths (e.g. number of LineStrings per MultiLineString)
+            to_reverse_gdf['multilinestring length'] = -1
+            to_reverse_gdf.loc[ to_reverse_gdf.geom_type == 'MultiLineString', 'multilinestring length'] = to_reverse_gdf['geometry'].apply(lambda mls: len(mls.geoms))
+            multlinestring_lengths_value_counts = to_reverse_gdf['multilinestring length'].value_counts(dropna=False)
+            WranglerLogger.debug('reverse_geometry: MultiLineString lengths:\n{}'.format(multlinestring_lengths_value_counts))
 
-        # handle MultiLineString with count of 1 LineString by converting to LineString
-        to_reverse_gdf.loc[ (to_reverse_gdf.geom_type == 'MultiLineString') & \
-                            (to_reverse_gdf['multilinestring length'] == 1), 
-                            'geometry'] = to_reverse_gdf['geometry'].apply(lambda mls: list(mls.geoms)[0])
+            # handle MultiLineString with count of 1 LineString by converting to LineString
+            to_reverse_gdf.loc[ (to_reverse_gdf.geom_type == 'MultiLineString') & \
+                                (to_reverse_gdf['multilinestring length'] == 1), 
+                                'geometry'] = to_reverse_gdf['geometry'].apply(lambda mls: list(mls.geoms)[0])
 
-        geom_types = to_reverse_gdf.geom_type.value_counts(dropna=False)  # this is a series
-        WranglerLogger.debug('reverse_geometry: to_reverse_gdf.geom_types:\n{}'.format(geom_types))
+            geom_types = to_reverse_gdf.geom_type.value_counts(dropna=False)  # this is a series
+            WranglerLogger.debug('reverse_geometry: to_reverse_gdf.geom_types:\n{}'.format(geom_types))
     
-    if geom_types['LineString'] == len(to_reverse_gdf):
+    if 'LineString' in geom_types.index.values:
+        if geom_types['LineString'] == len(to_reverse_gdf):
         # all geometries are single line strings now
-        pass
+            pass
     else:
         # todo: handle remaining MultiLineStrings or other types of geometries
         raise NotImplementedError
@@ -1765,7 +1767,7 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
     WranglerLogger.info('tagging nodes with county names')
 
     WranglerLogger.debug('...spatially joining nodes with county shape')
-    node_county_gdf = gpd.sjoin(node_gdf, counties_gdf, how='left', op='intersects')
+    node_county_gdf = gpd.sjoin(node_gdf, counties_gdf, how='left', predicate='intersects')
 
     # some nodes may get joined to more than one county, e.g. geometry on the boundary. Drop duplicates
     WranglerLogger.debug('# of unique nodes: {}'.format(node_gdf.shape[0]))
@@ -1775,48 +1777,42 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
     node_county_gdf.drop_duplicates(subset=['shst_node_id'], inplace=True)
 
     # use nearest match to fill in names for nodes that did not get county match (e.g. in the Bay)
-    # first, use cKDTree to construct k-dimensional points based on the matched nodes; then, for each unmatched node,
-    # find its nearest neighborhood within the matched nodes; last, fill out missing county names
-    WranglerLogger.debug('...running nearest match for nodes that did not get county join')
+    # Note: (also see https://app.asana.com/0/0/1202393240187598/f)
+    # - WSP's initial method uses cKDTree, first, construct a k-dimensional tree from matched points, then iterate through
+    #   each unmatched node to find its nearest neighbor. A slightly revised version of this method is here:
+    #   https://github.com/BayAreaMetro/travel-model-two-networks/blob/2f990f5438965389fd814fabf747413aea2a8d4c/notebooks/pipeline/methods.py#L1777)
+    # - A faster approach that also uses cKDTree is to do the second part in a dataframe instead of iterating through. Example:
+    #   "def ckdnearest(gdA, gdB)" at https://gis.stackexchange.com/questions/222315/finding-nearest-point-in-other-geodataframe-using-geopandas
+    # - geopandas.sjoin_nearest() usually is slower than cKDTree for large dataset. However, in this case, node_county_unmatched 
+    #   is small (less than 300 nodes) while node_county_matched is large, therefore the "overhead" of constructing the tree seems
+    #   unnecessarily large. geopandas.sjoin_nearest() is actually faster.
+
     node_county_matched_gdf = node_county_gdf.loc[node_county_gdf.NAME.notnull()]
     node_county_unmatched_gdf = node_county_gdf.loc[node_county_gdf.NAME.isnull()]
-    WranglerLogger.debug('{} unmatched nodes'.format(node_county_unmatched_gdf.shape[0]))
+    WranglerLogger.debug('{:,} nodes got a county join'.format(node_county_matched_gdf.shape[0]))
+    WranglerLogger.debug('{:,} nodes failed to get county join'.format(node_county_unmatched_gdf.shape[0]))
+    WranglerLogger.debug('filling in county name by looking for nearest nodes that already got a county join')
 
-    WranglerLogger.debug('......construct k-dimensional points on matched nodes')
+    # convert to meter-based EPSG
     node_county_matched_gdf = node_county_matched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
-    node_county_matched_gdf['X'] = node_county_matched_gdf.geometry.map(lambda g: g.x)
-    node_county_matched_gdf['Y'] = node_county_matched_gdf.geometry.map(lambda g: g.y)
-    node_matched_inventory_ref = node_county_matched_gdf[['X', 'Y']].values
-    node_matched_tree = cKDTree(node_matched_inventory_ref)
-
     node_county_unmatched_gdf = node_county_unmatched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
-    node_county_unmatched_gdf['X'] = node_county_unmatched_gdf['geometry'].apply(lambda p: p.x)
-    node_county_unmatched_gdf['Y'] = node_county_unmatched_gdf['geometry'].apply(lambda p: p.y)
 
-    WranglerLogger.debug('......look for nearest neighbor for the unmatched nodes')
-    node_county_rematch_gdf = pd.DataFrame()
+    # spatial join
+    node_county_rematch_gdf = gpd.sjoin_nearest(node_county_unmatched_gdf[['shst_node_id', 'geometry']],
+                                                node_county_matched_gdf[['geometry', 'NAME']], how='left')
+    WranglerLogger.debug('found nearest nodes for {} out of {} previously unmatched nodes'.format(
+        node_county_rematch_gdf.loc[node_county_rematch_gdf.NAME.notnull()].shape[0],
+        node_county_unmatched_gdf.shape[0]
+    ))
 
-    for i in range(len(node_county_unmatched_gdf)):
-        point = node_county_unmatched_gdf.iloc[i][['X', 'Y']].values
-        dd, ii = node_matched_tree.query(point, k=1)
-        add_snap_gdf = gpd.GeoDataFrame(node_county_matched_gdf.iloc[ii][["NAME"]]).transpose().reset_index(drop=True)
-
-        add_snap_gdf['shst_node_id'] = node_county_unmatched_gdf.iloc[i]['shst_node_id']
-
-        if i == 0:
-            node_county_rematch_gdf = add_snap_gdf.copy()
-        else:
-            node_county_rematch_gdf = pd.concat([node_county_rematch_gdf, add_snap_gdf], ignore_index=True, sort=False)
-    WranglerLogger.debug('found nearest neighbor for {} nodes'.format(node_county_rematch_gdf.shape[0]))
-
-    WranglerLogger.debug('......fill out missing county names based on nearest neighbor')
-    node_county_rematch_dict = dict(zip(node_county_rematch_gdf.shst_node_id, node_county_rematch_gdf.NAME))
-    node_county_gdf["NAME"] = node_county_gdf["NAME"].fillna(node_county_gdf.shst_node_id.map(node_county_rematch_dict))
+    # merge with nodes got a county join
+    node_county_matched_gdf = pd.concat([node_county_matched_gdf[['shst_node_id', 'NAME']],
+                                         node_county_rematch_gdf[['shst_node_id', 'NAME']]])
 
     # merge county name into node_gdf
     node_with_county_gdf = pd.merge(
         node_gdf,
-        node_county_gdf[['shst_node_id', 'NAME']].rename(columns={'NAME': 'county'}),
+        node_county_matched_gdf,
         how='left',
         on='shst_node_id')
 
@@ -1835,92 +1831,59 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
     link_centroid_gdf["geometry"] = link_centroid_gdf["geometry"].centroid
 
     # spatial join
-    link_centroid_gdf_join = gpd.sjoin(link_centroid_gdf, counties_gdf, how="left", op="intersects")
+    link_centroid_gdf_join = gpd.sjoin(link_centroid_gdf, counties_gdf, how="left", predicate="intersects")
     WranglerLogger.debug('{} unique links'.format(link_gdf.shape[0]))
     WranglerLogger.debug('{} links in spatial join result, representing {} unique links'.format(
         link_centroid_gdf_join.shape[0],
         link_centroid_gdf_join['temp_link_id'].nunique()))
-    WranglerLogger.debug('...drop duplicates due to links on county boundaries getting more than one math')
-    link_centroid_gdf_join.drop_duplicates(subset=['temp_link_id'], inplace=True)
+    if link_centroid_gdf_join.shape[0] != link_centroid_gdf_join['temp_link_id'].nunique():
+        WranglerLogger.debug('...drop duplicates due to links on county boundaries getting more than one match')
+        link_centroid_gdf_join.drop_duplicates(subset=['temp_link_id'], inplace=True)
 
-    # merge name to link_gdf
-    link_county_gdf = pd.merge(
-        link_gdf,
-        link_centroid_gdf_join[['temp_link_id', 'NAME']].rename(columns={'NAME': 'county'}),
-        how='left',
-        on='temp_link_id'
-    )
+    # use nearest match to fill in names for links that did not get county match (e.g. in the Bay)
 
-    link_county_unmatched_gdf = link_county_gdf.loc[link_county_gdf['county'].isnull()]
-    WranglerLogger.debug('{} links failed to get a county match through spatial join'.format(
-        link_county_unmatched_gdf.shape[0]))
+    link_centroid_county_matched_gdf = link_centroid_gdf_join.loc[link_centroid_gdf_join['NAME'].notnull()]
+    link_centroid_county_unmatched_gdf = link_centroid_gdf_join.loc[link_centroid_gdf_join['NAME'].isnull()]
+    # for some reason, the output of sjoin "link_centroid_gdf_join" is a dataframe instead of a geodataframe, convert.  
+    link_centroid_county_unmatched_gdf = gpd.GeoDataFrame(link_centroid_county_unmatched_gdf,
+                                                          crs=link_centroid_gdf.crs,
+                                                          geometry='geometry')
 
-    # use nearest method for links that did not get county match through spatial join
-    # using link centroids to find node-based build k-dimensional points
-    WranglerLogger.debug('...running nearest match for links that did not get county join')
+    WranglerLogger.debug('{:,} links got a county join'.format(link_centroid_county_matched_gdf.shape[0]))
+    WranglerLogger.debug('{:,} links failed to get a county join'.format(link_centroid_county_unmatched_gdf.shape[0]))
+    WranglerLogger.debug('filling in county name by looking for nearest nodes that already got a county join')
 
-    WranglerLogger.debug('......construct k-dimensional points on matched nodes')
-    node_county_matched_gdf = node_with_county_gdf.loc[node_with_county_gdf['county'].notnull()][['geometry', 'county']]
+    node_county_matched_gdf = node_with_county_gdf.loc[node_with_county_gdf['NAME'].notnull()][['geometry', 'NAME']]
+    # convert to meter-based EPSG
     node_county_matched_gdf = node_county_matched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
-    node_county_matched_gdf['X'] = node_county_matched_gdf.geometry.map(lambda g: g.x)
-    node_county_matched_gdf['Y'] = node_county_matched_gdf.geometry.map(lambda g: g.y)
-    node_matched_inventory_ref = node_county_matched_gdf[['X', 'Y']].values
-    node_matched_tree = cKDTree(node_matched_inventory_ref)
+    link_centroid_county_unmatched_gdf = \
+        link_centroid_county_unmatched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
     
-    # TODO: find a long-term solution for the following temporary work-around
-    # --- start of work-around
+    # spatial join
+    link_centroid_county_rematch_gdf = gpd.sjoin_nearest(link_centroid_county_unmatched_gdf[['temp_link_id', 'geometry']],
+                                                         node_county_matched_gdf[['geometry', 'NAME']], how='left')
+    WranglerLogger.debug('found nearest nodes for {} out of {} previously unmatched nodes'.format(
+        link_centroid_county_rematch_gdf.loc[link_centroid_county_rematch_gdf.NAME.notnull()].shape[0],
+        link_centroid_county_unmatched_gdf.shape[0]
+    ))
 
-    # I got "ValueError: Cannot transform naive geometries. Please set a crs on the object first." in the next step 
-    # "link_county_unmatched_gdf.to_crs()", even when calling "link_county_unmatched_gdf.crs" gives "+init=epsg:4326".
-    # Adding a step "link_county_unmatched_gdf = gpd.GeoDataFrame(link_county_unmatched_gdf, crs={'init': 'epsg:4326'})"
-    # didn't resolve the error.
-    # This appears to be due to the link data having corrupted geometry, because trying to write out the geodataframe
-    # gives the error "Cannot interpret '<geopandas.array.GeometryDtype object at 0x00000286F4ECCD60>' as a data type".
-    # The work-around separates 'geometry' from other attributes, converts the geometry to str, reconstructs geometry 
-    # from it, and joins it back to other link attributes. 
-    geoms = link_county_unmatched_gdf.geometry.astype(str)
-    link_county_unmatched_attrs = pd.DataFrame(link_county_unmatched_gdf.drop('geometry', axis = 1))
-    link_county_unmatched_attrs.to_parquet('link_county_unmatched_attrs.parquet')
-    geoms_new = gpd.GeoSeries.from_wkt(geoms).reset_index(drop = True)
-    link_county_unmatched_attrs_new = pd.read_parquet('link_county_unmatched_attrs.parquet').reset_index(drop = True)
-    link_county_unmatched_gdf = gpd.GeoDataFrame(link_county_unmatched_attrs_new.copy(), 
-                                                 geometry = geoms_new, crs = LAT_LONG_EPSG)
-    # --- end of work-around
+    # merge with links got a county join
+    link_centroid_county_matched_gdf = pd.concat([link_centroid_county_matched_gdf[['temp_link_id', 'NAME']], 
+                                                  link_centroid_county_rematch_gdf[['temp_link_id', 'NAME']]])
 
-    link_county_unmatched_gdf = link_county_unmatched_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
-    link_county_unmatched_gdf["geometry"] = link_county_unmatched_gdf["geometry"].centroid
-    link_county_unmatched_gdf['X'] = link_county_unmatched_gdf['geometry'].apply(lambda p: p.x)
-    link_county_unmatched_gdf['Y'] = link_county_unmatched_gdf['geometry'].apply(lambda p: p.y)
-
-    WranglerLogger.debug('......look for nearest neighbor')
-    link_county_rematch_gdf = pd.DataFrame()
-
-    for i in range(len(link_county_unmatched_gdf)):
-        point = link_county_unmatched_gdf.iloc[i][['X', 'Y']].values
-        dd, ii = node_matched_tree.query(point, k=1)
-        add_snap_gdf = gpd.GeoDataFrame(node_county_matched_gdf.iloc[ii][["county"]]).transpose().reset_index(drop=True)
-
-        add_snap_gdf['temp_link_id'] = link_county_unmatched_gdf.iloc[i]['temp_link_id']
-
-        if i == 0:
-            link_county_rematch_gdf = add_snap_gdf.copy()
-        else:
-            link_county_rematch_gdf = link_county_rematch_gdf.append(add_snap_gdf, ignore_index=True, sort=False)
-    WranglerLogger.debug('found nearest neighbor for {} links'.format(link_county_rematch_gdf.shape[0]))
-
-    WranglerLogger.debug('......fill out missing county names')
-    link_county_rematch_dict = dict(zip(link_county_rematch_gdf.temp_link_id, link_county_rematch_gdf.county))
-    link_county_gdf['county'] = link_county_gdf['county'].fillna(
-        link_county_gdf.temp_link_id.map(link_county_rematch_dict))
-
-    # merge it back to link_gdf
+    # merge county name into link_gdf
     link_with_county_gdf = pd.merge(
         link_gdf,
-        link_county_gdf[['temp_link_id', 'county']],
+        link_centroid_county_matched_gdf,
         how='left',
         on='temp_link_id')
 
+    # drop temporary unique link id
     link_with_county_gdf.drop(['temp_link_id'], axis=1, inplace=True)
+    
+    # rename 'NAME' to 'county'
+    node_with_county_gdf.rename(columns={'NAME': 'county'}, inplace=True)
+    link_with_county_gdf.rename(columns={'NAME': 'county'}, inplace=True)
 
     return node_with_county_gdf, link_with_county_gdf
 
