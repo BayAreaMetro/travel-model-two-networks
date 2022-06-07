@@ -954,28 +954,26 @@ def reverse_geometry(to_reverse_gdf):
     # for MultiLineString, do special processing
     # https://shapely.readthedocs.io/en/stable/manual.html?highlight=MultiLineString#MultiLineString
     if 'MultiLineString' in geom_types.index.values:
-        if geom_types['MultiLineString'] == len(to_reverse_gdf):
         # if they're all MultiLineStrings
 
-            # geometry is a MultiLineString, geoms is a list of LineString instances
-            # Get lengths (e.g. number of LineStrings per MultiLineString)
-            to_reverse_gdf['multilinestring length'] = -1
-            to_reverse_gdf.loc[ to_reverse_gdf.geom_type == 'MultiLineString', 'multilinestring length'] = to_reverse_gdf['geometry'].apply(lambda mls: len(mls.geoms))
-            multlinestring_lengths_value_counts = to_reverse_gdf['multilinestring length'].value_counts(dropna=False)
-            WranglerLogger.debug('reverse_geometry: MultiLineString lengths:\n{}'.format(multlinestring_lengths_value_counts))
+        # geometry is a MultiLineString, geoms is a list of LineString instances
+        # Get lengths (e.g. number of LineStrings per MultiLineString)
+        to_reverse_gdf['multilinestring length'] = -1
+        to_reverse_gdf.loc[ to_reverse_gdf.geom_type == 'MultiLineString', 'multilinestring length'] = to_reverse_gdf['geometry'].apply(lambda mls: len(mls.geoms))
+        multlinestring_lengths_value_counts = to_reverse_gdf['multilinestring length'].value_counts(dropna=False)
+        WranglerLogger.debug('reverse_geometry: MultiLineString lengths:\n{}'.format(multlinestring_lengths_value_counts))
 
-            # handle MultiLineString with count of 1 LineString by converting to LineString
-            to_reverse_gdf.loc[ (to_reverse_gdf.geom_type == 'MultiLineString') & \
-                                (to_reverse_gdf['multilinestring length'] == 1), 
-                                'geometry'] = to_reverse_gdf['geometry'].apply(lambda mls: list(mls.geoms)[0])
+        # handle MultiLineString with count of 1 LineString by converting to LineString
+        to_reverse_gdf.loc[ (to_reverse_gdf.geom_type == 'MultiLineString') & \
+                            (to_reverse_gdf['multilinestring length'] == 1), 
+                            'geometry'] = to_reverse_gdf['geometry'].apply(lambda mls: list(mls.geoms)[0])
 
-            geom_types = to_reverse_gdf.geom_type.value_counts(dropna=False)  # this is a series
-            WranglerLogger.debug('reverse_geometry: to_reverse_gdf.geom_types:\n{}'.format(geom_types))
+        geom_types = to_reverse_gdf.geom_type.value_counts(dropna=False)  # this is a series
+        WranglerLogger.debug('reverse_geometry: to_reverse_gdf.geom_types:\n{}'.format(geom_types))
     
-    if 'LineString' in geom_types.index.values:
-        if geom_types['LineString'] == len(to_reverse_gdf):
+    if ('LineString' in geom_types.index.values) and (geom_types['LineString'] == len(to_reverse_gdf)):
         # all geometries are single line strings now
-            pass
+        pass
     else:
         # todo: handle remaining MultiLineStrings or other types of geometries
         raise NotImplementedError
@@ -1977,6 +1975,13 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
         conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST)
     elif third_party_type == 'transit':
         conflation_dir = os.path.join(THIRD_PARTY_OUTPUT_DIR, CONFLATION_SHST)
+    else:
+        error_message = "conflate: third_party_type must be one of ['roadway_link','transit']. Received {}".format(third_party_type)
+        WranglerLogger.error(error_message)
+        raise ValueError(error_message)
+
+    WranglerLogger.debug("conflate: conflation_dir = {}".format(conflation_dir))
+
     if not os.path.exists(conflation_dir):
         WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
         os.makedirs(conflation_dir)
@@ -1995,6 +2000,11 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
     client        = None
     matched_gdf   = gpd.GeoDataFrame()
     unmatched_gdf = gpd.GeoDataFrame()
+
+    # write input file to single geofeather for debugging
+    debug_input_file    = os.path.join(conflation_dir, '{}.in.feather'.format(third_party))
+    geofeather.to_geofeather(third_party_gdf.reset_index(), debug_input_file)
+    WranglerLogger.debug('Wrote input file as geofeather {} for debugging'.format(debug_input_file))
 
     # boundary_partition is either '' or '_01','_02', etc
     for boundary_partition in boundary_partitions:

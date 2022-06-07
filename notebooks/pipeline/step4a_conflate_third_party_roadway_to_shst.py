@@ -19,6 +19,7 @@ Outputs: two sets of data for each of the above sources:
 import argparse, datetime, os, sys
 import methods
 import docker
+import numpy as np
 import pandas as pd
 import geopandas as gpd
 import fiona
@@ -125,6 +126,9 @@ def conflate_TOMTOM():
     # load tomtom data, use MultiNet Network (NW) layer
     WranglerLogger.info('loading TomTom raw data from layer mn_nw')
     tomtom_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TOMTOM], layer='mn_nw')
+    # the ID fields are not floats but uint64
+    tomtom_gdf[['ID','F_JNCTID','T_JNCTID']] = tomtom_gdf[['ID','F_JNCTID','T_JNCTID']].astype(np.uint64)
+
     WranglerLogger.debug('Read {:,} rows from Network layer; dtypes:\n{}'.format(len(tomtom_gdf), tomtom_gdf.dtypes))
 
     # filter irrelevant links
@@ -164,7 +168,7 @@ def conflate_TOMTOM():
 
     # Reverse TF: Open in Negative Directions and [blank]: Open in Both Directions
     tomtom_to_reverse_gdf = tomtom_gdf.loc[ (tomtom_gdf.ONEWAY==' ') | (tomtom_gdf.ONEWAY=='TF')].copy()
-    WranglerLogger.debug('Reversing NULL and TF ONEWAY links, or {:,} rows'.format(len(tomtom_to_reverse_gdf)))
+    WranglerLogger.debug('Reversing " " and TF ONEWAY links, or {:,} rows'.format(len(tomtom_to_reverse_gdf)))
     # reverse the links
     reverse_TomTom(tomtom_to_reverse_gdf)
 
@@ -181,10 +185,15 @@ def conflate_TOMTOM():
     WranglerLogger.debug('LANES (Number of Lanes) values:\n{}'.format(tomtom_gdf['LANES'].value_counts(dropna=False)))
     # By Functional Road Type
     WranglerLogger.debug('FRC x LANES values:\n{}'.format(tomtom_gdf[['FRC','LANES']].value_counts(dropna=False)))
+    # Roadway Names
+    tomtom_gdf['NAME_strlen'] = tomtom_gdf['NAME'].str.len()
+    WranglerLogger.debug('NAME_strlen values:\n{}'.format(tomtom_gdf['NAME_strlen'].value_counts(dropna=False)))
 
     # load the 'Speed Restrictions' table
     tomtom_sr_df = pd.DataFrame(gpd.read_file(THIRD_PARTY_INPUT_FILES[TOMTOM], layer='mn_sr'))
     tomtom_sr_df.drop(columns='geometry', inplace=True) # this is empty
+    tomtom_sr_df['id'] = tomtom_sr_df['id'].astype(np.uint64)  # this isn't a float => cast
+
     WranglerLogger.debug('Read {:,} rows from Speed Restrictions table; dtypes:\n{}'.format(len(tomtom_sr_df), tomtom_sr_df.dtypes))
 
     # speedtyp: 0 = Undefined, 1 = Maximum Speed, 2 = Recommended Speed, 3 = Land Dependent Maximum Speed, 4 = Speed Bump
@@ -203,11 +212,23 @@ def conflate_TOMTOM():
     assert(pd.isnull(tomtom_sr_df.id).sum() == 0)
     tomtom_sr_df['duplicated_id'] = tomtom_sr_df.id.duplicated(keep=False) # mark all duplicates as true
     WranglerLogger.debug('SR duplicated id: \n{}'.format(tomtom_sr_df.loc[ tomtom_sr_df.duplicated_id == True].head(30)))
+    tomtom_sr_df.drop(columns=['duplicated_id'], inplace=True)
 
     # debugging - let's see what these look like
-    WranglerLogger.debug('SR seqnr (Sequential Number of the restriction on the Feature) values:\n{}'.format(tomtom_sr_df['seqnr'].value_counts(dropna=False)))
-    WranglerLogger.debug('SR speed (Speed Restriction) values:\n{}'.format(tomtom_sr_df['speed'].value_counts(dropna=False)))
+    WranglerLogger.debug('SR seqnr (Sequential Number of the restriction on the Feature) values:\n{}'.format(
+        tomtom_sr_df['seqnr'].value_counts(dropna=False)))
     WranglerLogger.debug('SR valdir (Validity Direction) values:\n{}'.format(tomtom_sr_df['valdir'].value_counts(dropna=False)))
+
+    # if there are multiple speed restrictions on a single link (e.g. same id and valdir) then drop them
+    tomtom_sr_df['duplicate_id_valdir'] = tomtom_sr_df.duplicated(subset=['id','valdir'], keep=False)
+    WranglerLogger.debug('Dropping the following {:,} speed restrictions rows with duplicate id,valdir head(30):\n{}'.format(
+        tomtom_sr_df['duplicate_id_valdir'].sum(), tomtom_sr_df.loc[ tomtom_sr_df['duplicate_id_valdir']==True ].head(30)
+    ))
+    tomtom_sr_df = tomtom_sr_df.loc[ tomtom_sr_df['duplicate_id_valdir']==False ]
+    tomtom_sr_df.drop(columns=['duplicate_id_valdir'], inplace=True)
+    WranglerLogger.debug('Filtered to duplicate_id_valdir==False, have {:,} rows'.format(len(tomtom_sr_df)))
+
+    WranglerLogger.debug('SR speed (Speed Restriction) values:\n{}'.format(tomtom_sr_df['speed'].value_counts(dropna=False)))
     WranglerLogger.debug('SR verified values:\n{}'.format(tomtom_sr_df['verified'].value_counts(dropna=False)))
 
     # join speed restrictions to links based on id and valdir (Validity Direction)
@@ -221,40 +242,78 @@ def conflate_TOMTOM():
         indicator = True
     )
     tomtom_gdf.rename(columns = {'_merge':'merge sr_valdir1'}, inplace=True)
-    WranglerLogger.debug('After merging, tomtom_gdf["merge sr_valdir1"].value_counts()\n{}'.format(tomtom_gdf["merge sr_valdir1"].value_counts()))
-    sys.exit()
+    WranglerLogger.debug('After merging 1, tomtom_gdf["merge sr_valdir1"].value_counts()\n{}'.format(
+        tomtom_gdf["merge sr_valdir1"].value_counts(dropna=False)))
+    
+    # join valdirr==2 (Valid in Positive Line Directions)
+    # join valdirr==3 (Valid in Negative Line Directions)
+    tomtom_sr_df['reversed'] = False
+    tomtom_sr_df.loc[tomtom_sr_df.valdir ==3, 'reversed'] = True
+    tomtom_gdf = pd.merge(
+        left      = tomtom_gdf,
+        right     = tomtom_sr_df.loc[tomtom_sr_df.valdir > 1],
+        left_on   = ['ID', 'reversed'],
+        right_on  = ['id', 'reversed'],
+        how       = 'left',
+        indicator = True
+    )
+    tomtom_gdf.rename(columns = {'_merge':'merge sr_valdir23'}, inplace=True)
+    WranglerLogger.debug('After merging 23, tomtom_gdf["merge sr_valdir23"].value_counts()\n{}'.format(
+        tomtom_gdf["merge sr_valdir23"].value_counts(dropna=False)))
 
+    WranglerLogger.debug('tomtom_gdf["merge sr_valdir1","merge sr_valdir23"].value_counts()\n{}'.format(
+        tomtom_gdf[["merge sr_valdir1","merge sr_valdir23"]].value_counts(dropna=False)))
+
+    # double join means the columns in the Speed Restrictions table have been added twice; consolidate to the first join (_X)
+    # id, seqnr, speed, speedtyp, valdir, vt, verified
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both',       'id_x'] = tomtom_gdf[      'id_y']
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both',    'seqnr_x'] = tomtom_gdf[   'seqnr_y']
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both',    'speed_x'] = tomtom_gdf[   'speed_y']
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both', 'speedtyp_x'] = tomtom_gdf['speedtyp_y']
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both',   'valdir_x'] = tomtom_gdf[  'valdir_y']
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both',       'vt_x'] = tomtom_gdf[      'vt_y']
+    tomtom_gdf.loc[ tomtom_gdf['merge sr_valdir23'] == 'both', 'verified_x'] = tomtom_gdf['verified_y']
+    # drop the _y versions and rename
+    tomtom_gdf.drop(columns=['id_y','seqnr_y','speed_y','speedtyp_y','valdir_y','vt_y','verified_y'], inplace=True)
+    tomtom_gdf.rename(columns={
+        'id_x'      :'id',
+        'seqnr_x'   :'seqnr',
+        'speed_x'   :'speed',
+        'speedtyp_x':'speedtyp',
+        'valdir_x'  :'valdir',
+        'vt_x'      :'vt',
+        'verified_x':'verified'},
+    inplace = True)
+
+    # verify there are no duplicates of (ID, reversed) now, so this can serve as the unique ID
+    tomtom_gdf['duplicated_id'] = tomtom_gdf.duplicated(subset=['ID','reversed'], keep=False) # mark all duplicates as true
+    assert(tomtom_gdf['duplicated_id'].sum() == 0)
+    tomtom_gdf.drop(columns=['duplicated_id'], inplace=True)
+
+    # finally, filter out rows that have no usable attributes, where usable attributes = NAME, LANES, speed
+    tomtom_gdf['no_data'] = False
+    tomtom_gdf.loc[ (tomtom_gdf['NAME_strlen'] <= 1) & \
+                    (tomtom_gdf['speed'].notnull()) & \
+                    (tomtom_gdf['LANES'] > 0), 'no_data'] = True
+    WranglerLogger.debug('Filtering out {:,} no_data rows'.format(tomtom_gdf['no_data'].sum()))
+    tomtom_gdf = tomtom_gdf.loc[ tomtom_gdf.no_data == False ]
+    tomtom_gdf.drop(columns=['no_data'], inplace=True)
+    WranglerLogger.debug('Final TomTom dataset for conflation => {:,} rows'.format(len(tomtom_gdf)))
 
     # convert to ESPG lat-lon
     tomtom_gdf = tomtom_gdf.to_crs(epsg=methods.LAT_LONG_EPSG)
     WranglerLogger.info('converted to projection: ' + str(tomtom_gdf.crs))
 
     WranglerLogger.info('total {:,} tomtom links'.format(tomtom_gdf.shape[0]))
-    sys.exit()
-    # notes: 
-    #   oneway links may be the wrong way if ONEWAY=TF: Open in Negative direction
-    #   if ONEWAY='' then it's two way but reverse link needs to be created
-    #   filter to FEATTYPE=4110 (Road Element)?
-    #   check others too (F_JNCTTYP, T_JNCTTYP, FRC, FOW)
-    #   check LANES; seems not set a lot?
-    #   check POSCACCUR ?
-    #   FRAMP/FREEWAY summary?
-    #   SPEEDCAT seems useful...
-    # There is no existing unique tomtom handle for Bay Area, thus we need to create unique handle
-    WranglerLogger.info('ID + F_JNCTID + T_JNCTID: {}'.format(
-        len(tomtom_gdf.groupby(["ID", "F_JNCTID", "T_JNCTID"]).count())))
-
-    # generating unique handle for tomtom
-    tomtom_gdf['tomtom_link_id'] = range(1, len(tomtom_gdf) + 1)
 
     (tomtom_matched_gdf, tomtom_unmatched_gdf) = methods.conflate(
-        TOMTOM, tomtom_raw_gdf, ['tomtom_link_id'], 'roadway_link',
+        TOMTOM, tomtom_gdf, ['ID','reversed'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
 
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
     WranglerLogger.info('Sharedstreets matched {} out of {} total TomTom Links.'.format(
-        tomtom_matched_gdf.tomtom_link_id.nunique(), tomtom_raw_gdf.shape[0]))
+        tomtom_matched_gdf.tomtom_link_id.nunique(), tomtom_gdf.shape[0]))
 
 def conflate_TM2_NON_MARIN():
     """
