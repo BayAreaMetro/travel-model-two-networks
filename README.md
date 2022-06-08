@@ -33,3 +33,36 @@ Data used in this repository (the /data folder) is stored in [MTC's Box folder](
 (tm2_network_dev_py38) conda env config vars set OUTPUT_DATA_DIR=E:\tm2_network_version_13
 (tm2_network_dev_py38) conda activate tm2_network_dev_py38
 ```
+
+## Troubleshooting
+
+### Docker Error from python
+Note: the above environment worked fine but I got a runtime error on importing docker:
+```
+(tm2_network_dev_py38) PS C:\Users\lzorn\Documents\GitHub\travel-model-two-networks-version13\notebooks\pipeline> python
+Python 3.8.13 (default, Mar 28 2022, 06:59:08) [MSC v.1916 64 bit (AMD64)] :: Anaconda, Inc. on win32
+Type "help", "copyright", "credits" or "license" for more information.
+>>> import docker
+>>> client = docker.from_env()
+Traceback (most recent call last):
+  File "C:\Users\lzorn\.conda\envs\tm2_network_dev_py38\lib\site-packages\docker\api\client.py", line 159, in __init__
+    self._custom_adapter = NpipeHTTPAdapter(
+NameError: name 'NpipeHTTPAdapter' is not defined
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+  File "C:\Users\lzorn\.conda\envs\tm2_network_dev_py38\lib\site-packages\docker\client.py", line 96, in from_env
+    return cls(
+  File "C:\Users\lzorn\.conda\envs\tm2_network_dev_py38\lib\site-packages\docker\client.py", line 45, in __init__
+    self.api = APIClient(*args, **kwargs)
+  File "C:\Users\lzorn\.conda\envs\tm2_network_dev_py38\lib\site-packages\docker\api\client.py", line 164, in __init__
+    raise DockerException(
+docker.errors.DockerException: Install pypiwin32 package to enable npipe:// support
+```
+
+Following [these directions](https://github.com/twosixlabs/armory/issues/156), this was resolved by running
+```bat
+python <path-to-python-env>\Scripts\pywin32_postinstall.py -install
+```
