@@ -293,8 +293,8 @@ def conflate_TOMTOM():
     # finally, filter out rows that have no usable attributes, where usable attributes = NAME, LANES, speed
     tomtom_gdf['no_data'] = False
     tomtom_gdf.loc[ (tomtom_gdf['NAME_strlen'] <= 1) & \
-                    (tomtom_gdf['speed'].notnull()) & \
-                    (tomtom_gdf['LANES'] > 0), 'no_data'] = True
+                    (tomtom_gdf['speed'].isnull()) & \
+                    (tomtom_gdf['LANES'] == 0), 'no_data'] = True
     WranglerLogger.debug('Filtering out {:,} no_data rows'.format(tomtom_gdf['no_data'].sum()))
     tomtom_gdf = tomtom_gdf.loc[ tomtom_gdf.no_data == False ]
     tomtom_gdf.drop(columns=['no_data'], inplace=True)
