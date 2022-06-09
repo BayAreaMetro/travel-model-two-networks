@@ -319,12 +319,6 @@ def conflate_TOMTOM(docker_container_name):
     tomtom_gdf.drop(columns=['no_data'], inplace=True)
     WranglerLogger.debug('Final TomTom dataset for conflation => {:,} rows'.format(len(tomtom_gdf)))
 
-    # convert to ESPG lat-lon
-    tomtom_gdf = tomtom_gdf.to_crs(epsg=methods.LAT_LONG_EPSG)
-    WranglerLogger.info('converted to projection: ' + str(tomtom_gdf.crs))
-
-    WranglerLogger.info('total {:,} tomtom links'.format(tomtom_gdf.shape[0]))
-
     (tomtom_matched_gdf, tomtom_unmatched_gdf) = methods.conflate(
         TOMTOM, tomtom_gdf, ['ID','reversed'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
@@ -343,11 +337,8 @@ def conflate_TM2_NON_MARIN():
     WranglerLogger.debug('TM2_Marin raw data dtypes: \n{}'.format(tm2_link_gdf.dtypes))
 
     # define initial ESPG
+    # todo: delete this; it should be defined in the dataset
     tm2_link_gdf.crs = "esri:102646"
-
-    # convert to ESPG lat-lon
-    tm2_link_gdf = tm2_link_gdf.to_crs(CRS(lat_lon_epsg_str))
-    WranglerLogger.info('converted to projection: ' + str(tm2_link_gdf.crs))
 
     # select only road way links
     WranglerLogger.info('TM2_nonMarin link data CNTYPE stats: \n{}'.format(
@@ -440,11 +431,8 @@ def conflate_TM2_MARIN():
     WranglerLogger.debug('TM2_Marin raw data dtypes: \n{}'.format(tm2_marin_link_gdf.dtypes))
 
     # define initial ESPG
+    # todo: delete this; it should be defined in the dataset
     tm2_marin_link_gdf.crs = CRS("esri:102646")
-
-    # convert to ESPG lat-lon
-    tm2_marin_link_gdf = tm2_marin_link_gdf.to_crs(CRS(lat_lon_epsg_str))
-    WranglerLogger.info('converted to projection: ' + str(tm2_marin_link_gdf.crs))
 
     # select only road way links
     WranglerLogger.info('TM2_Marin link data CNTYPE stats: \n{}'.format(
@@ -466,8 +454,8 @@ def conflate_TM2_MARIN():
 
 def conflcate_SFCTA(docker_container_name):
     """
-    Conflate ACTC data with sharedstreets.
-    See SFCTA Stick network documentation at Box: https://mtcdrive.box.com/s/bqz2snotd4s6ctdsw18mbg74ugm3p16p.
+    Conflate SFCTA data with sharedstreets.
+    See SFCTA network documentation at Box: https://mtcdrive.box.com/s/bqz2snotd4s6ctdsw18mbg74ugm3p16p.
 
     Subset the data to only those links that have meaningful data that we want, which for now is:
     * ONEWAY     = boolean to determine if link is one-way
@@ -508,24 +496,17 @@ def conflcate_SFCTA(docker_container_name):
     # Prepare SFCTA for conflation
     WranglerLogger.info('loading SFCTA data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[SFCTA])))
     sfcta_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[SFCTA])
-    WranglerLogger.debug('SFCTA raw data dtypes: \n{}'.format(sfcta_gdf.dtypes))
-
-    # set initial ESPG
-    sfcta_gdf.crs = CRS("EPSG:2227")
-    # convert to ESPG lat-lon
-    sfcta_gdf = sfcta_gdf.to_crs(CRS(lat_lon_epsg_str))
-    WranglerLogger.info('converted to projection: ' + str(sfcta_gdf.crs))
+    WranglerLogger.debug('SFCTA data has {:,} rows and dtypes: \n{}'.format(len(sfcta_gdf), sfcta_gdf.dtypes))
 
     # only conflate SF part of the network
     boundary_4_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_04.geojson'))
-    sfcta_gdf = sfcta_gdf.loc[
-        sfcta_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
+    sfcta_gdf = sfcta_gdf.to_crs(epsg=methods.LAT_LONG_EPSG) # match the boundary crs
+    sfcta_gdf = sfcta_gdf.loc[sfcta_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
+    WranglerLogger.info('After filtering to links inside boundary_04, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
     # remove "special facility" (FT 6)
     sfcta_gdf = sfcta_gdf.loc[sfcta_gdf.FT != 6]
-
-    WranglerLogger.info('after removing links outside boundary_04 and FT=6, SF network has {:,} links'.format(
-        len(sfcta_gdf)))
+    WranglerLogger.info('After filter to FT != 6, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
@@ -595,10 +576,6 @@ def conflate_ACTC():
     ))
     WranglerLogger.debug('ACTC raw data dtypes:\n{}'.format(actc_raw_gdf.dtypes))
     WranglerLogger.debug('ACTC crs:\n{}'.format(actc_raw_gdf.crs))
-
-    # convert to ESPG lat-lon
-    actc_raw_gdf = actc_raw_gdf.to_crs(CRS(lat_lon_epsg_str))
-    WranglerLogger.info('converted to projection: ' + str(actc_raw_gdf.crs))
 
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 2.5-3 hours

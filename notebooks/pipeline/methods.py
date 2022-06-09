@@ -2001,6 +2001,11 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
         WranglerLogger.info('creating conflation folder: {}'.format(conflation_dir))
         os.makedirs(conflation_dir)
 
+    # In order to conflate, the dataset needs to be in ESPG WGS 84 (latitude/longitude)
+    prev_crs_str = str(third_party_gdf.crs)
+    third_party_gdf = third_party_gdf.to_crs(epsg=LAT_LONG_EPSG)
+    WranglerLogger.info('Converted third_party_gdf from crs {} to crs {}'.format(prev_crs_str, third_party_gdf.crs))
+
     # For smaller datasets, partitioning by the boundaries is not necessary with NODE_OPTIONS==--max_old_space_size=8192
     # For larger datasets, I'm not getting crashing but the 'optimizing graph...' step takes many hours; I gave up at 20
     # So far, 50k (ACTC, CCTA) has been fine without partitioning and 950k (TomTom) has not.

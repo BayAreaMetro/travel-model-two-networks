@@ -12,10 +12,25 @@ through python docker package.  See [sharedstreets-js docker documentation](http
 * [Dockerfile](Dockerfile) which defines Docker image to use for SharedStreets extraction
 
 #### Output:
-* 14 county/sub-county boundaries, `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[1-14].geojson`
-* Shared Street extract, `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[1-14].out.geojson` with columns: 
+* 14 county/sub-county boundaries, `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[01-14].geojson`:
+  * 01: Contra Costa east
+  * 02: Sonoma
+  * 03: Solano
+  * 04: San Francisco
+  * 05: Marin
+  * 06: Santa Clara east
+  * 07: San Mateo
+  * 08: Napa
+  * 09: Alameda east
+  * 10: Contra Costa west
+  * 11: Alameda south/west
+  * 12: Santa Clara central
+  * 13: Santa Clara west
+  * 14: Alameda north/west
+* Shared Street extract, `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[01-14].out.geojson` with columns: 
    'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
-* Shared Street extract logs: `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[1-14].tiles.txt`
+   * Note that these extracts cover a rectangle, so shst converts the above boundaries into a containing rectangular boundary
+* Shared Street extract logs: `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[01-14].tiles.txt`
 * Log file: `[OUTPUT_DATA_DIR]/step1_shst_extracts/step1_extract_shst_[YYmmdd_HHMM].[info,debug].log`
 
 See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-geometries)
@@ -72,14 +87,15 @@ Add OSM attributes to extracted SharedStreets network and convert to Network Sta
 Four parts, run in sequence:
 
 #### [step4a: Prepare third-party data for SharedStreet conflation.py](step4a_prepare_third_party_data_for_conflation.py)
-Prepare third party data for SharedStreets matching, including: remove duplicates, remove no roadway links (e.g. centroid connectors), add missing links (e.g. add the other link for two-way links) partition regional network datasets by the 14 boundaries, set to the standard lat-lon EPSG 4326.
+Prepare third party data for SharedStreets matching, including: remove duplicates, remove non roadway links (e.g. centroid connectors), add missing links (e.g. add the other link for two-way links) partition regional network datasets by the 14 boundaries, set to the standard lat-lon EPSG 4326.
 ##### Input:
-* TomTom network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/TomTom networkFGDB/network2019/Network_region.gdb/mn_nw`
-* TM2 non-Marion version, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_nonMarin/mtc_final_network_base.shp`
-* TM2 Marin version, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/TM2_Marin/mtc_final_network_base.shp`
-* SFCTA Stick network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/sfcta/SanFrancisco_links.shp`
-* ACTC network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/actc_model/AlamedaCo_MASTER_20190410_no_cc.shp`
-* CCTA network, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/ccta_model/ccta_2015_network/ccta_2015_network.shp`
+* Inputs are in the following structure: `[INPUT_DATA_DIR]/step4_third_party_data/[third_party]/input`:
+  * TomTom network: `network2019/Network_region.gdb/mn_nw`
+  * TM2 non-Marin: `mtc_final_network_base.shp`
+  * TM2 Marin: `mtc_final_network_base.shp`
+  * SFCTA network: `SanFrancisco_links.shp`
+  * ACTC network: `AlamedaCo_MASTER_20190410_no_cc.shp`
+  * CCTA network: `ccta_2015_network.shp`
 
 ##### Output:
 One set of data only containing unique identifier for each link and link geometry (`[data_source]_[1-14].in.geojson`), which will be used in SharedStreet matching in step4b - including all link attributes would substantially increase run time   
