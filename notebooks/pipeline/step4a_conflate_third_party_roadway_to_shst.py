@@ -378,7 +378,68 @@ def conflate_TM2_NON_MARIN():
 
 def conflate_TM2_MARIN():
     """
-    Conflate ACTC data with sharedstreets
+    Conflate ACTC data with sharedstreets.
+    See Marin version of the network documentation at http://bayareametro.github.io/travel-model-two/Marin/input/
+
+    Subset the data to only those links that have meaningful data that we want.
+    # TODO: evaluate if still need to conflate all third-party datasets given the overlap information, e.g. Marin version
+    # of the network contains TomTom info and PEMS info. 
+
+    * NUMLANES   = model number of lanes
+    * FRC	     = TomTom functional road class
+    * NAME	     = TomTom road name
+    * FREEWAY	 = TomTom freeway 
+    * TOLLRD	 = TomTom toll road
+    * ONEWAY	 = TomTom one way
+    * LANES	     = TomTom number of lanes
+    * RAMP	     = TomTom exit/entrance ramp
+    * RTEDIR	 = TomTom route directional
+    * ASSIGNABLE = is link used for assignment
+    * CNTYPE	 = link connector type
+                   BIKE: bike link
+                   CRAIL: commuter rail
+                   FERRY: ferry link
+                   HRAIL: heavy rail link
+                   LRAIL: light rail link
+                   MAZ: MAZ connector link
+                   PED: ped link
+                   TANA: regular network link
+                   TAP: TAP link
+                   TAZ: TAZ connector link
+                   USE: HOV (user class) link
+    * TRANSIT	 = is link transit
+    * TAP_DRIVE	 = MTC TAP link to parking lot
+                   1: true
+    * FT	     = facility type
+                   0: Connector
+                   1: Freeway to Freeway
+                   2: Freeway
+                   3: Expressway
+                   4: Collector
+                   5: Ramp
+                   6: Special Facility
+                   7: Major Arterial
+    * USECLASS	 = link user class
+                   0: NA; link open to everyone
+                   2: HOV 2+
+                   3: HOV 3+
+                   4: No combination trucks
+    * PEMSID	 = PEMS ID
+    * PEMSLANES	 = PEMS number of lanes
+    * TOLLSEG	 = toll segment
+    * TOLLBOOTH	 = toll link. Links with values less than 11 are bridge tolls; 11 or above are value tolls
+    * B_CLASS	 = BikeMapper bike class
+                   0: Unclassified Street
+                   1: Class I Trail
+                   2: Class II Route
+                   3: Class III Route
+    * PED_FLAG	 = BikeMapper pedestrian access
+                   Y: yes
+                   blank: no
+    * BIKEPEDOK	 = BikeMapper bridge that allows bike and peds
+                   1: true
+                   0: false
+
     TODO: What files are written?
     """
     # Prepare TM2 Marin for conflation
