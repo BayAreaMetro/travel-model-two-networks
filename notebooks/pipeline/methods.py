@@ -101,6 +101,20 @@ def docker_path(non_docker_path):
     LINUX_SEP = '/'
     return LINUX_SEP.join(non_docker_path_list)
 
+def get_docker_container(docker_container_name):
+    """
+    Attempts to fetch the named docker container.  Returns client and docker container instance.
+    Raises an exception on failure.
+    """
+    import docker
+    client = docker.from_env()
+    container = client.containers.get(docker_container_name)
+    WranglerLogger.info('Docker container named {} found; status: {}'.format(docker_container_name, container.status))
+    if container.status != 'running':
+        container.restart()
+    # note: I have had difficulty reusing a container when the mount fails because my IP address (which is included in the volume) has changed
+    return (client, container)
+
 def create_docker_container(mount_e: bool, mount_home: bool):
     """
     Uses docker python package to:
@@ -1943,7 +1957,7 @@ def remove_out_of_region_links_nodes(link_gdf, node_gdf):
 
 
 def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, third_party_type,
-             THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR):
+             THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name=None):
     """
     Generic conflation method.  Does the following:
     1) Creates conflation directory (if it doesn't exist)
@@ -1965,6 +1979,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
         - OUTPUT_DATA_DIR: the top level of output data dir, where the Docker contained will be created.
         - CONFLATION_SHST: sub-folder for the current third-party dataset's shst match outputs will be written to.
         - BOUNDARY_DIR: dir of th boundary files used to split the third-party dataset before shst matching if it is too large.
+        - docker_container_name: name of docker container to use; otherwise creates a new one.
     
     """
     WranglerLogger.info('Running conflate() for {} with id_columns {}; third_party_gdf.dtypes:\n{}'.format(
@@ -2001,6 +2016,10 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
     matched_gdf   = gpd.GeoDataFrame()
     unmatched_gdf = gpd.GeoDataFrame()
 
+    # verify that the id columns serve as unique identifiers
+    duplicated_id = third_party_gdf.duplicated(subset=id_columns)
+    assert(duplicated_id.sum() == 0)
+
     # write input file to single geofeather for debugging
     debug_input_file    = os.path.join(conflation_dir, '{}.in.feather'.format(third_party))
     geofeather.to_geofeather(third_party_gdf.reset_index(), debug_input_file)
@@ -2020,11 +2039,20 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
 
         else:
             # do this onely once, not for every partition
+            if (client == None) and (docker_container_name != None):
+                try:
+                    WranglerLogger.info('Attempting to get docker container named {}'.format(docker_container_name))
+                    (client, container) = get_docker_container(docker_container_name)
+                    WranglerLogger.info('Docker container found')
+                except Exception as error:
+                    WranglerLogger.error('Could not get docker container named {}; error:{}'.format(docker_container_name, error))
+
             if (client == None):
-                # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
-                docker_output_path = docker_path(OUTPUT_DATA_DIR)
                 # create docker container to do the shst matchting
                 (client, container) = create_docker_container(mount_e=OUTPUT_DATA_DIR.startswith('E:'), mount_home=True)
+
+            # we're going to need to cd into OUTPUT_DATA_DIR -- create that path (on UNIX)
+            docker_output_path = docker_path(OUTPUT_DATA_DIR)
 
             # no partitioning
             if boundary_partition == '':
@@ -2116,8 +2144,13 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
             matched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'matched.feather')
         elif third_party_type == 'transit':
             matched_geofeather = os.path.join(CONFLATION_SHST, '{}_matched.feather'.format(third_party))
+        
         geofeather.to_geofeather(matched_gdf, matched_geofeather)
         WranglerLogger.info('Wrote {:,} lines to {}'.format(len(matched_gdf), matched_geofeather))
+
+        WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total unique ids'.format(
+            len(matched_gdf.drop_duplicates(subset=id_columns)), len(third_party_gdf)))
+
     
     else:
         matched_gdf = None
@@ -2147,6 +2180,8 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
         geofeather.to_geofeather(unmatched_gdf, unmatched_geofeather)
         WranglerLogger.info('Wrote {:,} lines to {}'.format(len(unmatched_gdf), unmatched_geofeather))
 
+        WranglerLogger.info('Sharedstreets failed to match {:,} out of {:,} total unique ids'.format(
+            len(unmatched_gdf.drop_duplicates(subset=id_columns)), len(third_party_gdf)))
     else:
         unmatched_gdf = None
         WranglerLogger.debug('No unmatched file(s) found')

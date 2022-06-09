@@ -89,7 +89,7 @@ def reverse_TomTom(to_reverse_gdf):
         to_reverse_gdf['RTEDIRVD'].value_counts(dropna=False)))
 
 
-def conflate_TOMTOM():
+def conflate_TOMTOM(docker_container_name):
     """
     Conflate TomTom data with sharedstreets.
     See TomTom documentation by loading web page from Box: https://mtcdrive.box.com/s/f4ytbcfesy3jc71nscjvaho79ygjcetw
@@ -113,7 +113,6 @@ def conflate_TOMTOM():
     * SHIELDNUM = Route Number on Shield
     * RTETYPE   = Route Number Type
     * TOLLRD    = Toll Road
-    * 
 
     Outputs:
     -- tomtom_matched_gdf.feather: TomTom links matched to SharedStreets links under the match command config 
@@ -310,11 +309,6 @@ def conflate_TOMTOM():
         'verified_x':'verified'},
     inplace = True)
 
-    # verify there are no duplicates of (ID, reversed) now, so this can serve as the unique ID
-    tomtom_gdf['duplicated_id'] = tomtom_gdf.duplicated(subset=['ID','reversed'], keep=False) # mark all duplicates as true
-    assert(tomtom_gdf['duplicated_id'].sum() == 0)
-    tomtom_gdf.drop(columns=['duplicated_id'], inplace=True)
-
     # finally, filter out rows that have no usable attributes, where usable attributes = NAME, LANES, speed
     tomtom_gdf['no_data'] = False
     tomtom_gdf.loc[ (tomtom_gdf['NAME_strlen'] <= 1) & \
@@ -333,12 +327,10 @@ def conflate_TOMTOM():
 
     (tomtom_matched_gdf, tomtom_unmatched_gdf) = methods.conflate(
         TOMTOM, tomtom_gdf, ['ID','reversed'], 'roadway_link',
-        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
-    WranglerLogger.info('Sharedstreets matched {} out of {} total TomTom Links.'.format(
-        tomtom_matched_gdf.tomtom_link_id.nunique(), tomtom_gdf.shape[0]))
 
 def conflate_TM2_NON_MARIN():
     """
@@ -472,7 +464,7 @@ def conflate_TM2_MARIN():
     WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_Marin Links.'.format(
         len(matched_gdf.groupby(['A', 'B']).count()), tm2_marin_link_roadway_gdf.shape[0]))
 
-def conflcate_SFCTA():
+def conflcate_SFCTA(docker_container_name):
     """
     Conflate ACTC data with sharedstreets.
     See SFCTA Stick network documentation at Box: https://mtcdrive.box.com/s/bqz2snotd4s6ctdsw18mbg74ugm3p16p.
@@ -515,34 +507,33 @@ def conflcate_SFCTA():
     """
     # Prepare SFCTA for conflation
     WranglerLogger.info('loading SFCTA data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[SFCTA])))
-    sfcta_stick_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[SFCTA])
-    WranglerLogger.debug('SFCTA raw data dtypes: \n{}'.format(sfcta_stick_gdf.dtypes))
+    sfcta_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[SFCTA])
+    WranglerLogger.debug('SFCTA raw data dtypes: \n{}'.format(sfcta_gdf.dtypes))
 
     # set initial ESPG
-    sfcta_stick_gdf.crs = CRS("EPSG:2227")
+    sfcta_gdf.crs = CRS("EPSG:2227")
     # convert to ESPG lat-lon
-    sfcta_stick_gdf = sfcta_stick_gdf.to_crs(CRS(lat_lon_epsg_str))
-    WranglerLogger.info('converted to projection: ' + str(sfcta_stick_gdf.crs))
+    sfcta_gdf = sfcta_gdf.to_crs(CRS(lat_lon_epsg_str))
+    WranglerLogger.info('converted to projection: ' + str(sfcta_gdf.crs))
 
     # only conflate SF part of the network
     boundary_4_gdf = gpd.read_file(os.path.join(BOUNDARY_DIR, 'boundary_04.geojson'))
-    sfcta_SF_gdf = sfcta_stick_gdf[
-        sfcta_stick_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
+    sfcta_gdf = sfcta_gdf.loc[
+        sfcta_gdf.intersects(boundary_4_gdf.geometry.unary_union)]
 
     # remove "special facility" (FT 6)
-    sfcta_SF_roadway_gdf = sfcta_SF_gdf[~(sfcta_SF_gdf.FT == 6)]
+    sfcta_gdf = sfcta_gdf.loc[sfcta_gdf.FT != 6]
 
-    WranglerLogger.info('after removing links outside bounary_4 and FT=6, SF network has {:,} links, {:,} unique A-B combination'.format(
-        sfcta_SF_roadway_gdf.shape[0], len(sfcta_SF_roadway_gdf.groupby(['A', 'B']).count())))
+    WranglerLogger.info('after removing links outside boundary_04 and FT=6, SF network has {:,} links'.format(
+        len(sfcta_gdf)))
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        SFCTA, sfcta_SF_roadway_gdf, ['A','B'], 'roadway_link',
-        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
+        SFCTA, sfcta_gdf, ['A','B'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating SFCTA data')
-    WranglerLogger.info('Sharedstreets matched {} out of {} total SFCTA Links.'.format(
-        len(matched_gdf.groupby(['A', 'B']).count()), sfcta_SF_roadway_gdf.shape[0]))
+
 
 def conflate_CCTA():
     """
@@ -626,6 +617,7 @@ if __name__ == '__main__':
     # We could split this up into multiple scripts but I think there's enough in common that it's helpful to see in one script
     parser = argparse.ArgumentParser(description=USAGE)
     parser.add_argument('third_party', choices=[TOMTOM,TM2_NON_MARIN,TM2_MARIN,SFCTA,CCTA,ACTC,PEMS], help='Third party data to conflate')
+    parser.add_argument('--docker_container_name', required=False, help='Docker conainer name to use; otherwise, will create a new one.')
     args = parser.parse_args()
 
     if not os.path.exists(os.path.join(THIRD_PARTY_OUTPUT_DIR, args.third_party)):
@@ -655,13 +647,13 @@ if __name__ == '__main__':
     WranglerLogger.info(args)
 
     if args.third_party == TOMTOM:
-        conflate_TOMTOM()
+        conflate_TOMTOM(args.docker_container_name)
     elif args.third_party == TM2_NON_MARIN:
         conflate_TM2_NON_MARIN()
     elif args.third_party == TM2_MARIN:
         conflate_TM2_MARIN()
     elif args.third_party == SFCTA:
-        conflcate_SFCTA()
+        conflcate_SFCTA(args.docker_container_name)
     elif args.third_party == CCTA:
         conflate_CCTA()
     elif args.third_party == ACTC:
