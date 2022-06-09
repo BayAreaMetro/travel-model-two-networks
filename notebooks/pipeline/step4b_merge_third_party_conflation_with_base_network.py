@@ -133,15 +133,21 @@ if __name__ == '__main__':
     # only keep fields needed for link attributes heuristics
     unique_tomtom_matched_gdf = unique_tomtom_matched_gdf[[
         'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'tomtom_link_id', 'ID', 'F_JNCTID', 'T_JNCTID', 'LANES', 'FRC', 'NAME', 'SHIELDNUM', 'RTEDIR']]
+        'tomtom_link_id', 'ID', 'reversed', 'F_JNCTID', 'T_JNCTID', 'RAMP', 'FREEWAY',
+        'LANES', 'FRC', 'NAME', 'SHIELDNUM', 'RTETYPE', 'RTEDIR', 'TOLLRD']]
     
     # add data source prefix to column names
     unique_tomtom_matched_gdf.rename(columns={"ID": "tomtom_ID",
+                                              "reversed": 'tomtom_reversed',
+                                              'RAMP': 'tomtom_RAMP',
+                                              'FREEWAY': 'tomtom_FREEWAY',
                                               "LANES": "tomtom_lanes",
                                               "FRC": "tomtom_FRC",
                                               "NAME": "tomtom_name",
                                               "SHIELDNUM": "tomtom_shieldnum",
-                                              "RTEDIR": "tomtom_rtedir"},
+                                              'RTETYPE': 'tomtom_RTETYPE',
+                                              "RTEDIR": "tomtom_rtedir",
+                                              'TOLLRD': 'tomtom_TOLLRD'},
                                      inplace=True)
 
     # print out unique values for each key attribute to help fix typos

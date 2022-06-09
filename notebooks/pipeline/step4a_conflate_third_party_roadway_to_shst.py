@@ -413,7 +413,43 @@ def conflate_TM2_MARIN():
 
 def conflcate_SFCTA():
     """
-    Conflate ACTC data with sharedstreets
+    Conflate ACTC data with sharedstreets.
+    See SFCTA Stick network documentation at Box: https://mtcdrive.box.com/s/bqz2snotd4s6ctdsw18mbg74ugm3p16p.
+
+    Subset the data to only those links that have meaningful data that we want, which for now is:
+    * ONEWAY     = boolean to determine if link is one-way
+    * TOLL       =       int64
+    * USE        = use restrictions
+                   2 and 3: HOV2 and HOV3
+                   9: Transit only
+                   4: no trucks
+    * FT         = facility type
+    * STREETNAME = name of roads
+    * TYPE       = ?
+    * MTYPE      = ?
+    * SPEED           = freeflow speed in mph, based on FT and AT
+    ? DISTANCE        = length of link in miles
+    * LANE_{AM,PM,OP} = mumber of general purpose lanes in AM, excluding bus lanes
+                        AM:
+                        PM:
+                        OP:
+    * BUSLANE_{AM,PM,OP} = type of bus lane on link for time period
+                           0: none
+                           1: diamond
+                           2: side BRT
+                           3: center BRT
+    ? TOLL{AM,MD,PM,EV,EA}_{DA,SR2,SR3} = Toll in 1989 cents for the link in given time period for the given group
+    ? VALUETOLL_F                       = value toll flag on link
+                                          0: no value toll
+                                          1: toll on this link is a value toll 
+    ? PASSTHRU = if the value toll doesn't get a 'pass, 1 if it does
+    * BIKE_CLASS = type of bicycle facility on route
+                   0: None
+                   1: Class 1 facility (off-street bike path or cycletrack) or Class 4 facility (protected bike lane or
+                      bike lane physically buffered by soft-hit, parking, curb, raised)
+                   2: Class 2 facility (conventional bike lane or paint-buffered lane with no physical protection)
+                   3: Class 3 facility (sharrow, signed bike route, or bicycle boulevard)
+
     TODO: What files are written?
     """
     # Prepare SFCTA for conflation
