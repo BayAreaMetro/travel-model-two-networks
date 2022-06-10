@@ -326,7 +326,7 @@ def conflate_TOMTOM(docker_container_name):
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
 
-def conflate_TM2_NON_MARIN():
+def conflate_TM2_NON_MARIN(docker_container_name):
     """
     Conflate TM2 (NonMarin) data with sharedstreets
     TODO: What files are written?
@@ -352,31 +352,23 @@ def conflate_TM2_NON_MARIN():
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
         TM2_NON_MARIN, tm2_link_roadway_gdf, ['A','B'], 'roadway_link',
-        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating TM2_nonMarin data')
     WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_nonMarin Links.'.format(
         len(matched_gdf.groupby(['A', 'B']).count()), tm2_link_roadway_gdf.shape[0]))
         
 
-def conflate_TM2_MARIN():
+def conflate_TM2_MARIN(docker_container_name):
     """
     Conflate ACTC data with sharedstreets.
     See Marin version of the network documentation at http://bayareametro.github.io/travel-model-two/Marin/input/
 
-    Subset the data to only those links that have meaningful data that we want.
-    # TODO: evaluate if still need to conflate all third-party datasets given the overlap information, e.g. Marin version
-    # of the network contains TomTom info and PEMS info. 
+    Subset the data to only those links that have meaningful data that we want. Exclude TomTom attributes 
+    (FRC, NAME, FREEWAY, TOLLRD, ONEWAY, LANE, RAMP, RTEDIR) since TomTom data is conflated separately.
+    # TODO: evaluate if can use the PEMS info.
 
     * NUMLANES   = model number of lanes
-    * FRC	     = TomTom functional road class
-    * NAME	     = TomTom road name
-    * FREEWAY	 = TomTom freeway 
-    * TOLLRD	 = TomTom toll road
-    * ONEWAY	 = TomTom one way
-    * LANES	     = TomTom number of lanes
-    * RAMP	     = TomTom exit/entrance ramp
-    * RTEDIR	 = TomTom route directional
     * ASSIGNABLE = is link used for assignment
     * CNTYPE	 = link connector type
                    BIKE: bike link
@@ -433,7 +425,8 @@ def conflate_TM2_MARIN():
     tm2_marin_link_gdf.crs = CRS("esri:102646")
 
     # - select only road way links, CNTYPE=='TANA' (exclude PED and BIKE since methods.conflate() uses car-rule);
-    # - this would also exclude TRANSIT==1 and FT==0, so no need to drop TRANSIT==1 or FT==0 separately;
+    # - this would also exclude TRANSIT==1, FT==0, FT==6, so no need to drop them separately
+    
     # - about bike & ped data: 
     #   - a visual inspection suggests that CNTYPE=='BIKE' links are not true-shape network links, but similar to
     #     TM1.5 network links, so the shst conflation is less likely to be accurate.
@@ -471,19 +464,32 @@ def conflate_TM2_MARIN():
 
     WranglerLogger.info('TM2_Marin link data CNTYPE stats: \n{}'.format(
         tm2_marin_link_gdf.CNTYPE.value_counts(dropna=False)))
+    tm2_marin_link_gdf = tm2_marin_link_gdf.loc[tm2_marin_link_gdf.CNTYPE == "TANA"]
+    WranglerLogger.info('filtered to CNYTPE==TANA, {:,} roadway links, {:,}  unique A-B combination'.format(
+        tm2_marin_link_gdf.shape[0], len(tm2_marin_link_gdf.groupby(["A", "B"]).count())))
 
-    tm2_marin_link_roadway_gdf = tm2_marin_link_gdf.loc[tm2_marin_link_gdf.CNTYPE == "TANA"]
-    WranglerLogger.info('TM2_Marin has {:,} roadway links, {:,}  unique A-B combination'.format(
-        tm2_marin_link_roadway_gdf.shape[0], len(tm2_marin_link_roadway_gdf.groupby(["A", "B"]).count())))
+    # ONEWAY (TomTom data, Direction of Traffic Flow)
+    #      FT: Open in Positive Direction
+    #       N: Closed in Both Directions
+    #      TF: Open in Negative Direction
+    #      na: Open in Both Directions
+    WranglerLogger.debug('ONEWAY (Direction of Traffic Flow) list = {} values:\n{}'.format(
+        tm2_marin_link_gdf['ONEWAY'].value_counts(dropna=False).index.tolist(),
+        tm2_marin_link_gdf['ONEWAY'].value_counts(dropna=False)))
+    # drop N: Closed in Both Directions
+    tm2_marin_link_gdf = tm2_marin_link_gdf.loc[ tm2_marin_link_gdf.ONEWAY != 'N']
+    WranglerLogger.debug('Filtered to ONEWAY != N, have {:,} rows'.format(len(tm2_marin_link_gdf)))
+    # this dataset doesn't have ONEWAY==TF, and two-way links already have reversed lingstrings, no need
+    # to create reversed geometry as in the TomTom case
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        TM2_MARIN, tm2_marin_link_roadway_gdf, ['A','B'], 'roadway_link',
-        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)    
+        TM2_MARIN, tm2_marin_link_gdf, ['A','B'], 'roadway_link',
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)    
 
     WranglerLogger.info('finished conflating TM2_Marin data')
     WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_Marin Links.'.format(
-        len(matched_gdf.groupby(['A', 'B']).count()), tm2_marin_link_roadway_gdf.shape[0]))
+        len(matched_gdf.groupby(['A', 'B']).count()), tm2_marin_link_gdf.shape[0]))
 
 def conflcate_SFCTA(docker_container_name):
     """
@@ -491,17 +497,13 @@ def conflcate_SFCTA(docker_container_name):
     See SFCTA network documentation at Box: https://mtcdrive.box.com/s/bqz2snotd4s6ctdsw18mbg74ugm3p16p.
 
     Subset the data to only those links that have meaningful data that we want, which for now is:
-    * ONEWAY     = boolean to determine if link is one-way
-    * TOLL       =       int64
+    * ONEWAY     = boolean to determine if link is one-way (two-way links already have reversed geometries)
     * USE        = use restrictions
                    2 and 3: HOV2 and HOV3
                    9: Transit only
                    4: no trucks
     * FT         = facility type
     * STREETNAME = name of roads
-    * TYPE       = ?
-    * MTYPE      = ?
-    * SPEED           = freeflow speed in mph, based on FT and AT
     ? DISTANCE        = length of link in miles
     * LANE_{AM,PM,OP} = mumber of general purpose lanes in AM, excluding bus lanes
                         AM:
@@ -512,11 +514,6 @@ def conflcate_SFCTA(docker_container_name):
                            1: diamond
                            2: side BRT
                            3: center BRT
-    ? TOLL{AM,MD,PM,EV,EA}_{DA,SR2,SR3} = Toll in 1989 cents for the link in given time period for the given group
-    ? VALUETOLL_F                       = value toll flag on link
-                                          0: no value toll
-                                          1: toll on this link is a value toll 
-    ? PASSTHRU = if the value toll doesn't get a 'pass, 1 if it does
     * BIKE_CLASS = type of bicycle facility on route
                    0: None
                    1: Class 1 facility (off-street bike path or cycletrack) or Class 4 facility (protected bike lane or
@@ -540,6 +537,11 @@ def conflcate_SFCTA(docker_container_name):
     # remove "special facility" (FT 6)
     sfcta_gdf = sfcta_gdf.loc[sfcta_gdf.FT != 6]
     WranglerLogger.info('After filter to FT != 6, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
+
+    # drop 6 transit-only links with USE==9, LANE==0 and BUSLANE==1.
+    # drop 142 bike-only links (bike paths in open space) with USE==0, LANE==0.
+    sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.USE != 9) & (sfcta_gdf.USE != 0)]
+    WranglerLogger.info('After filter to USE != 9 and USE != 0, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(

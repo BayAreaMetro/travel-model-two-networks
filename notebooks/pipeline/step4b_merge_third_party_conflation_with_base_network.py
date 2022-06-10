@@ -243,7 +243,12 @@ if __name__ == '__main__':
                                              "STREETNAME": "sfcta_STREETNAME",
                                              "LANE_AM"   : "sfcta_LANE_AM",
                                              "LANE_OP"   : "sfcta_LANE_OP",
-                                             "LANE_PM"   : "sfcta_LANE_PM"},
+                                             "LANE_PM"   : "sfcta_LANE_PM",
+                                             "BUSLANE_AM": "sfcta_BUSLANE_AM",
+                                             "BUSLANE_PM": "sfcta_BUSLANE_PM",
+                                             "BUSLANE_OP": "sfcta_BUSLANE_OP",
+                                             "BIKE_CLASS": "sfcta_BIKE_CLASS",
+                                             "USE"       : "sfcta_USE"},
                                     inplace=True)
 
     ### CCTA data
@@ -643,12 +648,13 @@ if __name__ == '__main__':
     # write out conflation data base
     conflation_result_fields = [
         'shstReferenceId', 'roadway', 'lanes_tot', 'drive_access', 'bike_access', 'walk_access',
-        'tomtom_FRC', 'tomtom_FRC_def', 'tomtom_lanes', 'tomtom_link_id', 'F_JNCTID', 'T_JNCTID',
-        'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir',
+        'tomtom_ID', 'tomtom_reversed', 'tomtom_RAMP', 'tomtom_FREEWAY', 'tomtom_FRC', 'tomtom_FRC_def', 'tomtom_lanes', 
+        'F_JNCTID', 'T_JNCTID', 'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir', 'tomtom_RTETYPE', 'tomtom_TOLLRD', 
         'TM2Marin_A', 'TM2Marin_B', 'TM2Marin_FT', 'TM2Marin_LANES', 'TM2Marin_ASSIGNABLE',
         'TM2nonMarin_A', 'TM2nonMarin_B', 'TM2nonMarin_FT', 'TM2nonMarin_FT_def', 'TM2nonMarin_LANES',
         'TM2nonMarin_ASSIGNABLE',
         'sfcta_A', 'sfcta_B', "sfcta_STREETNAME", 'sfcta_FT', 'sfcta_LANE_AM', 'sfcta_LANE_OP', 'sfcta_LANE_PM',
+        'sfcta_BUSLANE_AM', 'sfcta_BUSLANE_PM', 'sfcta_BUSLANE_OP', 'sfcta_BIKE_CLASS', 'sfcta_USE',
         'ACTC_A', 'ACTC_B', 'ACTC_base_lanes_min', 'ACTC_base_lanes_max', 'ACTC_nmt2010_min', 'ACTC_nmt2010_max',
         'ACTC_nmt2020_min', 'ACTC_nmt2020_max',
         'CCTA_ID', 'CCTA_base_lanes_min', 'CCTA_base_lanes_max',
@@ -676,8 +682,16 @@ if __name__ == '__main__':
     # osmnx: if 'ref' not null, use 'ref', otherwise use 'name'
     # sfcta_STREETNAME: if not null, use it
 
+    ####################################
+    # Apply lane heuristics to finalize lane accounting
 
-    
+    # tm2_Marin 'USECLASS' represents link user class: 0: NA link open to everyone, 2: HOV 2+, 3: HOV 3+, 4: No combination trucks.
+    # for USECLASS==0, lanes = general purpose lanes; for USECLASS==2, 3, lanes = HOV lanes, general purpose lanes = 0.
+
+    # SFCTA:
+    # 'BUSLANE' !=0 represents bus-only lane in addition to general purpose lane ('LANE')
+    # 'USE' == 2 or 3 represents HOV lane in addition to general purpose lane ('LANE')
+
     ####################################
     # Write out standard links
     # TODO: decide which columns to include.
