@@ -391,8 +391,6 @@ def conflate_TM2_MARIN():
                    TAZ: TAZ connector link
                    USE: HOV (user class) link
     * TRANSIT	 = is link transit
-    * TAP_DRIVE	 = MTC TAP link to parking lot
-                   1: true
     * FT	     = facility type
                    0: Connector
                    1: Freeway to Freeway
@@ -407,10 +405,10 @@ def conflate_TM2_MARIN():
                    2: HOV 2+
                    3: HOV 3+
                    4: No combination trucks
-    * PEMSID	 = PEMS ID
-    * PEMSLANES	 = PEMS number of lanes
-    * TOLLSEG	 = toll segment
-    * TOLLBOOTH	 = toll link. Links with values less than 11 are bridge tolls; 11 or above are value tolls
+    ? PEMSID	 = PEMS ID
+    ? PEMSLANES	 = PEMS number of lanes
+    ? TOLLSEG	 = toll segment
+    ? TOLLBOOTH	 = toll link. Links with values less than 11 are bridge tolls; 11 or above are value tolls
     * B_CLASS	 = BikeMapper bike class
                    0: Unclassified Street
                    1: Class I Trail
@@ -434,12 +432,47 @@ def conflate_TM2_MARIN():
     # todo: delete this; it should be defined in the dataset
     tm2_marin_link_gdf.crs = CRS("esri:102646")
 
-    # select only road way links
+    # - select only road way links, CNTYPE=='TANA' (exclude PED and BIKE since methods.conflate() uses car-rule);
+    # - this would also exclude TRANSIT==1 and FT==0, so no need to drop TRANSIT==1 or FT==0 separately;
+    # - about bike & ped data: 
+    #   - a visual inspection suggests that CNTYPE=='BIKE' links are not true-shape network links, but similar to
+    #     TM1.5 network links, so the shst conflation is less likely to be accurate.
+    #   - CNTYPE=='PED' appear to be true-shape network links, but they are primarily trails in open space, or paths within a building complex.
+    #   - 'B_CLASS', 'PED_PLAG', 'BIKEPEDOK' seem useful. Suggest using these 3 fields to tag "bike_access" and "pedestrian_access",
+    #     instead of only relying on the arbitrary config in step3.
+    #       tm2_marin_link_gdf.loc[tm2_marin_link_gdf.B_CLASS != 0]['CNTYPE'].value_counts(dropna=False) OR
+    #       tm2_marin_link_gdf.loc[tm2_marin_link_gdf.PED_FLAG == 'Y']['CNTYPE'].value_counts(dropna=False):    
+    #           TANA: 117152
+    #           PED : 9008
+    #           BIKE: 6678
+    #           TAZ:  246
+    #           USE:  96
+    #       tm2_marin_link_gdf.loc[(tm2_marin_link_gdf.B_CLASS != 0) & \
+    #                              (tm2_marin_link_gdf.CNTYPE == 'TANA')]['FT'].value_counts(dropna=False) OR
+    #       tm2_marin_link_gdf.loc[(tm2_marin_link_gdf.PED_FLAG == 'Y') & \
+    #                              (tm2_marin_link_gdf.CNTYPE == 'TANA')]['FT'].value_counts(dropna=False):
+    #           7 : 72027
+    #           4 : 36477
+    #           3 : 3976
+    #           11: 1617
+    #           14: 1504
+    #           12: 1459
+    #           2 : 60
+    #           5 : 23
+    #           13: 9
+    #       tm2_marin_link_gdf.loc[tm2_marin_link_gdf.BIKEPEDOK == 1]['CNTYPE'].value_counts(dropna=False):
+    #           TANA: 23
+    #           PED : 34
+    #       tm2_marin_link_gdf.loc[(tm2_marin_link_gdf.BIKEPEDOK == 1) & \
+    #                              (tm2_marin_link_gdf.CNTYPE == 'TANA')]['FT'].value_counts(dropna=False):
+    #           2: 20
+    #           4: 2
+    #           5: 1
+
     WranglerLogger.info('TM2_Marin link data CNTYPE stats: \n{}'.format(
         tm2_marin_link_gdf.CNTYPE.value_counts(dropna=False)))
 
-    tm2_marin_link_roadway_gdf = tm2_marin_link_gdf.loc[
-        tm2_marin_link_gdf.CNTYPE.isin(["BIKE", "PED", "TANA"])]
+    tm2_marin_link_roadway_gdf = tm2_marin_link_gdf.loc[tm2_marin_link_gdf.CNTYPE == "TANA"]
     WranglerLogger.info('TM2_Marin has {:,} roadway links, {:,}  unique A-B combination'.format(
         tm2_marin_link_roadway_gdf.shape[0], len(tm2_marin_link_roadway_gdf.groupby(["A", "B"]).count())))
 
