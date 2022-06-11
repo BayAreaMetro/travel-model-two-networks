@@ -543,6 +543,10 @@ def conflcate_SFCTA(docker_container_name):
     sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.USE != 9) & (sfcta_gdf.USE != 0)]
     WranglerLogger.info('After filter to USE != 9 and USE != 0, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
+    # filter out TYPE=='PATH' or 'PLAZA' which are not road (some 'PATH' have USE==0 and were already filtered out in previous step)
+    sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.TYPE != 'PATH') & (sfcta_gdf.TYPE != 'PLAZA')]
+    WranglerLogger.info('After filter to TYPE != PATH and TYPE != PLAZA, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
+
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
         SFCTA, sfcta_gdf, ['A','B'], 'roadway_link',
