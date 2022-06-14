@@ -116,22 +116,10 @@ def conflate_TOMTOM(docker_container_name):
 
     Outputs:
     -- tomtom_matched_gdf.feather: TomTom links matched to SharedStreets links under the match command config 
-       "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction". It has three sets of columns: 
-            * TomTom link attributes
-            * SharedStreets link attributes: 'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId' (to be used as
-                                             the merge key to merge into sharedstreets-based link_gdf)
-            * shst matching metrics: 'gisReferenceId', 'gisGeometryId', 'gisTotalSegments', 'gisSegmentIndex',
-                                     'gisFromIntersectionId', 'gisToIntersectionId', 'startSideOfStreet', 'endSideOfStreet',
-                                     'sideOfStreet', 'score', 'matchType'
-       In most cases, TomTom links and sharedstreets links do not have one-to-one match. Two situations:
-        * One TomTom link matched to multiple sharedstreets links, usually when sharedstreets links break the TomTom link;
-          this results in multiple rows, each with its own SharedStreets link attributes, but the same TomTom link attributes. 
-        * Multiple TomTom links matched to the same sharedstreets links, usually when the sharedstreets link is more aggregated
-          than TomTom links; this also results in multiple rows, but each with its own TomTom link attributes, same SharedStreets link attributes.
-       In both cases, the output links follow sharedstreet links' shapes instead of TomTom links' shapes. But the geometries
-       represent the matched segments, not the geometries of the entire sharedstreet links.
-
+       "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction".
     -- tomtom_unmatched_gdf.feather: TomTom links failed to find a match. It retains the fields of the TomTom links before shst match call.
+
+    See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
 
     The following files were also written out, though not used in later steps.  
     -- TomTom.in.feather: TomTom data after shst matching preparation for QA/QC.

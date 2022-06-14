@@ -1970,6 +1970,57 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
     3) Merges the full results back with the full third_party_gdf and writes them for debugging
     4) Returns the resulting GeoDataFrames (matched and unmatched)
     
+    Currently does matching with options as follows (see https://github.com/sharedstreets/sharedstreets-js#options-1)
+    --tile-hierarchy=8      : SharedStreets tile hierarchy, which refers to the OSM data model. 
+                              Level 6 includes unclassified roads and above. 
+                              Level 7 includes service roads and above. 
+                              Level 8 includes other features, like bike and pedestrian paths.
+    --search-radius=50      : the search radius, in meters, for snapping points, lines, and traces to the street
+    --snap-intersections    : snap line end-points to nearest intersection
+    --follow-line-direction : only match using line direction
+
+    matched_gdf attributes:
+    * original third_party_gdf attributes
+    * SharedStreets link attributes: 'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId' 
+      (to be used as the merge key to merge into sharedstreets-based link_gdf)
+      - 'shstGeometryId' corresponds to the 'id' in the geojson files from step1_extract_shst.py; these links may be
+        bi-directional so many third_party_gdf links in both directions can correespond to a single 'shstGeometryId'
+      - 'shstReferenceId' is the directed version of 'shstGeometryId'; So for a given 'shstGeometryId', there are two
+        ('shstGeometryId', 'fromIntersectionId', 'toIntersectionId') pairs, with the latter two fields reversed
+    * shst matching metrics: 'gisReferenceId', 'gisGeometryId', 'gisTotalSegments', 'gisSegmentIndex',
+                             'gisFromIntersectionId', 'gisToIntersectionId', 'startSideOfStreet', 'endSideOfStreet',
+                             'sideOfStreet', 'score', 'matchType'
+      - the 'gisReferenceId' and 'gisGeometryId' appear to be ids for the input geometry link
+      - the 'gisFromIntersectionId' and 'gisToIntersectionId' appear to be ids for the input geometry start/end nodes; so
+        a link that is bidirectional will have to sets of ('gisReferenceId','gisGeometryId') and matching but reversed
+        'gisFromIntersectionId', 'gisToIntersectionId'
+      - 'gisTotalSegments', 'gisSegmentIndex' communicate about 1 input to many SharedStreets links; see below.
+      - 'startSideOfStreet', 'endSideOfStreet' communicate how the input link endpoints relate to the SharedStreet link (?)
+      - 'sideOfStreet': one of 'left','right' or 'unknown', not sure what this means
+      - 'score': a float, appears to be the same for the input link
+      - 'matchType': appears to always be 'hmm'
+
+    In most cases, third_party_gdf links and sharedstreets links do not have one-to-one match. Two situations:
+
+    1) One input link matched to multiple SharedStreets links, usually when SharedStreets are smaller than the input link;
+       this results in multiple rows, each with its own SharedStreets link attributes, but the same third party link attributes.
+
+       The number of SharedStreets links corresponding to the input link is 'gisTotalSegments', and each match link segment has 
+       a unique 'gisSegmentIndex' from 1 to 'gisTotalSegments' (both from shst match).
+
+    2) Multiple input links matched to the same SharedStreets link, usually when the SharedStreets link is more aggregated
+       than the input links; this also results in multiple rows, but each with its own third party link attributes, same 
+       SharedStreets link attributes.
+
+       The number of input links matching a single SharedStreets link is counted in 'shstReferenceId_count', a column added by
+       this method.
+
+       [Note: When I looked at these links for the SFCTA dataset, some of these seemed like misinterpretations, so we might remove
+       some of these correspondences based on mismatched names, etc.]
+    
+    In both cases, the output links follow SharedStreet links' shapes instead of the input links' shapes. But the geometries
+    represent the matched segments, not the geometries of the entire sharedstreet links.
+
     Args:
         - third_party: string name of the data source, need to be consistent with folder name.
         - third_party_gdf: geodataframe of third-party network data, already convert to CRS, with (one or more) id column(s). 
@@ -2143,6 +2194,29 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
             how      = 'left',
             on       = id_columns)
         WranglerLogger.debug('After join, matched_gdf.dtypes:\n{}'.format(matched_gdf.dtypes))
+
+        # Some output summaries -- tally one-input-to-many-shst
+        WranglerLogger.debug('one-input-to-many-shst: gisTotalSegments value_counts:\n{}'.format(matched_gdf.gisTotalSegments.value_counts(dropna=False)))
+        # Likewise, tally many-input-to-one-shst
+        # e.g. one shstReferenceId for multiple IDs
+        many_to_one_gdf = matched_gdf.groupby(by='shstReferenceId')[id_columns].size().reset_index(drop=False).rename(columns={0:'shstReferenceId_count'})
+        WranglerLogger.debug('many_to_one_gdf head:\n{}'.format(many_to_one_gdf.head()))
+        WranglerLogger.debug('many_to_one_gdf shstReferenceId count value_counts:\n{}'.format(many_to_one_gdf['shstReferenceId_count'].value_counts(dropna=False)))
+        # add this column back to matched_gdf
+        matched_gdf = pd.merge(
+            left     = matched_gdf,
+            right    = many_to_one_gdf,
+            how      = 'left',
+            on       = 'shstReferenceId',
+        )
+
+        # many to one vs one to many
+        WranglerLogger.debug('(gisTotalSegments, shstReferenceId_count) value_counts:\n{}'.format(
+            matched_gdf[['gisTotalSegments','shstReferenceId_count']].value_counts(dropna=False)))
+
+        # other match variables
+        WranglerLogger.debug('sideOfStreet value_counts:\n{}'.format(matched_gdf.sideOfStreet.value_counts(dropna=False)))
+        WranglerLogger.debug('matchType value_counts:\n{}'.format(matched_gdf.matchType.value_counts(dropna=False)))
 
         # output for debugging
         if third_party_type == 'roadway_link':
