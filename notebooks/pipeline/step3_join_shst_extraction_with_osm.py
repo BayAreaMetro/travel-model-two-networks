@@ -269,6 +269,34 @@ if __name__ == '__main__':
     # add to link_BayArea_gdf
     link_BayArea_gdf['length_meter'] = geom_length_gdf['length_meter']
 
+
+    #####################################
+    # manually correct roadway type and access values at Transbay temporary terminal
+    WranglerLogger.debug('manually correction for Transbay temporary terminal')
+    WranglerLogger.debug('links before correction: \n{}'.format(
+        link_BayArea_gdf.loc[
+            link_BayArea_gdf['shstReferenceId'].isin(["feab62cc90650bfc45dc453816782f9c", "9ab364b22d6b33ec158d8bc4008c1be7"])][[
+                'osm_node_id', "roadway", "drive_access", "walk_access", "bike_access"]]))
+    # set roadway type as 'service' and drive_access = 1
+    link_BayArea_gdf.loc[link_BayArea_gdf.shstReferenceId.isin(["feab62cc90650bfc45dc453816782f9c", "9ab364b22d6b33ec158d8bc4008c1be7"]), 
+                "roadway"] = "service"
+    link_BayArea_gdf.loc[link_BayArea_gdf.shstReferenceId.isin(["feab62cc90650bfc45dc453816782f9c", "9ab364b22d6b33ec158d8bc4008c1be7"]), 
+                "drive_access"] = 1
+    WranglerLogger.debug('links after correction: \n{}'.format(
+        link_BayArea_gdf.loc[
+            link_BayArea_gdf['shstReferenceId'].isin(["feab62cc90650bfc45dc453816782f9c", "9ab364b22d6b33ec158d8bc4008c1be7"])][[
+                'osm_node_id', "roadway", "drive_access", "walk_access", "bike_access"]]))    
+
+    # related nodes
+    WranglerLogger.debug('nodes before correction: \n{}'.format(
+        node_BayArea_gdf[node_BayArea_gdf.osm_node_id.isin([890045140, 5372055804, 890045129])]
+    ))
+    # set drive_access = 1
+    node_BayArea_gdf.loc[node_BayArea_gdf.osm_node_id.isin([890045140, 5372055804, 890045129]), "drive_access"] = 1
+    WranglerLogger.debug('nodes after correction: \n{}'.format(
+        node_BayArea_gdf[node_BayArea_gdf.osm_node_id.isin([890045140, 5372055804, 890045129])]
+    ))
+
     #####################################
     # export link, node
 
