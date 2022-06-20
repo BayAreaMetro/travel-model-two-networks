@@ -655,10 +655,12 @@ def conflate_ACTC(docker_container_name):
     * 'IMP3_NMT'    = bike facility class corresponding to IMP3_YEAR
 
     Notes on the attributes:
-    - WSP's code for the bi-county modeling project only uses 'BASE_LN', 'NMT2010', 'NMT2020'. 
-    - AUX: it appears that the AUX lane data cannot accurately represent turn/merge lanes, mainly because the
-      links are not granular enough, therefore a link with AUX=1 could cover a long stretch of road without auxiliary lane.
-      So, will not use 'AUX' attributes for conflation.
+    -- LN (lanes): WSP's code for the bi-county modeling project only uses 'BASE_LN'. However, when 'IMP1_YEAR'/'IMP2_YEAR'/'IMP3_YEAR' == 2015,
+       corresponding 'IMP1_LN'/'IMP2_LN'/'IMP3_LN' better reflect network status in year 2015.
+    -- NMT (bike): WSP's code for the bi-county modeling project used both 'NMT2010' and 'NMT2020'. 
+    -- AUX: it appears that the AUX lane data cannot accurately represent turn/merge lanes, mainly because the
+       links are not granular enough, therefore a link with AUX=1 could cover a long stretch of road without auxiliary lane.
+       So, will not use 'AUX' attributes for conflation.
 
     Outputs:
     -- matched_gdf.feather: ACTC links matched to SharedStreets links under the match command config 
@@ -682,6 +684,24 @@ def conflate_ACTC(docker_container_name):
     ))
     WranglerLogger.debug('ACTC raw data dtypes:\n{}'.format(actc_raw_gdf.dtypes))
     WranglerLogger.debug('ACTC crs:\n{}'.format(actc_raw_gdf.crs))
+
+    # consolidate 2000 lane count and 2015 changes to get 2015 lane count, and drop links with lane==0 in 2015
+    actc_raw_gdf['lanes_2015'] = actc_raw_gdf['BASE_LN']
+    # if IMP1_YEAR == 2015, update to IMP1_LN
+    LN_IMP1_2015_idx = (actc_raw_gdf['IMP1_YEAR'] == 2015) & (actc_raw_gdf['IMP1_LN'] != actc_raw_gdf['lanes_2015'])
+    WranglerLogger.debug('update lanes for {:,} links from IMP1'.format(LN_IMP1_2015_idx.sum()))
+    actc_raw_gdf.loc[LN_IMP1_2015_idx, 'lanes_2015'] = actc_raw_gdf['IMP1_LN']
+    # if IMP2_YEAR == 2015, update to IMP2_LN
+    LN_IMP2_2015_idx = (actc_raw_gdf['IMP2_YEAR'] == 2015) & (actc_raw_gdf['IMP2_LN'] != actc_raw_gdf['lanes_2015'])
+    WranglerLogger.debug('update lanes for {:,} links from IMP2'.format(LN_IMP2_2015_idx.sum()))
+    actc_raw_gdf.loc[LN_IMP2_2015_idx, 'lanes_2015'] = actc_raw_gdf['IMP2_LN']
+    # if IMP1_YEAR == 2015, update to IMP3_LN
+    LN_IMP3_2015_idx = (actc_raw_gdf['IMP3_YEAR'] == 2015) & (actc_raw_gdf['IMP3_LN'] != actc_raw_gdf['lanes_2015'])
+    WranglerLogger.debug('update lanes for {:,} links from IMP3'.format(LN_IMP3_2015_idx.sum()))
+    actc_raw_gdf.loc[LN_IMP3_2015_idx, 'lanes_2015'] = actc_raw_gdf['IMP3_LN']
+    # drop links with lane==0 in 2015
+    actc_raw_gdf = actc_raw_gdf.loc[actc_raw_gdf['lanes_2015'] > 0].reset_index()
+    WranglerLogger.debug('after dropping lanes==0 in 2015, {:,} links remain'.format(actc_raw_gdf.shape[0]))
 
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 2.5-3 hours
