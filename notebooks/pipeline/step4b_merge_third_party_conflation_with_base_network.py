@@ -22,10 +22,6 @@ from zipfile import ZipFile
 from io import BytesIO
 # import fiona
 from shapely.geometry import Point
-
-# from methods import read_shst_extract, LAT_LONG_EPSG
-# from methods import link_df_to_geojson
-from methods import point_df_to_geojson
 from network_wrangler import WranglerLogger, setupLogging
 
 #####################################
@@ -298,15 +294,15 @@ if __name__ == '__main__':
     # only keep fields needed for link attributes heuristics
     unique_actc_matched_gdf = unique_actc_matched_gdf[[
         'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'A', 'B', 'BASE_LN', 'NMT2010', 'NMT2020']]
+        'A', 'B', 'lanes_2015', 'NMT2010', 'NMT2020']]
 
     # in conflation df, aggregate based on shstReferenceId, get all number of lanes for each shstReferenceId
-    actc_lanes_conflation_df = unique_actc_matched_gdf.loc[unique_actc_matched_gdf['BASE_LN'] > 0].groupby(
+    actc_lanes_conflation_df = unique_actc_matched_gdf.loc[unique_actc_matched_gdf['lanes_2015'] > 0].groupby(
         ['shstReferenceId']
-    )['BASE_LN'].apply(list).to_frame().reset_index()
+    )['lanes_2015'].apply(list).to_frame().reset_index()
 
-    actc_lanes_conflation_df['base_lanes_min'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: min(set(x)))
-    actc_lanes_conflation_df['base_lanes_max'] = actc_lanes_conflation_df['BASE_LN'].apply(lambda x: max(set(x)))
+    actc_lanes_conflation_df['lanes_2015_min'] = actc_lanes_conflation_df['lanes_2015'].apply(lambda x: min(set(x)))
+    actc_lanes_conflation_df['lanes_2015_max'] = actc_lanes_conflation_df['lanes_2015'].apply(lambda x: max(set(x)))
 
     # TODO: decide if export or merge into the base network
     actc_lanes_conflation_df.to_csv(os.path.join(CONFLATION_RESULT_DIR, 'actcmodel_legacy_lanes.csv'), index=False)
@@ -327,8 +323,8 @@ if __name__ == '__main__':
     # add data source prefix to column names
     unique_actc_matched_gdf.rename(columns={'A': 'ACTC_A',
                                             'B': 'ACTC_B',
-                                            'base_lanes_min': 'ACTC_base_lanes_min',
-                                            'base_lanes_max': 'ACTC_base_lanes_max',
+                                            'lanes_2015_min': 'ACTC_lanes_min',
+                                            'lanes_2015_max': 'ACTC_lanes_max',
                                             'nmt2010_min': 'ACTC_nmt2010_min',
                                             'nmt2010_max': 'ACTC_nmt2010_max',
                                             'nmt2020_min': 'ACTC_nmt2020_min',
@@ -525,8 +521,13 @@ if __name__ == '__main__':
     geofeather.to_geofeather(pems_nearest_debug_gdf, OUTPUT_FILE)
     WranglerLogger.info("Wrote {} rows to {}".format(pems_nearest_debug_gdf.shape[0], OUTPUT_FILE))
 
-    # 4. (TODO: decide if this step is useful) For those that failed in nearest sheildnum+direction match, use nearest match only based on facility type
+    
+    # TODO: decide if 4. is useful
+    
+    # 4. () For those that failed in nearest sheildnum+direction match, use nearest match only based on facility type
     # get PEMS station+type+location that failed to find nearest match
+    pems_ft_matched_df = pd.DataFrame()
+    """
     pems_sheild_dir_unmatched_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]
     pems_sheild_dir_unmatched_station_df = pems_sheild_dir_unmatched_gdf[['station', 'type', 'latitude', 'longitude']].drop_duplicates()
     WranglerLogger.debug('PEMS records not find a nearest sheildnum+direction match represent {} '
@@ -548,16 +549,19 @@ if __name__ == '__main__':
         pems_ft_matched_df.station.nunique()))
     WranglerLogger.info('facility types of still unmatched PEMS records:\n{}'.format(
         pems_ft_matched_df.loc[pems_ft_matched_df.shstReferenceId.isnull()]['type'].value_counts()))
+    """
 
-    # TODO: if also do ShSt match for PEMS points, use that result to fill in unmatched
+    # TODO: decide if 5. is needed
+    # 5. finally, use ShSt match to fill in unmatched
+    pems_shst_matched_df = pd.DataFrame()
 
-    # 5. concatenate matching results from the two methods
+    # 6. concatenate matching results from the two methods
     pems_sheild_dir_matched_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()]
-    pems_conflation_result = pd.concat([pems_sheild_dir_matched_gdf, pems_ft_matched_df],
+    pems_conflation_result = pd.concat([pems_sheild_dir_matched_gdf, pems_ft_matched_df, pems_shst_matched_df],
                                        sort=False,
                                        ignore_index=True)
 
-    # post-process PEMS matching results
+    # 7. post-process PEMS matching results
     # link can have multiple pems station on it, so trying to get the mode of #lanes by station type
     # TODO: the initial code uses three years' PEMS data 2014, 2015, 2016 to represent 2015 lane count. Decide if want to apply the year filter before running matching, which would have reduce run time.
     # first, get lane count for each unique comb of shstReferenceId and PEMS type
@@ -598,6 +602,19 @@ if __name__ == '__main__':
         pems_lanes_df.shstReferenceId.nunique()
     ))
 
+    # recode 'lanes_[]' fields into 'lanes' and 'ft' fields
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FR'].isnull(), 'pems_ft'] = 'Ramp'
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_OR'].isnull(), 'pems_ft'] = 'Ramp'
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FF'].isnull(), 'pems_ft'] = 'Freeway to Freeway'
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_ML'].isnull(), 'pems_ft'] = 'Freeway'
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_HV'].isnull(), 'pems_ft'] = 'Freeway'
+
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FR'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_FR']
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_OR'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_OR']
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FF'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_FF']
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_ML'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_ML']
+    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_HV'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_HV'] + pems_lanes_df['pems_lanes']
+
     # merge PEMS conflation result into link_with_third_party_gdf
     link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
                                          pems_lanes_df,
@@ -609,9 +626,7 @@ if __name__ == '__main__':
         list(link_with_third_party_gdf)))
 
     ####################################
-    # TODO: resolve duplicated shstReferenceId; do lane/name heuristics here instead of exporting
-    # Write out conflation result data base - this will be used to create a number of 'lookup' tables to be used in
-    # lane heuristics and QAQC
+    # TODO: resolve duplicated shstReferenceId
     WranglerLogger.info('Write out third-party conflation result data base')
 
     # convert tomtom FRC to standard road type
@@ -647,7 +662,10 @@ if __name__ == '__main__':
 
     # write out conflation data base
     conflation_result_fields = [
-        'shstReferenceId', 'roadway', 'lanes_tot', 'drive_access', 'bike_access', 'walk_access',
+        'shstReferenceId', 'roadway', 'drive_access', 'bike_access', 'walk_access',
+        # lane accounting
+        ## OSMNX
+        'lanes_gp', 'lanes_tot', 
         'tomtom_ID', 'tomtom_reversed', 'tomtom_RAMP', 'tomtom_FREEWAY', 'tomtom_FRC', 'tomtom_FRC_def', 'tomtom_lanes', 
         'F_JNCTID', 'T_JNCTID', 'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir', 'tomtom_RTETYPE', 'tomtom_TOLLRD', 
         'TM2Marin_A', 'TM2Marin_B', 'TM2Marin_FT', 'TM2Marin_LANES', 'TM2Marin_ASSIGNABLE',
@@ -658,12 +676,12 @@ if __name__ == '__main__':
         'ACTC_A', 'ACTC_B', 'ACTC_base_lanes_min', 'ACTC_base_lanes_max', 'ACTC_nmt2010_min', 'ACTC_nmt2010_max',
         'ACTC_nmt2020_min', 'ACTC_nmt2020_max',
         'CCTA_ID', 'CCTA_base_lanes_min', 'CCTA_base_lanes_max',
-        'pems_lanes_FF', 'pems_lanes_FR', 'pems_lanes_HV', 'pems_lanes_ML',
-        'pems_lanes_OR', 'PEMS_station_ID',
+        'PEMS_station_ID', 'pems_ft', 'pems_lanes'
     ]
 
     link_conflation_fields_gdf = link_with_third_party_gdf[conflation_result_fields].rename(
-        columns={'lanes_tot': 'lanes_tot_osm',
+        columns={'lanes_tot': 'osmnx_lanes_tot',
+                 'lanes_gp': 'osmnx_lanes_gp',
                  'tomtom_link_id': 'tomtom_unique_id'})
 
     WranglerLogger.info('export conflation fields to {}'.format(CONFLATION_SUMMARY_FILE))
@@ -671,16 +689,10 @@ if __name__ == '__main__':
 
     ####################################
     # Apply road name heuristics to finalize road names
-    # Sources of name:
-    #  - osmnx        : 'ref' (freeway shield number, e.g. 'I 80', 'CA 4')
-    #                   'name' (less-used freeway name, e.g. 'Shoreline Highway', and names of other streets)
-    #  - sharedstreets: 'name_shst_metadata' (name in the metadata)
-    #  - TomTom       : 'tomtom_name' (less-used freeway name, and names of other streets)
-    #                   'tomtom_shieldnum' (freeway shield number, but without the letter, e.g. 80, 580)
-    #  - SFCTA        : 'sfcta_STREETNAME'
 
-    # osmnx: if 'ref' not null, use 'ref', otherwise use 'name'
-    # sfcta_STREETNAME: if not null, use it
+    
+    # TODO
+    methods.determine_road_name(link_conflation_fields_gdf)
 
     ####################################
     # Apply lane heuristics to finalize lane accounting
@@ -691,6 +703,18 @@ if __name__ == '__main__':
     # SFCTA:
     # 'BUSLANE' !=0 represents bus-only lane in addition to general purpose lane ('LANE')
     # 'USE' == 2 or 3 represents HOV lane in addition to general purpose lane ('LANE')
+
+    # TODO
+    methods.determine_number_of_gp_lanes(link_conflation_fields_gdf)
+
+    # TODO
+    methods.determine_number_of_bus_lanes(link_conflation_fields_gdf)
+
+    # TODO
+    methods.determine_number_of_hov_lanes(link_conflation_fields_gdf)
+
+    # TODO
+    methods.finalize_lane_accounting(link_conflation_fields_gdf)
 
     ####################################
     # Write out standard links

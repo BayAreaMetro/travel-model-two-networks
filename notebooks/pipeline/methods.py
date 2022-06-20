@@ -2451,6 +2451,272 @@ def pems_match_ft(pems_station_df, link_gdf, pems_type_roadway_crosswalk):
     return pems_stations_ft_matched_gdf
 
 
+def determine_number_of_gp_lanes(
+    link_gdf,
+    # parameters=None,
+    network_variable:str="lanes",
+    # osm_lanes_attributes:str=None,
+    # tam_tm2_attributes:str=None,
+    # sfcta_attributes:str=None,
+    # pems_attributes:str=None,
+    # tomtom_attributes:str=None,
+    # ccta_attributes:str=None,
+    # actc_attributes:str=None,
+    overwrite:bool=False,
+):
+    """
+    Uses a series of rules to determine the number of lanes.
+
+    Args:
+        link_gdf: roadway links, based on sharedstreet shapes, with 'shstReferenceId' as the unique identifier and attributes from third-party data.
+
+    Returns:
+        not return anything, but add two new fields to link_gdf:
+        - 'gp_lanes_final': number of general-purpose lanes
+        - 'heuristic_num': heuristic number
+
+    """
+
+    WranglerLogger.info("Determining number of general-purpose lanes")
+
+    # specify attributes from third-party data
+    osmnx_lane_att = 'osmnx_lanes_gp'
+    sfcta_lane_att = ['sfcta_LANE_AM', 'sfcta_LANE_OP', 'sfcta_LANE_PM']
+    tomtom_lane_att = 'tomtom_lanes'
+    tam_tm2_lane_att = 'TM2Marin_LANES'
+    pems_lane_att = 'pems_lanes'
+    actc_lane_att = 'ACTC_lanes'
+    ccta_lane_att = 'CCTA_lanes'
+
+    # check if all fields are present
+    
+    # if type(parameters) is dict:
+    #     parameters = Parameters(**parameters)
+    # elif isinstance(parameters, Parameters):
+    #     parameters = Parameters(**parameters.__dict__)
+    # else:
+    #     msg = "Parameters should be a dict or instance of Parameters: found {} which is of type:{}".format(
+    #         parameters, type(parameters)
+    #     )
+    #     WranglerLogger.error(msg)
+    #     raise ValueError(msg)
+
+    # if not roadway_network:
+    #     msg = "'roadway_network' is missing from the method call.".format(roadway_network)
+    #     WranglerLogger.error(msg)
+    #     raise ValueError(msg)
+
+    if osmnx_lane_att not in list(link_gdf):
+        msg = 'OSMNX lanes_gp field missing in link_gdf'
+        WranglerLogger.error(msg)
+        raise ValueError(msg)
+    # osm_lanes_attributes = (
+    #     osm_lanes_attributes
+    #     if osm_lanes_attributes
+    #     else parameters.osm_lanes_attributes
+    # )
+
+    # tam_tm2_attributes = (
+    #     tam_tm2_attributes
+    #     if tam_tm2_attributes
+    #     else parameters.tam_tm2_attributes
+    # )
+
+    if tam_tm2_lane_att not in list(link_gdf):
+        msg = 'TM2Marin_LANES field missing in link_gdf'
+        WranglerLogger.error(msg)
+        raise ValueError(msg)
+
+    # sfcta_attributes = (
+    #     sfcta_attributes
+    #     if sfcta_attributes
+    #     else parameters.sfcta_attributes
+    # )
+
+    for i in sfcta_lane_att:
+        if i not in list(link_gdf):
+            msg = 'SFCTA lane field {} missing in link_gdf'.format(i)
+            WranglerLogger.error(msg)
+            raise ValueError(msg)
+
+    # pems_attributes = (
+    #     pems_attributes
+    #     if pems_attributes
+    #     else parameters.pems_attributes
+    # )
+
+    if pems_lane_att not in list(link_gdf):
+        msg = 'PEMS lane field pems_lanes missing in link_gdf'
+        WranglerLogger.error(msg)
+        raise ValueError(msg)
+
+    # tomtom_attributes = (
+    #     tomtom_attributes
+    #     if tomtom_attributes
+    #     else parameters.tomtom_attributes
+    # )
+
+    if tomtom_lane_att not in list(link_gdf):
+        msg = 'TomTom lane field tomtom_lanes missing in link_gdf'
+        WranglerLogger.error(msg)
+        raise ValueError(msg)
+
+    # Start actual process
+
+    def _determine_lanes(x):
+            # heuristic 1
+            if pd.notna(x.pems_lanes):
+                if pd.notna(x.osmnx_lanes_gp):
+                    if x.pems_lanes == x.osmnx_lanes_gp:
+                        if x.roadway == "motorway":
+                            heuristic_num = 1
+                            return pd.Series([int(x.pems_lanes), heuristic_num])
+            # heuristic 2
+            if x.county == "San Francisco":
+                if pd.notna(x.sfcta_min_lanes):
+                    if x.sfcta_min_lanes > 0:
+                        if x.sfcta_min_lanes == x.sfcta_max_lanes:
+                            if x.roadway != "motorway":
+                                if x.roadway != "motorway_link":
+                                    if x.osmnx_lanes_gp >= x.sfcta_min_lanes:
+                                        if x.osmnx_lanes_gp <= x.sfcta_max_lanes:
+                                            heuristic_num = 2
+                                            return pd.Series([int(x.sfcta_min_lanes), heuristic_num])
+            # # heuristic 3
+            # if pd.notna(x.pems_lanes):
+            #     if pd.notna(x.osmnx_lanes_gp):
+            #         if x.pems_lanes >= x.osm_min_lanes:
+            #             if x.pems_lanes <= x.osm_max_lanes:
+            #                 if x.roadway == "motorway":
+            #                     heuristic_num = 3
+            #                     return pd.Series([int(x.pems_lanes), heuristic_num])
+            # heuristic 4
+            if x.roadway in ["motorway", "motorway_link"]:
+                if pd.notna(x.osmnx_lanes_gp):
+                    if x.osmnx_lanes_gp <= x.tomtom_lanes:
+                        if x.osm_max_lanes >= x.tomtom_lanes:
+                            heuristic_num = 4
+                            return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # heuristic 5
+            if x.county != "San Francisco":
+                if pd.notna(x.osm_min_lanes):
+                    if pd.notna(x.TM2Marin_LANES):
+                        if x.TM2Marin_LANES > 0:
+                            if x.osm_min_lanes <= x.TM2Marin_LANES:
+                                if x.osm_max_lanes >= x.TM2Marin_LANES:
+                                    heuristic_num = 5
+                                    return pd.Series([int(x.TM2Marin_LANES), heuristic_num])
+            # heuristic 6
+            if x.county == "San Francisco":
+                if pd.notna(x.sfcta_min_lanes):
+                    if x.sfcta_min_lanes > 0:
+                        if x.sfcta_min_lanes == x.sfcta_max_lanes:
+                            if x.roadway != "motorway":
+                                if x.roadway != "motorway_link":
+                                    heuristic_num = 6
+                                    return pd.Series([int(x.sfcta_min_lanes), heuristic_num])
+            # # heuristic 7
+            # if x.roadway in ["motorway", "motorway_link"]:
+            #     if pd.notna(x.osm_min_lanes):
+            #         if x.osm_min_lanes == x.osm_max_lanes:
+            #             heuristic_num = 7
+            #             return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # # heuristic 8
+            # if x.roadway in ["motorway", "motorway_link"]:
+            #     if pd.notna(x.osm_min_lanes):
+            #         if (x.osm_max_lanes - x.osm_min_lanes) == 1:
+            #             heuristic_num = 8
+            #             return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # heuristic 9
+            if x.roadway == "motorway":
+                if pd.notna(x.pems_lanes):
+                    heuristic_num = 9
+                    return pd.Series([int(x.pems_lanes), heuristic_num])
+            # heuristic 10
+            if x.county == "San Francisco":
+                if pd.notna(x.sfcta_min_lanes):
+                    if x.sfcta_min_lanes > 0:
+                        if x.roadway != "motorway":
+                            if x.roadway != "motorway_link":
+                                heuristic_num = 10
+                                return pd.Series([int(x.sfcta_min_lanes), heuristic_num])
+            # # heuristic 11
+            # if pd.notna(x.osm_min_lanes):
+            #     if x.osm_min_lanes == x.osm_max_lanes:
+            #         heuristic_num = 11
+            #         return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # # heuristic 12
+            # if pd.notna(x.osm_min_lanes):
+            #     if x.roadway in ["motorway", "motorway_link"]:
+            #         if (x.osm_max_lanes - x.osm_min_lanes) >= 2:
+            #             heuristic_num = 12
+            #             return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # # heuristic 13
+            # if pd.notna(x.osm_min_lanes):
+            #     if (x.osm_max_lanes - x.osm_min_lanes) == 1:
+            #         heuristic_num = 13
+            #         return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # # heuristic 14
+            # if pd.notna(x.osm_min_lanes):
+            #     if (x.osm_max_lanes - x.osm_min_lanes) >= 2:
+            #         heuristic_num = 14
+            #         return pd.Series([int(x.osm_min_lanes), heuristic_num])
+            # heuristic 15
+            if pd.notna(x.TM2Marin_LANES):
+                if x.TM2Marin_LANES > 0:
+                    heuristic_num = 15
+                    return pd.Series([int(x.TM2Marin_LANES), heuristic_num])
+            # heuristic 16
+            if pd.notna(x.tomtom_lanes):
+                if x.tomtom_lanes > 0:
+                    heuristic_num = 16
+                    return pd.Series([int(x.tomtom_lanes), heuristic_num])
+            # heuristic 17
+            if x.roadway in ["residential", "service"]:
+                heuristic_num = 17
+                return pd.Series([int(1), heuristic_num])
+            # heuristic 18
+            heuristic_num = 18
+            return pd.Series([int(1), heuristic_num])
+
+    link_gdf[['lanes_gp_final', 'heuristic_num']] = link_gdf.apply(lambda x: _determine_lanes(x), axis = 1)
+
+    WranglerLogger.info(
+        'Finished determining number of lanes based on heuristics; heuristic value counts:\n{}'.format(
+            link_gdf['heuristic_num'].value_counts(dropna=False))
+    )
+
+
+def determine_road_name(link_gdf):
+    """
+    Sources of name:
+     - osmnx        : 'ref' (freeway shield number, e.g. 'I 80', 'CA 4')
+                      'name' (less-used freeway name, e.g. 'Shoreline Highway', and names of other streets)
+     - sharedstreets: 'name_shst_metadata' (name in the metadata)
+     - TomTom       : 'tomtom_name' (less-used freeway name, and names of other streets)
+                      'tomtom_shieldnum' (freeway shield number, but without the letter, e.g. 80, 580)
+     - SFCTA        : 'sfcta_STREETNAME'
+
+    Rules:
+    - osmnx: if 'ref' not null, use 'ref', otherwise use 'name'
+    - sfcta_STREETNAME: if not null, use it
+    """
+
+def determine_number_of_bus_lanes(link_gdf):
+    """
+    """
+
+
+def determine_number_of_hov_lanes(link_gdf):
+    """
+    """
+
+
+def finalize_lane_accounting(link_gdf):
+    """
+    """
+
+
 def gtfs_point_shapes_to_link_gdf(gtfs_shape_file, gtfs_name):
 
     """
