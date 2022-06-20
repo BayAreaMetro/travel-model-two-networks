@@ -401,7 +401,19 @@ def conflate_TM2_MARIN(docker_container_name):
                    1: true
                    0: false
 
-    TODO: What files are written?
+    Outputs:
+    -- matched_gdf.feather: TM2_Marin links matched to SharedStreets links under the match command config 
+       "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction".
+    -- unmatched_gdf.feather: TM2_Marin links failed to find a match. It retains the fields of the TM2_Marin links before shst match call.
+
+    See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
+
+    The following files were also written out, though not used in later steps.  
+    -- TM2_Marin_[01-14].in.geojson: TM2_Marin data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
+       smaller geographies, each with an '.in.geojson file. 
+    -- TM2_Marin_[01-14].out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
+    -- TM2_Marin_[01-14].out.unmatched.geojson: shst matching output for unmatched links, corresponding to each '.in.geojson file.
+
     """
     # Prepare TM2 Marin for conflation
     WranglerLogger.info('loading TM2_Marin data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[TM2_MARIN])))
@@ -509,7 +521,20 @@ def conflcate_SFCTA(docker_container_name):
                    2: Class 2 facility (conventional bike lane or paint-buffered lane with no physical protection)
                    3: Class 3 facility (sharrow, signed bike route, or bicycle boulevard)
 
-    TODO: What files are written?
+    Outputs:
+    -- matched_gdf.feather: SFCTA links matched to SharedStreets links under the match command config 
+       "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction".
+    -- unmatched_gdf.feather: SFCTA links failed to find a match. It retains the fields of the TM2_Marin links before shst match call.
+
+    See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
+
+    The following files were also written out, though not used in later steps.  
+    -- SFCTA.in.feather: SFCTA data after shst matching preparation for QA/QC.
+    -- SFCTA.in.geojson: SFCTA data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
+       smaller geographies, each with an '.in.geojson file. 
+    -- SFCTA.out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
+    -- SFCTA.out.unmatched.geojson: shst matching output for unmatched links, corresponding to each '.in.geojson file.
+
     """
     # Prepare SFCTA for conflation
     WranglerLogger.info('loading SFCTA data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[SFCTA])))
@@ -543,9 +568,11 @@ def conflcate_SFCTA(docker_container_name):
     WranglerLogger.info('finished conflating SFCTA data')
 
 
-def conflate_CCTA():
+def conflate_CCTA(docker_container_name):
     """
     Conflate ACTC data with sharedstreets
+    See CCTA network documentation at Box: https://mtcdrive.box.com/s/lsnml5tpbrhrcjfiabw8zbjd5y9r1ow6.
+    TODO: the documentation doesn't really have data dictionary for the network data, only for loaded network it appears. 
     TODO: What files are written?
     """
     # Prepare CCTA for conflation
@@ -567,14 +594,18 @@ def conflate_CCTA():
     two_way_links_gdf["geometry"] = two_way_links_gdf.apply(
         lambda g: LineString(list(g["geometry"].coords)[::-1]),
         axis=1)
-    # rename all link attributes for 'AB_' into 'BA_'
+    # rename links attributes by switching between 'AB' and 'BA'
     rename_columns = {}
     for colname in [x for x in ccta_gdf.columns if ('AB_' in x)]:
         rename_columns[colname] = colname.replace('AB', 'BA')
+    for colname in [x for x in ccta_gdf.columns if ('BA_' in x)]:
+        rename_columns[colname] = colname.replace('BA', 'AB')
     WranglerLogger.debug('renaming columns for reversed links: {}'.format(rename_columns))
     two_way_links_gdf.rename(columns=rename_columns, inplace=True)
+    WranglerLogger.debug('max existing ID: {}'.format(two_way_links_gdf['ID'].max()))
     # TODO: why "9000000"? I assume the goal is to exceed the existing largest ID number, so need to be more generic
     two_way_links_gdf['ID'] = two_way_links_gdf['ID'] + 9000000
+    two_way_links_gdf['reversed'] = True
 
     ccta_gdf = pd.concat([ccta_gdf, two_way_links_gdf], sort=False, ignore_index=True)
     # double check
@@ -585,16 +616,64 @@ def conflate_CCTA():
     # lmz: this step takes me 3 hours
     (matched_gdf, unmatched_gdf) = methods.conflate(
         CCTA, ccta_gdf, ['ID'], 'roadway_link',
-        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating CCTA data')
     WranglerLogger.info('Sharedstreets matched {} out of {} total CCTA Links.'.format(
         matched_gdf['ID'].nunique(), ccta_gdf.shape[0]))
 
-def conflate_ACTC():
+def conflate_ACTC(docker_container_name):
     """
     Conflate ACTC data with sharedstreets
-    TODO: What files are written?  Is there documentation on the ACTC input file fields?
+    See ACTC network documentation at Box: https://mtcdrive.box.com/s/ta7mn21vhnemv07ch8irz87vfdgunw2a
+
+    Link attributes relevant to conflation:
+    * 'BASE_LN'     = 2000 number of lanes in each direction (excluding turn lanes)
+    * 'BASE_AUX'    = 2000 number of auxiliary lanes
+    * 'BASE_NMT'    = bike facility class (added to the network during the 2014-2015 model update)
+                      0: No bicycle or pedestrian use
+                      1: Bicycles/pedestrians allowed, no special facilities
+                      2: Bike lanes (Class II)
+                      3: Bike paths (Class I)
+                      4: Cycle tracks (Class IV)
+    * 'NMT2010'     = bike facility class in year 2010
+    * 'NMT2020'     = bike facility class in year 2020
+
+    * 'IMP1_YEAR'   = year of 1st round of road/bike improvement if applicable
+    * 'IMP1_LN'     = number of lanes in each direction corresponding to IMP1_YEAR
+    * 'IMP1_AUX'    = number of auxiliary lanes corresponding to IMP1_YEAR
+    * 'IMP1_NMT'    = bike facility class corresponding to IMP1_YEAR
+
+    * 'IMP2_YEAR'   = year of 2nd round of road/bike improvement if applicable
+    * 'IMP2_LN'     = number of lanes in each direction corresponding to IMP1_YEAR
+    * 'IMP2_AUX'    = number of auxiliary lanes corresponding to IMP2_YEAR
+    * 'IMP2_NMT'    = bike facility class corresponding to IMP2_YEAR
+
+    * 'IMP3_YEAR'   = year of 3rd round of road/bike improvement if applicable
+    * 'IMP3_LN'     = number of lanes in each direction corresponding to IMP3_YEAR
+    * 'IMP3_AUX'    = number of auxiliary lanes corresponding to IMP3_YEAR
+    * 'IMP3_NMT'    = bike facility class corresponding to IMP3_YEAR
+
+    Notes on the attributes:
+    - WSP's code for the bi-county modeling project only uses 'BASE_LN', 'NMT2010', 'NMT2020'. 
+    - AUX: it appears that the AUX lane data cannot accurately represent turn/merge lanes, mainly because the
+      links are not granular enough, therefore a link with AUX=1 could cover a long stretch of road without auxiliary lane.
+      So, will not use 'AUX' attributes for conflation.
+
+    Outputs:
+    -- matched_gdf.feather: ACTC links matched to SharedStreets links under the match command config 
+       "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction".
+    -- unmatched_gdf.feather: ACTC links failed to find a match. It retains the fields of the ACTC links before shst match call.
+
+    See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
+
+    The following files were also written out, though not used in later steps.  
+    -- ACTC.in.feather: ACTC data after shst matching preparation for QA/QC.
+    -- ACTC.in.geojson: ACTC data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
+       smaller geographies, each with an '.in.geojson file. 
+    -- ACTC.out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
+    -- ACTC.out.unmatched.geojson: shst matching output for unmatched links, corresponding to each '.in.geojson file.
+
     """
     WranglerLogger.info('loading ACTC data from {}'.format(THIRD_PARTY_INPUT_FILES[ACTC]))
     actc_raw_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[ACTC])
@@ -608,13 +687,12 @@ def conflate_ACTC():
     # lmz: this step takes me 2.5-3 hours
     (matched_gdf, unmatched_gdf) = methods.conflate(
         ACTC, actc_raw_gdf, ['A','B'], 'roadway_link',
-        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
+        THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating ACTC data')
     WranglerLogger.info('Sharedstreets matched {} out of {} total ACTC Links.'.format(
         len(matched_gdf.groupby(['A', 'B']).count()), actc_raw_gdf.shape[0]))
 
-# TODO: def conflate_pums():
 
 if __name__ == '__main__':
     # do one dataset at a time
@@ -655,12 +733,12 @@ if __name__ == '__main__':
     elif args.third_party == TM2_NON_MARIN:
         conflate_TM2_NON_MARIN()
     elif args.third_party == TM2_MARIN:
-        conflate_TM2_MARIN()
+        conflate_TM2_MARIN(args.docker_container_name)
     elif args.third_party == SFCTA:
         conflcate_SFCTA(args.docker_container_name)
     elif args.third_party == CCTA:
-        conflate_CCTA()
+        conflate_CCTA(args.docker_container_name)
     elif args.third_party == ACTC:
-        conflate_ACTC()
+        conflate_ACTC(args.docker_container_name)
 
     WranglerLogger.info('complete')
