@@ -11,6 +11,10 @@ from scipy.spatial import cKDTree
 from functools import partial
 from network_wrangler import WranglerLogger
 import geofeather
+import peartree as pt
+from urllib.request import urlopen
+from zipfile import ZipFile
+from io import BytesIO
 
 # World Geodetic System 1984 (WGS84) used py GPS (latitude/longitude)
 # https://epsg.io/4326
@@ -27,6 +31,14 @@ DOCKER_SHST_IMAGE_NAME = 'shst:latest'
 # Bay Area Counties
 BayArea_COUNTIES = ['San Francisco', 'Santa Clara', 'Sonoma', 'Marin', 'San Mateo',
                     'Contra Costa', 'Solano', 'Napa', 'Alameda']
+
+TIME_OF_DAY_DICT = {
+    "AM": {"start": 6, "end": 10},
+    "MD": {"start": 10, "end": 15},
+    "PM": {"start": 15, "end": 19},
+    "NT": {"start": 19, "end": 3, "frequency_start": 19, "frequency_end": 22},
+    "EA": {"start": 3, "end": 6, "frequency_start": 5, "frequency_end": 6},
+}
 
 # way (link) tags we want from OpenStreetMap (OSM)
 # osmnx defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
@@ -2715,6 +2727,455 @@ def determine_number_of_hov_lanes(link_gdf):
 def finalize_lane_accounting(link_gdf):
     """
     """
+
+
+def consolidate_all_gtfs(gtfs_input_dir, gtfs_raw_name_ls):
+    """
+    """
+
+
+    # initialize dataframes for consolidated GTFS data
+    all_routes_df = pd.DataFrame()
+    all_trips_df = pd.DataFrame()
+    all_stops_df = pd.DataFrame()
+    all_shapes_df = pd.DataFrame()
+    all_stop_times_df = pd.DataFrame()
+    all_agency_df = pd.DataFrame()
+    all_fare_attributes_df = pd.DataFrame()
+    all_fare_rules_df = pd.DataFrame()
+
+    # define a funtion to get representative feed
+    def _get_representative_feed_from_gtfs(work_dir, in_url = "", fetch = False):
+        """
+        A peartree method to get representative feed from GTFS data. See https://github.com/kuanb/peartree
+        """   
+        WranglerLogger.debug('...getting representative feed...')
+        
+        if fetch == True:
+            #read and save zip from url
+            resp = urlopen(in_url)
+            zipfile = ZipFile(BytesIO(resp.read()))
+        
+        if fetch == True:
+            zipfile.extractall(work_dir + "muni")
+        
+        file_loc = work_dir
+        
+        # get feed for the busiest day
+        feed = pt.get_representative_feed(file_loc)
+        
+        return feed
+
+    # loop through GTFS data, gather info and add to consolidated dataframes
+    for name in gtfs_raw_name_ls:
+        WranglerLogger.info('processing {}'.format(name))
+        
+        # exclude weekend only services
+        if "calendar_orig.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
+            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"calendar.txt"))
+            
+        elif "calendar.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
+            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"calendar.txt"))
+            calendar_df.to_csv(os.path.join(gtfs_input_dir,name,"calendar_orig.txt"),
+                                                    index = False,
+                                                    sep = ",")
+        
+            calendar_df["weekdays"] = calendar_df.apply(lambda x: x.monday + x.tuesday + x.wednesday + x.thursday + x.friday,
+                                                axis = 1)
+            calendar_df = calendar_df[calendar_df.weekdays > 0]
+            
+            # writing data to external :p
+            calendar_df.drop("weekdays", axis = 1).to_csv(os.path.join(gtfs_input_dir,name,"calendar.txt"),
+                                                    index = False,
+                                                    sep = ",")
+        
+        feed = _get_representative_feed_from_gtfs(os.path.join(gtfs_input_dir,name))
+        
+        WranglerLogger.debug('...getting routes info...')
+        routes_df = feed.routes.copy()
+        routes_df["agency_raw_name"] = name
+        
+        WranglerLogger.debug('...getting stops info...')
+        stops_df = feed.stops.copy()
+        stops_df["agency_raw_name"] = name
+        
+        WranglerLogger.debug('...getting trips info...')
+        trips_df = feed.trips.copy()
+        trips_df["agency_raw_name"] = name
+        
+        if "direction_id" not in trips_df.columns: # Marguerita
+            trips_df["direction_id"] = 0
+        
+        trips_df["direction_id"].fillna(0, inplace = True)
+    
+        WranglerLogger.debug('...getting shapes info...')
+        shapes_df = feed.shapes.copy()
+        shapes_df["agency_raw_name"] = name
+        
+        WranglerLogger.debug('...getting stop times info...')
+        stop_times_df = feed.stop_times.copy()
+        stop_times_df["agency_raw_name"] = name
+        
+        WranglerLogger.debug('...getting agency info...')
+        agency_df = feed.agency.copy()
+        agency_df["agency_raw_name"] = name
+        
+        WranglerLogger.debug('...getting fare_attributes info...')
+        # gtfs cannot read fare tables for all agencies
+        if "fare_attributes.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
+            
+            fare_attributes_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"fare_attributes.txt"),
+                                            dtype = {"fare_id" : str})
+            fare_attributes_df["agency_raw_name"] = name
+        
+        else:
+            
+            fare_attributes_df = pd.DataFrame()
+        
+        WranglerLogger.debug('...getting fare_rules info...')
+        if "fare_rules.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
+            
+            fare_rules_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"fare_rules.txt"),
+                                        dtype = {"fare_id" : str, "route_id" : str, "origin_id" : str, "destination_id" : str,
+                                                " route_id" : str, " origin_id" : str, " destination_id" : str,})
+            fare_rules_df["agency_raw_name"] = name
+            
+        else:
+            
+            fare_rules_df = pd.DataFrame()
+            
+        # add agency_id in routes.txt if missing
+        if "agency_id" not in routes_df.columns:
+            if "agency_id" in agency_df.columns:
+                routes_df["agency_id"] = agency_df.agency_id.iloc[0]
+        
+        if len(shapes_df) == 0: # ACE, CCTA, VINE
+            print("missing shapes.txt for {}".format(name))
+            group_df = trips_df.groupby(["route_id", "direction_id"])["trip_id"].first().reset_index().drop("trip_id", axis = 1)
+            group_df["shape_id"] = range(1, len(group_df) + 1)
+            if "shape_id" in trips_df.columns:
+                trips_df.drop("shape_id", axis = 1, inplace = True)
+            trips_df = pd.merge(trips_df, group_df, how = "left", on = ["route_id", "direction_id"])
+            
+        if len(trips_df[trips_df.shape_id.isnull()]) > 0:
+            print("some trips are missing shape_id for {}".format(name))
+            trips_missing_shape_df = trips_df[trips_df.shape_id.isnull()].copy()
+            group_df = trips_missing_shape_df.groupby(["route_id", "direction_id"])["trip_id"].first().reset_index().drop("trip_id", axis = 1)
+            group_df["shape_id"] = range(1, len(group_df) + 1)
+            group_df["shape_id"] = group_df["shape_id"].apply(lambda x: "psudo" + str(x))
+            trips_missing_shape_df = pd.merge(trips_missing_shape_df.drop("shape_id", axis = 1), 
+                                            group_df, how = "left", on = ["route_id", "direction_id"])
+            trips_df = pd.concat([trips_df[trips_df.shape_id.notnull()], trips_missing_shape_df],
+                                ignore_index = True,
+                                sort = False)
+            
+        all_routes_df = pd.concat([all_routes_df, routes_df], sort = False, ignore_index = True)
+        all_trips_df = pd.concat([all_trips_df, trips_df], sort = False, ignore_index = True)
+        all_stops_df = pd.concat([all_stops_df, stops_df], sort = False, ignore_index = True)
+        all_shapes_df = pd.concat([all_shapes_df, shapes_df], sort = False, ignore_index = True)
+        all_stop_times_df = pd.concat([all_stop_times_df, stop_times_df], sort = False, ignore_index = True)
+        all_agency_df = pd.concat([all_agency_df, agency_df], sort = False, ignore_index = True)
+        all_fare_attributes_df = pd.concat([all_fare_attributes_df, fare_attributes_df], sort = False, ignore_index = True)
+        all_fare_rules_df = pd.concat([all_fare_rules_df, fare_rules_df], sort = False, ignore_index = True)
+
+    return (all_routes_df, all_trips_df, all_stops_df, all_shapes_df, all_stop_times_df, 
+            all_agency_df, all_fare_attributes_df, all_fare_rules_df)
+
+
+def get_representative_trip_for_route(trips, stop_times):
+    
+    """
+    get the representative trips for each route, by direction, tod (time of day), based on shape_id with most trips
+
+    # TODO: confirm the following description of the goal and methodology of this method:
+    Two level of extraction:
+    1) each unique combination of (route_id + tod + direction_id) may have multiple shape_id, with different trip counts.
+       Keep the shape_id with the most trips:
+        - example: ('westcat-ca-us_9_17_2015', 'route_id' 703, 'direction_id' 0 'tod' PM) has 3 shape_id: 
+                   2060 (11 trips), 2064 (1 trip), 2084 (1 trip)
+    2) each unique combination of (route_id + tod + direction_id + shape_id) may have multiple trip_id, with different stop counts.
+       Keep the trip with the most stops
+        - example: ('BART_2015_8_3', 'route_id' 154, 'direction_id' 0, 'tod' AM, 'shape_id' 404) has 29 trips,
+                   with number of stops ranging from 11 to 25.
+
+    Args:
+        - trips: 
+        - stop_times:
+
+    Returns:
+        - trip_id: representative trip for each unique combination of (route_id + tod + direction_id) for each operator.
+
+    # TODO: verify the following assessment on v12 pipeline Notebook and Ranch:
+    V12 of the network pipeline only has level 1 of extraction, therefore the output 'trip_df' has multiple trips for each
+    unique combination of (route_id + tod + direction_id + shape_id). This appears to be a bug because each row represents 
+    one trip, but the 'trip_num' field represents total num of trips of a unique (route_id + tod + direction_id + shape_id),
+    unless the field 'trip_id' and 'trip_num' is not used in later steps, or there is a du-duplicate step later.
+
+    Ranch contains both level of extractions, so the output 'trip_df' has one trip for each unique combination of 
+    (route_id + tod + direction_id).
+ 
+    """
+    
+    WranglerLogger.info('...code arrival/departure hour at the first stop of each trip')
+
+    # code arrival/departure hour of each stop 
+    stop_times_df = stop_times.copy()
+    stop_times_df['arrival_h'] = pd.to_datetime(stop_times_df['arrival_time'], unit = 's').dt.hour
+    stop_times_df['arrival_m'] = pd.to_datetime(stop_times_df['arrival_time'], unit = 's').dt.minute
+    stop_times_df['departure_h'] = pd.to_datetime(stop_times_df['departure_time'], unit = 's').dt.hour
+    stop_times_df['departure_m'] = pd.to_datetime(stop_times_df['departure_time'], unit = 's').dt.minute
+    
+    # sort in order to get first stop of each trip
+    # according to the gtfs reference, the stop sequence does not have to be consecutive, but has to always increase
+    # so we can get the fisrt stop by the smallest stop sequence on the trip
+    stop_times_df.sort_values(by = ["trip_id", "stop_sequence"], 
+                              ascending = True, 
+                              inplace = True)
+    first_stop_df = stop_times_df.drop_duplicates(subset = ["trip_id"])
+
+    # code time-of-day of each trip based on arrival hour at a trip's first stop
+    WranglerLogger.info('...code time-of-day of each trip')
+    trip_df = trips.copy()
+    trip_df = pd.merge(trip_df, 
+                       first_stop_df,
+                       how = 'left',
+                       on = 'trip_id')
+        
+    TIME_OF_DAY_DICT = {
+        "AM": {"start": 6, "end": 10},
+        "MD": {"start": 10, "end": 15},
+        "PM": {"start": 15, "end": 19},
+        "NT": {"start": 19, "end": 3, "frequency_start": 19, "frequency_end": 22},
+        "EA": {"start": 3, "end": 6, "frequency_start": 5, "frequency_end": 6},
+    }
+
+    ## AM: 6-10am, MD: 10am-3pm, PM: 3-7pm, NT 7pm-3am, EA 3-6am
+    trip_df['tod'] = np.where((trip_df['arrival_h'] >= TIME_OF_DAY_DICT['AM']['start']) & \
+                              (trip_df['arrival_h'] < TIME_OF_DAY_DICT['AM']['end']),
+                              'AM',
+                              np.where((trip_df['arrival_h'] >= TIME_OF_DAY_DICT['MD']['start']) & \
+                                       (trip_df['arrival_h'] < TIME_OF_DAY_DICT['MD']['end']),
+                                       'MD',
+                                       np.where((trip_df['arrival_h'] >= TIME_OF_DAY_DICT['PM']['start']) & \
+                                                (trip_df['arrival_h'] < TIME_OF_DAY_DICT['PM']['end']),
+                                                'PM',
+                                                np.where((trip_df['arrival_h'] >= TIME_OF_DAY_DICT['EA']['start']) & 
+                                                         (trip_df['arrival_h'] < TIME_OF_DAY_DICT['EA']['end']),
+                                                         'EA',
+                                                         'NT'))))
+  
+    # calculate frequency for EA and NT period using 5-6am, and 7-10pm
+    # make a copy of trip_df, code 'EA' and 'NT', everything else 'NA'
+    trip_EA_NT_df = trip_df.copy()
+    trip_EA_NT_df["tod"] = np.where((trip_df['arrival_h'] >= TIME_OF_DAY_DICT['EA']['frequency_start']) & \
+                                    (trip_df['arrival_h'] < TIME_OF_DAY_DICT['EA']['frequency_end']),
+                                    "EA",
+                                    np.where((trip_df['arrival_h'] >= TIME_OF_DAY_DICT['NT']['frequency_start']) & \
+                                             (trip_df['arrival_h'] < TIME_OF_DAY_DICT['NT']['frequency_end']),
+                                          "NT",
+                                          "NA"))
+    trip_EA_NT_df = trip_EA_NT_df.loc[trip_EA_NT_df['tod'].isin(['EA', 'NT'])]
+    WranglerLogger.debug('trip_EA_NT_df has {} rows'.format(trip_EA_NT_df.shape[0]))
+
+    WranglerLogger.info('initial all_trips_df has {} rows,\
+    representing {} unique combinations of (route_id + tod + direction_id) for each operator.'.format(
+        trip_df.shape[0],
+        trip_df[["route_id", "tod", "direction_id"]].drop_duplicates().shape[0])
+    )
+    
+    ###### level 1 extraction
+    # get the most frequent trip for each route, by direction, by time of day
+    ## trips share the same shape_id is considered being the same
+    ## first get the trip count for each shape_id
+    trip_freq_df = trip_df.groupby(
+        ['agency_raw_name', 'route_id', 'tod', 'direction_id', 'shape_id'])['trip_id'].count().reset_index()
+    trip_freq_df.rename(columns = {'trip_id': 'trip_id_cnt'}, inplace=True)
+
+    ## then choose the most frequent shape_id for each route, frequency use the total number of trips for each shape_id
+    def agg(x):
+        m = x.shape_id.iloc[np.argmax(x.trip_id_cnt.values)]
+        return pd.Series({'trip_num': x.trip_id_cnt.sum(), 'shape_id': m})
+   
+    trip_freq_df = trip_freq_df.groupby(
+        ['agency_raw_name', 'route_id', 'tod', 'direction_id']).apply(agg).reset_index()
+    
+    # retain the complete trip info of represent trip only
+    WranglerLogger.debug('initial total number of trips: {}, {} unique route_id, {} unique shape_id, {} unique trip_id'.format(
+        trip_df.shape[0],
+        trip_df['route_id'].nunique(),
+        trip_df['shape_id'].nunique(),
+        trip_df['trip_id'].nunique()
+        ))
+    trip_df = pd.merge(
+        trip_df,
+        trip_freq_df,
+        how = 'inner',
+        on = ['agency_raw_name', 'route_id', 'tod', 'direction_id', 'shape_id'])
+    
+    WranglerLogger.debug('representative trips based on unique (route_id + tod + direction_id): \
+    {} rows, {} unique route_id, {} unique shape_id, {} unique trip_id'.format(
+        trip_df.shape[0],
+        trip_df['trip_num'].sum(),
+        trip_df['route_id'].nunique(),
+        trip_df['shape_id'].nunique(),
+        trip_df['trip_id'].nunique()
+        ))
+
+    ###### level 2 extraction
+
+    # add info on number of stops in each trip
+    trip_stops_df = stop_times_df.groupby(
+        ['trip_id'])['stop_sequence'].count().reset_index()
+    trip_stops_df.rename(columns = {'stop_sequence': 'number_of_stops'}, inplace = True)
+
+    trip_df = pd.merge(
+        trip_df,
+        trip_stops_df[['trip_id', 'number_of_stops']],
+        how="left",
+        on=['trip_id']
+        )
+ 
+    # drop duplicates and keep the trip with the most stops
+    trip_df.sort_values(by = ['agency_raw_name', 'route_id', 'shape_id', 'number_of_stops'],
+                        ascending = [True, True, True, False])   
+    trip_df.drop_duplicates(
+        subset = ["agency_raw_name", "route_id", 'shape_id', "direction_id", "tod"],
+        inplace = True)
+
+    WranglerLogger.debug('representative (unique) trips based on unique (route_id + tod + direction_id + shape_id): \
+    {} rows, {} trips, {} unique route_id, {} unique shape_id, {} unique trip_id'.format(
+        trip_df.shape[0],
+        trip_df['trip_num'].sum(),
+        trip_df['route_id'].nunique(),
+        trip_df['shape_id'].nunique(),
+        trip_df['trip_id'].nunique()
+        ))
+
+    # update trip frequency (number of trips) for EA and NT periods
+    WranglerLogger.debug('initial total number of EA/NT trips: {}, {} unique trip_id, {} unique route_id, {} unique shape_id'.format(
+        trip_EA_NT_df.shape[0],
+        trip_EA_NT_df['trip_id'].nunique(),
+        trip_EA_NT_df['route_id'].nunique(),
+        trip_EA_NT_df['shape_id'].nunique()
+        ))
+
+    trip_EA_NT_df = pd.merge(
+        trip_EA_NT_df, 
+        trip_freq_df,
+        how = 'inner',
+        on = ['agency_raw_name', 'route_id', 'tod', 'direction_id', 'shape_id'])
+    
+    trip_EA_NT_df = trip_EA_NT_df.loc[trip_EA_NT_df.tod.isin(["EA", "NT"])].groupby(
+        ['agency_raw_name', "route_id", "tod", "direction_id", "shape_id"])["trip_id"].count().reset_index()   
+    trip_EA_NT_df.rename(columns = {"trip_id" : "trip_num_EA_NT"}, inplace = True)
+    
+    WranglerLogger.debug('EA/NT representative trips based on unique (route_id + tod + direction_id + shape_id): \
+    {} rows, {} trips, {} unique route_id, {} unique shape_id'.format(
+        trip_EA_NT_df.shape[0],
+        trip_EA_NT_df['trip_num_EA_NT'].sum(),
+        trip_EA_NT_df['route_id'].nunique(),
+        trip_EA_NT_df['shape_id'].nunique()
+        ))
+
+    trip_df = pd.merge(
+        trip_df,
+        trip_EA_NT_df,
+        how = "left",
+        on = ['agency_raw_name', "route_id", "tod", "direction_id", "shape_id"]
+    )
+
+    # update trip_num for EA and NT
+    trip_df.loc[trip_df['trip_num_EA_NT'].notnull(), 'trip_num'] = trip_df['trip_num_EA_NT']
+    trip_df.drop(columns=['trip_num_EA_NT'], inplace=True)
+
+    WranglerLogger.info('Finished getting representative trips, trip_df has {} rows,\
+    representing {} unique combinations of (route_id + tod + direction_id) for each operator.'.format(
+        trip_df.shape[0],
+        trip_df[["route_id", "tod", "direction_id"]].drop_duplicates().shape[0])
+    )
+    
+    return trip_df
+
+
+def snap_stop_to_node(stops_df, node_gdf):
+
+    """
+    map gtfs stops to roadway nodes
+
+    Parameters:
+    ------------
+    stops from GTFS
+    drive nodes candidates for snapping transit stops to
+
+    return
+    ------------
+    stops with drive nodes id 'shst_node_id'
+    """
+
+    # Below is V12's initial method - cKDTree
+    """
+    WranglerLogger.info('snapping gtfs stops to roadway node...')
+
+    node_non_c_gdf = node_gdf.copy()
+    node_non_c_gdf = node_non_c_gdf.to_crs(CRS('epsg:26915'))
+    node_non_c_gdf['X'] = node_non_c_gdf.geometry.map(lambda g:g.x)
+    node_non_c_gdf['Y'] = node_non_c_gdf.geometry.map(lambda g:g.y)
+    inventory_node_ref = node_non_c_gdf[['X', 'Y']].values
+    tree = cKDTree(inventory_node_ref)
+
+    stop_df = stops.copy()
+    stop_df['geometry'] = [Point(xy) for xy in zip(stop_df['stop_lon'], stop_df['stop_lat'])]
+    stop_df = gpd.GeoDataFrame(stop_df, geometry=stop_df['geometry'], crs=CRS("EPSG:4326"))
+    # stop_df.crs = CRS("EPSG:4326")
+    stop_df = stop_df.to_crs(CRS('epsg:26915'))
+    stop_df['X'] = stop_df['geometry'].apply(lambda p: p.x)
+    stop_df['Y'] = stop_df['geometry'].apply(lambda p: p.y)
+
+    for i in range(len(stop_df)):
+        point = stop_df.iloc[i][['X', 'Y']].values
+        dd, ii = tree.query(point, k = 1)
+        add_snap_gdf = gpd.GeoDataFrame(node_non_c_gdf.iloc[ii]).transpose().reset_index(drop = True)
+        add_snap_gdf['stop_id'] = stop_df.iloc[i]['stop_id']
+        if i == 0:
+            stop_to_node_gdf = add_snap_gdf.copy()
+        else:
+            stop_to_node_gdf = pd.concat([stop_to_node_gdf, add_snap_gdf], ignore_index=True, sort=False)
+
+    stop_df.drop(['X','Y'], axis = 1, inplace = True)
+    stop_to_node_gdf = pd.merge(stop_df, stop_to_node_gdf, how = 'left', on = 'stop_id')
+
+    return stop_to_node_gdf
+    """
+
+    stops_gdf = stops_df.copy()
+    # create geometry from stop_lat and stop_lon
+    stops_gdf['geometry'] = [Point(xy) for xy in zip(stops_gdf['stop_lon'], stops_gdf['stop_lat'])]
+    stops_gdf = gpd.GeoDataFrame(stops_gdf, geometry=stops_gdf['geometry'], crs=CRS("EPSG:{}".format(str(LAT_LONG_EPSG))))
+
+    # convert to meter-based EPSG
+    stops_gdf = stops_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+    # WranglerLogger.debug(stops_gdf.crs)
+
+    nodes_candidates_df = node_gdf.copy()
+    nodes_candidates_df = nodes_candidates_df.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+    # WranglerLogger.debug(nodes_candidates_df.crs)
+
+    # spatial join
+    stop_snap_to_node = gpd.sjoin_nearest(stops_gdf[['stop_id', 'geometry']],
+                                          nodes_candidates_df[['geometry', 'shst_node_id']], how='left')
+
+    # bring in other stop attributes
+    stop_to_node_gdf = stops_gdf.merge(stop_snap_to_node[['stop_id', 'shst_node_id']],
+                                       on='stop_id',
+                                       how='left') 
+
+    WranglerLogger.info('Snapped {:,} out of {:,} stops to nearest nodes; {:,} unique nodes'.format(
+        stop_snap_to_node.loc[stop_snap_to_node.shst_node_id.notnull()].shape[0],
+        stops_gdf.shape[0],
+        stop_snap_to_node.shst_node_id.nunique()
+    ))
+
+    return stop_to_node_gdf
 
 
 def gtfs_point_shapes_to_link_gdf(gtfs_shape_file, gtfs_name):
