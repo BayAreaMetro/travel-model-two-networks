@@ -122,7 +122,7 @@ def conflate_TOMTOM(docker_container_name):
     See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
 
     The following files were also written out, though not used in later steps.  
-    -- TomTom.in.feather: TomTom data after shst matching preparation for QA/QC.
+    -- TomTom.in.feather: TomTom data before shst matching preparation for QA/QC.
     -- TomTom_[01-14].in.geojson: TomTom data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
        smaller geographies, each with an '.in.geojson file. 
     -- TomTom_[01-14].out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
@@ -408,7 +408,8 @@ def conflate_TM2_MARIN(docker_container_name):
 
     See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
 
-    The following files were also written out, though not used in later steps.  
+    The following files were also written out, though not used in later steps.
+    -- TM2_Marin.in.feather: TM2_Marin data before conflation  
     -- TM2_Marin_[01-14].in.geojson: TM2_Marin data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
        smaller geographies, each with an '.in.geojson file. 
     -- TM2_Marin_[01-14].out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
@@ -529,7 +530,7 @@ def conflcate_SFCTA(docker_container_name):
     See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
 
     The following files were also written out, though not used in later steps.  
-    -- SFCTA.in.feather: SFCTA data after shst matching preparation for QA/QC.
+    -- SFCTA.in.feather: SFCTA data before shst matching preparation for QA/QC.
     -- SFCTA.in.geojson: SFCTA data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
        smaller geographies, each with an '.in.geojson file. 
     -- SFCTA.out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
@@ -573,8 +574,22 @@ def conflate_CCTA(docker_container_name):
     Conflate ACTC data with sharedstreets
     See CCTA network documentation at Box: https://mtcdrive.box.com/s/lsnml5tpbrhrcjfiabw8zbjd5y9r1ow6.
     TODO: the documentation doesn't really have data dictionary for the network data, only for loaded network it appears. 
-    TODO: What files are written?
+
+    Outputs:
+    -- matched_gdf.feather: ACTC links matched to SharedStreets links under the match command config 
+       "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction".
+    -- unmatched_gdf.feather: ACTC links failed to find a match. It retains the fields of the ACTC links before shst match call.
+
+    See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
+
+    The following files were also written out, though not used in later steps.  
+    -- CCTA.in.feather: CCTA data before shst matching preparation for QA/QC.
+    -- CCTA.in.geojson: CCTA data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
+       smaller geographies, each with an '.in.geojson file. 
+    -- CCTA.out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
+    -- CCTA.out.unmatched.geojson: shst matching output for unmatched links, corresponding to each '.in.geojson file.
     """
+
     # Prepare CCTA for conflation
     WranglerLogger.info('loading CCTA data from {}'.format(THIRD_PARTY_INPUT_FILES[CCTA]))
     ccta_raw_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[CCTA])
@@ -670,7 +685,7 @@ def conflate_ACTC(docker_container_name):
     See methods.conflate() documentation for more detail about fields in the matched and unmatched output.
 
     The following files were also written out, though not used in later steps.  
-    -- ACTC.in.feather: ACTC data after shst matching preparation for QA/QC.
+    -- ACTC.in.feather: ACTC data before shst matching preparation for QA/QC.
     -- ACTC.in.geojson: ACTC data as input for shst matching. If the whole dataset is too large, the conflation() method splits it into 14
        smaller geographies, each with an '.in.geojson file. 
     -- ACTC.out.matched.geojson: shst matching output for matched links, corresponding to each '.in.geojson file.
