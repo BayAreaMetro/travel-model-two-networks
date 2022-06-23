@@ -2733,7 +2733,6 @@ def consolidate_all_gtfs(gtfs_input_dir, gtfs_raw_name_ls):
     """
     """
 
-
     # initialize dataframes for consolidated GTFS data
     all_routes_df = pd.DataFrame()
     all_trips_df = pd.DataFrame()
@@ -2744,39 +2743,17 @@ def consolidate_all_gtfs(gtfs_input_dir, gtfs_raw_name_ls):
     all_fare_attributes_df = pd.DataFrame()
     all_fare_rules_df = pd.DataFrame()
 
-    # define a funtion to get representative feed
-    def _get_representative_feed_from_gtfs(work_dir, in_url = "", fetch = False):
-        """
-        A peartree method to get representative feed from GTFS data. See https://github.com/kuanb/peartree
-        """   
-        WranglerLogger.debug('...getting representative feed...')
-        
-        if fetch == True:
-            #read and save zip from url
-            resp = urlopen(in_url)
-            zipfile = ZipFile(BytesIO(resp.read()))
-        
-        if fetch == True:
-            zipfile.extractall(work_dir + "muni")
-        
-        file_loc = work_dir
-        
-        # get feed for the busiest day
-        feed = pt.get_representative_feed(file_loc)
-        
-        return feed
-
     # loop through GTFS data, gather info and add to consolidated dataframes
-    for name in gtfs_raw_name_ls:
-        WranglerLogger.info('processing {}'.format(name))
+    for agency_gtfs_name in gtfs_raw_name_ls:
+        WranglerLogger.info('processing {}'.format(agency_gtfs_name))
         
         # exclude weekend only services
-        if "calendar_orig.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
-            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"calendar.txt"))
+        if "calendar_orig.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"))
             
-        elif "calendar.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
-            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"calendar.txt"))
-            calendar_df.to_csv(os.path.join(gtfs_input_dir,name,"calendar_orig.txt"),
+        elif "calendar.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"))
+            calendar_df.to_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar_orig.txt"),
                                                     index = False,
                                                     sep = ",")
         
@@ -2785,101 +2762,223 @@ def consolidate_all_gtfs(gtfs_input_dir, gtfs_raw_name_ls):
             calendar_df = calendar_df[calendar_df.weekdays > 0]
             
             # writing data to external :p
-            calendar_df.drop("weekdays", axis = 1).to_csv(os.path.join(gtfs_input_dir,name,"calendar.txt"),
+            calendar_df.drop("weekdays", axis = 1).to_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"),
                                                     index = False,
                                                     sep = ",")
         
-        feed = _get_representative_feed_from_gtfs(os.path.join(gtfs_input_dir,name))
-        
-        WranglerLogger.debug('...getting routes info...')
-        routes_df = feed.routes.copy()
-        routes_df["agency_raw_name"] = name
-        
-        WranglerLogger.debug('...getting stops info...')
-        stops_df = feed.stops.copy()
-        stops_df["agency_raw_name"] = name
-        
-        WranglerLogger.debug('...getting trips info...')
-        trips_df = feed.trips.copy()
-        trips_df["agency_raw_name"] = name
-        
-        if "direction_id" not in trips_df.columns: # Marguerita
-            trips_df["direction_id"] = 0
-        
-        trips_df["direction_id"].fillna(0, inplace = True)
-    
-        WranglerLogger.debug('...getting shapes info...')
-        shapes_df = feed.shapes.copy()
-        shapes_df["agency_raw_name"] = name
-        
-        WranglerLogger.debug('...getting stop times info...')
-        stop_times_df = feed.stop_times.copy()
-        stop_times_df["agency_raw_name"] = name
-        
-        WranglerLogger.debug('...getting agency info...')
-        agency_df = feed.agency.copy()
-        agency_df["agency_raw_name"] = name
-        
+        feed_path = os.path.join(gtfs_input_dir, agency_gtfs_name)
+        WranglerLogger.debug('...reading and getting representative transit feeds from {}'.format(feed_path))
+        feed = get_representative_feed_from_gtfs(feed_path, agency_gtfs_name)
+
+        feed_validate = validate_feed(feed, agency_gtfs_name)
+
+        # read fare tables if exist in GTFS
         WranglerLogger.debug('...getting fare_attributes info...')
-        # gtfs cannot read fare tables for all agencies
-        if "fare_attributes.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
+        if "fare_attributes.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
             
-            fare_attributes_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"fare_attributes.txt"),
+            fare_attributes_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"fare_attributes.txt"),
                                             dtype = {"fare_id" : str})
-            fare_attributes_df["agency_raw_name"] = name
+            fare_attributes_df["agency_raw_name"] = agency_gtfs_name
         
         else:
-            
+            WranglerLogger.debug('no fare_attributes data')
             fare_attributes_df = pd.DataFrame()
         
         WranglerLogger.debug('...getting fare_rules info...')
-        if "fare_rules.txt" in os.listdir(os.path.join(gtfs_input_dir,name)):
+        if "fare_rules.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
             
-            fare_rules_df = pd.read_csv(os.path.join(gtfs_input_dir,name,"fare_rules.txt"),
+            fare_rules_df = pd.read_csv(os.path.join(gtfs_input_dir, agency_gtfs_name, "fare_rules.txt"),
                                         dtype = {"fare_id" : str, "route_id" : str, "origin_id" : str, "destination_id" : str,
                                                 " route_id" : str, " origin_id" : str, " destination_id" : str,})
-            fare_rules_df["agency_raw_name"] = name
+            fare_rules_df["agency_raw_name"] = agency_gtfs_name
             
         else:
-            
+            WranglerLogger.debug('no fare_rules data')
             fare_rules_df = pd.DataFrame()
-            
-        # add agency_id in routes.txt if missing
-        if "agency_id" not in routes_df.columns:
-            if "agency_id" in agency_df.columns:
-                routes_df["agency_id"] = agency_df.agency_id.iloc[0]
-        
-        if len(shapes_df) == 0: # ACE, CCTA, VINE
-            print("missing shapes.txt for {}".format(name))
-            group_df = trips_df.groupby(["route_id", "direction_id"])["trip_id"].first().reset_index().drop("trip_id", axis = 1)
-            group_df["shape_id"] = range(1, len(group_df) + 1)
-            if "shape_id" in trips_df.columns:
-                trips_df.drop("shape_id", axis = 1, inplace = True)
-            trips_df = pd.merge(trips_df, group_df, how = "left", on = ["route_id", "direction_id"])
-            
-        if len(trips_df[trips_df.shape_id.isnull()]) > 0:
-            print("some trips are missing shape_id for {}".format(name))
-            trips_missing_shape_df = trips_df[trips_df.shape_id.isnull()].copy()
-            group_df = trips_missing_shape_df.groupby(["route_id", "direction_id"])["trip_id"].first().reset_index().drop("trip_id", axis = 1)
-            group_df["shape_id"] = range(1, len(group_df) + 1)
-            group_df["shape_id"] = group_df["shape_id"].apply(lambda x: "psudo" + str(x))
-            trips_missing_shape_df = pd.merge(trips_missing_shape_df.drop("shape_id", axis = 1), 
-                                            group_df, how = "left", on = ["route_id", "direction_id"])
-            trips_df = pd.concat([trips_df[trips_df.shape_id.notnull()], trips_missing_shape_df],
-                                ignore_index = True,
-                                sort = False)
-            
-        all_routes_df = pd.concat([all_routes_df, routes_df], sort = False, ignore_index = True)
-        all_trips_df = pd.concat([all_trips_df, trips_df], sort = False, ignore_index = True)
-        all_stops_df = pd.concat([all_stops_df, stops_df], sort = False, ignore_index = True)
-        all_shapes_df = pd.concat([all_shapes_df, shapes_df], sort = False, ignore_index = True)
-        all_stop_times_df = pd.concat([all_stop_times_df, stop_times_df], sort = False, ignore_index = True)
-        all_agency_df = pd.concat([all_agency_df, agency_df], sort = False, ignore_index = True)
+
+        all_routes_df = pd.concat([all_routes_df, feed_validate.routes], sort = False, ignore_index = True)
+        all_trips_df = pd.concat([all_trips_df, feed_validate.trips], sort = False, ignore_index = True)
+        all_stops_df = pd.concat([all_stops_df, feed_validate.stops], sort = False, ignore_index = True)
+        all_shapes_df = pd.concat([all_shapes_df, feed_validate.shapes], sort = False, ignore_index = True)
+        all_stop_times_df = pd.concat([all_stop_times_df, feed_validate.stop_times], sort = False, ignore_index = True)
+        all_agency_df = pd.concat([all_agency_df, feed_validate.agency], sort = False, ignore_index = True)
         all_fare_attributes_df = pd.concat([all_fare_attributes_df, fare_attributes_df], sort = False, ignore_index = True)
         all_fare_rules_df = pd.concat([all_fare_rules_df, fare_rules_df], sort = False, ignore_index = True)
 
     return (all_routes_df, all_trips_df, all_stops_df, all_shapes_df, all_stop_times_df, 
             all_agency_df, all_fare_attributes_df, all_fare_rules_df)
+
+
+
+
+def validate_feed(feed, agency_gtfs_name):
+
+    """
+    validate GTFS feed and add fields
+ 
+    """
+    
+    WranglerLogger.debug('...adding agency_raw_name to routes, stops, trips, shapes, stop_times, agency')
+    feed.routes["agency_raw_name"] = agency_gtfs_name   
+    feed.stops["agency_raw_name"] = agency_gtfs_name
+    feed.trips["agency_raw_name"] = agency_gtfs_name    
+    feed.shapes["agency_raw_name"] = agency_gtfs_name 
+    feed.stop_times["agency_raw_name"] = agency_gtfs_name
+    feed.agency["agency_raw_name"] = agency_gtfs_name
+
+    # when 'direction_id' is not present, fill in with 0
+    WranglerLogger.debug('...filling in missing direction_id in trips')
+    if "direction_id" not in feed.trips.columns: # Marguerita
+        feed.trips["direction_id"] = 0  
+    feed.trips["direction_id"].fillna(0, inplace = True)
+
+    # add agency_id in routes.txt if missing
+    WranglerLogger.debug('...filling in missing agency_id in routes')      
+    if "agency_id" not in feed.routes.columns:
+        if "agency_id" in feed.routes.columns:
+            feed.routes["agency_id"] = feed.routes.agency_id.iloc[0]
+ 
+# """
+#     if len(shapes_df) == 0: # ACE, CCTA, VINE
+#         print("missing shapes.txt for {}".format(agency_gtfs_name))
+#         group_df = trips_df.groupby(["route_id", "direction_id"])["trip_id"].first().reset_index().drop("trip_id", axis = 1)
+#         group_df["shape_id"] = range(1, len(group_df) + 1)
+#         if "shape_id" in trips_df.columns:
+#             trips_df.drop("shape_id", axis = 1, inplace = True)
+#         trips_df = pd.merge(trips_df, group_df, how = "left", on = ["route_id", "direction_id"])
+        
+#     if len(trips_df[trips_df.shape_id.isnull()]) > 0:
+#         print("some trips are missing shape_id for {}".format(agency_gtfs_name))
+#         trips_missing_shape_df = trips_df[trips_df.shape_id.isnull()].copy()
+#         group_df = trips_missing_shape_df.groupby(["route_id", "direction_id"])["trip_id"].first().reset_index().drop("trip_id", axis = 1)
+#         group_df["shape_id"] = range(1, len(group_df) + 1)
+#         group_df["shape_id"] = group_df["shape_id"].apply(lambda x: "psudo" + str(x))
+#         trips_missing_shape_df = pd.merge(trips_missing_shape_df.drop("shape_id", axis = 1), 
+#                                         group_df, how = "left", on = ["route_id", "direction_id"])
+#         trips_df = pd.concat([trips_df[trips_df.shape_id.notnull()], trips_missing_shape_df],
+#                             ignore_index = True,
+#                             sort = False)
+# """
+
+    # check if shapes are missing in GTFS
+    if 'shape_id' not in feed.trips.columns:
+        feed.trips['shape_id'] = np.nan
+    
+    # prep data for creating missing shape ids based on stop patterns
+    # if the stop patterns are differnt, then assume the shapes are different
+    stop_times_df = feed.stop_times.copy()
+    trips_df = feed.trips.copy()
+
+    trip_stops_df = (
+        stop_times_df.groupby(
+            ['agency_raw_name', 'trip_id']
+        )['stop_id']
+        .agg(list)
+        .reset_index()
+    )
+    trip_stops_df.rename(
+        columns = {'stop_id' : 'stop_pattern'},
+        inplace = True
+    )
+    trip_stops_df['stop_pattern'] = trip_stops_df['stop_pattern'].str.join('-')
+
+    trips_df = pd.merge(
+        trips_df,
+        trip_stops_df[['agency_raw_name', 'trip_id', 'stop_pattern']],
+        how = 'left',
+        on = ['agency_raw_name', 'trip_id']
+    )
+
+    if (len(feed.shapes) == 0) and (len(feed.trips[feed.trips.shape_id.notnull()]) == 0):  # ACE, CCTA, VINE
+
+        WranglerLogger.debug("missing shapes.txt for {}".format(agency_gtfs_name))
+
+        group_df = (
+            trips_df.groupby(["agency_raw_name", "route_id", "direction_id", 'stop_pattern'])["trip_id"]
+            .first()
+            .reset_index()
+            .drop("trip_id", axis=1)
+        )
+
+        group_df["shape_id"] = range(1, len(group_df) + 1)
+        group_df["shape_id"] = group_df["shape_id"].astype(str)
+
+        if "shape_id" in feed.trips.columns:
+            feed.trips.drop("shape_id", axis=1, inplace=True)
+            trips_df.drop("shape_id", axis=1, inplace=True)
+
+        join_df = pd.merge(
+            trips_df, group_df, how="left", on=["agency_raw_name", "route_id", "direction_id", 'stop_pattern']
+        )
+
+        join_df = pd.merge(
+            feed.trips, 
+            join_df[["agency_raw_name", "route_id", "direction_id", 'trip_id', 'shape_id']], 
+            how="left", 
+            on=["agency_raw_name", "route_id", "direction_id", 'trip_id']
+        )
+
+        feed.trips['shape_id'] = join_df['shape_id']
+
+    if len(feed.trips[feed.trips.shape_id.isnull()]) > 0:
+        WranglerLogger.debug("missing shape_ids in trips.txt for {}".format(agency_gtfs_name))
+
+        trips_missing_shape_df = trips_df[trips_df.shape_id.isnull()].copy()
+
+        group_df = (
+            trips_missing_shape_df.groupby(['agency_raw_name', "route_id", "direction_id", 'stop_pattern'])["trip_id"]
+            .first()
+            .reset_index()
+            .drop("trip_id", axis=1)
+        )
+        group_df["shape_id"] = range(1, len(group_df) + 1)
+        group_df["shape_id"] = group_df["shape_id"].apply(
+            lambda x: "psudo" + str(x)
+        )
+
+        trips_missing_shape_df = pd.merge(
+            trips_missing_shape_df.drop("shape_id", axis=1),
+            group_df,
+            how="left",
+            on=['agency_raw_name', "route_id", "direction_id", 'stop_pattern'],
+        )
+
+        new_shape_id_dict = dict(
+            zip(trips_missing_shape_df.trip_id,trips_missing_shape_df.shape_id)
+        )
+        
+        feed.trips['shape_id'] = np.where(
+            feed.trips.shape_id.isnull(),
+            feed.trips.trip_id.map(new_shape_id_dict),
+            feed.trips.shape_id
+        )
+
+    return feed
+    # return trips
+
+
+def get_representative_feed_from_gtfs(work_dir, agency_gtfs_name, in_url = "", fetch = False):
+    """
+
+    Uses peartree method (https://github.com/kuanb/peartree) to get representative feed from GTFS data folder.
+
+    """   
+    WranglerLogger.debug('...getting representative feed...')
+    
+    if fetch == True:
+        #read and save zip from url
+        resp = urlopen(in_url)
+        zipfile = ZipFile(BytesIO(resp.read()))
+    
+    if fetch == True:
+        zipfile.extractall(work_dir + "muni")
+    
+    file_loc = work_dir
+    
+    # get feed for the busiest day
+    feed = pt.get_representative_feed(file_loc)
+
+    return feed
 
 
 def get_representative_trip_for_route(trips, stop_times):
