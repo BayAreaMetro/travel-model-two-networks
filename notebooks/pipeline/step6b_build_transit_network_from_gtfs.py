@@ -35,7 +35,7 @@ import osmnx as ox
 # 
 
 # from shapely.geometry import Point, LineString
-# import networkx as nx
+# 
 # from shapely import wkt
 # from scipy.spatial import cKDTree
 # 
@@ -61,9 +61,12 @@ ROADWAY_NODE_FILE = os.path.join(ROADWAY_NETWORK_DIR, 'step3_node.feather')
 # GTFS raw data
 GTFS_DATA_DIR = os.path.join(INPUT_DATA_DIR, 'step6_GTFS')
 GTFS_INPUT_DIR  = os.path.join(GTFS_DATA_DIR, '2015_input')
+# gtfs shape to sharedstreet conflation result
+CONFLATION_SHST = os.path.join(GTFS_DATA_DIR, 'conflation_shst')
 
 # output
-GTFS_CONSOLIDATED_DIR = os.path.join(GTFS_DATA_DIR, 'consolidated_gtfs_input')
+GTFS_OUTPUT_DIR = os.path.join(OUTPUT_DATA_DIR, 'step6_gtfs')
+GTFS_CONSOLIDATED_DIR = os.path.join(GTFS_OUTPUT_DIR, 'consolidated_gtfs')
 
 # # todo: describe what goes in here
 # output_data_version_dir = os.path.join(output_data_interim_dir,'version_12')
@@ -89,9 +92,11 @@ if __name__ == '__main__':
     # Consolidate all gtfs into one
     gtfs_raw_name_ls = os.listdir(GTFS_INPUT_DIR)
     # remove data not needed
-    gtfs_raw_name_ls.remove("Petaluma_2016_5_22")
-    gtfs_raw_name_ls.remove("WestCAT_2016_5_26")
-    gtfs_raw_name_ls.remove("GGFerries_2017_3_18")
+    for gtfs_feed_name in gtfs_raw_name_ls:
+        if gtfs_feed_name not in methods.gtfs_name_dict:
+            WranglerLogger.debug('skipping GTFS dataset {} for {}'.format(
+                gtfs_feed_name, methods.gtfs_name_dict[gtfs_feed_name]))
+            gtfs_raw_name_ls.remove(gtfs_feed_name)
     WranglerLogger.info('Consolidating the following GTFS data: {}'.format(gtfs_raw_name_ls))
 
     # A typical GTFS dataset contains multiple .txt files with information on agency, schedule, routes, stops, trips, fares.
@@ -133,15 +138,35 @@ if __name__ == '__main__':
 
     # examine transit agencies included
     WranglerLogger.debug('examine agency_raw_name, agency_name, agency_id: \n{}'.format(
-        all_agency_df.astype(str).groupby(["agency_raw_name", "agency_name", "agency_id"]).count().reset_index()[["agency_raw_name", "agency_name", "agency_id"]]))
+        all_agency_df.astype(str).groupby(["agency_raw_name", "agency_name", "agency_id"]).count().reset_index()[[
+            "agency_raw_name", "agency_name", "agency_id"]]))
 
-    # in the GTFS data, "Sonoma County Transit (id 175)" and "Cloverdale Transit (id 183)" are from the same
-    # GTFS feed with the same agency_raw_name "SonomaCounty_2015_8_18". This is also the case in the Cube fare files
-    # so, update the lookup to keep "Conoma County Transit" only
-    WranglerLogger.debug('recode Cloverdale Transit ("183") into Sonoma County Transit ("175")')
-    all_agency_df.loc[all_agency_df.agency_name == 'Cloverdale Transit', 'agency_name'] = 'Sonoma County Transit'
-    all_agency_df.loc[all_agency_df.agency_id == '183', 'agency_id'] = '175'
-    all_fare_attributes_df.loc[all_fare_attributes_df.agency_id == 183, 'agency_id'] = 175
+    # modify some 'agency_raw_name', 'agency_name', and 'agency_id'
+    for df in [all_routes_df, all_trips_df, all_stops_df, all_shapes_df, 
+               all_stop_times_df, all_agency_df, all_fare_attributes_df, all_fare_rules_df]:
+
+        # in the GTFS data, "Sonoma County Transit (id 175)" and "Cloverdale Transit (id 183)" are from the same
+        # GTFS feed with the same agency_raw_name "SonomaCounty_2015_8_18". This is also the case in the Cube fare files
+        # so, update the lookup to keep "Conoma County Transit" only
+        if 'agency_name' in list(df):
+            WranglerLogger.debug('recode agency_name "Cloverdale Transit" as "Sonoma County Transit"')
+            df.loc[df.agency_name == 'Cloverdale Transit', 'agency_name'] = 'Sonoma County Transit'
+        if 'agency_id' in list(df):
+            WranglerLogger.debug('recode agency_name 183 (Cloverdale Transit) as 175 (Sonoma County Transit)')
+            all_agency_df.loc[all_agency_df.agency_id == '183', 'agency_id'] = '175'
+            all_fare_attributes_df.loc[all_fare_attributes_df.agency_id == 183, 'agency_id'] = 175
+    
+        # to enable sharedstreets conflation, agency_raw_name 'Blue&Gold_gtfs_10_4_2017' and agency_name 'Blue&Gold Fleet' have been
+        # modified to 'Blue_Gold_gtfs_10_4_2017' and 'Blue Gold Fleet' respectively; 
+        # agency_raw_name 'Union_City_Transit_Aug-01-2015 to Jun-30-2017' has been modified to 'Union_City_Transit_Aug-01-2015_to_Jun-30-2017'.
+        if 'agency_name' in list(df):
+            WranglerLogger.debug('recode agency_name "Blue&Gold Fleet" as "Blue Gold Fleet"')
+            df.loc[df.agency_name == 'Blue&Gold Fleet', 'agency_name'] = 'Blue Gold Fleet'
+        if 'agency_raw_name' in list(df):
+            WranglerLogger.debug('recode agency_raw_name "Blue&Gold_gtfs_10_4_2017" as "Blue_Gold_gtfs_10_4_2017"')
+            df.loc[df.agency_raw_name == 'Blue&Gold_gtfs_10_4_2017', 'agency_raw_name'] = 'Blue_Gold_gtfs_10_4_2017'
+            WranglerLogger.debug('recode agency_raw_name "Blue&Gold_gtfs_10_4_2017" as "Blue_Gold_gtfs_10_4_2017"')
+            df.loc[df.agency_raw_name == 'Union_City_Transit_Aug-01-2015 to Jun-30-2017', 'agency_raw_name'] = 'Union_City_Transit_Aug-01-2015_to_Jun-30-2017'
 
     # Re-ID the consolidated gtfs, creating unique route_id, shape_id, trip_id, stop_id across agencies
     WranglerLogger.info('creating unique route_id, shape_id, trip_id, stop_id for consolidated GTFS data')
@@ -320,7 +345,7 @@ if __name__ == '__main__':
     WranglerLogger.info('Snapping GFTS stops to roadway nodes')
 
     # first, get candidate nodes to for snapping transit stops to
-    WranglerLogger.debug('load roadway links from {} and nodes from {}'.fromat(ROADWAY_LINK_FILE, ROADWAY_NODE_FILE))
+    WranglerLogger.debug('load roadway links from {} and nodes from {}'.format(ROADWAY_LINK_FILE, ROADWAY_NODE_FILE))
     link_gdf = geofeather.from_geofeather(ROADWAY_LINK_FILE)
     node_gdf = geofeather.from_geofeather(ROADWAY_NODE_FILE)
 
@@ -331,14 +356,80 @@ if __name__ == '__main__':
 
     # only keep non-motorway nodes: motorway and motorway are restricted-access freeway and freeway ramps, 
     # shouldn't have transit stops
-    non_motorway_links_gdf = drive_link_gdf.loc[~drive_link_gdf.roadway.isin(["motorway", "motorway_link"])]
+    # also exclude links with roadway=='unknown' highway=='traffic_island'. See discussion: https://app.asana.com/0/0/1202470211319796/1202491781241679/f 
+    non_motorway_links_gdf = drive_link_gdf.loc[~drive_link_gdf.roadway.isin(["motorway", "motorway_link", 'unknown'])]
 
     node_candidates_for_stops_df = drive_node_gdf.loc[
         drive_node_gdf.shst_node_id.isin(
             non_motorway_links_gdf.fromIntersectionId.tolist() + non_motorway_links_gdf.toIntersectionId.tolist())]
-    WranglerLogger.debug('{,:} out of {,:} drive_nodes are candidates to snap transit stops to'.format(
+    WranglerLogger.debug('{:,} out of {:,} drive_nodes are candidates to snap transit stops to'.format(
         drive_node_gdf.shape[0],
         node_candidates_for_stops_df.shape[0]
     ))
 
     stop_gdf = methods.snap_stop_to_node(all_stops_df, node_candidates_for_stops_df)
+
+
+    ####################################
+    # routing
+
+    ## Approach 1: osmnx routing
+    # build network routing file for osmnx routing
+    G_drive = methods.v12_ox_graph(drive_node_gdf,
+                                   drive_link_gdf)
+
+    # route bus using osmnx method, based on representative trips and stops already snapped to roadway drive nodes
+    bus_osmnx_link_shape_df, bus_osmnx_broken_trip_list = methods.v12_route_bus_link_osmnx(drive_link_gdf, 
+                                                                                           drive_node_gdf,
+                                                                                           G_drive, 
+                                                                                           all_stop_times_df,
+                                                                                           all_routes_df,
+                                                                                           trip_df, 
+                                                                                           stop_gdf)
+
+    # trips successfully routed by osmnx
+    WranglerLogger.info('finished routing bus by osmnx method:\
+    all trips contain {:,} unique shape_id, routed trips contain {:,} unique shape_id'.format(
+        trip_df.shape_id.nunique(),
+        bus_osmnx_link_shape_df.shape_id.nunique()))
+    WranglerLogger.debug('dataframe of drive links where bus trips traverse has the following fields:\n{}'.format(
+        bus_osmnx_link_shape_df.dtypes
+    ))
+    WranglerLogger.info(
+        'osmnx method failed to route these trips (can be rail modes): {}, containing these shapes: {}'.format(
+            bus_osmnx_broken_trip_list,
+            trip_df[trip_df.trip_id.isin(bus_osmnx_broken_trip_list)].shape_id.unique()))
+
+    ## Approach 2: shst routing
+    # read transit to shst matching result
+    shape_shst_matched_df = pd.DataFrame()
+    for filename in os.listdir(CONFLATION_SHST):
+        if ('_matched.feather' in filename) & ('_matched.feather.crs' not in filename):
+            agency_raw_name = filename.split('_matched')[0]
+            WranglerLogger.info('read shst matching result for {}'.format(agency_raw_name))
+            shst_matched = geofeather.from_geofeather(os.path.join(CONFLATION_SHST, filename))
+            # add agency_raw_name
+            shst_matched['agency_raw_name'] = agency_raw_name
+
+            shape_shst_matched_df = pd.concat([shape_shst_matched_df, shst_matched], sort = False, ignore_index = True)
+    
+    # rename 'shape_id' to 'shape_id_original'
+    shape_shst_matched_df.rename(columns = {'shape_id': 'shape_id_original'}, inplace=True)
+    
+    # add other shape attributes
+    shape_shst_matched_df = shape_shst_matched_df.merge(unique_shape_id_df,
+                                                        on = ['agency_raw_name', 'shape_id_original'],
+                                                        how = 'left')
+
+    # since peertree "pt.get_representative_feed" method only keeps the feed for the busiest day, some shape_id
+    # won't be in 'unique_shape_id_df', therefore 'shape_shst_matched_df' has shape_id.isnull(). Drop those.
+    shape_shst_matched_df = shape_shst_matched_df.loc[shape_shst_matched_df.shape_id.notnull()]
+
+    # route bus using shst routing method
+    bus_shst_link_shape_df, incomplete_shape_list = methods.v12_route_bus_link_shst(drive_link_gdf, shape_shst_matched_df)
+
+    WranglerLogger.info('total {} bus_shst links with {} shapes; {} links with {} shapes were successfully routed'.format(
+        bus_shst_link_shape_df.shape[0],
+        bus_shst_link_shape_df.shape_id.nunique(),
+        bus_shst_link_shape_df.shape[0],
+        bus_shst_link_shape_df.shape_id.nunique()))

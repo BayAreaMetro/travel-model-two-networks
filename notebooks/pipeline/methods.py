@@ -1,8 +1,10 @@
 import errno, glob, math, os, sys
+from textwrap import wrap
 import pandas as pd
 import numpy as np
 import geopandas as gpd
 import osmnx as ox
+import networkx as nx
 from shapely.geometry import Point, shape, LineString, Polygon
 from shapely.ops import transform
 import pyproj
@@ -39,6 +41,56 @@ TIME_OF_DAY_DICT = {
     "NT": {"start": 19, "end": 3, "frequency_start": 19, "frequency_end": 22},
     "EA": {"start": 3, "end": 6, "frequency_start": 5, "frequency_end": 6},
 }
+
+# some settings on GTFS data sources
+# this is based on fields 'agency_raw_name' and 'agency_name' in GTFS agency.txt
+
+# some operators have more than one GTFS datasets. Use the 2015 one only.
+
+# TODO: for Blue & Gold Fleet, the GTFS_feed_name and agency_raw_name is 'Blue&Gold_gtfs_10_4_2017', 
+# and agency_name is 'Blue&Gold Fleet'. However, sharedstreet conflation cannot deal with "&" or space in input/output file
+# names. Therefore, need to modify to 'Blue_Gold_gtfs_10_4_2017' and 'Blue Gold Fleet' respectively; 
+# similarly, modify 'Union_City_Transit_Aug-01-2015 to Jun-30-2017' to 'Union_City_Transit_Aug-01-2015_to_Jun-30-2017'.
+# May need more generic solution.
+
+gtfs_name_dict = {
+    'ACE_2017_3_20'                                   : 'ACE Altamont Corridor Express',
+    'ACTransit_2015_8_14'                             : 'AC Transit', 
+    'BART_2015_8_3'                                   : 'Bay Area Rapid Transit', 
+    'Blue_Gold_gtfs_10_4_2017'                        : 'Blue Gold Fleet', 
+    'Caltrain_2015_5_13'                              : 'Caltrain', 
+    'Capitol_2017_3_20'                               : 'Capitol Corridor', 
+    'CCTA_2015_8_11'                                  : 'County Connection', 
+    'commuteDOTorg_GTFSImportExport_20160127_final_mj': 'Commute.org Shuttle', # Caltrain_shuttle
+    'Emeryville_2016_10_26'                           : 'Emery Go-Round',
+    # 'Fairfield_2015_10_14'                            : 'Fairfield and Suisun Transit', 
+    'Fairfield_2015_10_14_updates'                    : 'Fairfield and Suisun Transit',
+    'GGFerries_2017_3_18'                             : 'Golden Gate Ferries', 
+    'GGTransit_2015_9_3'                              : 'Golden Gate Transit', 
+    'Marguerite_2016_10_10'                           : 'Stanford Marguerite Shuttle', 
+    'MarinTransit_2015_8_31'                          : 'Marin Transit', 
+    'MVGo_2016_10_26'                                 : 'MVgo Mountain View', 
+    'petalumatransit-petaluma-ca-us__11_12_15'        : 'Petaluma Transit', 
+    # 'Petaluma_2016_5_22':                              'Petaluma Transit',
+    'RioVista_2015_8_20'                              : 'Rio Vista Delta Breeze', 
+    'SamTrans_2015_8_20'                              : 'SamTrans', 
+    'SantaRosa_google_transit_08_28_15'               : 'Santa Rosa CityBus', 
+    'SFMTA_2015_8_11'                                 : 'San Francisco Municipal Transportation Agency', 
+    'SF_Bay_Ferry2016_07_01'                          : 'San Francisco Bay Ferry', 
+    'Soltrans_2016_5_20'                              : 'SolTrans', 
+    'SonomaCounty_2015_8_18'                          : 'Sonoma County Transit', 
+    'TriDelta-GTFS-2018-05-24_21-43-17'               : 'Tri Delta Transit',
+    'Union_City_Transit_Aug-01-2015_to_Jun-30-2017'   : 'Union City Transit', 
+    'vacavillecitycoach-2020-ca-us'                   : 'Vacaville City Coach', 
+    'Vine_GTFS_PLUS_2015'                             : 'Vine (Napa County)', 
+    'VTA_2015_8_27'                                   : 'VTA', 
+    'westcat-ca-us_9_17_2015'                         : 'WestCat (Western Contra Costa)', 
+    # 'WestCAT_2016_5_26'                               : 'WestCat (Western Contra Costa)',
+    'Wheels_2016_7_13'                                : 'Wheels Bus'
+}
+
+rail_gtfs = ['Bay Area Rapid Transit', 'Caltrain', 'Capitol Corridor']
+ferry_gtfs = ['Golden Gate Ferries', 'San Francisco Bay Ferry']
 
 # way (link) tags we want from OpenStreetMap (OSM)
 # osmnx defaults are viewable here: https://osmnx.readthedocs.io/en/stable/osmnx.html?highlight=util.config#osmnx.utils.config
@@ -2141,8 +2193,8 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
                             "--tile-hierarchy=8 --search-radius=50 --snap-intersections --follow-line-direction'".format(
                                 path=docker_output_path, third_party=third_party, boundary_partition=boundary_partition))
             elif third_party_type == 'transit':
-                command = ("/bin/bash -c 'cd {path}; shst match step6_gtfs/output/conflation_shst/{third_party}{boundary_partition}.in.geojson "
-                            "--out=step6_gtfs/output/conflation_shst/{third_party}{boundary_partition}.out.geojson "
+                command = ("/bin/bash -c 'cd {path}; shst match step6_gtfs/conflation_shst/{third_party}{boundary_partition}.in.geojson "
+                            "--out=step6_gtfs/conflation_shst/{third_party}{boundary_partition}.out.geojson "
                             "--tile-hierarchy=8 --follow-line-direction'".format(
                                 path=docker_output_path, third_party=third_party, boundary_partition=boundary_partition))
                 
@@ -2745,65 +2797,71 @@ def consolidate_all_gtfs(gtfs_input_dir, gtfs_raw_name_ls):
 
     # loop through GTFS data, gather info and add to consolidated dataframes
     for agency_gtfs_name in gtfs_raw_name_ls:
-        WranglerLogger.info('processing {}'.format(agency_gtfs_name))
-        
-        # exclude weekend only services
-        if "calendar_orig.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
-            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"))
-            
-        elif "calendar.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
-            calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"))
-            calendar_df.to_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar_orig.txt"),
-                                                    index = False,
-                                                    sep = ",")
-        
-            calendar_df["weekdays"] = calendar_df.apply(lambda x: x.monday + x.tuesday + x.wednesday + x.thursday + x.friday,
-                                                axis = 1)
-            calendar_df = calendar_df[calendar_df.weekdays > 0]
-            
-            # writing data to external :p
-            calendar_df.drop("weekdays", axis = 1).to_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"),
-                                                    index = False,
-                                                    sep = ",")
-        
-        feed_path = os.path.join(gtfs_input_dir, agency_gtfs_name)
-        WranglerLogger.debug('...reading and getting representative transit feeds from {}'.format(feed_path))
-        feed = get_representative_feed_from_gtfs(feed_path, agency_gtfs_name)
 
-        feed_validate = validate_feed(feed, agency_gtfs_name)
-
-        # read fare tables if exist in GTFS
-        WranglerLogger.debug('...getting fare_attributes info...')
-        if "fare_attributes.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
-            
-            fare_attributes_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"fare_attributes.txt"),
-                                            dtype = {"fare_id" : str})
-            fare_attributes_df["agency_raw_name"] = agency_gtfs_name
+        # some operators have multiple GTFS data, only use one
+        if agency_gtfs_name not in gtfs_name_dict:
+            WranglerLogger.debug('{} not in gtfs_name_dict, skip'.format(agency_gtfs_name))
         
         else:
-            WranglerLogger.debug('no fare_attributes data')
-            fare_attributes_df = pd.DataFrame()
-        
-        WranglerLogger.debug('...getting fare_rules info...')
-        if "fare_rules.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+            WranglerLogger.info('processing {}'.format(agency_gtfs_name))
             
-            fare_rules_df = pd.read_csv(os.path.join(gtfs_input_dir, agency_gtfs_name, "fare_rules.txt"),
-                                        dtype = {"fare_id" : str, "route_id" : str, "origin_id" : str, "destination_id" : str,
-                                                " route_id" : str, " origin_id" : str, " destination_id" : str,})
-            fare_rules_df["agency_raw_name"] = agency_gtfs_name
+            # exclude weekend only services
+            if "calendar_orig.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+                calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"))
+                
+            elif "calendar.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+                calendar_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"))
+                calendar_df.to_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar_orig.txt"),
+                                                        index = False,
+                                                        sep = ",")
             
-        else:
-            WranglerLogger.debug('no fare_rules data')
-            fare_rules_df = pd.DataFrame()
+                calendar_df["weekdays"] = calendar_df.apply(lambda x: x.monday + x.tuesday + x.wednesday + x.thursday + x.friday,
+                                                    axis = 1)
+                calendar_df = calendar_df[calendar_df.weekdays > 0]
+                
+                # writing data to external :p
+                calendar_df.drop("weekdays", axis = 1).to_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"calendar.txt"),
+                                                        index = False,
+                                                        sep = ",")
+            
+            feed_path = os.path.join(gtfs_input_dir, agency_gtfs_name)
+            WranglerLogger.debug('...reading and getting representative transit feeds from {}'.format(feed_path))
+            feed = get_representative_feed_from_gtfs(feed_path, agency_gtfs_name)
 
-        all_routes_df = pd.concat([all_routes_df, feed_validate.routes], sort = False, ignore_index = True)
-        all_trips_df = pd.concat([all_trips_df, feed_validate.trips], sort = False, ignore_index = True)
-        all_stops_df = pd.concat([all_stops_df, feed_validate.stops], sort = False, ignore_index = True)
-        all_shapes_df = pd.concat([all_shapes_df, feed_validate.shapes], sort = False, ignore_index = True)
-        all_stop_times_df = pd.concat([all_stop_times_df, feed_validate.stop_times], sort = False, ignore_index = True)
-        all_agency_df = pd.concat([all_agency_df, feed_validate.agency], sort = False, ignore_index = True)
-        all_fare_attributes_df = pd.concat([all_fare_attributes_df, fare_attributes_df], sort = False, ignore_index = True)
-        all_fare_rules_df = pd.concat([all_fare_rules_df, fare_rules_df], sort = False, ignore_index = True)
+            feed_validate = validate_feed(feed, agency_gtfs_name)
+
+            # read fare tables if exist in GTFS
+            WranglerLogger.debug('...getting fare_attributes info...')
+            if "fare_attributes.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+                
+                fare_attributes_df = pd.read_csv(os.path.join(gtfs_input_dir,agency_gtfs_name,"fare_attributes.txt"),
+                                                dtype = {"fare_id" : str})
+                fare_attributes_df["agency_raw_name"] = agency_gtfs_name
+            
+            else:
+                WranglerLogger.debug('no fare_attributes data')
+                fare_attributes_df = pd.DataFrame()
+            
+            WranglerLogger.debug('...getting fare_rules info...')
+            if "fare_rules.txt" in os.listdir(os.path.join(gtfs_input_dir,agency_gtfs_name)):
+                
+                fare_rules_df = pd.read_csv(os.path.join(gtfs_input_dir, agency_gtfs_name, "fare_rules.txt"),
+                                            dtype = {"fare_id" : str, "route_id" : str, "origin_id" : str, "destination_id" : str,
+                                                    " route_id" : str, " origin_id" : str, " destination_id" : str,})
+                fare_rules_df["agency_raw_name"] = agency_gtfs_name
+                
+            else:
+                WranglerLogger.debug('no fare_rules data')
+                fare_rules_df = pd.DataFrame()
+
+            all_routes_df = pd.concat([all_routes_df, feed_validate.routes], sort = False, ignore_index = True)
+            all_trips_df = pd.concat([all_trips_df, feed_validate.trips], sort = False, ignore_index = True)
+            all_stops_df = pd.concat([all_stops_df, feed_validate.stops], sort = False, ignore_index = True)
+            all_shapes_df = pd.concat([all_shapes_df, feed_validate.shapes], sort = False, ignore_index = True)
+            all_stop_times_df = pd.concat([all_stop_times_df, feed_validate.stop_times], sort = False, ignore_index = True)
+            all_agency_df = pd.concat([all_agency_df, feed_validate.agency], sort = False, ignore_index = True)
+            all_fare_attributes_df = pd.concat([all_fare_attributes_df, fare_attributes_df], sort = False, ignore_index = True)
+            all_fare_rules_df = pd.concat([all_fare_rules_df, fare_rules_df], sort = False, ignore_index = True)
 
     return (all_routes_df, all_trips_df, all_stops_df, all_shapes_df, all_stop_times_df, 
             all_agency_df, all_fare_attributes_df, all_fare_rules_df)
@@ -2954,7 +3012,6 @@ def validate_feed(feed, agency_gtfs_name):
         )
 
     return feed
-    # return trips
 
 
 def get_representative_feed_from_gtfs(work_dir, agency_gtfs_name, in_url = "", fetch = False):
@@ -3261,10 +3318,10 @@ def snap_stop_to_node(stops_df, node_gdf):
 
     # spatial join
     stop_snap_to_node = gpd.sjoin_nearest(stops_gdf[['stop_id', 'geometry']],
-                                          nodes_candidates_df[['geometry', 'shst_node_id']], how='left')
+                                          nodes_candidates_df[['geometry', 'shst_node_id', 'osm_node_id']], how='left')
 
     # bring in other stop attributes
-    stop_to_node_gdf = stops_gdf.merge(stop_snap_to_node[['stop_id', 'shst_node_id']],
+    stop_to_node_gdf = stops_gdf.merge(stop_snap_to_node[['stop_id', 'shst_node_id', 'osm_node_id']],
                                        on='stop_id',
                                        how='left') 
 
@@ -3277,7 +3334,211 @@ def snap_stop_to_node(stops_df, node_gdf):
     return stop_to_node_gdf
 
 
-def gtfs_point_shapes_to_link_gdf(gtfs_shape_file, gtfs_name):
+def v12_ox_graph(nodes_gdf, links_gdf):
+    """
+        create an osmnx-flavored network graph
+        
+        Parameters
+        ----------
+        nodes_df : GeoDataFrame
+        link_df : GeoDataFrame
+        Returns
+        -------
+        networkx multidigraph
+    """
+    try:
+        graph_nodes = nodes_gdf.drop(
+                ["inboundReferenceId", "outboundReferenceId"], axis=1
+            )
+    except:
+        graph_nodes = nodes_gdf.copy()
+
+    # osmnx requires certain variables
+
+    graph_nodes.gdf_name = "network_nodes"
+    graph_nodes['id'] = graph_nodes['shst_node_id']
+    
+    if 'x' not in list(graph_nodes):
+        graph_nodes['x'] = graph_nodes['geometry'].x
+        graph_nodes['y'] = graph_nodes['geometry'].y
+
+    graph_links = links_gdf.copy()
+    graph_links['id'] = graph_links['shstReferenceId']
+    graph_links['key'] = graph_links['shstReferenceId']
+
+    # osmnx doesn't like values that are arrays, so remove the variables that have arrays
+    graph_links.drop(columns=['nodeIds'], inplace=True)
+
+    # osmnx requires graph_links to be uniquely multi-indexed by u, v, key
+    # https://github.com/gboeing/osmnx/blob/fc3ad4249846b05841d58648018b15e4494e04f6/osmnx/utils_graph.py#L110
+    graph_links.set_index(['u','v','key'], inplace=True)
+
+    G = ox.graph_from_gdfs(graph_nodes, graph_links)    
+
+    return G
+
+
+def v12_route_bus_link_osmnx(drive_link_gdf, G, stop_times, routes, trip, stop):
+    
+    """
+    route bus with OSMNX routing
+    
+    Parameters
+    ----------
+    drive_link_gdf: drive links
+    # drive_node_gdf: drive nodes
+    G             : drive graph
+    stop_times    : GTFS stop_times data
+    routes        : GTFS routes data
+    trip          : GTFS trips data - representative trips
+    stop          : GTFS stops data - already snapped to roadway drive nodes
+    
+    return
+    ----------
+    trip_link_shape_df    : dataframe of drive links where bus trips traverses
+    broken_shape_trip_list: list of trips that could not be routed by OSMNX
+    """
+    
+    trip_df = trip.copy()
+    stop_df = stop.copy()
+    stop_time_df = stop_times.copy()
+    
+    chained_stop_df = stop_time_df[stop_time_df['trip_id'].isin(trip_df.trip_id.tolist())]
+    chained_stop_to_node_df = pd.merge(chained_stop_df, 
+                                       stop_df,
+                                        how = 'left',
+                                        on = 'stop_id')
+    
+    WranglerLogger.info('routing bus on roadway network with osmnx...')
+    
+    #osm_node_dict = dict(zip(node_gdf.osmid, node_gdf.N))
+    
+    trip_df = pd.merge(trip_df, routes, how = 'left', on = 'route_id')
+    bus_trip_df = trip_df[trip_df['route_type'] == 3]
+    WranglerLogger.debug('{:,} bus trips'.format(bus_trip_df.shape[0]))
+
+    WranglerLogger.debug('a total of {:,} stops, on {:,} representative trips'.format(
+    chained_stop_to_node_df.stop_id.nunique(),
+    chained_stop_to_node_df.trip_id.nunique()))
+    WranglerLogger.debug('of them, {:,} bus trips, containing {:,} stops'.format(
+        bus_trip_df.shape[0],
+        chained_stop_to_node_df.loc[
+            chained_stop_to_node_df['trip_id'].isin(bus_trip_df.trip_id.tolist())].stop_id.nunique()))
+    
+    # to track trips that osmnx failed to route
+    broken_shape_trip_list = []
+    
+    # output dataframe for osmnx success
+    trip_link_shape_df = pd.DataFrame()
+    
+    # loop through for bus trips
+    for trip_id in bus_trip_df.trip_id.unique():
+        
+        # get the stops on the trip
+        trip_stop_df = chained_stop_to_node_df[chained_stop_to_node_df['trip_id'] == trip_id].copy()
+        
+        trip_stop_df.sort_values(by = ["stop_sequence"], inplace = True)
+
+        try:
+            WranglerLogger.info("routing" + str(trip_id))
+            for s in range(len(trip_stop_df)-1):
+                # from stop node OSM id
+                closest_node_to_stop1 = int(trip_stop_df.osm_node_id.iloc[s])
+                
+                # to stop node OSM id
+                closest_node_to_stop2 = int(trip_stop_df.osm_node_id.iloc[s+1])
+                
+                # osmnx routing btw from and to stops, return the list of nodes
+                # TODO: here nx.shortest_path is used.  
+                node_osmid_list = nx.shortest_path(G, closest_node_to_stop1, closest_node_to_stop2, weight = "length")
+                
+                # get the links
+                if len(node_osmid_list) > 1:
+                    osm_link_gdf = pd.DataFrame({'u' : node_osmid_list[:len(node_osmid_list)-1], 
+                                            'v' : node_osmid_list[1:len(node_osmid_list)],
+                                            'trip_id' : trip_id},
+                                               )
+                else:
+                    continue
+                
+                trip_link_shape_df = pd.concat([trip_link_shape_df, osm_link_gdf], ignore_index = True, sort = False)                
+
+        except:
+            broken_shape_trip_list = broken_shape_trip_list + [trip_id]
+            print('  warning: cannot route bus: ' + str(trip_id))
+            continue      
+    
+    trip_link_shape_df = pd.merge(trip_link_shape_df, trip_df[['trip_id', 'shape_id']], how = 'left', on = 'trip_id')
+
+    trip_link_shape_df = pd.merge(trip_link_shape_df,
+                                # TODO: 'A', 'B' were added in step5_tidy_roadway. Leave them out since we've skipped step5
+                                #   drive_link_gdf[["u", "v", "wayId", "shstReferenceId", "shstGeometryId", "A", "B"]].\
+                                  drive_link_gdf[["u", "v", "wayId", "shstReferenceId", "shstGeometryId"]].\
+                                      drop_duplicates(subset = ["u", "v"]),
+                                  how = "left",
+                                  on = ["u", "v"])
+    
+    return trip_link_shape_df, broken_shape_trip_list
+
+
+def v12_route_bus_link_shst(drive_link_gdf, gtfs_shst_id):
+    
+    """
+    route bus with shst match result
+    
+    parameter
+    ---------
+    drive_link_gdf: roadway drive links
+    gtfs shst match return
+    
+    return
+    ---------
+    dataframe of drive links bus traverses
+    list of imcomplete bus shapes
+    
+    """
+    
+    drive_link_df = drive_link_gdf.copy()
+    shape_shst_df = gtfs_shst_id.copy()
+
+    shape_shst_df = pd.merge(shape_shst_df, 
+                             drive_link_df[
+                                #  ['shstReferenceId','wayId','u','v', "fromIntersectionId", "toIntersectionId", "A", "B"]
+                                ['shstReferenceId','wayId','u','v', "fromIntersectionId", "toIntersectionId"]
+                             ],
+                             how = 'left',
+                             left_on = 'shstReferenceId',
+                             right_on = 'shstReferenceId')
+    
+    shape_shst_df["u"] = shape_shst_df["u"].fillna(0).astype(np.int64)
+    shape_shst_df["v"] = shape_shst_df["v"].fillna(0).astype(np.int64)
+    # shape_shst_df["A"] = shape_shst_df["A"].fillna(0).astype(np.int64)
+    # shape_shst_df["B"] = shape_shst_df["B"].fillna(0).astype(np.int64)
+    
+    shape_shst_df = shape_shst_df.reset_index(drop=True)
+    
+    shape_shst_df['next_shape_id'] = shape_shst_df['shape_id'].\
+                                            iloc[1:].\
+                                            append(pd.Series(shape_shst_df['shape_id'].iloc[-1])).\
+                                            reset_index(drop=True)
+    
+    shape_shst_df['next_u'] = shape_shst_df['u'].\
+                                iloc[1:].\
+                                append(pd.Series(shape_shst_df['v'].iloc[-1])).\
+                                reset_index(drop=True)
+    
+    incomplete_shape_list = shape_shst_df[\
+                                   (shape_shst_df.shape_id==shape_shst_df.next_shape_id)\
+                                   &(shape_shst_df.v!=shape_shst_df.next_u)\
+                                  ].shape_id.unique().\
+                                    tolist()
+    
+    shape_shst_df = shape_shst_df[~shape_shst_df.shape_id.isin(incomplete_shape_list)].copy()
+    
+    return shape_shst_df, incomplete_shape_list
+
+
+def gtfs_point_shapes_to_link_gdf(gtfs_shape_file):
 
     """
     Create a transit line geodataframe from 'shapes.txt' in GTFS data, which contains lat/lon of transit stops/stations:
@@ -3297,7 +3558,7 @@ def gtfs_point_shapes_to_link_gdf(gtfs_shape_file, gtfs_name):
 
         # group stations/stops to get line 
         line_df = gtfs_shape_gdf.groupby(['shape_id'])['geometry'].apply(lambda x:LineString(x.tolist())).reset_index()
-        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry')
+        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry').set_crs(epsg=LAT_LONG_EPSG)
 
         return line_gdf  
 
