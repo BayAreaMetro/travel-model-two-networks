@@ -371,7 +371,7 @@ if __name__ == '__main__':
 
 
     ####################################
-    # routing
+    # route buses
 
     ## Approach 1: osmnx routing
     # build network routing file for osmnx routing
@@ -428,8 +428,100 @@ if __name__ == '__main__':
     # route bus using shst routing method
     bus_shst_link_shape_df, incomplete_shape_list = methods.v12_route_bus_link_shst(drive_link_gdf, shape_shst_matched_df)
 
-    WranglerLogger.info('total {} bus_shst links with {} shapes; {} links with {} shapes were successfully routed'.format(
+    WranglerLogger.info('finished routing bus using sharedstreets matching result;\
+    total {:,} bus_shst links with {:,} shapes; {:,} links with {:,} shapes were successfully routed'.format(
         bus_shst_link_shape_df.shape[0],
         bus_shst_link_shape_df.shape_id.nunique(),
         bus_shst_link_shape_df.shape[0],
         bus_shst_link_shape_df.shape_id.nunique()))
+
+    WranglerLogger.info(
+        'shst method failed to route these shapes: {}'.format(incomplete_shape_list))
+    
+    # combine routing results of the two approaches
+    bus_routed_link_df = methods.v12_route_bus_link_consolidate(bus_osmnx_link_shape_df,
+                                                                bus_shst_link_shape_df,
+                                                                all_routes_df,
+                                                                trip_df,
+                                                                incomplete_shape_list)
+    WranglerLogger.info('consolidated osmnx routing and shst routing results.\
+    Output dataframe bus_routed_link_df has columns:\n{}\n header: \n{}'.format(
+        bus_routed_link_df.dtypes,
+        bus_routed_link_df.head()
+    ))
+
+    ####################################
+    # route non-bus
+
+    # TODO: v12 code has the following manual correction. I think the shape_id and trip_id will be different
+    # when the script is rerun, especially given that shape_id and trip_id are created in this script. Need to 
+    # check the routing results and fix it if needed.
+
+    # manual correction for Capitol Corridor: the shape_id from GTFS are wrong, use the trips that go to San Jose
+    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="AM"), 
+    #                 "trip_id"] = 8042
+    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="MD"), 
+    #                 "trip_id"] = 8049
+    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="PM"), 
+    #                 "trip_id"] = 8054
+    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="NT"), 
+    #                 "trip_id"] = 8063
+
+    rail_path_link_df, rail_path_node_df = methods.v12_create_non_bus_links_nodes(all_stop_times_df,
+                                                                                  all_shapes_df,
+                                                                                  all_routes_df,
+                                                                                  trip_df,
+                                                                                  stop_gdf)
+
+    WranglerLogger.info('finished generating rail links and nodes')
+    WranglerLogger.info('{:,} rail nodes, with columns:\n {}'.format(
+        rail_path_node_df.shape[0],
+        rail_path_node_df.dtypes))
+    WranglerLogger.info('{:,} rail links with {:,} unique shapes; columns:\n{} '.format(
+        rail_path_link_df.shape[0],
+        rail_path_link_df.shape_id.nunique(),
+        rail_path_link_df.dtypes))
+
+    ####################################
+    # create shapes for ACE, CCTA, VINE whose GTFS data doesn't have 'shape.txt' info
+
+    WranglerLogger.info('creat shape for ACE because "ACE_2017_3_20" GTFS feed is missing shape.txt')
+
+    ACE_linestring_gdf, ACE_rail_node_df = methods.v12_create_links_nodes_for_GTFS_missing_shapes(trip_df,
+                                                                                                  all_stop_times_df,
+                                                                                                  all_stops_df,
+                                                                                                  'ACE_2017_3_20')
+
+    # add ACE data into the rest of rail
+    rail_path_link_df = pd.concat([rail_path_link_df,
+                                   ACE_linestring_gdf], sort = False, ignore_index = True)
+    rail_path_node_df = pd.concat([rail_path_node_df,
+                                   ACE_rail_node_df], sort = False, ignore_index = True)
+    
+    WranglerLogger.info('after adding ACE shapes, there are {:,} rail links with {:,} unique shapes, {:,} rail nodes'.format(
+        rail_path_link_df.shape[0],
+        rail_path_link_df.shape_id.nunique(),
+        rail_path_node_df.shape[0]))
+    
+    ####################################
+    # combine bus and rail data with roadway data
+    WranglerLogger.info('combining bus and rail data')
+
+    roadway_and_rail_link_gdf, \
+    roadway_and_rail_node_gdf, \
+    unique_rail_link_gdf, \
+    unique_rail_node_df, \
+    rail_path_link_df = methods.v12_combine_bus_and_rail_shape(rail_path_link_df, 
+                                                               rail_path_node_df,
+                                                               link_gdf,
+                                                               node_gdf)
+
+    WranglerLogger.info('{:,} roadway links, {:,} links after adding transit gtfs'.format(
+        link_gdf.shape[0], 
+        roadway_and_rail_link_gdf.shape[0]))
+    WranglerLogger.info('{:,} roadway nodes, {:,} nodes after adding transit gtfs'.format(
+        node_gdf.shape[0],
+        roadway_and_rail_node_gdf.shape[0]))
+
+    ####################################
+    # TODO: re-number rail nodes and links to be consistent with the county numbering ranges
