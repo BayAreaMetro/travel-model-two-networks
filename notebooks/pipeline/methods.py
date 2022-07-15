@@ -2887,7 +2887,7 @@ def validate_feed(feed, agency_gtfs_name):
     # when 'direction_id' is not present, fill in with 0
     WranglerLogger.debug('...filling in missing direction_id in trips')
     if "direction_id" not in feed.trips.columns: # Marguerita
-        feed.trips["direction_id"] = 0  
+        feed.trips["direction_id"] = 0
     feed.trips["direction_id"].fillna(0, inplace = True)
 
     # add agency_id in routes.txt if missing

@@ -94,9 +94,11 @@ if __name__ == '__main__':
     # remove data not needed
     for gtfs_feed_name in gtfs_raw_name_ls:
         if gtfs_feed_name not in methods.gtfs_name_dict:
-            WranglerLogger.debug('skipping GTFS dataset {} for {}'.format(
-                gtfs_feed_name, methods.gtfs_name_dict[gtfs_feed_name]))
+            WranglerLogger.debug('skipping GTFS dataset {}'.format(gtfs_feed_name))
             gtfs_raw_name_ls.remove(gtfs_feed_name)
+    # TODO: also remove GGFerries - why?
+    WranglerLogger.debug('skipping GTFS dataset GGFerries_2017_3_18')
+    gtfs_raw_name_ls.remove('GGFerries_2017_3_18')
     WranglerLogger.info('Consolidating the following GTFS data: {}'.format(gtfs_raw_name_ls))
 
     # A typical GTFS dataset contains multiple .txt files with information on agency, schedule, routes, stops, trips, fares.
@@ -279,6 +281,7 @@ if __name__ == '__main__':
     
     zonal_fare_df = all_fare_rules_no_route_id_df.loc[all_fare_rules_no_route_id_df['origin_id'].notnull() & \
                                                       all_fare_rules_no_route_id_df['destination_id'].notnull()]
+    # TODO: verify these are indeed operators with zonal fare systems
     WranglerLogger.debug('{} rows of all_fare_rules_df missing new route_id, but have origin_id and destination_id, \
     including agencies: {}'.format(
         zonal_fare_df.shape[0],
@@ -287,6 +290,7 @@ if __name__ == '__main__':
 
     fare_rules_missing_route_id_df = all_fare_rules_no_route_id_df.loc[all_fare_rules_no_route_id_df['origin_id'].isnull() & \
                                                                        all_fare_rules_no_route_id_df['destination_id'].isnull()]
+    # TODO: decide if need to clean up missing values
     WranglerLogger.debug('{} rows of all_fare_rules_df missing new route_id, origin_id, destination_id, \
     including the following agencies: {}'.format(
         fare_rules_missing_route_id_df.shape[0],
@@ -363,8 +367,8 @@ if __name__ == '__main__':
         drive_node_gdf.shst_node_id.isin(
             non_motorway_links_gdf.fromIntersectionId.tolist() + non_motorway_links_gdf.toIntersectionId.tolist())]
     WranglerLogger.debug('{:,} out of {:,} drive_nodes are candidates to snap transit stops to'.format(
-        drive_node_gdf.shape[0],
-        node_candidates_for_stops_df.shape[0]
+        node_candidates_for_stops_df.shape[0],
+        drive_node_gdf.shape[0]
     ))
 
     stop_gdf = methods.snap_stop_to_node(all_stops_df, node_candidates_for_stops_df)
@@ -380,7 +384,6 @@ if __name__ == '__main__':
 
     # route bus using osmnx method, based on representative trips and stops already snapped to roadway drive nodes
     bus_osmnx_link_shape_df, bus_osmnx_broken_trip_list = methods.v12_route_bus_link_osmnx(drive_link_gdf, 
-                                                                                           drive_node_gdf,
                                                                                            G_drive, 
                                                                                            all_stop_times_df,
                                                                                            all_routes_df,
