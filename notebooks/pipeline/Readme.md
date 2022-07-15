@@ -43,7 +43,7 @@ This is much faster to read/write so will be used for subsequent steps instead o
 
 **Optional conversion to geopackage using [convert_geojson_to_geopackage.py](../../src/scripts/convert_geojson_to_geopackage.py)**:
 
-`python convert_geojson_to_geopackage.py "%OUTPUT_DATA_DIR%\step1_shst_extracts" "%OUTPUT_DATA_DIR\step1_shst_extracts\mtc_all_out.gpkg"`
+`python convert_geojson_to_geopackage.py "%OUTPUT_DATA_DIR%\step1_shst_extracts" "%OUTPUT_DATA_DIR%\step1_shst_extracts\mtc_all_out.gpkg"`
 
 ### [Step 2: OSMnx extraction](step2_osmnx_extraction.py)
 
@@ -54,7 +54,6 @@ Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 #### Output:
 * OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/[link,node].feather[.crs]`
-* Geopackage, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/osmnx_extracts.gpkg` with layers 'link', 'node' corresponding to the geofeather output files above; this format is useful for visualization
    
 Data is fetched using [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon) using `simplify=False`, so there are typically multiple links per OSM way.  (This is because if `simplify=True`, OSMnx will aggregate some OSM ways into a single link, which we don't want; see a nice explanation of this process in [OSMnx: Python for Street Networks](https://geoffboeing.com/2016/11/osmnx-python-street-networks/))
 

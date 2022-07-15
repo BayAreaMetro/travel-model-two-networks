@@ -99,7 +99,7 @@ if __name__ == '__main__':
 
     # Request specific way tags from OSM
     WranglerLogger.info("Requesting the following way tags from OSM: {}".format(methods.OSM_WAY_TAGS.keys()))
-    ox.utils.config(useful_tags_way=methods.OSM_WAY_TAGS.keys())
+    ox.settings.useful_tags_way=methods.OSM_WAY_TAGS.keys()
 
     # OSM extraction - Note: this is memory intensive (~15GB) and time-consuming (~50 min)
     WranglerLogger.info('starting osmnx extraction')
@@ -123,9 +123,6 @@ if __name__ == '__main__':
     for column in link_gdf.select_dtypes([object]):
         WranglerLogger.info("column {} value_counts:\n{}".format(column, link_gdf[column].value_counts(dropna=False)))
 
-    # write links to geopackage
-    WranglerLogger.info('writing out OSM links to gpkg at {}'.format(OUTPUT_DIR))
-    link_gdf.to_file(OUTPUT_GPKG, layer="link", driver="GPKG")
     # write links to geofeather
     WranglerLogger.info('writing out OSM links to geofeather at {}'.format(OUTPUT_FEATHER_LINK))
     geofeather.to_geofeather(link_gdf, OUTPUT_FEATHER_LINK)
@@ -144,9 +141,6 @@ if __name__ == '__main__':
     for column in node_gdf.select_dtypes([object]):
         WranglerLogger.info("column {} value_counts:\n{}".format(column, node_gdf[column].value_counts(dropna=False)))
 
-    # writing out OSM node data to geopackage
-    WranglerLogger.info('writing out OSM nodes to gpkg at {}'.format(OUTPUT_DIR))
-    node_gdf.to_file(OUTPUT_GPKG, layer="node", driver="GPKG")
     # write nodes to geofeather
     WranglerLogger.info('writing out OSM nodes to geofeather at {}'.format(OUTPUT_FEATHER_NODE))
     geofeather.to_geofeather(node_gdf, OUTPUT_FEATHER_NODE)
