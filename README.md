@@ -16,18 +16,20 @@ Data used in this repository (the /data folder) is stored in [MTC's Box folder](
 (tm2_network_dev_py38) M:
 (tm2_network_dev_py38) cd M:\Software\Python\py38_geopandas_set
 (tm2_network_dev_py38) pip install .\Rtree-1.0.0-cp38-cp38-win_amd64.whl
+:: Note geopandas looks for pygeos
+(tm2_network_dev_py38) pip install .\pygeos-0.12.0-cp38-cp38-win_amd64.whl
 (tm2_network_dev_py38) pip install .\GDAL-3.4.3-cp38-cp38-win_amd64.whl
 (tm2_network_dev_py38) pip install .\pyproj-3.3.1-cp38-cp38-win_amd64.whl
 (tm2_network_dev_py38) pip install .\Fiona-1.8.21-cp38-cp38-win_amd64.whl
 (tm2_network_dev_py38) pip install .\Shapely-1.8.2-cp38-cp38-win_amd64.whl
 (tm2_network_dev_py38) pip install geopandas osmnx
-(tm2_network_dev_py38) pip install .\pygeos-0.12.0-cp38-cp38-win_amd64.whl
+:: can check that geopandas sees pygeos here: import geopandas; geopandas.show_versions()
 :: Install network_wrangler
 (tm2_network_dev_py38) C:
 (tm2_network_dev_py38) cd C:\Users\lzorn\Documents\GitHub\network_wrangler
 (tm2_network_dev_py38) pip install -e .
 :: Install new dependencies introduced in this repo, noted in requirements.txt
-(tm2_network_dev_py38) pip install scipy geofeather docker
+(tm2_network_dev_py38) pip install scipy geofeather docker peartree
 :: Set environment variables needed for the pipeline and reactivate conda env for them to take effect
 (tm2_network_dev_py38) conda env config vars set INPUT_DATA_DIR="E:\Box\Modeling and Surveys\Development\Travel Model Two Development\Travel Model Two Network Rebuild\travel-model-two-networks\data"
 (tm2_network_dev_py38) conda env config vars set OUTPUT_DATA_DIR=E:\tm2_network_version_13
