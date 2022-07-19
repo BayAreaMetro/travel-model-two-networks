@@ -3551,29 +3551,29 @@ def v12_route_bus_link_consolidate(bus_link_osmnx, bus_link_shst, routes, trip, 
 
     incomplete_list = [x for x in incomplete_list]
     
-    print("Targeting number of bus shape IDs: " + str(bus_trip_df.shape_id.nunique()))
+    WranglerLogger.debug('Targeting number of bus shape IDs: {}'.format(str(bus_trip_df.shape_id.nunique())))
     
     shst_shape_list = list(set([x for x in bus_link_shst_df.shape_id]))
     
     shapes_replace_with_shst_list = [x for x in shst_shape_list if x in shape_id_list]
     
-    print("\n There are " + str(len(shapes_replace_with_shst_list)) + 
-          " shapes that are from shst gtfs matching: \n \t" + 
-          str(shapes_replace_with_shst_list))
+    WranglerLogger.debug('There are {} shapes that are from shst gtfs matching: \n \t{}'.format(
+        str(len(shapes_replace_with_shst_list)), 
+        shapes_replace_with_shst_list))
 
     bus_link_osmnx_df = bus_link_osmnx_df[~bus_link_osmnx_df.shape_id.isin(shapes_replace_with_shst_list)].copy()
     
     osmnx_shape_list = bus_link_osmnx_df.shape_id.unique().tolist()
     
-    print("\n There are " + str(len(osmnx_shape_list)) + 
-          " shapes that are from OSMNX routing: \n \t" + 
-          str(osmnx_shape_list))
+    WranglerLogger.debug('There are {} shapes that are from OSMNX routing: \n \t{}'.format(
+        str(len(osmnx_shape_list)),
+        osmnx_shape_list))
     
     not_routed_list = [x for x in shape_id_list if x not in (shst_shape_list + osmnx_shape_list)]
     
-    print("\n There are " + str(len(not_routed_list)) + 
-         " shapes that are not routed by either of the two methods: \n \t" + 
-         str(not_routed_list))
+    WranglerLogger.debug('There are {} shapes that are not routed by either of the two methods: \n \t{}'.format(
+        str(len(not_routed_list)),
+        not_routed_list))
     
     bus_link_shst_df = pd.merge(bus_link_shst_df,
                                 bus_trip_df[['trip_id', 'shape_id']],
@@ -3585,8 +3585,8 @@ def v12_route_bus_link_consolidate(bus_link_osmnx, bus_link_shst, routes, trip, 
                             sort = False,
                            ignore_index = True)
     
+    # only keep needed columns
     column_list = bus_link_osmnx.columns.values.tolist()
-    WranglerLogger.debug(column_list)
     
     return bus_link_df[column_list]
 
@@ -3908,115 +3908,108 @@ def v12_create_links_nodes_for_GTFS_missing_shapes(trip, stop_times, all_stop, G
     return linestring_df, node_df
 
 
-def v12_combine_bus_and_rail_shape(rail_path_link, rail_path_node, roadway_link_gdf, roadway_node_gdf):
+def v12_combine_roadway_and_rail_links_nodes(rail_path_link_df, rail_path_node_df, roadway_link_gdf, roadway_node_gdf):
     
     """
-    add only unique rail links and nodes to roadway standard
+    Add rail-only links and nodes to roadway links and nodes.
     
-    parameter
+    Args:
     -----------
-    complete rail link path
-    complete rail node path
-    all roadway links
-    all roadway nodes
-    all roadway shapes
+    rail_path_link: complete rail link path
+    rail_path_node: complete rail node path
+    roadway_link_gdf: all roadway links
+    roadway_node_gdf: all roadway nodes
     
-    return
+    Returns:
     -----------
-    all roadway and rail links
-    all roadway and rail nodes
-    all roadway and rail shapes
-    unique rail links
-    unique rail nodes
-    complete rail link path with updated link ID
+    roadway_and_rail_link_gdf: all roadway and rail links
+    roadway_and_rail_node_gdf: all roadway and rail nodes
+    unique_rail_link_gdf: unique rail links
+    unique_rail_node_df: unique rail nodes
+    rail_path_link_df: complete rail link path with updated link ID
     
     """
-    
-    print('indexing rail links and nodes...')
     
     node_gdf = roadway_node_gdf.copy()
     link_gdf = roadway_link_gdf.copy()
-    # shape_gdf = shape.copy()
+
+    WranglerLogger.debug('adding unique rail nodes to roadway nodes gdf')
+
+    # add unique rail nodes to roadway node dataframe (because one node might be used by multiple rail paths)
+    unique_rail_node_df = rail_path_node_df.drop_duplicates(['shape_pt_lat', 'shape_pt_lon'])
     
-    # add unique rail nodes to roadway node dataframe
-    rail_path_node_gdf = rail_path_node.copy()
-    unique_rail_node_df = rail_path_node_gdf.drop_duplicates(['shape_pt_lat', 'shape_pt_lon'])
-    
-    # http://bayareametro.github.io/travel-model-two/input/#roadway-network
-    TAP_start_number = 90001 
-    
-    unique_rail_node_df['model_node_id'] = range(TAP_start_number, TAP_start_number + len(unique_rail_node_df))
-    
-    rail_path_node_gdf = pd.merge(rail_path_node_gdf, 
+    # TODO: decide if want to add 'model_node_id' here and make adjustments accordingly.
+    # Since rail nodes do not have 'osm_node_id' and 'shst_node_id' which the roadway nodes have, 'model_node_id'
+    # becomes the unique identifer after merging roadway and rail nodes. An alternative approach would be to
+    # create fake osm_node_id or shst_node_id for rail nodes, as v12 did for rail-only links.
+    TAP_start_number = 90001  # http://bayareametro.github.io/travel-model-two/input/#roadway-network
+    unique_rail_node_df.loc[:, 'model_node_id'] = range(TAP_start_number, TAP_start_number + len(unique_rail_node_df))   
+    rail_path_node_gdf = pd.merge(rail_path_node_df, 
                                   unique_rail_node_df[['shape_pt_lat', 'shape_pt_lon', 'model_node_id']], 
                                   how = 'left', 
                                   on = ['shape_pt_lat', 'shape_pt_lon'])
     
-    # get unique rail nodes
+    # create geometry
     unique_rail_node_df['geometry'] = [Point(xy) for xy in zip(unique_rail_node_df.shape_pt_lon, 
                                                                unique_rail_node_df.shape_pt_lat)]
-    
-    unique_rail_node_df = gpd.GeoDataFrame(unique_rail_node_df)
-    unique_rail_node_df.crs = {'init' : 'epsg:{}'.format(str(LAT_LONG_EPSG))}
-    unique_rail_node_df = unique_rail_node_df.to_crs(node_gdf.crs)
-    
-    unique_rail_node_df['rail_only'] = int(1)
-    unique_rail_node_df["walk_access"] = int(1)
+    unique_rail_node_gdf = gpd.GeoDataFrame(unique_rail_node_df)
+    unique_rail_node_gdf.crs = {'init' : 'epsg:{}'.format(str(LAT_LONG_EPSG))}
+    unique_rail_node_gdf = unique_rail_node_gdf.to_crs(node_gdf.crs)
+    # add other tags
+    unique_rail_node_gdf['rail_only'] = int(1)
+    unique_rail_node_gdf["walk_access"] = int(1)
     
     # combine rail nodes and roadway nodes
-    node_gdf["rail_only"] = int(0)
+    node_gdf['rail_only'] = int(0)  
+    roadway_and_rail_node_gdf = pd.concat(
+        [node_gdf,
+         unique_rail_node_gdf[['model_node_id', 'geometry', 'rail_only', 'walk_access']]], 
+        ignore_index=True,
+        sort=False)
+
+    WranglerLogger.debug('total roadway and rail nodes: {}'.format(roadway_and_rail_node_gdf.shape[0]))
+
+    WranglerLogger.debug('adding unique rail links to roadway links gdf')
+    rail_path_link_gdf = rail_path_link_df.copy()
+
+    # replace rail links 'u' , 'v' (which are based on rail 'node_id') with 'model_node_id' 
+    rail_node_osmid_dict = dict(zip(rail_path_node_gdf.node_id, rail_path_node_gdf.model_node_id))   
+    rail_path_link_gdf['A'] = rail_path_link_gdf.u.map(rail_node_osmid_dict)
+    rail_path_link_gdf['B'] = rail_path_link_gdf.v.map(rail_node_osmid_dict)
+    rail_path_link_gdf.drop(['u', 'v'], axis = 1, inplace = True)
     
-    rail_node_columns = ["model_node_id", "geometry", "rail_only", "walk_access"]
+    # convert to geodataframe
+    rail_path_link_gdf = gpd.GeoDataFrame(rail_path_link_gdf)
+    rail_path_link_gdf.crs = {'init' : 'epsg:{}'.format(str(LAT_LONG_EPSG))}
     
-    roadway_and_rail_node_gdf = node_gdf.append(unique_rail_node_df[rail_node_columns],
-                                                ignore_index = True, 
-                                                sort = False)
+    # get unique rail links from the rail paths
+    unique_rail_link_gdf = rail_path_link_gdf.drop_duplicates(['A', 'B'])
     
-    
-    rail_node_osmid_dict = dict(zip(rail_path_node_gdf.node_id, rail_path_node_gdf.model_node_id))
-    
-    rail_path_link_df = rail_path_link.copy()
-    
-    rail_path_link_df['A'] = rail_path_link_df.u.map(rail_node_osmid_dict)
-    rail_path_link_df['B'] = rail_path_link_df.v.map(rail_node_osmid_dict)
-    
-    rail_path_link_df.drop(["u", "v"], axis = 1, inplace = True)
-    
-    rail_path_link_df = gpd.GeoDataFrame(rail_path_link_df)
-    rail_path_link_df.crs = {'init' : 'epsg:4326'}
-    
-    # get unique rail links
-    unique_rail_link_gdf = rail_path_link_df.drop_duplicates(['A', 'B'])
-    
-    # fake rail link shst geom id
+    # fake rail link shstGeometryId
     unique_rail_link_gdf['shstGeometryId'] = range(1, 1 + len(unique_rail_link_gdf))
     unique_rail_link_gdf['shstGeometryId'] = unique_rail_link_gdf.shstGeometryId.apply(lambda x:'rail'+str(x))
     unique_rail_link_gdf['id'] = unique_rail_link_gdf['shstGeometryId']
 
+    # add other tags
     unique_rail_link_gdf['rail_only'] = int(1)
     
-    rail_path_link_df = pd.merge(rail_path_link_df,
-                                 unique_rail_link_gdf[["A", "B", "shstGeometryId"]],
-                                 how = "left",
-                                 on = ["A", "B"])
-    
-    rail_link_columns = ['A', 'B', "shstGeometryId", "rail_traveltime", "rail_only", "id", 'geometry']
-    
     # combine rail and roadway links
-    roadway_and_rail_link_gdf = pd.concat([link_gdf, unique_rail_link_gdf[rail_link_columns]], 
-                                           ignore_index = True, 
-                                           sort = False)
+    link_gdf['rail_only'] = int(0) 
+    roadway_and_rail_link_gdf = pd.concat(
+        [link_gdf, 
+         unique_rail_link_gdf[['A', 'B', "shstGeometryId", "rail_traveltime", "rail_only", "id", 'geometry']]], 
+        ignore_index=True, 
+        sort=False)
     
-    """rail_path_link_df = pd.merge(rail_path_link_df[['shape_id', 'geometry', 'u_stop_id', 'v_stop_id']],
-                            unique_rail_shape_gdf.drop(['geometry', 'shape_id'], axis = 1),
-                            how = 'left',
-                            on = ['u_stop_id', 'v_stop_id'])"""
-    
-    rail_path_link_df = rail_path_link_df.to_crs({'init' : 'epsg:{}'.format(str(LAT_LONG_EPSG))})
-        
+    # also, add fake 'shstGeometryId' to rail paths
+    rail_path_link_gdf = pd.merge(rail_path_link_gdf,
+                                  unique_rail_link_gdf[['A', 'B', 'shstGeometryId']],
+                                  how = 'left',
+                                  on = ['A', 'B'])
+
     return roadway_and_rail_link_gdf, roadway_and_rail_node_gdf, \
-                unique_rail_link_gdf, unique_rail_node_df, \
-                rail_path_link_df
+                unique_rail_link_gdf, unique_rail_node_gdf, \
+                rail_path_link_gdf
 
 
 def gtfs_point_shapes_to_link_gdf(gtfs_shape_file):

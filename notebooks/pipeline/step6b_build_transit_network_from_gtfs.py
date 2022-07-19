@@ -391,8 +391,8 @@ if __name__ == '__main__':
                                                                                            stop_gdf)
 
     # trips successfully routed by osmnx
-    WranglerLogger.info('finished routing bus by osmnx method:\
-    all trips contain {:,} unique shape_id, routed trips contain {:,} unique shape_id'.format(
+    WranglerLogger.info('finished routing bus by osmnx method: \
+    a total of {:,} unique shape_id contained by all trips, routed trips contain {:,} unique shape_id'.format(
         trip_df.shape_id.nunique(),
         bus_osmnx_link_shape_df.shape_id.nunique()))
     WranglerLogger.debug('dataframe of drive links where bus trips traverse has the following fields:\n{}'.format(
@@ -486,14 +486,21 @@ if __name__ == '__main__':
         rail_path_link_df.dtypes))
 
     ####################################
-    # create shapes for ACE, CCTA, VINE whose GTFS data doesn't have 'shape.txt' info
+    # create lines and nodes for ACE, CCTA, VINE whose GTFS data doesn't have 'shape.txt' info
 
-    WranglerLogger.info('creat shape for ACE because "ACE_2017_3_20" GTFS feed is missing shape.txt')
+    WranglerLogger.info('creating lines and nodes for ACE because "ACE_2017_3_20" GTFS feed is missing shape.txt')
 
     ACE_linestring_gdf, ACE_rail_node_df = methods.v12_create_links_nodes_for_GTFS_missing_shapes(trip_df,
                                                                                                   all_stop_times_df,
                                                                                                   all_stops_df,
                                                                                                   'ACE_2017_3_20')
+    WranglerLogger.info('created {:,} ACE nodes, with columns:\n {}'.format(
+        ACE_rail_node_df.shape[0],
+        ACE_rail_node_df.dtypes))
+    WranglerLogger.info('created {:,} ACE links with {:,} unique shapes; columns:\n{} '.format(
+        ACE_linestring_gdf.shape[0],
+        ACE_linestring_gdf.shape_id.nunique(),
+        ACE_linestring_gdf.dtypes))                                                                                        
 
     # add ACE data into the rest of rail
     rail_path_link_df = pd.concat([rail_path_link_df,
@@ -507,22 +514,22 @@ if __name__ == '__main__':
         rail_path_node_df.shape[0]))
     
     ####################################
-    # combine bus and rail data with roadway data
-    WranglerLogger.info('combining bus and rail data')
+    # combine roadway and rail links and nodes (bus nodes and links are already in roadway networks)
+    WranglerLogger.info('combine roadway and rail links and nodes')
 
     roadway_and_rail_link_gdf, \
     roadway_and_rail_node_gdf, \
     unique_rail_link_gdf, \
-    unique_rail_node_df, \
-    rail_path_link_df = methods.v12_combine_bus_and_rail_shape(rail_path_link_df, 
-                                                               rail_path_node_df,
-                                                               link_gdf,
-                                                               node_gdf)
+    unique_rail_node_gdf, \
+    rail_path_link_gdf = methods.v12_combine_roadway_and_rail_links_nodes(rail_path_link_df, 
+                                                                          rail_path_node_df,
+                                                                          link_gdf,
+                                                                          node_gdf)
 
-    WranglerLogger.info('{:,} roadway links, {:,} links after adding transit gtfs'.format(
+    WranglerLogger.info('{:,} roadway links, {:,} links after adding rail-only links'.format(
         link_gdf.shape[0], 
         roadway_and_rail_link_gdf.shape[0]))
-    WranglerLogger.info('{:,} roadway nodes, {:,} nodes after adding transit gtfs'.format(
+    WranglerLogger.info('{:,} roadway nodes, {:,} nodes after adding rail-only nodes'.format(
         node_gdf.shape[0],
         roadway_and_rail_node_gdf.shape[0]))
 

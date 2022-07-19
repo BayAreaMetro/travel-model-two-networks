@@ -6,7 +6,10 @@ Inputs:
 Outputs:   
 
 """
-
+# TODO: step6a can potentially be integrated into step6b instead of being a separate script.
+# It also reduces the number of shapes needed to run shst match, because step6b only uses 
+# "representative trips" in GTFS data. But fortunately the number of transit shapes needed
+# for shst match is not that huge, so performance is ok with the entire dataset.
 
 import geopandas as gpd
 import geofeather
