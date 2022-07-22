@@ -340,7 +340,10 @@ if __name__ == '__main__':
     ####################################
     # extract representative trip for each route by direction and time-of-day
     WranglerLogger.info('Getting representative trip for each route by direction and time-of-day')
-    trip_df = methods.get_representative_trip_for_route(all_trips_df, all_stop_times_df)
+    representative_trip_df = methods.get_representative_trip_for_route(all_trips_df,
+                                                        all_stop_times_df,
+                                                        methods.TIME_OF_DAY_DICT)
+    WranglerLogger.info('representative_trip_df has fields: \n{}'.format(representative_trip_df.dtypes))
 
 
     ####################################
@@ -375,25 +378,24 @@ if __name__ == '__main__':
 
 
     ####################################
-    # route buses
+    # route buses - V12 methods
+    # 1. osmnx routing using osmnx network graph
+    # 2. shst routing based on sharedstreest match
+    # 3. combine the two results, prioritizing shst routing
 
-    ## Approach 1: osmnx routing
-    # build network routing file for osmnx routing
-    G_drive = methods.v12_ox_graph(drive_node_gdf,
-                                   drive_link_gdf)
-
-    # route bus using osmnx method, based on representative trips and stops already snapped to roadway drive nodes
-    bus_osmnx_link_shape_df, bus_osmnx_broken_trip_list = methods.v12_route_bus_link_osmnx(drive_link_gdf, 
-                                                                                           G_drive, 
-                                                                                           all_stop_times_df,
-                                                                                           all_routes_df,
-                                                                                           trip_df, 
-                                                                                           stop_gdf)
+    # 1: bus osmnx routing, based on representative trips and stops already snapped to roadway drive nodes
+    WranglerLogger.info('Routing bus using osmnx method')
+    bus_osmnx_link_shape_df, bus_osmnx_broken_trip_list = methods.v12_route_bus_osmnx_graph(drive_link_gdf,
+                                                                                            drive_node_gdf,
+                                                                                            all_stop_times_df,
+                                                                                            all_routes_df,
+                                                                                            representative_trip_df, 
+                                                                                            stop_gdf)
 
     # trips successfully routed by osmnx
     WranglerLogger.info('finished routing bus by osmnx method: \
     a total of {:,} unique shape_id contained by all trips, routed trips contain {:,} unique shape_id'.format(
-        trip_df.shape_id.nunique(),
+        representative_trip_df.shape_id.nunique(),
         bus_osmnx_link_shape_df.shape_id.nunique()))
     WranglerLogger.debug('dataframe of drive links where bus trips traverse has the following fields:\n{}'.format(
         bus_osmnx_link_shape_df.dtypes
@@ -401,9 +403,10 @@ if __name__ == '__main__':
     WranglerLogger.info(
         'osmnx method failed to route these trips (can be rail modes): {}, containing these shapes: {}'.format(
             bus_osmnx_broken_trip_list,
-            trip_df[trip_df.trip_id.isin(bus_osmnx_broken_trip_list)].shape_id.unique()))
+            representative_trip_df.loc[
+                representative_trip_df.trip_id.isin(bus_osmnx_broken_trip_list)].shape_id.unique()))
 
-    ## Approach 2: shst routing
+    # 2: bus shst routing, based on gtfs shapes to sharedstreets conflation 
     # read transit to shst matching result
     shape_shst_matched_df = pd.DataFrame()
     for filename in os.listdir(CONFLATION_SHST):
@@ -429,7 +432,7 @@ if __name__ == '__main__':
     shape_shst_matched_df = shape_shst_matched_df.loc[shape_shst_matched_df.shape_id.notnull()]
 
     # route bus using shst routing method
-    bus_shst_link_shape_df, incomplete_shape_list = methods.v12_route_bus_link_shst(drive_link_gdf, shape_shst_matched_df)
+    bus_shst_link_shape_df, incomplete_shape_list = methods.v12_route_bus_shst(drive_link_gdf, shape_shst_matched_df)
 
     WranglerLogger.info('finished routing bus using sharedstreets matching result;\
     total {:,} bus_shst links with {:,} shapes; {:,} links with {:,} shapes were successfully routed'.format(
@@ -441,17 +444,26 @@ if __name__ == '__main__':
     WranglerLogger.info(
         'shst method failed to route these shapes: {}'.format(incomplete_shape_list))
     
-    # combine routing results of the two approaches
+    # 3: combine routing results of the two approaches
     bus_routed_link_df = methods.v12_route_bus_link_consolidate(bus_osmnx_link_shape_df,
                                                                 bus_shst_link_shape_df,
                                                                 all_routes_df,
-                                                                trip_df,
+                                                                representative_trip_df,
                                                                 incomplete_shape_list)
     WranglerLogger.info('consolidated osmnx routing and shst routing results.\
     Output dataframe bus_routed_link_df has columns:\n{}\n header: \n{}'.format(
         bus_routed_link_df.dtypes,
         bus_routed_link_df.head()
     ))
+
+    ####################################
+    # route buses - Ranch methods
+    # 1. shortest path routing
+    # 2. shst routing based on sharedstreest match
+    # 3. combine the two routing results
+
+    # 
+
 
     ####################################
     # route non-bus
@@ -461,19 +473,19 @@ if __name__ == '__main__':
     # check the routing results and fix it if needed.
 
     # manual correction for Capitol Corridor: the shape_id from GTFS are wrong, use the trips that go to San Jose
-    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="AM"), 
+    # representative_trip_df.loc[(representative_trip_df.shape_id==487)&(representative_trip_df.tod=="AM"), 
     #                 "trip_id"] = 8042
-    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="MD"), 
+    # representative_trip_df.loc[(representative_trip_df.shape_id==487)&(representative_trip_df.tod=="MD"), 
     #                 "trip_id"] = 8049
-    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="PM"), 
+    # representative_trip_df.loc[(representative_trip_df.shape_id==487)&(representative_trip_df.tod=="PM"), 
     #                 "trip_id"] = 8054
-    # trip_df.loc[(trip_df.shape_id==487)&(trip_df.tod=="NT"), 
+    # representative_trip_df.loc[(representative_trip_df.shape_id==487)&(representative_trip_df.tod=="NT"), 
     #                 "trip_id"] = 8063
 
     rail_path_link_df, rail_path_node_df = methods.v12_create_non_bus_links_nodes(all_stop_times_df,
                                                                                   all_shapes_df,
                                                                                   all_routes_df,
-                                                                                  trip_df,
+                                                                                  representative_trip_df,
                                                                                   stop_gdf)
 
     WranglerLogger.info('finished generating rail links and nodes')
@@ -490,7 +502,7 @@ if __name__ == '__main__':
 
     WranglerLogger.info('creating lines and nodes for ACE because "ACE_2017_3_20" GTFS feed is missing shape.txt')
 
-    ACE_linestring_gdf, ACE_rail_node_df = methods.v12_create_links_nodes_for_GTFS_missing_shapes(trip_df,
+    ACE_linestring_gdf, ACE_rail_node_df = methods.v12_create_links_nodes_for_GTFS_missing_shapes(representative_trip_df,
                                                                                                   all_stop_times_df,
                                                                                                   all_stops_df,
                                                                                                   'ACE_2017_3_20')
@@ -534,4 +546,39 @@ if __name__ == '__main__':
         roadway_and_rail_node_gdf.shape[0]))
 
     ####################################
-    # TODO: re-number rail nodes and links to be consistent with the county numbering ranges
+    # clean up
+
+    # 1. TODO: re-number rail nodes and links to be consistent with the county numbering ranges, therefore 
+    # the rail-only nodes and links will start from each county's latest roadway "model_node_id" / "model_link_id".
+    # Since current we are skipping model_node_id and model_link_id creation, skip this part as well.
+
+    # 2. calculate trip frequency for representative trips
+    freq_df = methods.create_freq_table(representative_trip_df,
+                                        methods.TIME_OF_DAY_DICT,
+                                        methods.TOD_NUMHOURS_FREQUENCY_DICT)
+    
+    # 3. create new shape with complete node list the route passes to replace the gtfs shape.txt
+    shape_point_df = methods.create_shape_node_table(roadway_and_rail_node_gdf, 
+                                                     bus_routed_link_df,
+                                                     rail_path_link_gdf)
+    
+    ####################################
+    # write out standard transit data
+    methods.write_standard_transit(GTFS_OUTPUT_DIR,
+                                   representative_trip_df,
+                                   stop_gdf,
+                                   shape_point_df,
+                                   freq_df, 
+                                   all_stop_times_df, 
+                                   all_routes_df, 
+                                   all_trips_df, 
+                                   unique_rail_node_gdf)
+    
+    ####################################
+    # create rail walk access/egress links and assign them model_link_id
+    # TODO: decide where to relocate this step to if it does not belong in Pipeline.
+
+
+    ####################################
+    # export roadway+rail links and nodes
+    #  
