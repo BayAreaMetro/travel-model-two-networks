@@ -556,10 +556,10 @@ if __name__ == '__main__':
     # 2. create lines and nodes for ACE, CCTA, VINE whose GTFS data doesn't have 'shape.txt' info
     WranglerLogger.info('creating lines and nodes for ACE because "ACE_2017_3_20" GTFS feed is missing shape.txt')
 
-    ACE_linestring_gdf, ACE_rail_node_df = methods.v12_create_links_nodes_for_GTFS_missing_shapes(representative_trip_df,
-                                                                                                  all_stop_times_df,
-                                                                                                  all_stops_df,
-                                                                                                  'ACE_2017_3_20')
+    ACE_linestring_gdf, ACE_rail_node_df = methods.v12_route_non_bus_for_GTFS_missing_shapes(representative_trip_df,
+                                                                                             all_stop_times_df,
+                                                                                             all_stops_df,
+                                                                                             'ACE_2017_3_20')
     WranglerLogger.info('created {:,} ACE nodes, with columns:\n {}'.format(
         ACE_rail_node_df.shape[0],
         ACE_rail_node_df.dtypes))

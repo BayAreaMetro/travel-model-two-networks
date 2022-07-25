@@ -3958,7 +3958,7 @@ def v12_route_non_bus(stop_times, shapes, routes, trip, stop, drive_links):
     return rail_trip_link_gdf, rail_stops_gdf, rail_nodes_gdf, unique_rail_nodes_gdf, unique_rail_links_gdf
 
 
-def v12_create_links_nodes_for_GTFS_missing_shapes(trip, stop_times, all_stop, GTFS_name):
+def v12_route_non_bus_for_GTFS_missing_shapes(trip, stop_times, all_stop, GTFS_name):
     """
     for GTFS data that is missing shape.txt, create links and nodes
 
