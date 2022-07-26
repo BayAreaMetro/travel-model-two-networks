@@ -4263,7 +4263,7 @@ def ranch_route_non_bus(trips, routes, shapes, stop_times, stops, drive_links):
                 [rail_trip_link_df, linestring_df],
                 ignore_index=True,
                 sort=False)
-    
+
     # TODO: v12 calculated rail travel time between stops and added it to rail_trip_link_df.
     # Do we need it?
 
@@ -4293,7 +4293,7 @@ def ranch_route_non_bus(trips, routes, shapes, stop_times, stops, drive_links):
     WranglerLogger.debug('creating new rail/ferry nodes')
     
     rail_nodes_df = rail_shape_stop_df.loc[rail_shape_stop_df.is_stop == 1][
-        ["stop_id", "agency_raw_name", "shape_pt_lon", "shape_pt_lat"]]
+        ["stop_id", "agency_raw_name", "shape_pt_lon", "shape_pt_lat"]].reset_index()
 
     # fake node shst id for rail nodes, use 'agency_raw_name'+'stop_id'
     rail_nodes_df["shst_node_id"] = \
@@ -4318,7 +4318,7 @@ def ranch_route_non_bus(trips, routes, shapes, stop_times, stops, drive_links):
             unique_rail_nodes_df.shape_pt_lon, unique_rail_nodes_df.shape_pt_lat)],
         crs=drive_links.crs)
     WranglerLogger.debug(
-        'unique_rail_nodes_gdf has {} rows, fields: {}'.format(
+        'unique_rail_nodes_gdf has {} rows, fields: \n{}'.format(
             unique_rail_nodes_gdf.shape[0], unique_rail_nodes_gdf.dtypes
         ))
 
@@ -4326,16 +4326,11 @@ def ranch_route_non_bus(trips, routes, shapes, stop_times, stops, drive_links):
     WranglerLogger.debug('creating rail_stops')
 
     stop_df = stops.drop(["shst_node_id", 'osm_node_id'], axis=1)
-    rail_stops = pd.merge(
+    rail_stops_gdf = pd.merge(
         stop_df,
         unique_rail_nodes_df[["agency_raw_name", "stop_id", "shst_node_id"]],
         how="inner",
         on=["agency_raw_name", "stop_id"]
-    )
-    rail_stops_gdf = gpd.GeoDataFrame(
-        rail_stops,
-        geometry=rail_stops['geometry'],
-        crs=drive_links.crs
     )
     WranglerLogger.debug(
         'rail_stops_gdf has {} rows, fields: \n{}'.format(
@@ -4532,62 +4527,97 @@ def ranch_route_bus_shortest_path(
     WranglerLogger.info(
         'Shortest path - step 1. routing bus links from start node to end node')
 
-    trip_osm_link_df, trip_osm_link_gdf, shortest_path_failed_shape_list, good_link_dict = \
+    trip_osm_link_df, shortest_path_failed_shape_list, good_link_dict = \
         ranch_route_bus_link_osmnx_from_start_to_end(
             trips, stops, routes, shapes, stop_times, drive_links_gdf, drive_nodes_gdf, 
             good_links_buffer_radius, ft_penalty, non_good_links_penalty)
 
+    # NOTE: trip_osm_link_df contains circular routes which have u==v, therefore not actually routed;
+    # they will be catched in step 2 and resolved in step 3.
     WranglerLogger.info('finished shortest path - step 1')
     WranglerLogger.info('trip_osm_link_df has {} rows with fields: \n{}'.format(
         trip_osm_link_df.shape[0],
         trip_osm_link_df.dtypes))
     WranglerLogger.debug(trip_osm_link_df.head())
-    
+
     WranglerLogger.info(
         'step 1 failed to route {} shapes/trips, including: {}'.format(
             len(shortest_path_failed_shape_list),
             shortest_path_failed_shape_list))
+    
+    # optional: export the routed trips to QAQC
+    # remove rows without a link joined (circular routes, empty geometry) and convert to trip_osm_link_gdf
+    trip_osm_link_gdf = trip_osm_link_df.loc[trip_osm_link_df.shstReferenceId.notnull()].reset_index()
+    trip_osm_link_gdf = gpd.GeoDataFrame(
+        trip_osm_link_gdf,
+        geometry=trip_osm_link_gdf["geometry"],
+        crs=drive_links_gdf.crs,
+    )    
+    WranglerLogger.debug('trip_osm_link_gdf has {} rows with fields: \n{}'.format(
+        trip_osm_link_gdf.shape[0],
+        trip_osm_link_gdf.dtypes))
+    WranglerLogger.debug(trip_osm_link_gdf.head())
 
-    # optional: export for QAQC
-    RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE = \
-        os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step1.feather')
-    WranglerLogger.info('exporting step1 routing results to {}'.format(RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE))
-    geofeather.to_geofeather(trip_osm_link_gdf, RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE) 
+    # also check circular trips
+    trip_osm_link_circular_df = trip_osm_link_df.loc[trip_osm_link_df['u'] == trip_osm_link_df['v']]
+    if trip_osm_link_circular_df.shape[0] > 0:
+        CIRCULAR_TRIPS_QAQC_FILE = \
+            os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step1_circular.csv')
+        WranglerLogger.info('exporting step1 circular trips to {}'.format(CIRCULAR_TRIPS_QAQC_FILE))
+        trip_osm_link_circular_df.to_csv(CIRCULAR_TRIPS_QAQC_FILE, index=False)
+
+    # export non-circular routed trips
+    if trip_osm_link_gdf.shape[0] > 0:
+        RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE = \
+            os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step1.feather')
+        WranglerLogger.info('exporting step1 routing results to {}'.format(RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE))
+        geofeather.to_geofeather(trip_osm_link_gdf, RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE) 
 
     # step 2: for each stop, check if the routed route is within 50 meters. Stops without routed link within 50 meters are "bad stops".
     # self.set_bad_stops() in Ranch package
     WranglerLogger.info('Shortest path - step 2. checking if the routed route is within 50 meters of stops')
     bad_stop_dict = ranch_set_bad_stops(
-        trips, stops, stop_times, trip_osm_link_gdf, bad_stop_buffer_radius)
+        trips, stops, stop_times, trip_osm_link_df, drive_links_gdf, bad_stop_buffer_radius)
 
     WranglerLogger.info('finished shortest path - step 2')
-    WranglerLogger.debug('bad_stop_dict: \n{}'.format(bad_stop_dict))
 
     # step 3: route link between "bad" stops
     # self.route_bus_link_osmnx_between_stops() in Ranch package
-    trip_osm_link_between_stops_df,  trip_osm_link_between_stops_gdf, shortest_path_failed_shape_list = \
+    trip_osm_link_between_stops_df, shortest_path_failed_shape_list = \
         ranch_route_bus_link_osmnx_between_stops(
             trips, stops, shapes, stop_times, drive_links_gdf, drive_nodes_gdf,
             trip_osm_link_df, shortest_path_failed_shape_list, bad_stop_dict, good_link_dict,
             ft_penalty, non_good_links_penalty)
     WranglerLogger.info('finished shortest path - step 3')
-    WranglerLogger.info('trip_osm_link_between_stops_gdf has {} rows with fields: \n{}'.format(
-        trip_osm_link_between_stops_gdf.shape[0],
-        trip_osm_link_between_stops_gdf.dtypes))
-    WranglerLogger.debug(trip_osm_link_between_stops_gdf.head())
+    WranglerLogger.info('trip_osm_link_between_stops_df has {} rows with fields: \n{}'.format(
+        trip_osm_link_between_stops_df.shape[0],
+        trip_osm_link_between_stops_df.dtypes))
+    WranglerLogger.debug(trip_osm_link_between_stops_df.head())
 
     WranglerLogger.info(
         'eventually Ranch osmnx shortest path method failed to route {} shapes/trips, including: {}'.format(
             len(shortest_path_failed_shape_list),
             shortest_path_failed_shape_list))
 
-    # export for QAQC
-    RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE = \
-        os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step3.feather')
-    WranglerLogger.info('exporting step3 routing results to {}'.format(RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE))
-    geofeather.to_geofeather(trip_osm_link_between_stops_gdf, RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE)
+    # optional: convert to trip_osm_link_gdf and export for QAQC
+    trip_osm_link_between_stops_gdf = \
+        trip_osm_link_between_stops_df.loc[trip_osm_link_between_stops_df.shstReferenceId.notnull()].reset_index()
+    trip_osm_link_between_stops_gdf = gpd.GeoDataFrame(
+        trip_osm_link_between_stops_gdf,
+        geometry=trip_osm_link_between_stops_gdf["geometry"],
+        crs=drive_links_gdf.crs,
+    )
+    WranglerLogger.debug('trip_osm_link_between_stops_gdf has {} rows with fields: \n{}'.format(
+        trip_osm_link_between_stops_gdf.shape[0],
+        trip_osm_link_between_stops_gdf.dtypes))
 
-    return trip_osm_link_between_stops_gdf, shortest_path_failed_shape_list
+    if trip_osm_link_between_stops_gdf.shape[0]:
+        RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE = \
+            os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step3.feather')
+        WranglerLogger.info('exporting step3 routing results to {}'.format(RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE))
+        geofeather.to_geofeather(trip_osm_link_between_stops_gdf, RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE)
+
+    return trip_osm_link_between_stops_df, shortest_path_failed_shape_list
 
 
 def ranch_route_bus_link_osmnx_from_start_to_end(
@@ -4637,6 +4667,7 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
         '{} bus trips, representing {} shapes'.format(
             bus_trip_df.shape[0],
             bus_trip_df.shape_id.nunique()))
+    WranglerLogger.debug('bus_trip_df contains: {}'.format(bus_trip_df.agency_raw_name.unique()))
 
     # subset bus trip: for each shape_id, only keep the trip with most number of stops
     # 1) count # stops on each trip
@@ -4670,9 +4701,6 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
         )
         & (stop_trip_df["trip_id"].isin(bus_trip_df["trip_id"].unique()))
     ]
-    # stops_on_bus_trips_df.drop_duplicates(
-    #     subset=["agency_raw_name", "stop_id"], inplace=True
-    # )
     stops_on_bus_trips_df = stops_on_bus_trips_df.drop_duplicates(subset=["agency_raw_name", "stop_id"])
     WranglerLogger.debug('these bus trips contain {} stops'.format(stops_on_bus_trips_df.shape[0]))
 
@@ -4680,9 +4708,9 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
     WranglerLogger.debug("Setting good link dictionary for these stops")
     good_link_dict = ranch_set_good_links(stops_on_bus_trips_df, drive_links_gdf, good_links_buffer_radius)
     WranglerLogger.debug(
-        'good_link_dict has {} records; first 3 records: \n{}'.format(
+        'good_link_dict has {} records; first record: \n{}'.format(
             len(good_link_dict),
-            list(good_link_dict.items())[:3]))
+            list(good_link_dict.items())[0]))
 
     # create output dataframe for osmnx routing success
     trip_osm_link_df = pd.DataFrame()
@@ -4700,11 +4728,14 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
 
         for trip_id in trip_id_list:
 
-            WranglerLogger.debug("\tRouting agency {}, trip {}".format(agency_raw_name, trip_id))
             shape_id = bus_trip_df.loc[
                 (bus_trip_df['agency_raw_name'] == agency_raw_name) &
                 (bus_trip_df['trip_id'] == trip_id)
             ]['shape_id'].iloc[0]
+
+            WranglerLogger.debug(
+                '...Routing agency {}, trip_id {}, shape_id {}'.format(
+                    agency_raw_name, trip_id, shape_id))
 
             # create 'shape_polygon', a bounding box from shape pt (or stop), xmin, xmax, ymin, ymax
             shape_df_sub = shape_df.loc[
@@ -4756,12 +4787,8 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
             ]
 
             # get the good links from good links dictionary that are within stop buffer
-            good_links_list = []
-            stop_id_list = trip_stops_df['stop_id'].unique()
-            for stop_id in stop_id_list:
-                if stop_id in good_link_dict:
-                    good_links_list = good_links_list + good_link_dict[stop_id]
-
+            good_links_list = ranch_get_good_link_for_trip(good_link_dict, trip_stops_df)
+            
             # update link weights, first based on link length, and apply non_good_links_penalty and ft_penalty
             # TODO: this is based on 'length'. Before fully cleaning up roadway links data,
             # it has 'length_osmnx' and 'length_meter', use 'length_meter' for now
@@ -4811,7 +4838,7 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
             if type(path_osm_link_df) == str:
                 shortest_path_failed_shape_list.append(
                     '{}_{}'.format(agency_raw_name, 
-                                   shape_id))
+                                shape_id))
                 continue
             
             # if get a link path for this trip, append it to all routed trips dataframe
@@ -4819,9 +4846,10 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
             path_osm_link_df['agency_raw_name'] = agency_raw_name
 
             trip_osm_link_df = pd.concat([trip_osm_link_df, path_osm_link_df],
-                                         ignore_index=True,
-                                         sort=False)
+                                        ignore_index=True,
+                                        sort=False)
 
+    WranglerLogger.debug('trip_osm_link_df has {} rows'.format(trip_osm_link_df.shape[0]))
     # after routing all trips, add other trip and link attributes
     trip_osm_link_df = merge_dfs_with_dup_col(
         trip_osm_link_df,
@@ -4830,37 +4858,45 @@ def ranch_route_bus_link_osmnx_from_start_to_end(
         'left'
     )
 
+    # NOTE: for circular routes, trip_osm_link_df as same u and v, then the merge below will fail to find
+    # a road way link for it.
     trip_osm_link_df = merge_dfs_with_dup_col(
         trip_osm_link_df,
         drive_links_gdf[["u", "v", "wayId", "shstReferenceId", "shstGeometryId", "geometry"]].drop_duplicates(subset=["u", "v"]),
         ["u", "v"],
         'left')
 
-    # convert to trip_osm_link_gdf
-    trip_osm_link_gdf = gpd.GeoDataFrame(
-        trip_osm_link_df,
-        geometry=trip_osm_link_df["geometry"],
-        crs=drive_links_gdf.crs,
-    )
-
-    return trip_osm_link_df, trip_osm_link_gdf, shortest_path_failed_shape_list, good_link_dict
+    return trip_osm_link_df, shortest_path_failed_shape_list, good_link_dict
 
 
-def ranch_set_bad_stops(trips, stops, stop_times, trip_osm_link_gdf, bad_stop_buffer_radius):
+def ranch_set_bad_stops(trips, stops, stop_times, trip_osm_link_df,
+                        drive_links_gdf, bad_stop_buffer_radius):
 
     """
     for each stop, check if the routed route is within 50 meters, Stops without routed link within 50 meters are "bad stops".
     - loop through each routed trip and each stop, get all routed links for the stop
     - examine how many of these routed links are within the 50-meter 'bad_stop_buffer_radius'
     - if none of the links is within, add the stop to the 'bad stops' dictionary
+    
+    Circular routes have empty geometry in "trip_osm_link_gdf", therefore function 'ranch_links_within_stop_buffer'
+    will find no link for any nodes/stops, so all will be 'bad stops'.
 
     Returns:
-    - dict_stop_far_from_trip: 'bad stops' dictionary, key is (agency_raw_name, trip_id), value is a list of 'bad' stops on that trip
+    - dict_stop_far_from_trip: 'bad stops' dictionary; key is (agency_raw_name, trip_id);
+                               value is a list of 'bad' stops on that trip, or empty list if no 'bad' stop in the trip.
+                               
     """
 
     trip_df = trips.copy()
     stop_df = stops.copy()
     stop_time_df = stop_times.copy()
+
+    # convert trip_osm_link_df into trip_osm_link_gdf 
+    trip_osm_link_gdf = gpd.GeoDataFrame(
+        trip_osm_link_df,
+        geometry=trip_osm_link_df["geometry"],
+        crs=drive_links_gdf.crs
+    )
 
     # get chained stops on a trip
     chained_stop_df = stop_time_df.loc[
@@ -4966,11 +5002,13 @@ def ranch_route_bus_link_osmnx_between_stops(
 
         for trip_id in trip_id_list:
 
-            WranglerLogger.debug("\tRouting agency {}, trip {}".format(agency_raw_name, trip_id))
             shape_id = bus_trip_df.loc[
                 (bus_trip_df["agency_raw_name"] == agency_raw_name)
                 & (bus_trip_df["trip_id"] == trip_id)
             ]["shape_id"].iloc[0]
+
+            WranglerLogger.debug("Routing agency {}, trip_id {}, shape_id {}".format(
+                agency_raw_name, trip_id, shape_id))
 
             # create bounding box from shape, xmin, xmax, ymin, ymax
             shape_df_sub = shape_df.loc[
@@ -5028,11 +5066,7 @@ def ranch_route_bus_link_osmnx_between_stops(
             ]
 
             # get the links from good links dictionary that are within stop buffer
-            good_links_list = []
-            stop_id_list = trip_stops_df['stop_id'].unique()
-            for stop_id in stop_id_list:
-                if stop_id in good_link_dict:
-                    good_links_list = good_links_list + good_link_dict[stop_id]
+            good_links_list = ranch_get_good_link_for_trip(good_link_dict, trip_stops_df)
 
             # update link weights
             # TODO: this is based on 'length'. Before fully cleaning up roadway links data,
@@ -5153,19 +5187,7 @@ def ranch_route_bus_link_osmnx_between_stops(
         ["u", "v"],
         'left')
 
-    # convert to trip_osm_link_gdf
-    trip_osm_link_between_stops_gdf = gpd.GeoDataFrame(
-        trip_osm_link_between_stops_df,
-        geometry=trip_osm_link_between_stops_df["geometry"],
-        crs=drive_links_gdf.crs,
-    )
-
-    WranglerLogger.info(
-        'failed to route {} shapes/trips, including: {}'.format(
-            len(shortest_path_failed_shape_list),
-            shortest_path_failed_shape_list))
-
-    return trip_osm_link_between_stops_df, trip_osm_link_between_stops_gdf, shortest_path_failed_shape_list
+    return trip_osm_link_between_stops_df, shortest_path_failed_shape_list
 
 
 def ranch_geodesic_point_buffer(lat, lon, meters):
@@ -5215,7 +5237,7 @@ def ranch_set_good_links(stops_on_bus_trips_df, drive_links_gdf, good_links_buff
     Returns:
     - good_link_dict: key is (agency_raw_name, stop_id), value is a list of good links ID'ed by shstReferenceId
 
-    """
+    """ 
     stop_good_link_df = ranch_links_within_stop_buffer(
         drive_links_gdf,
         stops_on_bus_trips_df,
@@ -5229,6 +5251,25 @@ def ranch_set_good_links(stops_on_bus_trips_df, drive_links_gdf, good_links_buff
     )
     
     return good_link_dict
+
+
+def ranch_get_good_link_for_trip(good_link_dict, trip_stops):
+    """
+    for input stop IDs return a list of the good link IDs, referenced by shstReferenceId
+    """
+
+    link_shstReferenceId_list = []
+    for agency_raw_name in trip_stops["agency_raw_name"].unique():
+        stop_id_list = trip_stops[trip_stops["agency_raw_name"] == agency_raw_name][
+            "stop_id"
+        ].unique()
+        for stop_id in stop_id_list:
+            if good_link_dict.get((agency_raw_name, stop_id)):
+                link_shstReferenceId_list += good_link_dict.get(
+                    (agency_raw_name, stop_id)
+                )
+
+    return link_shstReferenceId_list
 
 
 def ranch_get_link_path_between_nodes(G, from_node, to_node, weight_field):
@@ -5255,7 +5296,7 @@ def ranch_get_link_path_between_nodes(G, from_node, to_node, weight_field):
                 "v": [from_node],
             },
         )
-
+        WranglerLogger.debug('...this is a circular route')
         return osm_link_df
 
     # get the links

@@ -414,7 +414,8 @@ if __name__ == '__main__':
     WranglerLogger.info('Saving V12 bus osmnx routing result to {}'.format(v12_BUS_OSMNX_ROUTING_QAQC_FILE))
     bus_osmnx_link_shape_df.to_csv(v12_BUS_OSMNX_ROUTING_QAQC_FILE, index=False)
 
-    # 2: bus shst routing, based on gtfs shapes to sharedstreets conflation 
+    # 2: bus shst routing, based on gtfs shapes to sharedstreets conflation
+    # TODO: bus_shst_link_shape_df has duplicate columns. Need to debug! 
     # read transit to shst matching result
     shape_shst_matched_df = pd.DataFrame()
     for filename in os.listdir(CONFLATION_SHST):
@@ -502,7 +503,7 @@ if __name__ == '__main__':
             all_stop_times_df,
             drive_link_gdf,
             drive_node_gdf,
-            TRANSIT_ROUTING_QAQC_DIR                                                                 
+            TRANSIT_ROUTING_QAQC_DIR
         )
     
     # TODO: compare v12 and Ranch shst routing
@@ -601,7 +602,6 @@ if __name__ == '__main__':
     geofeather.to_geofeather(ranch_rail_nodes_gdf, RANCH_RAIL_NODE_QAQC_FILE) 
     WranglerLogger.info('exporting ranch non-bus stops to {}'.format(RANCH_RAIL_STOPS_QAQC_FILE))
     geofeather.to_geofeather(ranch_rail_stops_gdf, RANCH_RAIL_STOPS_QAQC_FILE)
-    
 
     ####################################
     # combine roadway and rail links and nodes (bus nodes and links are already in roadway networks)
@@ -646,10 +646,10 @@ if __name__ == '__main__':
                                    representative_trip_df,
                                    stop_gdf,
                                    shape_point_df,
-                                   freq_df, 
-                                   all_stop_times_df, 
-                                   all_routes_df, 
-                                   all_trips_df, 
+                                   freq_df,
+                                   all_stop_times_df,
+                                   all_routes_df,
+                                   all_trips_df,
                                    unique_rail_node_gdf)
     
     ####################################
