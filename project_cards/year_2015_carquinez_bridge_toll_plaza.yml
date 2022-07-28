@@ -53,11 +53,11 @@ changes:
     - time:
       - '6:00'
       - '10:00'
-      set: 2
+      set: 3
     - time:
       - '15:00'
       - '19:00'
-      set: 2
+      set: 3
   - property: ML_access
     set: all
   - property: ML_egress
