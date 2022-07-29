@@ -1863,7 +1863,7 @@ def create_node_gdf(link_gdf):
     return point_gdf
 
 
-def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
+def tag_nodes_links_by_county_name(node_gdf, link_gdf, COUNTY_BOUNDARY_FILE):
     """
     Tag network nodes and links by county.
     Nodes: first spatially join nodes with counties shapes; for nodes failed to join (e.g. in the Bay), 
@@ -1871,6 +1871,12 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, counties_gdf):
     Links: first spatially join links with counties shapes based on link centroids. For links failed to join, 
            match to the nearest nodes which already have county tags.
     """
+
+    ###### loading county boundary file and convert to the correct crs
+    WranglerLogger.info('loading county shapefile {}'.format(COUNTY_BOUNDARY_FILE))
+    counties_gdf = gpd.read_file(COUNTY_BOUNDARY_FILE)
+    WranglerLogger.info('convert to link_gdf CRS')
+    counties_gdf = counties_gdf.to_crs(link_gdf.crs)
 
     ###### tag nodes 
     WranglerLogger.info('tagging nodes with county names')
@@ -3284,19 +3290,57 @@ def merge_dfs_with_dup_col(df1, df2, merge_key_ls, merge_rule):
     return df_merge
 
 
-def snap_stop_to_node(stops_df, node_gdf):
-
+def snap_stop_to_roadway_nodes(stops_df, drive_nodes_gdf, drive_links_gdf):
     """
     map gtfs stops to roadway nodes
 
     Parameters:
     ------------
-    stops from GTFS
-    drive nodes candidates for snapping transit stops to
+    stops_df: stops from GTFS
+    node_gdf: roadway nodes for snapping transit stops to
 
     return
     ------------
-    stops with drive nodes id 'shst_node_id'
+    stops with drive nodes id 'shst_node_id' and 'osm_node_id
+    """
+
+    # only keep non-motorway nodes: motorway and motorway are restricted-access freeway and freeway ramps, 
+    # shouldn't have transit stops
+    # also exclude links with roadway=='unknown' highway=='traffic_island'. See discussion: https://app.asana.com/0/0/1202470211319796/1202491781241679/f 
+    non_motorway_links_gdf = drive_links_gdf.loc[~drive_links_gdf.roadway.isin(["motorway", "motorway_link", 'unknown'])]
+
+    node_candidates_for_stops_df = drive_nodes_gdf.loc[
+        drive_nodes_gdf.shst_node_id.isin(
+            non_motorway_links_gdf.fromIntersectionId.tolist() + non_motorway_links_gdf.toIntersectionId.tolist())]
+    WranglerLogger.debug('{:,} out of {:,} drive_nodes are candidates to snap transit stops to'.format(
+        node_candidates_for_stops_df.shape[0],
+        drive_nodes_gdf.shape[0]
+    ))
+
+    stops_snapped_gdf = snap_stop_to_node(stops_df, node_candidates_for_stops_df)
+
+    WranglerLogger.info('Snapped {:,} out of {:,} stops to nearest nodes; {:,} unique nodes'.format(
+        stops_snapped_gdf.loc[stops_snapped_gdf.shst_node_id.notnull()].shape[0],
+        stops_df.shape[0],
+        stops_snapped_gdf.shst_node_id.nunique()
+    ))
+
+    return stops_snapped_gdf
+ 
+
+def snap_stop_to_node(stops_df, node_gdf):
+
+    """
+    find closest node in node_candidates_df for each node in node_df
+    
+    Parameters:
+    ------------
+    node_df
+    node_candidates_df
+    
+    return
+    ------------
+    stops with drive nodes id and needed attributes
     """
 
     # Below is V12's initial method - cKDTree
@@ -3354,13 +3398,7 @@ def snap_stop_to_node(stops_df, node_gdf):
     # bring in other stop attributes
     stop_to_node_gdf = stops_gdf.merge(stop_snap_to_node[['stop_id', 'shst_node_id', 'osm_node_id']],
                                        on='stop_id',
-                                       how='left') 
-
-    WranglerLogger.info('Snapped {:,} out of {:,} stops to nearest nodes; {:,} unique nodes'.format(
-        stop_snap_to_node.loc[stop_snap_to_node.shst_node_id.notnull()].shape[0],
-        stops_gdf.shape[0],
-        stop_snap_to_node.shst_node_id.nunique()
-    ))
+                                       how='left')
 
     return stop_to_node_gdf
 
@@ -3502,7 +3540,7 @@ def v12_route_bus_osmnx(drive_link_gdf, drive_node_gdf, stop_times, routes, trip
 
         except:
             broken_shape_trip_list = broken_shape_trip_list + [(agency_raw_name, trip_id)]
-            WranglerLogger(
+            WranglerLogger.debug(
                 'warning: cannot route bus (agency_raw_name + trip_id): {}'.format(agency_raw_name +''+ str(trip_id)))
             continue      
     
@@ -3590,7 +3628,7 @@ def route_bus_shst(SHST_MATCH_OUTPUT_DIR, drive_link_gdf, trips, unique_shape_id
     shape_shst_matched_df = shape_shst_matched_df.loc[shape_shst_matched_df.shape_id.notnull()]
 
     # route bus using shst routing method
-    bus_shst_link_shape_gdf, incomplete_shape_list = \
+    bus_shst_link_shape_gdf, shst_incomplete_trip_shape_df = \
         v12_route_bus_from_shst_matched_to_links(drive_link_gdf, shape_shst_matched_df)
 
     # add trip_id
@@ -3607,10 +3645,12 @@ def route_bus_shst(SHST_MATCH_OUTPUT_DIR, drive_link_gdf, trips, unique_shape_id
         bus_shst_link_shape_gdf[['agency_raw_name', 'shape_id']].drop_duplicates().shape[0]
     ))
 
+    shst_incomplete_shape_list = \
+        shst_incomplete_trip_shape_df[['agency_raw_name', 'shape_id']].values.tolist()
     WranglerLogger.info(
-        'shst method failed to route these shapes: {}'.format(incomplete_shape_list))
+        'shst method failed to route these shapes: {}'.format(shst_incomplete_shape_list))
 
-    return bus_shst_link_shape_gdf, incomplete_shape_list
+    return bus_shst_link_shape_gdf, shst_incomplete_trip_shape_df[['agency_raw_name', 'shape_id']]
 
 
 def v12_route_bus_from_shst_matched_to_links(drive_link_gdf, gtfs_shape_shst_match_df):
@@ -3646,25 +3686,45 @@ def v12_route_bus_from_shst_matched_to_links(drive_link_gdf, gtfs_shape_shst_mat
     # shape_shst_gdf["B"] = shape_shst_gdf["B"].fillna(0).astype(np.int64)
     
     shape_shst_gdf = shape_shst_gdf.reset_index(drop=True)
+
+    shape_shst_gdf['next_agency_raw_name'] = pd.concat(
+        [shape_shst_gdf['agency_raw_name'].iloc[1:],
+         pd.Series(shape_shst_gdf['agency_raw_name'].iloc[-1])]).reset_index(drop=True)
     
-    shape_shst_gdf['next_shape_id'] = pd.concat([shape_shst_gdf['shape_id'].iloc[1:],
-                                                pd.Series(shape_shst_gdf['shape_id'].iloc[-1])]).reset_index(drop=True)
+    shape_shst_gdf['next_shape_id'] = pd.concat(
+        [shape_shst_gdf['shape_id'].iloc[1:],
+        pd.Series(shape_shst_gdf['shape_id'].iloc[-1])]).reset_index(drop=True)
     
-    shape_shst_gdf['next_u'] = pd.concat([shape_shst_gdf['u'].iloc[1:],  
-                                         pd.Series(shape_shst_gdf['v'].iloc[-1])]).reset_index(drop=True)
+    shape_shst_gdf['next_u'] = pd.concat(
+        [shape_shst_gdf['u'].iloc[1:],  
+         pd.Series(shape_shst_gdf['v'].iloc[-1])]).reset_index(drop=True)
     
     # if the matched links do not form a complete shape, but have gap(s) in the middle, then consider the routing failed
-    incomplete_shape_list = shape_shst_gdf.loc[
-        (shape_shst_gdf.shape_id == shape_shst_gdf.next_shape_id) &\
-        (shape_shst_gdf.v != shape_shst_gdf.next_u)
-            ].shape_id.unique().tolist()
+    shst_incomplete_trip_shape_df = shape_shst_gdf.loc[
+        (shape_shst_gdf.agency_raw_name == shape_shst_gdf.next_agency_raw_name) & \
+        (shape_shst_gdf.shape_id == shape_shst_gdf.next_shape_id) & \
+        (shape_shst_gdf.v != shape_shst_gdf.next_u)]
     
-    shape_shst_gdf = shape_shst_gdf.loc[~shape_shst_gdf.shape_id.isin(incomplete_shape_list)].reset_index()
+    shst_incomplete_trip_shape_df['agency_shape_id'] = \
+        shst_incomplete_trip_shape_df['agency_raw_name'] + \
+        '_' + \
+        shst_incomplete_trip_shape_df['shape_id'].astype(int).astype(str)
 
-    return shape_shst_gdf, incomplete_shape_list
+    shape_shst_gdf['agency_shape_id'] = \
+        shape_shst_gdf['agency_raw_name'] + \
+        '_' + \
+        shape_shst_gdf['shape_id'].astype(int).astype(str)
+    
+    shape_shst_gdf = shape_shst_gdf.loc[
+        ~shape_shst_gdf['agency_shape_id'].isin(
+            shst_incomplete_trip_shape_df['agency_shape_id'].unique())].reset_index()
+
+    shape_shst_gdf.drop(columns='agency_shape_id', inplace=True)
+
+    return shape_shst_gdf, shst_incomplete_trip_shape_df
 
 
-def route_bus_link_consolidate(bus_link_osmnx, bus_link_shst, routes, trip, incomplete_list):
+def route_bus_link_consolidate(bus_link_osmnx, bus_link_shst, routes, trip):
 
     """
     combine bus links from OSMNX and SHST
@@ -3699,8 +3759,6 @@ def route_bus_link_consolidate(bus_link_osmnx, bus_link_shst, routes, trip, inco
         'routing target: representative trips include {} bus shapes, {} bus trips'.format(
             len(target_shape_id_list), bus_trip_df.shape[0]
         ))
-
-    incomplete_list = [x for x in incomplete_list]
     
     # shapes in the target list and successfully routed by shst
     bus_link_shst_df = bus_link_shst_df.loc[
@@ -4402,15 +4460,6 @@ def ranch_route_non_bus(trips, routes, shapes, stop_times, stops, drive_links):
     # fake shst_node_id for rail nodes, use 'agency_raw_name'+'stop_id'
     rail_nodes_df["shst_node_id"] = \
         rail_nodes_df["agency_raw_name"] + "_" + rail_nodes_df["stop_id"].astype(int).astype(str)
-    rail_nodes_gdf = gpd.GeoDataFrame(
-        rail_nodes_df,
-        geometry=[Point(xy) for xy in zip(
-            rail_nodes_df.shape_pt_lon, rail_nodes_df.shape_pt_lat)],
-        crs=drive_links.crs)
-    WranglerLogger.debug(
-        'rail_nodes_gdf has {} rows, fields: {}'.format(
-            rail_nodes_gdf.shape[0], rail_nodes_gdf.dtypes
-        ))
 
     # create unique rail nodes
     agency_unique_rail_nodes_df = rail_nodes_df.drop_duplicates(
@@ -4476,47 +4525,37 @@ def ranch_route_non_bus(trips, routes, shapes, stop_times, stops, drive_links):
 
     WranglerLogger.info('creating unique rail/ferry link gdf')
     
-    # creating unique rail/ferry links
-    agency_unique_rail_links_gdf = rail_trip_links_gdf.drop_duplicates(
-        subset=["agency_raw_name", "from_stop_id", "to_stop_id"]
-    )
-    WranglerLogger.debug(
-        'agency_unique_rail_links_gdf has {} rows, fields: {}'.format(
-            agency_unique_rail_links_gdf.shape[0], agency_unique_rail_links_gdf.dtypes
-        ))
-
-    return rail_trip_links_gdf, rail_stops_gdf, rail_nodes_gdf, agency_unique_rail_nodes_gdf, agency_unique_rail_links_gdf
+    return rail_trip_links_gdf, rail_stops_gdf, agency_unique_rail_nodes_gdf
 
 
-def combine_roadway_and_rail_links_nodes(rail_nodes_gdf, rail_trip_links_gdf, roadway_link_gdf, roadway_node_gdf):
+def combine_roadway_and_rail_links_nodes(unique_rail_nodes, rail_trip_links, roadway_links, roadway_nodes):
     
     """
     Add rail-only links and nodes to roadway links and nodes.
     
     Args:
     -----------
-    rail_path_link: complete rail link path
-    rail_path_node: complete rail node path
-    roadway_link_gdf: all roadway links
-    roadway_node_gdf: all roadway nodes
+    rail_trip_links: complete rail/ferry links on paths
+    unique_rail_nodes: unique rail/ferry nodes
+    roadway_link: all roadway links
+    roadway_node: all roadway nodes
     
     Returns:
     -----------
     roadway_and_rail_link_gdf: all roadway and rail links
     roadway_and_rail_node_gdf: all roadway and rail nodes
     unique_rail_link_gdf: unique rail links
-    unique_rail_node_df: unique rail nodes
-    rail_path_link_df: complete rail link path with updated link ID
+    unique_rail_node_gdf: unique rail nodes
+    rail_path_link_gdf: complete rail link path with updated link ID
     
     """
     
-    nodes_gdf = roadway_node_gdf.copy()
-    links_gdf = roadway_link_gdf.copy()
+    nodes_gdf = roadway_nodes.copy()
+    links_gdf = roadway_links.copy()
 
     WranglerLogger.debug('adding unique rail nodes to roadway nodes gdf')
 
 
-    
     # # TODO: decide if want to add 'model_node_id' here and make adjustments accordingly.
     # TAP_start_number = 90001  # http://bayareametro.github.io/travel-model-two/input/#roadway-network
     # unique_rail_node_df.loc[:, 'model_node_id'] = range(TAP_start_number, TAP_start_number + len(unique_rail_node_df))   
@@ -4532,9 +4571,7 @@ def combine_roadway_and_rail_links_nodes(rail_nodes_gdf, rail_trip_links_gdf, ro
     # unique_rail_node_gdf.crs = {'init' : 'epsg:{}'.format(str(LAT_LONG_EPSG))}
 
     # create unique rail/ferry nodes (because one node might be used by multiple rail paths)
-    unique_rail_nodes_gdf = rail_nodes_gdf[[
-        'shape_pt_lat','shape_pt_lon', 'shst_node_id', 'geometry']].drop_duplicates(
-            ['shape_pt_lat', 'shape_pt_lon'])
+    unique_rail_nodes_gdf = unique_rail_nodes[['shape_pt_lat','shape_pt_lon', 'shst_node_id', 'geometry']]
     # update CRS just in case
     unique_rail_nodes_gdf = unique_rail_nodes_gdf.to_crs(nodes_gdf.crs)
     # add other tags
@@ -4552,10 +4589,9 @@ def combine_roadway_and_rail_links_nodes(rail_nodes_gdf, rail_trip_links_gdf, ro
     WranglerLogger.debug('total roadway and rail nodes: {}'.format(roadway_and_rail_node_gdf.shape[0]))
 
     WranglerLogger.debug('adding unique rail links to roadway links gdf')
-    # create unique rail/ferry links
-    unique_rail_links_gdf = rail_trip_links_gdf.drop_duplicates(
-            ['from_stop_id', 'to_stop_id'])
-    # update CRS just in case
+    # get unique trip links
+    unique_rail_links_gdf = rail_trip_links.drop_duplicates(
+            subset=['agency_raw_name', 'from_stop_id', 'to_stop_id'])
     unique_rail_links_gdf = unique_rail_links_gdf.to_crs(links_gdf.crs)
 
     # # replace rail links 'u' , 'v' (which are based on rail 'node_id') with 'model_node_id' 
@@ -4587,7 +4623,7 @@ def combine_roadway_and_rail_links_nodes(rail_nodes_gdf, rail_trip_links_gdf, ro
          unique_rail_links_gdf[['fromIntersectionId',
                                'toIntersectionId', 
                                'shstGeometryId',
-                               'rail_traveltime', 
+                            #    'rail_traveltime', 
                                'rail_only', 
                                'id', 
                                'geometry']]], 
@@ -4595,7 +4631,7 @@ def combine_roadway_and_rail_links_nodes(rail_nodes_gdf, rail_trip_links_gdf, ro
         sort=False)
     
     # also, add fake 'shstGeometryId' to rail paths
-    rail_trip_links_gdf = rail_trip_links_gdf.merge(
+    rail_trip_links_gdf = rail_trip_links.merge(
         unique_rail_links_gdf[['fromIntersectionId', 'toIntersectionId', 'shstGeometryId']],
         on = ['fromIntersectionId', 'toIntersectionId'],
         how='left')
@@ -5442,6 +5478,103 @@ def ranch_get_link_path_between_nodes(G, from_node, to_node, weight_field):
         return pd.DataFrame()
 
 
+def ranch_update_bus_stop_node(stop_times, stops, trips, routes, node_gdf,
+                               bus_routed_links, shortest_path_failed_shape_list):
+    """
+    after routing buses, update bus stop nodes
+    match stops to the nodes that are on the bus links
+    """
+
+    WranglerLogger.info("Updating bus stop node matching")
+
+    # first for each stop, get what trips use them
+    stop_time_df = stop_times.copy()
+    stop_df = stops.copy()
+    stop_time_gdf = merge_dfs_with_dup_col(
+        stop_time_df,
+        stop_df,
+        ["agency_raw_name", "stop_id"],
+        "left")
+    stop_time_gdf = gpd.GeoDataFrame(
+        stop_time_gdf,
+        geometry = stop_time_gdf['geometry'],
+        crs = node_gdf.crs)
+
+    # get route type for trips, get bus trips
+    trip_df = merge_dfs_with_dup_col(
+        trips,
+        routes,
+        ["agency_raw_name", "route_id"],
+        "left")
+    bus_trip_df = trip_df[trip_df["route_type"] == 3]
+
+    stop_time_gdf = merge_dfs_with_dup_col(
+        stop_time_gdf,
+        bus_trip_df[["agency_raw_name", "trip_id"]],
+        ["agency_raw_name", "trip_id"],
+        "inner")
+
+    stop_to_node_df = pd.DataFrame()
+
+    for agency_raw_name in bus_routed_links.agency_raw_name.unique():
+        agency_trip_link_df = bus_routed_links.loc[
+            bus_routed_links.agency_raw_name == agency_raw_name].copy()
+
+        for trip_id in agency_trip_link_df.trip_id.unique():
+            
+            shape_id = trips.loc[
+                (trips.trip_id == trip_id) & \
+                (trips.agency_raw_name == agency_raw_name)].shape_id.iloc[0].astype(int)
+
+            if '{}_{}'.format(agency_raw_name, shape_id) in shortest_path_failed_shape_list:
+                continue
+
+            trip_stop_gdf = stop_time_gdf[
+                (stop_time_gdf.trip_id == trip_id) & \
+                (stop_time_gdf.agency_raw_name == agency_raw_name)]
+
+            related_bus_trip_link_df = agency_trip_link_df.loc[
+                (agency_trip_link_df.shape_id == shape_id)]
+
+            trip_node_gdf = node_gdf.loc[
+                node_gdf.osm_node_id.isin(
+                    related_bus_trip_link_df.u.tolist()
+                    + related_bus_trip_link_df.v.tolist())]
+
+            # find cloest node (with its 'osm_node_id', 'shst_node_id') for each stop
+            # trip_stop_df = find_closest_node(
+            #     trip_stop_df,
+            #     trip_node_df,
+            #     unique_id=["agency_raw_name", "stop_id", "trip_id"],
+            # )
+            trip_stop_gdf = trip_stop_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+            trip_node_gdf = trip_node_gdf.to_crs(CRS('epsg:{}'.format(str(NEAREST_MATCH_EPSG))))
+            stop_node_join = gpd.sjoin_nearest(trip_stop_gdf[['agency_raw_name', 'trip_id', 'stop_id', 'geometry']],
+                                trip_node_gdf[['geometry', 'osm_node_id', 'shst_node_id']], how='left')
+
+            trip_stop_gdf = trip_stop_gdf.drop(columns=['geometry', 'shst_node_id', 'osm_node_id']).merge(
+                stop_node_join, on=['agency_raw_name', 'trip_id', 'stop_id'], how='left')
+            trip_stop_gdf.drop(columns='index_right', inplace=True)
+
+            stop_to_node_df = pd.concat(
+                [stop_to_node_df, trip_stop_gdf],
+                sort=False, 
+                ignore_index=True)
+
+    if "osm_node_id" in stop_df.columns:
+        stop_df.drop(["osm_node_id", "shst_node_id"], axis=1, inplace=True)
+
+    # TODO: check if should keep 'geometry' from stops or update with 'geometry' from stop_to_node_df
+    bus_stops = pd.merge(
+        stop_df,
+        stop_to_node_df[['agency_raw_name', 'trip_id', 'stop_id', 'shst_node_id', 'osm_node_id']],
+        how="inner",
+        on=["agency_raw_name", "stop_id"]
+    )
+    
+    return bus_stops
+
+
 def create_shape_node_table(node_gdf, bus_link_df, rail_link_df):
     """
     create complete node lists each transit traverses to replace the gtfs shape.txt
@@ -5460,8 +5593,8 @@ def create_shape_node_table(node_gdf, bus_link_df, rail_link_df):
 
     # combine with rail link
     shape_link_df = pd.concat([
-            bus_link_df_sub[["u", "v", "shape_id", "agency_raw_name"]],
-            rail_link_df[["shape_id", "agency_raw_name"]]
+            bus_link_df_sub[["u", "v", "shape_id", "fromIntersectionId", "toIntersectionId", "agency_raw_name"]],
+            rail_link_df[["shape_id", "fromIntersectionId", "toIntersectionId", "agency_raw_name"]]
         ],
         sort = False,
         ignore_index = True)
@@ -5472,43 +5605,50 @@ def create_shape_node_table(node_gdf, bus_link_df, rail_link_df):
     # create shape_point_df from nodes
     shape_point_df = gpd.GeoDataFrame()
     
-    for shape_id in shape_link_df.shape_id.unique():
-        shape_df = shape_link_df.loc[shape_link_df.shape_id == shape_id]
-        point_df = pd.DataFrame(
-            data = {
-                    "agency_raw_name": shape_df["agency_raw_name"].iloc[0],
-                    "shape_id" : shape_id,
-                    "shape_osm_node_id" : shape_df.u.tolist() + [shape_df.v.iloc[-1]],
-                    "shape_shst_node_id": shape_df.fromIntersectionId.tolist() + [shape_df.toIntersectionId.iloc[-1]],
-                    # "shape_model_node_id" : shape_df.A.tolist() + [shape_df.B.iloc[-1]],
-                    "shape_pt_sequence" : range(1, 1+len(shape_df)+1)})
-   
-        shape_point_df = pd.concat([shape_point_df,
-                                    point_df],
-                                  sort = False,
-                                  ignore_index = True)
+    for agency_raw_name in shape_link_df['agency_raw_name'].unique():
+        shape_id_list = shape_link_df.loc[
+            shape_link_df['agency_raw_name'] == agency_raw_name].shape_id.unique()
+        for shape_id in shape_id_list:
+            shape_df = shape_link_df.loc[
+                (shape_link_df['agency_raw_name'] == agency_raw_name) & \
+                (shape_link_df['shape_id'] == shape_id)]
+            point_df = pd.DataFrame(
+                data = {
+                        "agency_raw_name": agency_raw_name,
+                        "shape_id" : shape_id,
+                        "shape_osm_node_id" : shape_df.u.tolist() + [shape_df.v.iloc[-1]],
+                        "shape_shst_node_id": shape_df.fromIntersectionId.tolist() + [shape_df.toIntersectionId.iloc[-1]],
+                        # "shape_model_node_id" : shape_df.A.tolist() + [shape_df.B.iloc[-1]],
+                        "shape_pt_sequence" : range(1, 1+len(shape_df)+1)})
     
+            shape_point_df = pd.concat([shape_point_df,
+                                        point_df],
+                                    sort = False,
+                                    ignore_index = True)
+        
     # add geometry from node_gdf to create shape_pt_lat, shape_pt_lon
     shape_point_df = pd.merge(shape_point_df,
                               node_gdf[["osm_node_id", "shst_node_id", "geometry"]],
                              how = "left",
                              left_on = "shape_shst_node_id",
                              right_on = "shst_node_id")
-                            
-    shape_point_df.crs = {'init' : 'epsg:{}'.format(str(LAT_LONG_EPSG))}
+    shape_point_df.drop(columns=['osm_node_id', 'shst_node_id'], inplace=True)
+    shape_point_gdf = gpd.GeoDataFrame(
+        shape_point_df,
+        geometry=shape_point_df["geometry"],
+        crs=node_gdf.crs
+    )                     
 
-    shape_point_df_null_geom = shape_point_df.loc[shape_point_df.geometry.isnull()]
-    if shape_point_df_null_geom.shape[0] == 0:
-        WranglerLogger.debug('{} shape points missing geometry: \n{}'.format(
+    shape_point_df_null_geom = shape_point_gdf.loc[shape_point_gdf.geometry.isnull()]
+    if shape_point_df_null_geom.shape[0] > 0:
+        WranglerLogger.warning('{} shape points missing geometry: \n{}'.format(
             shape_point_df_null_geom.shape[0],
             shape_point_df_null_geom
         ))
-    shape_point_df["shape_pt_lat"] = shape_point_df.geometry.map(lambda g:g.y)
-    shape_point_df["shape_pt_lon"] = shape_point_df.geometry.map(lambda g:g.x)
+    shape_point_gdf["shape_pt_lat"] = shape_point_gdf.geometry.map(lambda g:g.y)
+    shape_point_gdf["shape_pt_lon"] = shape_point_gdf.geometry.map(lambda g:g.x)
 
-    shape_point_df.rename(columns = {"shst_node_id": "shape_shst_node_id"}, inplace = True)
-
-    return shape_point_df[["shape_id", "shape_pt_sequence", "shape_osm_node_id", "shape_shst_node_id"]]
+    return shape_point_gdf
 
 
 def create_freq_table(trip_df, TIME_OF_DAY_DICT, TOD_NUMHOURS_FREQUENCY_DICT):
@@ -5545,84 +5685,111 @@ def create_freq_table(trip_df, TIME_OF_DAY_DICT, TOD_NUMHOURS_FREQUENCY_DICT):
     return freq_df
 
 
-def write_standard_transit(output_folder, trip, stop, shape_point, freq, stop_times, routes, trips, rail_node = None):
+def v12_write_standard_transit(output_folder, representative_trips, shape_points, freqs, stops, stop_times,
+                               routes, all_trips, agencies, fare_attributes, fare_rules, unique_rail_nodes=None):
     """
     """
-    shape_point_df = shape_point.copy()
-    trip_df = trip.copy()
-    
-    #trip_df = pd.merge(trip_df, routes[["route_id", "agency_raw_name"]], how = "left", on = ["route_id"])
-    
-    trip_df = trip_df[~ trip_df.agency_raw_name.isin(["Petaluma_2016_5_22", "WestCAT_2016_5_26", "GGFerries_2017_3_18"])].copy()
-    
-    trip_df["shape_id"] = trip_df["shape_id"].astype(int)
-    
-    trip_df = trip_df[trip_df.shape_id.isin(shape_point_df.shape_id.unique().tolist())]
-    
-    final_trip_list = trip_df.trip_id.unique().tolist()
-    
-    freq_df = freq.loc[freq.trip_id.isin(final_trip_list)]
-    
-    stop_df = stop.copy()
-    
-    if len(rail_node) > 0:
-        rail_node_df = rail_node.copy()
-        rail_node_dict = dict(zip(rail_node_df.stop_id, rail_node_df.model_node_id))
-        
-        stop_df['model_node_id'] = stop_df.apply(lambda x: rail_node_dict[x.stop_id] 
-                                               if x.stop_id in rail_node_df.stop_id.tolist() 
-                                               else x.model_node_id,
-                                                axis = 1)
-        stop_df['osm_node_id'] = stop_df.apply(lambda x: ""
-                                                if x.stop_id in rail_node_df.stop_id.tolist() 
-                                                else x.osm_node_id,
-                                                axis = 1)
-        stop_df['shst_node_id'] = stop_df.apply(lambda x: '' 
-                                                if x.stop_id in rail_node_df.stop_id.tolist() 
-                                                else x.shst_node_id,
-                                                axis = 1)
-    
+
+    # use shape_point to subset representative trips, frequencies, stop_times, routes
+    shape_point_df = shape_points.copy()
+    if 'geometry' in shape_point_df.columns:
+            shape_point_df.drop(['geometry'], axis = 1, inplace = True)
+    shape_point_df['agency_shape_id'] = \
+        shape_point_df['agency_raw_name'] + '_' + shape_point_df['shape_id'].astype(int).astype(str)
+
+    trip_df = representative_trips.copy()
+    trip_df['agency_shape_id'] = \
+        trip_df['agency_raw_name'] + '_' + trip_df['shape_id'].astype(int).astype(str)
+    trip_df = trip_df[
+            trip_df['agency_shape_id'].isin(shape_point_df['agency_shape_id'].unique())]
+
+    freq_df = freqs.copy()
+    freq_df = pd.merge(
+            freq_df,
+            trip_df[['agency_raw_name', 'trip_id']],
+            how='inner',
+            on=['agency_raw_name', 'trip_id'])
 
     stop_times_df = stop_times.copy()
-    stop_times_df = stop_times_df[stop_times_df.trip_id.isin(final_trip_list)]
-    
-    # update time to relative time for frequency based transit system
-    stop_times_df['first_arrival'] = stop_times_df.groupby(['trip_id'])['arrival_time'].transform(min)
-    stop_times_df['arrival_time'] = stop_times_df['arrival_time'] - stop_times_df['first_arrival']
-    stop_times_df['departure_time'] = stop_times_df['departure_time'] - stop_times_df['first_arrival']
-    
-    stop_times_df['arrival_time'] = stop_times_df['arrival_time'].apply(
-        lambda x : time.strftime('%H:%M:%S', time.gmtime(x)) if ~np.isnan(x) else x)
-    stop_times_df['departure_time'] = stop_times_df['departure_time'].apply(
-        lambda x : time.strftime('%H:%M:%S', time.gmtime(x)) if ~np.isnan(x) else x)
+    stop_times_df = pd.merge(
+        stop_times_df,
+        trip_df[['agency_raw_name', 'trip_id']],
+        how='inner',
+        on=['agency_raw_name', 'trip_id'])
 
-    
-    stop_times_df.drop(['first_arrival'], axis = 1, inplace = True)
-    
     route_df = routes.copy()
-    route_df = route_df[route_df.route_id.isin(trip_df.route_id.tolist())]
-    
-    route_df.to_csv(output_folder + "routes.txt", 
-                    index = False, 
-                    sep = ',')
+    route_df = pd.merge(
+        route_df,
+        trip_df[['agency_raw_name', 'route_id']].drop_duplicates(),
+        how='inner',
+        on=['agency_raw_name', 'route_id'],
+    )
+
+    # update time to relative time for frequency based transit system
+    stop_times_df["first_arrival"] = stop_times_df.groupby(
+        ["agency_raw_name", "trip_id"]
+    )["arrival_time"].transform(min)
+    stop_times_df["arrival_time"] = (
+        stop_times_df["arrival_time"] - stop_times_df["first_arrival"]
+    )
+    stop_times_df["departure_time"] = (
+        stop_times_df["departure_time"] - stop_times_df["first_arrival"]
+    )
+    stop_times_df["arrival_time"] = stop_times_df["arrival_time"].apply(
+        lambda x: time.strftime("%H:%M:%S", time.gmtime(x)) if ~np.isnan(x) else x
+    )
+    stop_times_df["departure_time"] = stop_times_df["departure_time"].apply(
+        lambda x: time.strftime("%H:%M:%S", time.gmtime(x)) if ~np.isnan(x) else x
+    )
+    stop_times_df.drop(["first_arrival"], axis=1, inplace=True)
+
+    # for rail/ferry stops in stop_gdf, update 'shst_node_id' (to 'agency_raw_name + stop_id')
+    # and 'osm_node_id' (to na).
+    # TODO: in Ranch, stop_df is re-built by concating rail_stops (output of ranch 'route_non_bus()')
+    # and bus_stops (output of 'update_bus_stop_node()').
+
+    if unique_rail_nodes is not None:
+        stop_df = stops.copy()
+        stop_df['agency_stop_id'] = \
+            stop_df['agency_raw_name'] + '_' + stop_df['stop_id'].astype(int).astype(str)
+
+        update_idx = stop_df['agency_stop_id'].isin(unique_rail_nodes['shst_node_id'].unique())
+
+        stop_df.loc[update_idx, 'shst_node_id'] = stop_df['agency_stop_id']
+        stop_df.loc[update_idx, 'osm_node_id'] = np.nan
+
+    # export
+    route_df.to_csv(os.path.join(output_folder, "routes.txt"), index = False, sep = ',')
    
-    shape_point_df.to_csv(output_folder + "shapes.txt", 
-                          index = False, 
-                          sep = ',')
+    shape_point_df.drop(['agency_shape_id'], axis = 1, inplace = True)
+    shape_point_df.to_csv(os.path.join(output_folder, "shapes.txt"), index = False, sep = ',')
   
-    trip_df[trips.columns.values].to_csv(output_folder + "trips.txt", 
-                                              index = False, 
-                                              sep = ',')
+    trip_df[all_trips.columns.values].to_csv(os.path.join(output_folder, "trips.txt"),
+                                            index = False, 
+                                            sep = ',')
   
-    freq_df[['trip_id', 'headway_secs', 'start_time', 'end_time']].to_csv(output_folder + "frequencies.txt", 
-                                                index = False, 
-                                                sep = ',')
+    freq_df[['trip_id', 'headway_secs', 'start_time', 'end_time']].to_csv(
+        os.path.join(output_folder, "frequencies.txt"), 
+        index = False, 
+        sep = ',')
     
-    stop_df.to_csv(output_folder + "stops.txt", 
+    stop_df.to_csv(os.path.join(output_folder, "stops.txt"), 
                    index = False, 
                    sep = ',')
    
-    stop_times_df.to_csv(output_folder + "stop_times.txt", 
+    stop_times_df.to_csv(os.path.join(output_folder, "stop_times.txt"), 
+                         index = False, 
+                         sep = ',')
+
+    agencies.to_csv(os.path.join(output_folder, "agency.txt"), 
+                         index = False, 
+                         sep = ',')
+    
+    fare_attributes.to_csv(os.path.join(output_folder, "fare_attributes.txt"), 
+                         index = False, 
+                         sep = ',')
+
+    fare_rules.to_csv(os.path.join(output_folder, "fare_rules.txt"), 
                          index = False, 
                          sep = ',')
 

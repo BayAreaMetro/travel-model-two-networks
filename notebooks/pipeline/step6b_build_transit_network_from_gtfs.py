@@ -64,11 +64,15 @@ GTFS_DATA_DIR = os.path.join(INPUT_DATA_DIR, 'step6_GTFS')
 GTFS_INPUT_DIR  = os.path.join(GTFS_DATA_DIR, '2015_input')
 # gtfs shape to sharedstreet conflation result
 CONFLATION_SHST = os.path.join(GTFS_DATA_DIR, 'conflation_shst')
+# county boundaries shapefile
+COUNTY_BOUNDARY_FILE = os.path.join(
+    INPUT_DATA_DIR, 'step0_boundaries', 'cb_2018_us_county_500k', 'cb_2018_us_county_500k.shp')
 
 # output
 GTFS_OUTPUT_DIR = os.path.join(OUTPUT_DATA_DIR, 'step6_gtfs')
 GTFS_CONSOLIDATED_DIR = os.path.join(GTFS_OUTPUT_DIR, 'consolidated_gtfs')
 TRANSIT_ROUTING_QAQC_DIR = os.path.join(GTFS_OUTPUT_DIR, 'transit_routing')
+STANDARD_TRANSIT_DIR = os.path.join(GTFS_OUTPUT_DIR, 'standard_transit')
 
 # # todo: describe what goes in here
 # output_data_version_dir = os.path.join(output_data_interim_dir,'version_12')
@@ -76,7 +80,7 @@ TRANSIT_ROUTING_QAQC_DIR = os.path.join(GTFS_OUTPUT_DIR, 'transit_routing')
 
 if __name__ == '__main__':
     # create output directories if not exist
-    for output_dir in [GTFS_CONSOLIDATED_DIR, TRANSIT_ROUTING_QAQC_DIR]:
+    for output_dir in [GTFS_CONSOLIDATED_DIR, TRANSIT_ROUTING_QAQC_DIR, STANDARD_TRANSIT_DIR]:
         if not os.path.exists(output_dir):
             WranglerLogger.info('create output folder: {}'.format(output_dir))
             os.makedirs(output_dir)
@@ -95,7 +99,7 @@ if __name__ == '__main__':
     # Consolidate all gtfs into one
     gtfs_raw_name_ls = os.listdir(GTFS_INPUT_DIR)
     # remove data not needed
-    for gtfs_feed_name in gtfs_raw_name_ls:
+    for gtfs_feed_name in os.listdir(GTFS_INPUT_DIR):
         if gtfs_feed_name not in methods.gtfs_name_dict:
             WranglerLogger.debug('skipping GTFS dataset {}'.format(gtfs_feed_name))
             gtfs_raw_name_ls.remove(gtfs_feed_name)
@@ -158,8 +162,8 @@ if __name__ == '__main__':
             df.loc[df.agency_name == 'Cloverdale Transit', 'agency_name'] = 'Sonoma County Transit'
         if 'agency_id' in list(df):
             WranglerLogger.debug('recode agency_name 183 (Cloverdale Transit) as 175 (Sonoma County Transit)')
-            all_agency_df.loc[all_agency_df.agency_id == '183', 'agency_id'] = '175'
-            all_fare_attributes_df.loc[all_fare_attributes_df.agency_id == 183, 'agency_id'] = 175
+            df.loc[df.agency_id == '183', 'agency_id'] = '175'
+            df.loc[df.agency_id == 183, 'agency_id'] = 175
     
         # to enable sharedstreets conflation, agency_raw_name 'Blue&Gold_gtfs_10_4_2017' and agency_name 'Blue&Gold Fleet' have been
         # modified to 'Blue_Gold_gtfs_10_4_2017' and 'Blue Gold Fleet' respectively; 
@@ -353,30 +357,19 @@ if __name__ == '__main__':
 
     WranglerLogger.info('Snapping GFTS stops to roadway nodes')
 
-    # first, get candidate nodes to for snapping transit stops to
+    # load roadway nodes and links
     WranglerLogger.debug('load roadway links from {} and nodes from {}'.format(ROADWAY_LINK_FILE, ROADWAY_NODE_FILE))
     link_gdf = geofeather.from_geofeather(ROADWAY_LINK_FILE)
     node_gdf = geofeather.from_geofeather(ROADWAY_NODE_FILE)
 
+    # subset drive nodes and drive links
     drive_link_gdf = link_gdf[link_gdf.drive_access == True]
     drive_node_gdf = node_gdf[node_gdf.drive_access == True]
     WranglerLogger.debug('{:,} out of {:,} links have drive_access==True'.format(drive_link_gdf.shape[0], link_gdf.shape[0]))
     WranglerLogger.debug('{:,} out of {:,} nodes have drive_access==True'.format(drive_node_gdf.shape[0], node_gdf.shape[0]))
 
-    # only keep non-motorway nodes: motorway and motorway are restricted-access freeway and freeway ramps, 
-    # shouldn't have transit stops
-    # also exclude links with roadway=='unknown' highway=='traffic_island'. See discussion: https://app.asana.com/0/0/1202470211319796/1202491781241679/f 
-    non_motorway_links_gdf = drive_link_gdf.loc[~drive_link_gdf.roadway.isin(["motorway", "motorway_link", 'unknown'])]
-
-    node_candidates_for_stops_df = drive_node_gdf.loc[
-        drive_node_gdf.shst_node_id.isin(
-            non_motorway_links_gdf.fromIntersectionId.tolist() + non_motorway_links_gdf.toIntersectionId.tolist())]
-    WranglerLogger.debug('{:,} out of {:,} drive_nodes are candidates to snap transit stops to'.format(
-        node_candidates_for_stops_df.shape[0],
-        drive_node_gdf.shape[0]
-    ))
-
-    stop_gdf = methods.snap_stop_to_node(all_stops_df, node_candidates_for_stops_df)
+    # snap stops to nodes
+    stop_gdf = methods.snap_stop_to_roadway_nodes(all_stops_df, drive_node_gdf, drive_link_gdf)
     WranglerLogger.debug(
         'stop_gdf has {} rows, with columns: \n{}'.format(stop_gdf.shape[0], stop_gdf.dtypes))
 
@@ -404,7 +397,7 @@ if __name__ == '__main__':
     # 2: bus shst routing, based on gtfs shapes to sharedstreets conflation
     WranglerLogger.info('Routing bus using shst matching')
  
-    v12_bus_shst_link_shape_gdf, v12_incomplete_shape_list = \
+    v12_bus_shst_link_shape_gdf, v12_shst_incomplete_shape_df = \
         methods.route_bus_shst(CONFLATION_SHST,
                                drive_link_gdf,
                                representative_trip_df,
@@ -420,11 +413,10 @@ if __name__ == '__main__':
         methods.route_bus_link_consolidate(v12_bus_osmnx_link_shape_gdf,
                                            v12_bus_shst_link_shape_gdf,
                                            all_routes_df,
-                                           representative_trip_df,
-                                           v12_incomplete_shape_list)
+                                           representative_trip_df)
 
     # add additional field to help QAQC
-    v12_bus_routed_link_gdf = methods.merge_dfs_with_dup_col(
+    v12_bus_routed_link_gdf_QAQC = methods.merge_dfs_with_dup_col(
         v12_bus_routed_link_gdf,
         link_gdf,
         ['shstReferenceId', 'shstGeometryId'],
@@ -432,15 +424,15 @@ if __name__ == '__main__':
     )
 
     v12_BUS_ROUTING_ALL_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'v12_bus_routing_all.feather')
-    WranglerLogger.info('Saving V12 bus routing solidated results to {}'.format(v12_BUS_ROUTING_ALL_QAQC_FILE))
-    geofeather.to_geofeather(v12_bus_routed_link_gdf, v12_BUS_ROUTING_ALL_QAQC_FILE)
+    WranglerLogger.info('Saving V12 bus routing consolidated results to {}'.format(v12_BUS_ROUTING_ALL_QAQC_FILE))
+    geofeather.to_geofeather(v12_bus_routed_link_gdf_QAQC, v12_BUS_ROUTING_ALL_QAQC_FILE)
 
     ####################################
     # route buses - Ranch methods
     # 1. osmnx shortest path routing
     # 2. shst routing based on sharedstreest match
     # 3. combine the two routing results
-    # TODO: 4. update bus stop ? - what does this do?
+    # 4. update bus stop
 
     # 1. osmnx shortest path routing: iteratively route each shape (represented by one trip), in 3 steps:
     # - routing from the start stop to the end stop of the trip
@@ -459,17 +451,26 @@ if __name__ == '__main__':
             TRANSIT_ROUTING_QAQC_DIR
         )
     
-    # v12 and Ranch basically have the same shst routing methodology. Only difference is that
+    # 2. v12 and Ranch basically have the same shst routing methodology. Only difference is that
     # in Ranch, GTFS shape - shst matching (currently step6a) is called with the 'route_bus_shst()'
     # function. 
     
-    # combine two routing results
+    # 3. combine two routing results
     ranch_bus_routed_link_gdf, ranch_shape_not_routed_list = \
         methods.route_bus_link_consolidate(ranch_bus_shortest_path_routed_link_gdf,
                                            v12_bus_shst_link_shape_gdf,
                                            all_routes_df,
-                                           representative_trip_df,
-                                           v12_incomplete_shape_list)    #  
+                                           representative_trip_df) 
+
+    # 4. update bus stop
+    bus_stops = methods.ranch_update_bus_stop_node(all_stop_times_df, 
+                                                   stop_gdf, 
+                                                   representative_trip_df,
+                                                   all_routes_df, 
+                                                   node_gdf,
+                                                   ranch_bus_routed_link_gdf,
+                                                   ranch_bus_shortest_path_failed_shape_list)
+
 
     ####################################
     # route non-bus (rail and ferry) - V12 methods
@@ -489,7 +490,7 @@ if __name__ == '__main__':
     #                 "trip_id"] = 8054
     # representative_trip_df.loc[(representative_trip_df.shape_id==487)&(representative_trip_df.tod=="NT"), 
     #                 "trip_id"] = 8063
-
+    """
     ######### NOTE: 
     # In the following v12 non-bus routing methods, part 1 has been updated based on Ranch, so that rail/ferry links and nodes
     # won't rely on model_link_id and model_node_id, which we've decided to exclude from Pipeline networks.
@@ -514,7 +515,7 @@ if __name__ == '__main__':
         rail_trip_link_gdf.shape[0],
         rail_trip_link_gdf.shape_id.nunique(),
         rail_trip_link_gdf.dtypes))
-    """
+
     # 2. create lines and nodes for ACE, CCTA, VINE whose GTFS data doesn't have 'shape.txt' info
     WranglerLogger.info('creating lines and nodes for ACE because "ACE_2017_3_20" GTFS feed is missing shape.txt')
 
@@ -544,40 +545,53 @@ if __name__ == '__main__':
     """
     ####################################
     # route non-bus (rail and ferry) - Ranch methods
-    rail_trip_link_gdf, rail_stops_gdf, rail_nodes_gdf, \
-    agency_unique_rail_nodes_gdf, agency_unique_rail_links_gdf = \
-        methods.ranch_route_non_bus(
-            representative_trip_df,
-            all_routes_df,
-            all_shapes_df,
-            all_stop_times_df,
-            stop_gdf,
-            drive_link_gdf)
-    # TODO: probably not needed to export 'agency_unique_rail_nodes_gdf' and 
-    # 'agency_unique_rail_links_gdf' at this step. The following step 
-    # 'combine_roadway_and_rail_links_nodes()' will export them with additional fields.
+    rail_trip_links_gdf, \
+    rail_stops_gdf, \
+    agency_unique_rail_nodes_gdf = methods.ranch_route_non_bus(representative_trip_df,
+                                                               all_routes_df,
+                                                               all_shapes_df,
+                                                               all_stop_times_df,
+                                                               stop_gdf,
+                                                               drive_link_gdf)
+
+    # tag rail/ferry-only nodes and links with County
+    agency_unique_rail_nodes_gdf, \
+    rail_trip_links_gdf = methods.tag_nodes_links_by_county_name(agency_unique_rail_nodes_gdf,
+                                                                 rail_trip_links_gdf,
+                                                                 COUNTY_BOUNDARY_FILE)
+
+    WranglerLogger.info(
+        'finished tagging rail/ferry nodes with county names. Total {:,} nodes, counts by county:\n{}'.format(
+            agency_unique_rail_nodes_gdf.shape[0],
+            agency_unique_rail_nodes_gdf['county'].value_counts(dropna=False)))
+    WranglerLogger.info(
+        'finished tagging rail/ferry links with county names. Total {:,} links, counts by county:\n{}'.format(
+            rail_trip_links_gdf.shape[0],
+            rail_trip_links_gdf['county'].value_counts(dropna=False)))
 
     # write out to QAQC
-    RANCH_RAIL_LINKS_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_trip_link_gdf.feather')
-    RANCH_RAIL_NODE_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_nodes_gdf.feather')
-    RANCH_RAIL_STOPS_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_stops_gdf.feather')
+    RANCH_RAIL_LINKS_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_trip_links_QAQC.feather')
+    RANCH_RAIL_NODE_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_unique_nodes_QAQC.feather')
+    RANCH_RAIL_STOPS_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_stops_QAQC.feather')
     WranglerLogger.info('exporting ranch non-bus links to {}'.format(RANCH_RAIL_LINKS_QAQC_FILE))
-    geofeather.to_geofeather(rail_trip_link_gdf, RANCH_RAIL_LINKS_QAQC_FILE)
-    WranglerLogger.info('exporting ranch non-bus nodes to {}'.format(RANCH_RAIL_NODE_QAQC_FILE))
-    geofeather.to_geofeather(rail_nodes_gdf, RANCH_RAIL_NODE_QAQC_FILE) 
+    geofeather.to_geofeather(rail_trip_links_gdf, RANCH_RAIL_LINKS_QAQC_FILE)
+    WranglerLogger.info('exporting ranch unique non-bus nodes to {}'.format(RANCH_RAIL_NODE_QAQC_FILE))
+    geofeather.to_geofeather(agency_unique_rail_nodes_gdf, RANCH_RAIL_NODE_QAQC_FILE) 
     WranglerLogger.info('exporting ranch non-bus stops to {}'.format(RANCH_RAIL_STOPS_QAQC_FILE))
     geofeather.to_geofeather(rail_stops_gdf, RANCH_RAIL_STOPS_QAQC_FILE)
 
     ####################################
-    # combine roadway and rail links and nodes (bus nodes and links are already in roadway networks)
+    # consolidate and clean up roadway and transit networks
+
+    # 1. combine roadway and rail links and nodes (bus nodes and links are already in roadway networks)
     WranglerLogger.info('combine roadway and rail links and nodes')
 
     roadway_and_rail_links_gdf, \
     roadway_and_rail_nodes_gdf, \
     unique_rail_links_gdf, \
     unique_rail_nodes_gdf, \
-    rail_trip_links_gdf = methods.combine_roadway_and_rail_links_nodes(rail_trip_link_gdf, 
-                                                                       rail_nodes_gdf,
+    rail_trip_links_gdf = methods.combine_roadway_and_rail_links_nodes(agency_unique_rail_nodes_gdf,
+                                                                       rail_trip_links_gdf,
                                                                        link_gdf,
                                                                        node_gdf)
 
@@ -588,40 +602,39 @@ if __name__ == '__main__':
         node_gdf.shape[0],
         roadway_and_rail_nodes_gdf.shape[0]))
 
-    ####################################
-    # clean up
-
-    # 1. TODO: re-number rail nodes and links to be consistent with the county numbering ranges, therefore 
-    # the rail-only nodes and links will start from each county's latest roadway "model_node_id" / "model_link_id".
-    # Since current we are skipping model_node_id and model_link_id creation, skip this part as well.
-
     # 2. calculate trip frequency for representative trips
     freq_df = methods.create_freq_table(representative_trip_df,
                                         methods.TIME_OF_DAY_DICT,
                                         methods.TOD_NUMHOURS_FREQUENCY_DICT)
     
     # 3. create new shape with complete node list the route passes to replace the gtfs shape.txt
-    shape_point_df = methods.create_shape_node_table(roadway_and_rail_node_gdf, 
-                                                     bus_routed_link_df,
-                                                     rail_path_link_gdf)
+    v12_shape_point_df = methods.create_shape_node_table(roadway_and_rail_nodes_gdf, 
+                                                         v12_bus_routed_link_gdf,
+                                                         rail_trip_links_gdf)
+    ranch_shape_point_df = methods.create_shape_node_table(roadway_and_rail_nodes_gdf, 
+                                                         ranch_bus_routed_link_gdf,
+                                                         rail_trip_links_gdf)
+
+    # TODO: 4. create A, B based on county numbering ranges
+
+    # TODO: 5. re-number rail nodes and links to be consistent with the county numbering ranges, therefore 
+    # the rail-only nodes and links will start from each county's latest roadway "model_node_id" / "model_link_id".
+    # Since current we are skipping model_node_id and model_link_id creation, skip this part as well.
+                                                  
     
     ####################################
     # write out standard transit data
-    methods.write_standard_transit(GTFS_OUTPUT_DIR,
-                                   representative_trip_df,
-                                   stop_gdf,
-                                   shape_point_df,
-                                   freq_df,
-                                   all_stop_times_df,
-                                   all_routes_df,
-                                   all_trips_df,
-                                   unique_rail_node_gdf)
+    # NOTE: the following uses v12 bus routing results
+    methods.v12_write_standard_transit(STANDARD_TRANSIT_DIR,
+                                       representative_trip_df,
+                                       stop_gdf,
+                                       v12_shape_point_df,
+                                       freq_df,
+                                       all_stop_times_df,
+                                       all_routes_df,
+                                       all_trips_df,
+                                       unique_rail_nodes_gdf)
     
     ####################################
-    # create rail walk access/egress links and assign them model_link_id
-    # TODO: decide where to relocate this step to if it does not belong in Pipeline.
+    # TODO: create rail walk access/egress links and assign them model_link_id
 
-
-    ####################################
-    # export roadway+rail links and nodes
-    #  
