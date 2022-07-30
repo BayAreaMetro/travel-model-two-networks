@@ -11,6 +11,7 @@ set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
     [OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather[.crs]
 """
 
+from warnings import WarningMessage
 import pandas as pd
 import geopandas as gpd
 import geofeather  # this is fast
@@ -177,8 +178,14 @@ if __name__ == '__main__':
     geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_aggregated_gdf), OUTPUT_FILE))
 
-    WranglerLogger.info('Finished converting SHST extraction into standard network links with {:,} links'.format(
-        shst_aggregated_gdf.shape[0]))
+    WranglerLogger.info(
+        'Finished converting SHST extraction into standard network links with {:,} links'.format(shst_aggregated_gdf.shape[0]))
+    WranglerLogger.debug(
+        '{:,} unique shstReferenceId, {:,} unique u/v pairs, {:,} unique fromIntersectionId/toIntersectionId pairs'.format(
+            shst_aggregated_gdf['shstReferenceId'].nunique(),
+            shst_aggregated_gdf[['u', 'v']].drop_duplicates().shape[0],
+            shst_aggregated_gdf[['fromIntersectionId', 'toIntersectionId']].drop_duplicates().shape[0]
+    ))
     WranglerLogger.debug('Standard network links have the following attributes: \n{}'.format(list(shst_aggregated_gdf)))
 
     # TODO: clean up: there are links with different 'shstGeometryId' and 'id', but same shstReferenceId and to/from nodes.
@@ -186,7 +193,7 @@ if __name__ == '__main__':
     # export to debug
     shst_link_geometryId_debug = shst_aggregated_gdf.copy()
     shst_link_geometryId_debug.loc[:, 'shst_link_cnt'] = shst_link_geometryId_debug.groupby(
-        ['fromIntersectionId', 'toIntersectionId', 'shstReferenceId'])['id'].transform('size')
+        ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size')
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_link_geometryId_QAQC.feather")
     geofeather.to_geofeather(shst_link_geometryId_debug, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_link_geometryId_debug), OUTPUT_FILE))
@@ -219,14 +226,15 @@ if __name__ == '__main__':
     # 11. label links and nodes with county names, and remove out-of-region links and nodes
     WranglerLogger.info('11. Tagging links and nodes by county and removing out-of-region links and nodes')
 
-    # load Bay Area counties shapefile
-    WranglerLogger.info('loading county shapefile {}'.format(COUNTY_FILE))
-    counties_gdf = gpd.read_file(COUNTY_FILE)
-    WranglerLogger.info('convert to link_gdf CRS')
-    counties_gdf = counties_gdf.to_crs(shst_aggregated_gdf.crs)
+    # # load Bay Area counties shapefile
+    # WranglerLogger.info('loading county shapefile {}'.format(COUNTY_FILE))
+    # counties_gdf = gpd.read_file(COUNTY_FILE)
+    # WranglerLogger.info('convert to link_gdf CRS')
+    # counties_gdf = counties_gdf.to_crs(shst_aggregated_gdf.crs)
 
-    # tag nodes and links by county
-    node_gdf, shst_aggregated_gdf = methods.tag_nodes_links_by_county_name(node_gdf, shst_aggregated_gdf, counties_gdf)
+    # # tag nodes and links by county
+    # node_gdf, shst_aggregated_gdf = methods.tag_nodes_links_by_county_name(node_gdf, shst_aggregated_gdf, counties_gdf)
+    node_gdf, shst_aggregated_gdf = methods.tag_nodes_links_by_county_name(node_gdf, shst_aggregated_gdf, COUNTY_FILE)
     WranglerLogger.info('finished tagging nodes with county names. Total {:,} nodes, counts by county:\n{}'.format(
         node_gdf.shape[0],
         node_gdf['county'].value_counts(dropna=False)))
@@ -269,6 +277,59 @@ if __name__ == '__main__':
     # add to link_BayArea_gdf
     link_BayArea_gdf['length_meter'] = geom_length_gdf['length_meter']
 
+    #####################################
+    # some clean up
+
+    # 1. drop duplicated links between same u/v pair 
+    # get count of unique links of each u/v pair
+    uv_links_cnt = link_BayArea_gdf.groupby(['u', 'v'])['shstReferenceId'].count().reset_index().rename(
+        columns={'shstReferenceId': 'link_cnt'})
+    uv_links_cnt_gdf = link_BayArea_gdf.merge(uv_links_cnt,
+                                              on=['u', 'v'],
+                                              how='left')
+    # non_unique_uv_links_gdf = non_unique_uv_links_gdf.loc[non_unique_uv_links_gdf['link_cnt'] > 1]
+    WranglerLogger.debug('total {} roadway links, has {} unique shstReferenceId, {} unique u/v pairs; {} u/v pairs has multiple links'.format(
+        link_BayArea_gdf.shape[0],
+        link_BayArea_gdf['shstReferenceId'].nunique(),
+        link_BayArea_gdf[['u', 'v']].drop_duplicates().shape[0],
+        uv_links_cnt_gdf.loc[uv_links_cnt_gdf['link_cnt'] > 1][['u', 'v']].drop_duplicates().shape[0]
+    ))
+
+    # proposed method to drop duplicates: sort by roadway hierarchy (ascending), drive_access(descending), 
+    # bike_access (descending), walk_access (descending), length (ascending); keep the first of each u/v pair
+    uv_links_cnt_gdf = uv_links_cnt_gdf.sort_values(
+        by=["hierarchy", "drive_access", "bike_access", "walk_access", "length_meter"],
+        ascending=[True, False, False, False, True])
+    # NOTE: the following dropping method relies on link_BayArea_gdf having no duplicated shstReferenceId, which should have been
+    # cleaned in earlier steps. Otherwise, need to use the initial method in V12.
+    unique_uv_links_gdf = uv_links_cnt_gdf.drop_duplicates(subset=['u', 'v'], keep='first')
+    WranglerLogger.debug('after removing duplicated links between u/v pairs, {} links remain, for {} u/v pairs'.format(
+        unique_uv_links_gdf.shape[0],
+        unique_uv_links_gdf[['u', 'v']].drop_duplicates().shape[0]
+    ))
+
+    # optional: track which link is kept for QAQC
+    uv_links_cnt_gdf['keep_tag'] = ''
+    uv_links_cnt_gdf.loc[
+        uv_links_cnt_gdf.groupby(['u', 'v'])['keep_tag'].head(1).index, 'keep_tag'] = 'keep'
+    non_unique_uv_links_gdf = uv_links_cnt_gdf.loc[
+        uv_links_cnt_gdf['link_cnt'] > 1].reset_index()
+    if non_unique_uv_links_gdf.shape[0] > 0:
+        NON_UNIQUE_UV_LINK_QAQC_FILE = os.path.join(SHST_WITH_OSM_DIR, 'non_unique_uv_links_QAQC.feather')
+        WranglerLogger.debug('exporting {} rows of duplicated links between u/v pairs to {}'.format(
+            non_unique_uv_links_gdf.shape[0],
+            NON_UNIQUE_UV_LINK_QAQC_FILE
+        ))
+
+    # 
+
+
+
+    # 1. drop circular links (u == v) and circular-link-only nodes
+
+    # 2. flag drive dead end, and make dead-end links and nodes drive_access=0
+    # 3. 
+ 
 
     #####################################
     # manually correct roadway type and access values at Transbay temporary terminal
