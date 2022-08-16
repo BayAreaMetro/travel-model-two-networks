@@ -289,7 +289,7 @@ if __name__ == '__main__':
     ))
 
     # 2. drop circular links (u == v) and circular-link-only nodes
-    # NOTE: circular links cause duplicated shstReferenceId, i.e. same shstReferenceId and to/from nodes (same u/v), but
+    # NOTE: circular links often cause duplicated shstReferenceId, i.e. same shstReferenceId and to/from nodes (same u/v), but
     # different 'shstGeometryId' (from shst) and 'id' (from osmnx), e.g. shstReferenceId == '00f297d3c36358ee88d583809275164c'.
     circular_link_gdf = link_BayArea_gdf.loc[link_BayArea_gdf.u == link_BayArea_gdf.v]
     link_BayArea_gdf = link_BayArea_gdf.loc[
@@ -300,24 +300,63 @@ if __name__ == '__main__':
         (node_BayArea_gdf.osm_node_id.isin(link_BayArea_gdf.v.tolist()))
     ]
 
-    # TODO: 3. drop duplicated ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId']
+    # 3. drop duplicated ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId']
     # There are links with different 'shstGeometryId' (from shst) and 'id' (from osmnx), but same shstReferenceId and to/from nodes.
     # (FYI: a link and its reverse link have the same 'shstGeometryId' and 'id')
     # Different reasons for duplicated shstReferenceId:
     #   1) discrepancy between shst and osmnx (showing in 'osmnx_shst_merge'). e.g. shstReferenceId == '001516bb08e57c92f78df14c9dcfb6d7',
     #      shst has one link between nodeIds '1276183745'/'1276184111' with wayId 112192609, but osmnx has no link with osmid 112192609, 
-    #      but has osmid 112192618 between the same nodeIds '1276183745'/'1276184111', with different shstgeometryId and id. In such cases,
-    #      suggest dropping the one that has no osmnx info (length==0, osmid==0 (due to fillna), index==0, osmnx_shst_merge=='shst_only')
-    #   2) 
-
+    #      but has osmid 112192618 between the same nodeIds '1276183745'/'1276184111', with different shstgeometryId and id. 
+    #   2) "duplicates" in shst raw data. For two-way road, shst should have only one record, the opposite-diretion link to be created
+    #      in methods.add_two_way_osm(). However, there are cases where shst raw data already contains two records, one for each direction,
+    #      with opposite 'toIntersectionId' vs 'fromIntersectionId', 'forwardReferenceId' vs 'backReferenceId', and reversed 'nodeIds' orders,
+    #      but different 'geometryId' and osmnx 'wayId'. Then in methods.add_two_way_osm(), a reversed link was created for each record,
+    #      thus duplicating ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'] with different 'shstGeometryId' and 'id'.
+    #      For example, the following two records in shst extracts 'metadata':
+    #      - forwardReferenceId 'fe8c82b6649b0213b0dda0e70199cd9a'
+    #        id 'cfde28acf3e40d96f69ae5a666b4d2e3'
+    #        geometryId 'cfde28acf3e40d96f69ae5a666b4d2e3'
+    #        'osmMetadata': {'name': '',
+    #                        'waySections': array([{'link': False, 
+    #                                               'name': '', 
+    #                                               'nodeIds': array(['4567863491', '342441731'], dtype=object),
+    #                                               'oneWay': False, 
+    #                                               'roadClass': 'Other', 
+    #                                               'roundabout': False, 
+    #                                               'wayId': '461257875',
+    #                                               'waySections_len': 1, 
+    #                                               'waySection_ord': 1, 
+    #                                               'geometryId': 'cfde28acf3e40d96f69ae5a666b4d2e3'}], dtype=object)
+    #      - forwardReferenceId 'cee421918b93e675a9632648572c6c17'
+    #        id 'cbea24b2472d3bf58cb431d06ee81ff9'
+    #        geometryId 'cbea24b2472d3bf58cb431d06ee81ff9'
+    #        'osmMetadata': {'name': '', 
+    #                        'waySections': array([{'link': False, 
+    #                                               'name': '', 
+    #                                               'nodeIds': array(['342441731', '4567863491'], dtype=object), 
+    #                                               'oneWay': False, 
+    #                                               'roadClass': 'Other', 
+    #                                               'roundabout': False, 
+    #                                               'wayId': '461257874', 
+    #                                               'waySections_len': 1, 
+    #                                               'waySection_ord': 1, 
+    #                                               'geometryId': 'cbea24b2472d3bf58cb431d06ee81ff9'}], dtype=object)
+    # 
     # export to debug
     link_BayArea_geometryId_debug = link_BayArea_gdf.copy()
     link_BayArea_geometryId_debug.loc[:, 'shst_link_cnt'] = link_BayArea_geometryId_debug.groupby(
-        ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size')
+        ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size').reset_index()
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_BayArea_geometryId_QAQC.feather")
     geofeather.to_geofeather(link_BayArea_geometryId_debug, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(link_BayArea_geometryId_debug), OUTPUT_FILE))
     del link_BayArea_geometryId_debug
+
+    # In case 1), suggest dropping the one that has no osmnx info (length==0, osmid==0 (due to fillna), index==0, osmnx_shst_merge=='shst_only').
+    # In such cases, the duplicates are essentially the same link, so keeping any of them should be fine.
+    link_BayArea_gdf = link_BayArea_gdf.sort_values(by=['osmid'], ascending=[False])
+    link_BayArea_gdf = link_BayArea_gdf.drop_duplicates(
+        subset=['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'], 
+        keep='first')
 
     # 4. drop duplicated links between same u/v pair
     # NOTE: this step relied on links having no duplicated shstReferenceId
@@ -335,10 +374,12 @@ if __name__ == '__main__':
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
+    link_BayArea_gdf.reset_index(inplace=True)
     geofeather.to_geofeather(link_BayArea_gdf, OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_node.feather')
     WranglerLogger.info('Saving nodes to {}'.format(OUTPUT_FILE))
+    node_BayArea_gdf.reset_index(inplace=True)
     geofeather.to_geofeather(node_BayArea_gdf, OUTPUT_FILE)
 
     WranglerLogger.info('Done')
