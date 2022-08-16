@@ -2175,7 +2175,7 @@ def drop_duplicated_links_between_same_u_v_pair(links_gdf, QAQC_OUTPUT_DIR):
     uv_links_cnt_gdf.loc[
         uv_links_cnt_gdf.groupby(['u', 'v'])['keep_tag'].head(1).index, 'keep_tag'] = 'keep'
     non_unique_uv_links_gdf = uv_links_cnt_gdf.loc[
-        uv_links_cnt_gdf['link_cnt'] > 1].reset_index()
+        uv_links_cnt_gdf['link_cnt'] > 1].reset_index(drop=True)
     if non_unique_uv_links_gdf.shape[0] > 0:
         NON_UNIQUE_UV_LINK_QAQC_FILE = os.path.join(QAQC_OUTPUT_DIR, 'non_unique_uv_links_QAQC.feather')
         WranglerLogger.debug('exporting {} rows of duplicated links between u/v pairs to {}'.format(

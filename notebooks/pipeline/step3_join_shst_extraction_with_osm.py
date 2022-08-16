@@ -217,7 +217,6 @@ if __name__ == '__main__':
     WranglerLogger.info('11. Tagging links and nodes by county and removing out-of-region links and nodes')
 
     # # tag nodes and links by county
-    # node_gdf, shst_aggregated_gdf = methods.tag_nodes_links_by_county_name(node_gdf, shst_aggregated_gdf, counties_gdf)
     node_gdf, shst_aggregated_gdf = methods.tag_nodes_links_by_county_name(node_gdf, shst_aggregated_gdf, COUNTY_FILE)
     WranglerLogger.info('finished tagging nodes with county names. Total {:,} nodes, counts by county:\n{}'.format(
         node_gdf.shape[0],
@@ -242,10 +241,10 @@ if __name__ == '__main__':
         link_BayArea_gdf.shape[0], 
         node_BayArea_gdf.shape[0]))
 
-    # (?) 12. reconcile link length
-    # note: the initial Pipeline process didn't extract "length" from OSMnx, but calculated meter length based on geometry.
-    # may comapre the two and decide which one to use
-    # NOTE: links with 'length_osmnx' == 0 are links in shst, but the corresponding wayId no longer exists in osmnx.
+    # 12. reconcile link length
+    # NOTE: the initial Pipeline process didn't extract "length" from OSMnx, but calculated meter length based on geometry.
+    # May comapre the two and decide which one to use.
+    # Links with 'length_osmnx' == 0 are links in shst, but the corresponding wayId no longer exists in osmnx.
     WranglerLogger.info('12. Reconciling OSMnx extraction link length and geometry-based meter link length')
     # add '_osmnx' suffix to 'length' field from OSMNX
     if 'length' in link_BayArea_gdf.columns:
@@ -312,7 +311,7 @@ if __name__ == '__main__':
     #      with opposite 'toIntersectionId' vs 'fromIntersectionId', 'forwardReferenceId' vs 'backReferenceId', and reversed 'nodeIds' orders,
     #      but different 'geometryId' and osmnx 'wayId'. Then in methods.add_two_way_osm(), a reversed link was created for each record,
     #      thus duplicating ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'] with different 'shstGeometryId' and 'id'.
-    #      For example, the following two records in shst extracts 'metadata':
+    #      For example, the following two records in shst extracts 'metadata' (with different wayId):
     #      - forwardReferenceId 'fe8c82b6649b0213b0dda0e70199cd9a'
     #        id 'cfde28acf3e40d96f69ae5a666b4d2e3'
     #        geometryId 'cfde28acf3e40d96f69ae5a666b4d2e3'
@@ -341,11 +340,13 @@ if __name__ == '__main__':
     #                                               'waySections_len': 1, 
     #                                               'waySection_ord': 1, 
     #                                               'geometryId': 'cbea24b2472d3bf58cb431d06ee81ff9'}], dtype=object)
+    #     Another example: forwardReferenceId '00f297d3c36358ee88d583809275164c' and '869f004cd90e223a50c6a78bb225417e', with
+    #         same wayId '8919831', but different geometryId '77c0401e481ae9e40936cf4dee3922bf' and '49d22c14da4261f446c7ab73bb5a3500'
     # 
     # export to debug
     link_BayArea_geometryId_debug = link_BayArea_gdf.copy()
     link_BayArea_geometryId_debug.loc[:, 'shst_link_cnt'] = link_BayArea_geometryId_debug.groupby(
-        ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size').reset_index()
+        ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size')
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_BayArea_geometryId_QAQC.feather")
     geofeather.to_geofeather(link_BayArea_geometryId_debug, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(link_BayArea_geometryId_debug), OUTPUT_FILE))
@@ -353,10 +354,15 @@ if __name__ == '__main__':
 
     # In case 1), suggest dropping the one that has no osmnx info (length==0, osmid==0 (due to fillna), index==0, osmnx_shst_merge=='shst_only').
     # In such cases, the duplicates are essentially the same link, so keeping any of them should be fine.
-    link_BayArea_gdf = link_BayArea_gdf.sort_values(by=['osmid'], ascending=[False])
-    link_BayArea_gdf = link_BayArea_gdf.drop_duplicates(
+    unique_link_BayArea_gdf = link_BayArea_gdf.sort_values(by=['osmid'], ascending=[False])
+    unique_link_BayArea_gdf = unique_link_BayArea_gdf.drop_duplicates(
         subset=['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'], 
         keep='first')
+    # unique_link_BayArea_gdf become a dataframe after drop_duplicates(), so convert it back
+    unique_link_BayArea_gdf = gpd.GeoDataFrame(unique_link_BayArea_gdf, 
+                                               geometry='geometry', 
+                                               crs=link_BayArea_gdf.crs)
+    link_BayArea_gdf = unique_link_BayArea_gdf.copy()
 
     # 4. drop duplicated links between same u/v pair
     # NOTE: this step relied on links having no duplicated shstReferenceId
@@ -374,12 +380,12 @@ if __name__ == '__main__':
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
-    link_BayArea_gdf.reset_index(inplace=True)
+    link_BayArea_gdf.reset_index(inplace=True, drop=True)
     geofeather.to_geofeather(link_BayArea_gdf, OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_node.feather')
     WranglerLogger.info('Saving nodes to {}'.format(OUTPUT_FILE))
-    node_BayArea_gdf.reset_index(inplace=True)
+    node_BayArea_gdf.reset_index(inplace=True, drop=True)
     geofeather.to_geofeather(node_BayArea_gdf, OUTPUT_FILE)
 
     WranglerLogger.info('Done')
