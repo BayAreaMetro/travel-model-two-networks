@@ -95,7 +95,7 @@ if __name__ == '__main__':
     osmnx_shst_gdf = methods.merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, SHST_WITH_OSM_DIR)
 
     # 4a. Record OSMnx 'highway' tag; add columns 'roadway', 'hierarchy' (?), 'drive_access', 'bike_access', 'walk_access'
-    osmnx_shst_gdf = methods.recode_osmnx_highway_tag(osmnx_shst_gdf)
+    osmnx_shst_gdf = methods.recode_osmnx_highway_tag(osmnx_shst_gdf, methods.HIGHWAY_TO_ROADWAY, methods.ROADWAY_TO_ACCESS)
 
     # 5. impute total lane count, bus-only lane count, hov lane count by link direction
     WranglerLogger.info('5. Imputing total lane count and bus-only/hov lane counts')
@@ -270,9 +270,10 @@ if __name__ == '__main__':
     WranglerLogger.debug('links before correction: \n{}'.format(
         link_BayArea_gdf.loc[transbay_terminal_link_idx][["roadway", "drive_access", "walk_access", "bike_access"]]))
 
-    # set roadway type as 'service' and drive_access = 1
+    # set roadway type as 'service', drive_access = 1, and hierarchy==12
     link_BayArea_gdf.loc[transbay_terminal_link_idx, "roadway"] = "service"
     link_BayArea_gdf.loc[transbay_terminal_link_idx, "drive_access"] = True
+    link_BayArea_gdf.loc[transbay_terminal_link_idx, "hierarchy"] = 12
     WranglerLogger.debug('links after correction: \n{}'.format(
         link_BayArea_gdf.loc[transbay_terminal_link_idx][["roadway", "drive_access", "walk_access", "bike_access"]]))
 

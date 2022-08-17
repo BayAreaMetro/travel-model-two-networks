@@ -92,6 +92,65 @@ OSM_WAY_TAGS = {
     'cycleway'           : TAG_STRING,   # https://wiki.openstreetmap.org/wiki/Key:cycleway
 }
 
+# osmnx 'highway' tag to 'roadway' crosswalk
+# OSMnx 'highway' tags have a multitude of values that are too detailed for us;
+# Simplify the tag to a new column, 'roadway'
+HIGHWAY_TO_ROADWAY = [
+    # highway               # roadway           # hierarchy
+    ('bridleway',           'cycleway',         13),
+    ('closed:path',         'cycleway',         13),
+    ('cycleway',            'cycleway',         13),
+    ('other',               'cycleway',         13), # ?
+    ('path',                'cycleway',         13),
+    ('socail_path',         'cycleway',         13),
+    ('track',               'cycleway',         13),
+    ('corridor',            'footway',          14),
+    ('footpath',            'footway',          14),
+    ('footway',             'footway',          14),
+    ('pedestrian',          'footway',          14),
+    ('steps',               'footway',          14),
+    ('motorway',            'motorway',          1),
+    ('motorway_link',       'motorway_link',     2),
+    ('primary',             'primary',           5),
+    ('primary_link',        'primary_link',      6),
+    ('access',              'residential',      11),
+    ('junction',            'residential',      11),
+    ('residential',         'residential',      11),
+    ('road',                'residential',      11),
+    ('unclassified',        'residential',      11),
+    ('unclassified_link',   'residential',      11),
+    ('secondary',           'secondary',         7),
+    ('secondary_link',      'secondary_link',    8),
+    ('busway',              'service',          12),
+    ('living_street',       'service',          12),
+    ('service',             'service',          12),
+    ('tertiary',            'tertiary',          9),
+    ('tertiary_link',       'tertiary_link',    10),
+    ('traffic_island',      'primary',          12),
+    ('trunk',               'trunk',             3),
+    ('trunk_link',          'trunk_link',        4),
+]
+
+# 'roadway' to "drive_access", "walk_access", "bike_access" crosswalk
+ROADWAY_TO_ACCESS = [
+    # roadway,          drive_access,   walk_access,    bike_access
+    ('cycleway',        False,          True,           True ),
+    ('footway',         False,          True,           False),
+    ('motorway',        True,           False,          False),
+    ('motorway_link',   True,           True,           True ),
+    ('primary',         True,           True,           True ),
+    ('primary_link',    True,           True,           True ),
+    ('residential',     True,           True,           True ),
+    ('secondary',       True,           True,           True ),
+    ('secondary_link',  True,           True,           True ),
+    ('service',         True,           True,           True ),
+    ('tertiary',        True,           True,           True ),
+    ('tertiary_link',   True,           True,           True ),
+    ('trunk',           True,           True,           True ),
+    ('trunk_link',      True,           True,           True ),
+    ('unknown',         True,           True,           True ), # default to true to err on the side of granting more access
+]
+
 # number ranges for nodes by county
 county_network_node_numbering_start_dict = {
     "San Francisco": 1000000,
@@ -585,52 +644,16 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     return osmnx_shst_gdf
 
 
-def recode_osmnx_highway_tag(osmnx_shst_gdf):
+def recode_osmnx_highway_tag(osmnx_shst_gdf, highway_roadway_crosswalk, roadway_access_crosswalk):
     """"
     OSMnx 'highway' tags have a multitude of values that are too detailed for us;
     Simplify the tag to a new column, 'roadway'
     Additionally, add boolean columns 'drive_access', 'walk_access', 'bike_access' representing
     whether these links have this type of access.
     """
-    HIGHWAY_TO_ROADWAY = [
-        # highway               # roadway           # hierarchy
-        ('bridleway',           'cycleway',         13),
-        ('closed:path',         'cycleway',         13),
-        ('cycleway',            'cycleway',         13),
-        ('other',               'cycleway',         13), # ?
-        ('path',                'cycleway',         13),
-        ('socail_path',         'cycleway',         13),
-        ('track',               'cycleway',         13),
-        ('corridor',            'footway',          14),
-        ('footpath',            'footway',          14),
-        ('footway',             'footway',          14),
-        ('pedestrian',          'footway',          14),
-        ('steps',               'footway',          14),
-        ('motorway',            'motorway',          1),
-        ('motorway_link',       'motorway_link',     2),
-        ('primary',             'primary',           5),
-        ('primary_link',        'primary_link',      6),
-        ('access',              'residential',      11),
-        ('junction',            'residential',      11),
-        ('residential',         'residential',      11),
-        ('road',                'residential',      11),
-        ('unclassified',        'residential',      11),
-        ('unclassified_link',   'residential',      11),
-        ('secondary',           'secondary',         7),
-        ('secondary_link',      'secondary_link',    8),
-        ('busway',              'service',          12),
-        ('living_street',       'service',          12),
-        ('service',             'service',          12),
-        ('tertiary',            'tertiary',          9),
-        ('tertiary_link',       'tertiary_link',    10),
-        ('traffic_island',      'primary',          12),
-        ('trunk',               'trunk',             3),
-        ('trunk_link',          'trunk_link',        4),
-    ]
-    # OSMnx 'highway' tags have a multitude of values that are too detailed for us;
-    # Simplify the tag to a new column, 'roadway'
+
     WranglerLogger.info('4a. Converting OSM highway variable into standard roadway variable')
-    highway_to_roadway_df = pd.DataFrame.from_records(HIGHWAY_TO_ROADWAY, columns=['highway','roadway','hierarchy'])
+    highway_to_roadway_df = pd.DataFrame.from_records(highway_roadway_crosswalk, columns=['highway','roadway','hierarchy'])
     osmnx_shst_gdf = pd.merge(
         left      = osmnx_shst_gdf, 
         right     = highway_to_roadway_df,
@@ -644,27 +667,9 @@ def recode_osmnx_highway_tag(osmnx_shst_gdf):
         osmnx_shst_gdf[['highway','roadway','_merge']].value_counts(dropna=False)))
     osmnx_shst_gdf.drop(columns="_merge", inplace=True)
 
-    ROADWAY_TO_ACCESS = [
-        # roadway,          drive_access,   walk_access,    bike_access
-        ('cycleway',        False,          True,           True ),
-        ('footway',         False,          True,           False),
-        ('motorway',        True,           False,          False),
-        ('motorway_link',   True,           True,           True ),
-        ('primary',         True,           True,           True ),
-        ('primary_link',    True,           True,           True ),
-        ('residential',     True,           True,           True ),
-        ('secondary',       True,           True,           True ),
-        ('secondary_link',  True,           True,           True ),
-        ('service',         True,           True,           True ),
-        ('tertiary',        True,           True,           True ),
-        ('tertiary_link',   True,           True,           True ),
-        ('trunk',           True,           True,           True ),
-        ('trunk_link',      True,           True,           True ),
-        ('unknown',         True,           True,           True ), # default to true to err on the side of granting more access
-    ]
     # add network type variables "drive_access", "walk_access", "bike_access" based on roadway
     WranglerLogger.info('Adding network type variables "drive_access", "walk_access", "bike_access"')
-    network_type_df = pd.DataFrame.from_records(ROADWAY_TO_ACCESS, columns=['roadway','drive_access','walk_access','bike_access'])
+    network_type_df = pd.DataFrame.from_records(roadway_access_crosswalk, columns=['roadway','drive_access','walk_access','bike_access'])
     osmnx_shst_gdf = pd.merge(
         left  = osmnx_shst_gdf,
         right = network_type_df,
