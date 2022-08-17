@@ -126,7 +126,7 @@ HIGHWAY_TO_ROADWAY = [
     ('service',             'service',          12),
     ('tertiary',            'tertiary',          9),
     ('tertiary_link',       'tertiary_link',    10),
-    ('traffic_island',      'primary',          12),
+    ('traffic_island',      'service',          12),
     ('trunk',               'trunk',             3),
     ('trunk_link',          'trunk_link',        4),
 ]
