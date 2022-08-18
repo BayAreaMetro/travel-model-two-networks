@@ -353,6 +353,7 @@ if __name__ == '__main__':
     link_BayArea_geometryId_debug = link_BayArea_gdf.copy()
     link_BayArea_geometryId_debug.loc[:, 'shst_link_cnt'] = link_BayArea_geometryId_debug.groupby(
         ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size')
+    link_BayArea_geometryId_debug.reset_index(inplace=True, drop=True)
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_BayArea_geometryId_QAQC.feather")
     geofeather.to_geofeather(link_BayArea_geometryId_debug, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(link_BayArea_geometryId_debug), OUTPUT_FILE))
