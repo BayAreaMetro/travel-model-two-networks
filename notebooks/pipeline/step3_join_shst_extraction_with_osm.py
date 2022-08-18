@@ -166,13 +166,15 @@ if __name__ == '__main__':
     # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row.
     WranglerLogger.info('9. Aggregating OSM ways back to SharedStreets-based links')
     shst_aggregated_gdf = methods.aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf)
-    WranglerLogger.info('Before aggregating osm ways back to sharedstreets-based links, osmnx_shst_gdf has {} links, '
-                        'representing {} unique sharedstreets links; after aggregating, shst_consolidated_gdf has {} links'.format(
+    WranglerLogger.info('Before aggregating osm ways back to sharedstreets-based links, osmnx_shst_gdf has {:,} links, '
+                        'representing {:,} unique sharedstreets links; after aggregating, shst_aggregated_gdf has {:,} links'.format(
                             osmnx_shst_gdf.shape[0],
                             osmnx_shst_gdf.drop_duplicates(subset=['id', 'fromIntersectionId',
                                                                    'toIntersectionId', 'shstReferenceId',
                                                                    'shstGeometryId']).shape[0],
                             shst_aggregated_gdf.shape[0]))
+    WranglerLogger.info('shst_aggregated_gdf has columns {}; head:\n{}'.format(
+        list(shst_aggregated_gdf.columns), shst_aggregated_gdf.head()))                       
 
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_consolidated_gdf_QAQC.feather")
@@ -227,11 +229,14 @@ if __name__ == '__main__':
     
     # write to QAQC
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_county_tag_QAQC.feather")
+    WranglerLogger.info("Writing {:,} rows with columns {} to {}".format(len(shst_aggregated_gdf), 
+        list(shst_aggregated_gdf.columns), OUTPUT_FILE))
     geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_aggregated_gdf), OUTPUT_FILE))
+
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "node_county_tag_QAQC.feather")
+    WranglerLogger.info("Writing {:,} rows with columns {} to {}".format(len(node_gdf), 
+        list(node_gdf.columns), OUTPUT_FILE))        
     geofeather.to_geofeather(node_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {:,} rows to {}".format(len(node_gdf), OUTPUT_FILE))
 
     # remove out-of-region links and nodes
     # for nodes that are out-of-region but used in cross-region links, keep them and re-label to Bay Area counties

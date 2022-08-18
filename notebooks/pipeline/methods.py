@@ -1126,7 +1126,7 @@ def reverse_geometry(to_reverse_gdf):
     for forward_linestring in forward_linestrings:
         # forward_linstring is a shapely.geometry.LineString object
         reverse_coordinates = list(forward_linestring.coords)[::-1]
-        reverse_linestrings.append(LineString(reverse_coordinates))
+        reverse_linestrings.append(LineString(np.array(reverse_coordinates)))
     return reverse_linestrings
 
 
@@ -1625,7 +1625,12 @@ def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby
                                                               on=groupby_cols,
                                                               how='left')
     WranglerLogger.debug('......finished updating attributes based on osm way length')
-
+    WranglerLogger.debug('type for osmnx_shst_gdf: {}  osmnx_shst_gdf_sorted: {}  osmnx_new_values_by_shst: {}  osmnx_shst_other_attrs_gdf: {}  osmnx_shst_gdf_updated: {}'.format(
+        type(osmnx_shst_gdf), type(osmnx_shst_gdf_sorted), type(osmnx_new_values_by_shst), type(osmnx_shst_other_attrs_gdf), type(osmnx_shst_gdf_updated)
+    ))
+    WranglerLogger.debug('CRS for osmnx_shst_gdf: {}  osmnx_shst_gdf_sorted: {}  osmnx_shst_other_attrs_gdf: {}  osmnx_shst_gdf_updated: {}'.format(
+        osmnx_shst_gdf.crs, osmnx_shst_gdf_sorted.crs, osmnx_shst_other_attrs_gdf.crs, osmnx_shst_gdf_updated.crs
+    ))
     return osmnx_shst_gdf_updated
 
 
@@ -1664,6 +1669,8 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     groupby_cols = ['id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'shstGeometryId']
     WranglerLogger.debug('...updating values for osm-way-length-based link attribute')
     osmnx_shst_gdf_longest_update = update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby_cols)
+    WranglerLogger.debug('osmnx_shst_gdf_longest_update type:{} crs:{} columns:{}'.format(type(osmnx_shst_gdf_longest_update), 
+        osmnx_shst_gdf_longest_update.crs, list(osmnx_shst_gdf_longest_update.columns)))
 
     # 3, create an agg dictionary for grouping by osm ways by shst link
     def _concat_way_values(x):
@@ -1734,21 +1741,30 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     # 'reverse=True' links), the order should be reversed, in other words, descending.
     forward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == False].copy()
     forward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], inplace=True)
-    WranglerLogger.debug('...aggregating forward links')
+    WranglerLogger.debug('...aggregating forward links; columns={}'.format(list(forward_link_gdf.columns)))
     forward_link_gdf_agg = forward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
+    forward_link_gdf_agg.set_crs(crs=forward_link_gdf.crs, inplace=True)
+    # for some reason, we now have a column (looks like the geometry column), named None: delete it
+    if None in list(forward_link_gdf_agg.columns):
+        WranglerLogger.debug('Found column named None in forward_link_gdf_agg; deleting\n{}'.format(
+            forward_link_gdf_agg.head()))
+        del forward_link_gdf_agg[None]
 
     backward_link_gdf = osmnx_shst_gdf_longest_update.loc[osmnx_shst_gdf_longest_update['reverse'] == True].copy()
     backward_link_gdf.sort_values(['shstReferenceId', 'waySection_ord'], ascending=False, inplace=True)
-    WranglerLogger.debug('...aggregating backward links')
+    WranglerLogger.debug('...aggregating backward links; columns={}'.format(list(backward_link_gdf.columns)))
     backward_link_gdf_agg = backward_link_gdf.groupby(groupby_cols).agg(agg_dict).reset_index()
+    backward_link_gdf_agg.set_crs(crs=backward_link_gdf.crs, inplace=True)
+    # for some reason, we now have a column (looks like the geometry column), named None: delete it
+    if None in list(backward_link_gdf_agg.columns):
+        WranglerLogger.debug('Found column named None in backward_link_gdf_agg; deleting\n{}'.format(
+            backward_link_gdf_agg.head()))
+        del backward_link_gdf_agg[None]
 
     # put them together
-    shst_link_gdf = pd.concat([forward_link_gdf_agg, backward_link_gdf_agg],
-                              sort=False,
-                              ignore_index=True)
-
-    # assign EPSG
-    shst_link_gdf = gpd.GeoDataFrame(shst_link_gdf, crs=LAT_LONG_EPSG)
+    shst_link_gdf = gpd.GeoDataFrame(
+        pd.concat([forward_link_gdf_agg, backward_link_gdf_agg], sort=False, ignore_index=True), 
+        crs=forward_link_gdf_agg.crs)
 
     return shst_link_gdf
 
@@ -1909,8 +1925,8 @@ def create_node_gdf(link_gdf):
     forward_link_gdf = link_gdf[link_gdf.reverse == False].copy()
 
     # create point geometry from shst linestring
-    forward_link_gdf["u_point"] = forward_link_gdf.apply(lambda x: Point(list(x.geometry.coords)[0]), axis=1)
-    forward_link_gdf["v_point"] = forward_link_gdf.apply(lambda x: Point(list(x.geometry.coords)[-1]), axis=1)
+    forward_link_gdf["u_point"] = forward_link_gdf.apply(lambda x: Point(np.array(x.geometry.coords)[0]), axis=1)
+    forward_link_gdf["v_point"] = forward_link_gdf.apply(lambda x: Point(np.array(x.geometry.coords)[-1]), axis=1)
 
     # we want the u and v points for each link
     point_gdf = pd.concat([
@@ -1928,7 +1944,9 @@ def create_node_gdf(link_gdf):
     # drop duplicates
     point_gdf.drop_duplicates(subset=["osm_node_id", "shst_node_id"], inplace=True)
 
-    point_gdf = gpd.GeoDataFrame(point_gdf, crs=LAT_LONG_EPSG)
+    WranglerLogger.debug('point_gdf type:{} point_gdf crs:{} point_gdf.head():\n{}'.format(type(point_gdf), point_gdf.crs, point_gdf.head()))
+    # it's already a GeoDataFrame so set the crs
+    point_gdf.set_crs(epsg=LAT_LONG_EPSG, inplace=True)
 
     return point_gdf
 
@@ -2073,6 +2091,12 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, COUNTY_BOUNDARY_FILE):
     # reset index for potentially exporting to geofeather for QAQC
     node_with_county_gdf.reset_index(inplace=True)
     link_with_county_gdf.reset_index(inplace=True)
+
+    # for some reason, we now have a column (looks like the geometry column), named None: delete it
+    if None in list(node_with_county_gdf.columns):
+        WranglerLogger.debug('Found column named None in node_with_county_gdf; deleting\n{}'.format(
+            node_with_county_gdf.head()))
+        del node_with_county_gdf[None]
 
     return node_with_county_gdf, link_with_county_gdf
 
@@ -6063,7 +6087,7 @@ def gtfs_point_shapes_to_link_gdf(gtfs_shape_file):
 
         # group stations/stops to get line 
         line_df = gtfs_shape_gdf.groupby(['shape_id'])['geometry'].apply(lambda x:LineString(x.tolist())).reset_index()
-        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry').set_crs(epsg=LAT_LONG_EPSG)
+        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry', crs='ESPG:{}'.format(LAT_LONG_EPSG))
 
         return line_gdf  
 
