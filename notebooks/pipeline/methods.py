@@ -368,6 +368,7 @@ def extract_osm_links_from_shst_metadata(shst_gdf):
         'link'              : from SharedStreets OSM Metadata waySections; boolean, I'm guessing it's from the highway tag?  https://wiki.openstreetmap.org/wiki/Highway_link
         'name'              : from SharedStreets OSM Metadata waySections; string
         'waySections_len'   : from SharedStreets OSM Metadata waySections; number of waySections
+        'waySections_ord'   : from SharedStreets OSM Metadata waySections; starts at 1 and numbers the waySections in order
         'geometryId'        : from SharedStreets OSM Metadata
         'u','v'             : from SharedStreets OSM Metadata waySections, first and last elements in nodeIds
         'id'                : SharedStreets id of each geometry, equivalent to "geometryId" in SharedStreets OSM Metadata; 32-character hex
@@ -515,7 +516,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
 
     # the merge is based on "wayId" in osm_ways_from_shst_gdf and "osmid" in osmnx_link_gdf, so first examine duplicated 'osmid'
     osmnx_link_gdf['osmid_cnt'] = osmnx_link_gdf.groupby(['osmid'])['length'].transform('size')
-    WranglerLogger.debug('stats on osmid occurances: {}'.format(osmnx_link_gdf['osmid_cnt'].value_counts()))
+    WranglerLogger.debug('stats on osmid occurances:\n{}'.format(osmnx_link_gdf['osmid_cnt'].value_counts()))
     # export some examples with duplicated osmid to check on a map
     chk_osmid_dup_gdf = osmnx_link_gdf.loc[(osmnx_link_gdf['osmid_cnt'] > 1) & \
                                             osmnx_link_gdf['lanes:backward'].notnull() & \
@@ -559,9 +560,9 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
         agg_dict[col] = 'first' # these are all the same for each osmid so take the first
     agg_dict['length'] = 'sum' # sum this one
     osmnx_link_df = osmnx_link_gdf.groupby(by=['osmid']).agg(agg_dict).reset_index(drop=False)
-    WranglerLogger.debug("After aggregating to osm ways, osmnx_link_df len={}, head():\n{}".format(len(osmnx_link_df), osmnx_link_df.head()))
+    WranglerLogger.debug("After aggregating to osm ways, osmnx_link_df len={:,}, head():\n{}".format(len(osmnx_link_df), osmnx_link_df.head()))
 
-    # to keep this as a dataframe, call merge with geodataframe as left
+    # to keep this as a geodataframe, call merge with geodataframe as left
     # https://geopandas.org/en/stable/docs/user_guide/mergingdata.html#attribute-joins
     osmnx_shst_gdf = pd.merge(
         left      = osm_ways_from_shst_gdf,
@@ -1605,9 +1606,14 @@ def consolidate_lane_accounting(osmnx_shst_gdf):
 def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby_cols):
     """
     When multiple OSM ways are matched to a same shst link, update certain attributes to use the values of the longest
-     OSM way.
+    OSM way.  Returns geodataframe that is identical to input parameter, osmnx_shst_gdf, but with
+    the attributes specified in attrs_longest updated to correspond to the longest attribute
+
+    groupby_cols = ['id','fromIntersectionId','toIntersectionId','shstReferenceId','shstGeometryId']
     """
-    # sort by shstReferenceId and length
+    WranglerLogger.debug('update_attributes_based_on_way_length: osmnx_shst_gdf has {:,} rows, CRS {}, and fields {}'.format(
+        len(osmnx_shst_gdf), osmnx_shst_gdf.crs.to_epsg(), list(osmnx_shst_gdf.columns)))
+    # sort by shstReferenceId and length; shstReferenceId is directional
     osmnx_shst_gdf_sorted = osmnx_shst_gdf.sort_values(['shstReferenceId', 'length'], ascending=False)
 
     # group by 'shstReferenceId' and keep the first (longest OSM way) of each group
@@ -1625,13 +1631,20 @@ def update_attributes_based_on_way_length(osmnx_shst_gdf, attrs_longest, groupby
                                                               on=groupby_cols,
                                                               how='left')
     WranglerLogger.debug('......finished updating attributes based on osm way length')
-    WranglerLogger.debug('type for osmnx_shst_gdf: {}  osmnx_shst_gdf_sorted: {}  osmnx_new_values_by_shst: {}  osmnx_shst_other_attrs_gdf: {}  osmnx_shst_gdf_updated: {}'.format(
-        type(osmnx_shst_gdf), type(osmnx_shst_gdf_sorted), type(osmnx_new_values_by_shst), type(osmnx_shst_other_attrs_gdf), type(osmnx_shst_gdf_updated)
-    ))
-    WranglerLogger.debug('CRS for osmnx_shst_gdf: {}  osmnx_shst_gdf_sorted: {}  osmnx_shst_other_attrs_gdf: {}  osmnx_shst_gdf_updated: {}'.format(
-        osmnx_shst_gdf.crs, osmnx_shst_gdf_sorted.crs, osmnx_shst_other_attrs_gdf.crs, osmnx_shst_gdf_updated.crs
-    ))
+
+    WranglerLogger.debug('update_attributes_based_on_way_length: osmnx_shst_gdf_updated has {:,} rows, CRS {}, and fields {}'.format(
+        len(osmnx_shst_gdf_updated), osmnx_shst_gdf_updated.crs.to_epsg(), list(osmnx_shst_gdf_updated.columns)))
     return osmnx_shst_gdf_updated
+
+
+def dict_to_string(my_dict):
+    """
+    Print a dictionary for debugging so it's readable
+    """
+    return_str = ""
+    for key in my_dict.keys():
+        return_str += "{:>20}:{}\n".format(key, my_dict[key])
+    return return_str
 
 
 def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
@@ -1713,7 +1726,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     for c in attrs_longest:
         agg_dict[c] = 'first'
 
-    WranglerLogger.debug('...aggregation dict:\n{}'.format(agg_dict))
+    WranglerLogger.debug('...aggregation dict:\n{}'.format(dict_to_string(agg_dict)))
 
     # TODO: decide if 4. fill NaN is needed
     # 4, fill NaN and modify field type before aggregating. This fills NAs for ShSt-derived OSM Ways that do not have
@@ -2364,7 +2377,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
     * SharedStreets link attributes: 'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId' 
       (to be used as the merge key to merge into sharedstreets-based link_gdf)
       - 'shstGeometryId' corresponds to the 'id' in the geojson files from step1_extract_shst.py; these links may be
-        bi-directional so many third_party_gdf links in both directions can correespond to a single 'shstGeometryId'
+        bi-directional so many third_party_gdf links in both directions can correspond to a single 'shstGeometryId'
       - 'shstReferenceId' is the directed version of 'shstGeometryId'; So for a given 'shstGeometryId', there are two
         ('shstGeometryId', 'fromIntersectionId', 'toIntersectionId') pairs, with the latter two fields reversed
     * shst matching metrics: 'gisReferenceId', 'gisGeometryId', 'gisTotalSegments', 'gisSegmentIndex',
@@ -6175,7 +6188,7 @@ def read_shst_extract(path, suffix):
                              ignore_index=True,
                              sort=False)
     WranglerLogger.debug("----------finished reading shst extraction data-------------")
-    WranglerLogger.debug("shst extraction head:{}\n".format(shst_gdf.head(10)))
+    WranglerLogger.debug("shst extraction head:\n{}".format(shst_gdf.head(10)))
 
     return shst_gdf
 

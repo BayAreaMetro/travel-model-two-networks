@@ -27,6 +27,10 @@ from network_wrangler import WranglerLogger, setupLogging
 INPUT_DATA_DIR  = os.environ['INPUT_DATA_DIR']
 OUTPUT_DATA_DIR = os.environ['OUTPUT_DATA_DIR']
 
+# Since this is a very memory intensive process, for debugging, we can filter to just links in this bounding box
+# specify: lat1,lon1,lat2,lon2. e.g. "37.866893,-122.309461,37.758647,-122.163130"
+DEBUG_BOUNDING_BOX = os.environ['DEBUG_BOUNDING_BOX'] if 'DEBUG_BOUNDING_BOX' in os.environ else None
+
 # OSM extraction and SharedStreet extraction
 SHST_EXTRACT_DIR = os.path.join(INPUT_DATA_DIR, 'step1_shst_extracts')
 OSM_EXTRACT_DIR  = os.path.join(INPUT_DATA_DIR, 'step2_osmnx_extracts')
@@ -58,6 +62,16 @@ if __name__ == '__main__':
     nearest_match_epsg_str = 'epsg:{}'.format(str(26915))
     WranglerLogger.info('nearest match ESPG: {}'.format(nearest_match_epsg_str))
 
+    DEBUG_MIN_X = DEBUG_MIN_Y = DEBUG_MAX_X = DEBUG_MAX_Y = None
+    if DEBUG_BOUNDING_BOX:
+        DEBUG_BOUNDING_BOX_FLOAT_LIST = [float(x) for x in DEBUG_BOUNDING_BOX.split(",")]
+        # expect lat1,lon1,lat2,lon2 => y1,x1,y2,x2
+        DEBUG_MIN_X = min(DEBUG_BOUNDING_BOX_FLOAT_LIST[1],DEBUG_BOUNDING_BOX_FLOAT_LIST[3])
+        DEBUG_MAX_X = max(DEBUG_BOUNDING_BOX_FLOAT_LIST[1],DEBUG_BOUNDING_BOX_FLOAT_LIST[3])
+        DEBUG_MIN_Y = min(DEBUG_BOUNDING_BOX_FLOAT_LIST[0],DEBUG_BOUNDING_BOX_FLOAT_LIST[2])
+        DEBUG_MAX_Y = max(DEBUG_BOUNDING_BOX_FLOAT_LIST[0],DEBUG_BOUNDING_BOX_FLOAT_LIST[2])
+    WranglerLogger.info('DEBUG_BOUNDING cx: [{}:{}, {}:{}]'.format(DEBUG_MIN_X, DEBUG_MAX_X, DEBUG_MIN_Y, DEBUG_MAX_Y))
+
     # 1. Load and consolidate ShSt extracts (from step1_shst_extraction.sh) by reading and combining geofeather files
     WranglerLogger.info('1. Loading SharedStreets extracts from {}'.format(SHST_EXTRACT_DIR))
     shst_link_gdf = methods.read_shst_extract(SHST_EXTRACT_DIR, "*.out.feather")
@@ -67,32 +81,50 @@ if __name__ == '__main__':
     WranglerLogger.info('Dropping duplicates due to buffer area along polygon boundaries')
     WranglerLogger.info('.. before removing duplicates, shst extract has {} geometries'.format(shst_link_gdf.shape[0]))
     shst_link_gdf.drop_duplicates(subset=['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'], inplace=True)
-    WranglerLogger.info('...after removing duplicates, {} geometries remain'.format(shst_link_gdf.shape[0]))
+    WranglerLogger.info('...after removing duplicates, {:,} geometries remain'.format(shst_link_gdf.shape[0]))
+
+    # DEBUG option: drop outside of bounding box
+    if DEBUG_BOUNDING_BOX:
+        shst_link_gdf = shst_link_gdf.cx[DEBUG_MIN_X:DEBUG_MAX_X, DEBUG_MIN_Y:DEBUG_MAX_Y]
+        WranglerLogger.info('Dropped links outside of DEBUG_BOUNDING_BOX; {:,} links remain'.format(len(shst_link_gdf)))
 
     # 2. Expand ShSt extract's metadata field into OSM Ways
-    #    This step is needed because is come cases, one ShSt extract record (one geometry) contain multiple OSM Ways.
+    #    This step is needed because is some cases, one ShSt extract record (one geometry) contain multiple OSM Ways.
     #    Creates dataframe "osm_ways_from_shst_gdf" with fields:
     #     ['id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'link',
     #      'name', 'nodeIds', 'oneWay', 'roadClass', 'roundabout', 'wayId', 'waySections_len', 'waySection_ord', 'geometryId', 'u', 'v']
     WranglerLogger.info('2. Expanding ShSt extract into OSM Ways with ShSt-specific link attributes')
     osm_ways_from_shst_gdf = methods.extract_osm_links_from_shst_metadata(shst_link_gdf)
-    WranglerLogger.info('shst extracts has {} geometries, {} OSM Ways'.format(
+    WranglerLogger.info('shst extracts has {:,} geometries, {:,} OSM Ways'.format(
         osm_ways_from_shst_gdf.geometryId.nunique(),
         osm_ways_from_shst_gdf.shape[0])
     )
     WranglerLogger.debug('osm_ways_from_shst_gdf has the following fields: {}'.format(list(osm_ways_from_shst_gdf)))
 
     # 3. Read OSM data from step2_osmnx_extraction.py
+    #    Resulting dataframe has fields:
+    #    ['u','v','key','osmid','reversed','length','geometry'] plus the fields OSM way tags in methods.OSM_WAY_TAGS
     WranglerLogger.info('3. Reading osmnx links from {}'.format(OSM_LINK_FILE))
     osmnx_link_gdf = geofeather.from_geofeather(OSM_LINK_FILE)
-    WranglerLogger.info('Finished reading {} rows of osmnx links'.format(len(osmnx_link_gdf)))
+    WranglerLogger.info('Finished reading {:,} rows of osmnx links'.format(len(osmnx_link_gdf)))
     WranglerLogger.debug('osmnx link data has the following attributes:\n{}'.format(osmnx_link_gdf.dtypes))
-    # WranglerLogger.info('osmnx node data has the following attributes: {}'.format(list(osmnx_node_gdf)))
     WranglerLogger.debug('head:\n{}'.format(osmnx_link_gdf.head(10)))
 
-    # 4. merge link attributes from OSM extracts with ShSt-derived OSM ways dataframe
+    # DEBUG option: drop outside of bounding box
+    if DEBUG_BOUNDING_BOX:
+        osmnx_link_gdf = osmnx_link_gdf.cx[DEBUG_MIN_X:DEBUG_MAX_X, DEBUG_MIN_Y:DEBUG_MAX_Y]
+        WranglerLogger.info('Dropped links outside of DEBUG_BOUNDING_BOX; {:,} links remain'.format(len(osmnx_link_gdf)))
+
+    # 4. merge link attributes from OSM extracts with ShSt-derived OSM ways dataframe.
+    #    Note that some of the OSM ways from Step 3 were represented as multiple rows so aggregation is performed here, so:
+    #    - u,v,geometry are from the shst dataste and not from osmnx_link_gdf (the osmnx_link_gdf version is dropped)
+    #    - key from osmnx_link_gdf is dropped
+    #    - name from osm_ways_from_shst_gdf => name_shst_metadata
+    #    - oneWay from osm_ways_from_shst_gdf => oneway
+    #    - osmnx_shst_merge: 'both' if the shst metadata osm way joined to osm data; 'shst_only' if osm data wasn't found for that wayId
     WranglerLogger.info('4. Merging link attributes from OSM extracts with ShSt-derived OSM ways dataframe')
     osmnx_shst_gdf = methods.merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, SHST_WITH_OSM_DIR)
+    WranglerLogger.info('Resulting osmnx_shst_gdf has {:,} rows'.format(len(osmnx_shst_gdf)))
 
     # 4a. Record OSMnx 'highway' tag; add columns 'roadway', 'hierarchy' (?), 'drive_access', 'bike_access', 'walk_access'
     osmnx_shst_gdf = methods.recode_osmnx_highway_tag(osmnx_shst_gdf, methods.HIGHWAY_TO_ROADWAY, methods.ROADWAY_TO_ACCESS)
@@ -117,8 +149,8 @@ if __name__ == '__main__':
     # 'shstReferenceId', 'geometry', but still the same 'id' and 'shstGeometryId'
     WranglerLogger.info('6. Adding reversed links for two-way OSM ways')
     osmnx_shst_gdf = methods.add_two_way_osm(osmnx_shst_gdf)
-    WranglerLogger.debug('after adding two-way links, osm_from_shst_link_gdf has the following fields: {}'.format(
-        osmnx_shst_gdf.dtypes))
+    WranglerLogger.debug('after adding two-way links, osm_from_shst_link_gdf has {:,} rows and the following fields: {}'.format(
+        len(osmnx_shst_gdf), osmnx_shst_gdf.dtypes))
     WranglerLogger.debug(osmnx_shst_gdf.head())
 
     # write this to look at it
