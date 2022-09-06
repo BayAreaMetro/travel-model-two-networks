@@ -129,7 +129,7 @@ if __name__ == '__main__':
     # 4a. Record OSMnx 'highway' tag; add columns 'roadway', 'hierarchy' (?), 'drive_access', 'bike_access', 'walk_access'
     osmnx_shst_gdf = methods.recode_osmnx_highway_tag(osmnx_shst_gdf, methods.HIGHWAY_TO_ROADWAY, methods.ROADWAY_TO_ACCESS)
 
-    # 5. impute total lane count, bus-only lane count, hov lane count by link direction
+    # 5. impute total lane count, bus-only lane count, hov lane count by link direction based on OSM tags
     WranglerLogger.info('5. Imputing total lane count and bus-only/hov lane counts')
     # first, clean up the field types and NAs of lane, turn related attributes
     methods.modify_osmway_lane_accounting_field_type(osmnx_shst_gdf)
@@ -139,8 +139,11 @@ if __name__ == '__main__':
     methods.count_bus_lanes(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
     # impute hov lane count - add 'forward_hov_lane'
     methods.count_hov_lanes(osmnx_shst_gdf)
-    # then, impute lane count for each direction -- adds 'lane_count_type', 'forward_tot_lanes','backward_tot_lanes','bothways_tot_lanes'
-    methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
+    # clean up osm turn values and impute lane count from turn values - add 'lanes_from_turns_forward', 'lanes_from_turns_backward'
+    methods.cleanup_osm_turn_values(osmnx_shst_gdf)
+    methods.get_lane_count_from_osm_turns(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
+    # then, impute lane count for each direction -- add 'lane_count_type', 'forward_lanes','backward_lanes','bothways_lanes'
+    osmnx_shst_gdf = methods.impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
 
     WranglerLogger.debug('osmnx_shst_gdf.dtypes:\n{}'.format(osmnx_shst_gdf.dtypes))
 
@@ -158,40 +161,35 @@ if __name__ == '__main__':
     geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
-    # 7. impute turn lane counts from 'turn:lanes' string
+    # 7. impute turn lane counts by extracting info from 'turns:lanes_osmSplit' string, which was created by methods.add_two_way_osm()
+    # from osmnx fields 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward'. This add 6 columns: 'through_turn', 'merge_only',
+    # 'through_only', 'turn_only', 'merge_turn', 'lane_count_from_turns'
     WranglerLogger.info('7. Imputing turn lane counts')
-    # first, clean up the strings used in 'turn' values
-    methods.cleanup_turns_attributes(osmnx_shst_gdf)
-    # then, count turn lanes from 'turns:lanes_osmSplit'; this adds columns 'through_turn','merge_only',
-    # 'through_only',turn_only','lane_count_from_turns','middle_turn','merge_turn'
     osmnx_shst_gdf = methods.turn_lane_accounting(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
 
     # 8. consolidate lane accounting
     WranglerLogger.info('8. Consolidating lane accounting')
-    # first, reconcile total lane count
-    methods.reconcile_lane_count_inconsistency(osmnx_shst_gdf)
-    # lane accounting
-    methods.consolidate_lane_accounting(osmnx_shst_gdf)
+    methods.consolidate_lane_accounting(osmnx_shst_gdf, SHST_WITH_OSM_DIR)
 
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf_lane_accounting_QAQC.feather")
     geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
-    # drop interim fields before continue
-    osmnx_shst_gdf.drop(columns=[
-        'lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',      # raw OSMnx lane count
-        'turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',  # raw OSMnx turn info
-        'hov', 'hov:lanes', 'lanes:hov',                                    # raw OSMnx hov info
-        'bus', 'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward',      # raw OSMnx bus info
-        'forward_tot_lanes', 'backward_tot_lanes',                          # interim lane count
-        'bothways_tot_lanes',                                               # interim middle turn count
-        'backward_bus_lane', 'forward_bus_lane',                            # interim bus lane count
-        'forward_hov_lane',                                                 # interim hov lane count
-        'turns:lanes_osmSplit', 'bothways_lane_osmSplit',                   # interim turn info
-        'through_only',                                                     # interim turn lane counts
-        'lane_count_from_turns', 'lanes_non_gp'                             # validation lane count
-        ], inplace=True)
+    # # drop interim fields before continue
+    # osmnx_shst_gdf.drop(columns=[
+    #     'lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',      # raw OSMnx lane count
+    #     'turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',  # raw OSMnx turn info
+    #     'hov', 'hov:lanes', 'lanes:hov',                                    # raw OSMnx hov info
+    #     'bus', 'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward',      # raw OSMnx bus info
+    #     'forward_lanes', 'backward_lanes',                                  # interim lane count
+    #     'bothways_lanes',                                                   # interim middle turn count
+    #     'backward_bus_lane', 'forward_bus_lane',                            # interim bus lane count
+    #     'forward_hov_lane',                                                 # interim hov lane count
+    #     'turns:lanes_osmSplit', 'bothways_lane_osmSplit',                   # interim turn info
+    #     'through_only',                                                     # interim turn lane counts
+    #     'lane_count_from_turns', 'lanes_non_gp'                             # validation lane count
+    #     ], inplace=True)
 
     # 9. aggregate osm ways back to ShSt based links
     # At this point, osmnx_shst_gdf has duplicated shstReferenceId because some sharedstreets links contain more than
@@ -392,7 +390,7 @@ if __name__ == '__main__':
     del link_BayArea_geometryId_debug
 
     # In case 1), suggest dropping the one that has no osmnx info (length==0, osmid==0 (due to fillna), index==0, osmnx_shst_merge=='shst_only').
-    # In such cases, the duplicates are essentially the same link, so keeping any of them should be fine.
+    # In case 2), the duplicates are essentially the same link, so keeping any of them should be fine.
     unique_link_BayArea_gdf = link_BayArea_gdf.sort_values(by=['osmid'], ascending=[False])
     unique_link_BayArea_gdf = unique_link_BayArea_gdf.drop_duplicates(
         subset=['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'], 
