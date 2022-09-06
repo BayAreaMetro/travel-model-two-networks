@@ -2385,9 +2385,14 @@ def create_node_gdf(link_gdf):
     # drop duplicates
     point_gdf.drop_duplicates(subset=["osm_node_id", "shst_node_id"], inplace=True)
 
+    # convert to geodataframe
+    WranglerLogger.debug('type of point_gdf: {}'.format(type(point_gdf)))
+    point_gdf = gpd.GeoDataFrame(
+        point_gdf,
+        geometry='geometry',
+        crs=LAT_LONG_EPSG
+    )
     WranglerLogger.debug('point_gdf type:{} point_gdf crs:{} point_gdf.head():\n{}'.format(type(point_gdf), point_gdf.crs, point_gdf.head()))
-    # it's already a GeoDataFrame so set the crs
-    point_gdf.set_crs(epsg=LAT_LONG_EPSG, inplace=True)
 
     return point_gdf
 
