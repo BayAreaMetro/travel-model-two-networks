@@ -13,7 +13,6 @@ USAGE = """
 import argparse, datetime, glob, os, sys
 import geopandas
 import numpy
-import geofeather
 import pandas as pd
 from network_wrangler import WranglerLogger, setupLogging
 
@@ -52,7 +51,7 @@ if __name__ == '__main__':
             continue
 
         WranglerLogger.info("Reading {}".format(full_filename))
-        input_gdf = geofeather.from_geofeather(full_filename)
+        input_gdf = geopandas.read_feather(full_filename)
         WranglerLogger.info("Initial dtypes:\n{}".format(input_gdf.dtypes))
 
         # downcast num types
