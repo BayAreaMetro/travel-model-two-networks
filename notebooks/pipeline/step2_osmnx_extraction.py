@@ -44,7 +44,6 @@ import methods
 import pandas as pd
 import geopandas as gpd
 import osmnx as ox
-import geofeather
 from pyproj import CRS
 from network_wrangler import WranglerLogger, setupLogging
 
@@ -125,7 +124,7 @@ if __name__ == '__main__':
 
     # write links to geofeather
     WranglerLogger.info('writing out OSM links to geofeather at {}'.format(OUTPUT_FEATHER_LINK))
-    geofeather.to_geofeather(link_gdf, OUTPUT_FEATHER_LINK)
+    link_gdf.to_feather(OUTPUT_FEATHER_LINK)
     del link_gdf
     WranglerLogger.info('link objects deleted')
 
@@ -143,7 +142,7 @@ if __name__ == '__main__':
 
     # write nodes to geofeather
     WranglerLogger.info('writing out OSM nodes to geofeather at {}'.format(OUTPUT_FEATHER_NODE))
-    geofeather.to_geofeather(node_gdf, OUTPUT_FEATHER_NODE)
+    node_gdf.to_feather(OUTPUT_FEATHER_NODE)
 
     del node_gdf
     WranglerLogger.info('node objects deleted')

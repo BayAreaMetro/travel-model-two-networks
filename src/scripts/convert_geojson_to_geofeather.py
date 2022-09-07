@@ -8,7 +8,6 @@ USAGE = """
 
 import argparse, datetime, glob, os, sys
 import geopandas
-import geofeather
 from network_wrangler import WranglerLogger, setupLogging
 
 if __name__ == '__main__':
@@ -38,7 +37,7 @@ if __name__ == '__main__':
         WranglerLogger.info("dtypes:\n{}".format(input_gdf.dtypes))
         output_geofeather = full_filename.replace('.geojson','.feather')
 
-        geofeather.to_geofeather(input_gdf, output_geofeather)
+        input_gdf.to_feather(output_geofeather)
         WranglerLogger.info("Wrote to {}".format(output_geofeather))
 
     WranglerLogger.info("Done")

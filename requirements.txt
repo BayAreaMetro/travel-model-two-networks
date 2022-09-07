@@ -3,8 +3,6 @@ network-wrangler
 docker
 # 1.2.0 needed for this feature:
 osmnx >= 1.2.0
-# we use this for intermediate files
-geofeather
 # cKDTree used in methods
 scipy
 # peartree used in methods.get_representative_feed_from_gtfs()
