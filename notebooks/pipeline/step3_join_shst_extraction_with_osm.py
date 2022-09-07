@@ -14,7 +14,6 @@ set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
 from warnings import WarningMessage
 import pandas as pd
 import geopandas as gpd
-import geofeather  # this is fast
 from scipy.spatial import cKDTree
 from pyproj import CRS
 import datetime, json, os, sys
@@ -105,7 +104,7 @@ if __name__ == '__main__':
     #    Resulting dataframe has fields:
     #    ['u','v','key','osmid','reversed','length','geometry'] plus the fields OSM way tags in methods.OSM_WAY_TAGS
     WranglerLogger.info('3. Reading osmnx links from {}'.format(OSM_LINK_FILE))
-    osmnx_link_gdf = geofeather.from_geofeather(OSM_LINK_FILE)
+    osmnx_link_gdf = gpd.read_geofeather(OSM_LINK_FILE)
     WranglerLogger.info('Finished reading {:,} rows of osmnx links'.format(len(osmnx_link_gdf)))
     WranglerLogger.debug('osmnx link data has the following attributes:\n{}'.format(osmnx_link_gdf.dtypes))
     WranglerLogger.debug('head:\n{}'.format(osmnx_link_gdf.head(10)))
@@ -158,7 +157,7 @@ if __name__ == '__main__':
 
     # write this to look at it
     OUTPUT_FILE= os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf.feather")
-    geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
+    osmnx_shst_gdf.to_feather(OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
     # 7. impute turn lane counts by extracting info from 'turns:lanes_osmSplit' string, which was created by methods.add_two_way_osm()
@@ -173,7 +172,7 @@ if __name__ == '__main__':
 
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf_lane_accounting_QAQC.feather")
-    geofeather.to_geofeather(osmnx_shst_gdf, OUTPUT_FILE)
+    osmnx_shst_gdf.to_feather(OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
 
     # # drop interim fields before continue
@@ -208,7 +207,7 @@ if __name__ == '__main__':
 
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_consolidated_gdf_QAQC.feather")
-    geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
+    shst_aggregated_gdf.to_feather(OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(shst_aggregated_gdf), OUTPUT_FILE))
 
     WranglerLogger.info(
@@ -261,12 +260,12 @@ if __name__ == '__main__':
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_county_tag_QAQC.feather")
     WranglerLogger.info("Writing {:,} rows with columns {} to {}".format(len(shst_aggregated_gdf), 
         list(shst_aggregated_gdf.columns), OUTPUT_FILE))
-    geofeather.to_geofeather(shst_aggregated_gdf, OUTPUT_FILE)
+    shst_aggregated_gdf.to_feather(OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "node_county_tag_QAQC.feather")
     WranglerLogger.info("Writing {:,} rows with columns {} to {}".format(len(node_gdf), 
         list(node_gdf.columns), OUTPUT_FILE))        
-    geofeather.to_geofeather(node_gdf, OUTPUT_FILE)
+    node_gdf.to_feather(OUTPUT_FILE)
 
     # remove out-of-region links and nodes
     # for nodes that are out-of-region but used in cross-region links, keep them and re-label to Bay Area counties
@@ -385,7 +384,7 @@ if __name__ == '__main__':
         ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'])['id'].transform('size')
     link_BayArea_geometryId_debug.reset_index(inplace=True, drop=True)
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "link_BayArea_geometryId_QAQC.feather")
-    geofeather.to_geofeather(link_BayArea_geometryId_debug, OUTPUT_FILE)
+    link_BayArea_geometryId_debug.to_feather(OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(link_BayArea_geometryId_debug), OUTPUT_FILE))
     del link_BayArea_geometryId_debug
 
@@ -418,12 +417,12 @@ if __name__ == '__main__':
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
     link_BayArea_gdf.reset_index(inplace=True, drop=True)
-    geofeather.to_geofeather(link_BayArea_gdf, OUTPUT_FILE)
+    link_BayArea_gdf.to_feather(OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_node.feather')
     WranglerLogger.info('Saving nodes to {}'.format(OUTPUT_FILE))
     node_BayArea_gdf.reset_index(inplace=True, drop=True)
-    geofeather.to_geofeather(node_BayArea_gdf, OUTPUT_FILE)
+    node_BayArea_gdf.to_feather(OUTPUT_FILE)
 
     WranglerLogger.info('Done')
 

@@ -18,7 +18,6 @@ from pyproj import CRS
 from scipy.spatial import cKDTree
 from functools import partial
 from network_wrangler import WranglerLogger
-import geofeather
 import peartree as pt
 from urllib.request import urlopen
 from zipfile import ZipFile
@@ -526,7 +525,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
                                             osmnx_link_gdf['lanes:forward'].notnull()].sort_values('osmid')
     chk_osmid_dup_gdf.reset_index(drop=True, inplace=True)
     OSMID_DUP_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'osmnx_osmid_dup.feather')
-    geofeather.to_geofeather(chk_osmid_dup_gdf, OSMID_DUP_DEBUG_FILE)
+    chk_osmid_dup_gdf.to_feather(OSMID_DUP_DEBUG_FILE)
     WranglerLogger.debug('Wrote chk_osmid_dup_gdf to {}'.format(OSMID_DUP_DEBUG_FILE))    
                             
     # Two reasons for duplicated osmid:
@@ -614,7 +613,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     )
     null_shst_geom_gdf.reset_index(drop=True, inplace=True)
     OSMNX_ONLY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'osmnx_ways_without_shst.feather')
-    geofeather.to_geofeather(null_shst_geom_gdf, OSMNX_ONLY_DEBUG_FILE)
+    null_shst_geom_gdf.to_feather(null_shst_geom_gdf, OSMNX_ONLY_DEBUG_FILE)
     WranglerLogger.debug('Wrote null_osmnx_geom_gdf to {}'.format(OSMNX_ONLY_DEBUG_FILE))
 
     # remove those rows which didn't correspond to osmnx ways
@@ -642,7 +641,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     WranglerLogger.debug('export {} links with different oneway_shst and oneway_osm for debugging'.format(
         oneway_diff.shape[0]))
     ONEWAY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'shst_osmnx_oneway_diff.feather')
-    geofeather.to_geofeather(oneway_diff, ONEWAY_DEBUG_FILE)
+    oneway_diff.to_feather(oneway_diff, ONEWAY_DEBUG_FILE)
     WranglerLogger.debug('Wrote oneway_diff to {}'.format(ONEWAY_DEBUG_FILE))
 
     return osmnx_shst_gdf
@@ -1738,7 +1737,7 @@ def add_two_way_osm(osmnx_shst_gdf):
             link_all_gdf.loc[link_all_gdf.osmid.isnull()].wayId.nunique()
         )
     )
-    WranglerLogger.debug("add_two_way_osm returning link_all_gdf with type(link_all_gdf): {}".format(type(link_all_gdf)))
+    WranglerLogger.debug("add_two_way_osm returning link_all_gdf with type(link_all_gdf):\n{}".format(type(link_all_gdf)))
     return link_all_gdf
 
 
@@ -2904,7 +2903,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
 
     # write input file to single geofeather for debugging
     debug_input_file    = os.path.join(conflation_dir, '{}.in.feather'.format(third_party))
-    geofeather.to_geofeather(third_party_gdf.reset_index(), debug_input_file)
+    third_party_gdf.reset_index().to_feather(debug_input_file)
     WranglerLogger.debug('Wrote input file as geofeather {} for debugging'.format(debug_input_file))
 
     # boundary_partition is either '' or '_01','_02', etc
@@ -3050,7 +3049,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
         elif third_party_type == 'transit':
             matched_geofeather = os.path.join(CONFLATION_SHST, '{}_matched.feather'.format(third_party))
         
-        geofeather.to_geofeather(matched_gdf, matched_geofeather)
+        matched_gdf.to_feather(matched_geofeather)
         WranglerLogger.info('Wrote {:,} lines to {}'.format(len(matched_gdf), matched_geofeather))
 
         WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total unique ids'.format(
@@ -3082,7 +3081,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
             unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'unmatched.feather')
         elif third_party_type == 'transit':
             unmatched_geofeather = os.path.join(CONFLATION_SHST, '{}_unmatched.feather'.format(third_party))
-        geofeather.to_geofeather(unmatched_gdf, unmatched_geofeather)
+        unmatched_gdf.to_feather(unmatched_gdf, unmatched_geofeather)
         WranglerLogger.info('Wrote {:,} lines to {}'.format(len(unmatched_gdf), unmatched_geofeather))
 
         WranglerLogger.info('Sharedstreets failed to match {:,} out of {:,} total unique ids'.format(
@@ -4323,7 +4322,7 @@ def route_bus_shst(SHST_MATCH_OUTPUT_DIR, drive_link_gdf, trips, unique_shape_id
         if ('_matched.feather' in filename) & ('_matched.feather.crs' not in filename):
             agency_raw_name = filename.split('_matched')[0]
             WranglerLogger.info('read shst matching result for {}'.format(agency_raw_name))
-            shst_matched = geofeather.from_geofeather(os.path.join(SHST_MATCH_OUTPUT_DIR, filename))
+            shst_matched = gpd.read_geofeather(os.path.join(SHST_MATCH_OUTPUT_DIR, filename))
             # add agency_raw_name
             shst_matched['agency_raw_name'] = agency_raw_name
 
@@ -5455,7 +5454,7 @@ def ranch_route_bus_shortest_path(
         RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE = \
             os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step1.feather')
         WranglerLogger.info('exporting step1 routing results to {}'.format(RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE))
-        geofeather.to_geofeather(trip_osm_link_gdf, RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE) 
+        trip_osm_link_gdf.to_feather(RANCH_BUSROUTING_SHORTEST_PATH_STEP1_QAQC_FILE) 
 
     # step 2: for each stop, check if the routed route is within 50 meters. Stops without routed link within 50 meters are "bad stops".
     # self.set_bad_stops() in Ranch package
@@ -5499,7 +5498,7 @@ def ranch_route_bus_shortest_path(
         RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE = \
             os.path.join(BUS_SHORTEST_PATH_ROUTING_QAQC_DIR, 'ranch_bus_routing_shortest_path_step3.feather')
         WranglerLogger.info('exporting step3 routing results to {}'.format(RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE))
-        geofeather.to_geofeather(trip_osm_link_between_stops_gdf, RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE)
+        trip_osm_link_between_stops_gdf.to_feather(RANCH_BUSROUTING_SHORTEST_PATH_STEP3_QAQC_FILE)
 
     return trip_osm_link_between_stops_df, shortest_path_failed_shape_list
 
@@ -6615,7 +6614,7 @@ def read_shst_extract(path, suffix):
     for shst_file in shst_files:
         (dirname, filename) = os.path.split(shst_file)
         WranglerLogger.debug("reading shst extraction data: {}".format(filename))
-        new_gdf = geofeather.from_geofeather(shst_file)
+        new_gdf = gpd.read_feather(shst_file)
         new_gdf['source'] = shst_file
         shst_gdf = pd.concat([shst_gdf, new_gdf],
                              ignore_index=True,
