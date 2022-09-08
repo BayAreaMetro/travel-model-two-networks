@@ -641,7 +641,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     WranglerLogger.debug('export {} links with different oneway_shst and oneway_osm for debugging'.format(
         oneway_diff.shape[0]))
     ONEWAY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'shst_osmnx_oneway_diff.feather')
-    oneway_diff.to_feather(oneway_diff, ONEWAY_DEBUG_FILE)
+    oneway_diff.to_feather(ONEWAY_DEBUG_FILE)
     WranglerLogger.debug('Wrote oneway_diff to {}'.format(ONEWAY_DEBUG_FILE))
 
     return osmnx_shst_gdf
@@ -854,7 +854,7 @@ def get_lane_count_from_osm_turns(osmnx_shst_gdf, OUTPUT_DIR):
         'export {} links with different total lane counts from "lanes" and "turns" for debugging'.format(
             lane_count_debug.shape[0]))
     LANE_COUNT_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'lane_turn_counts_diff.feather')
-    geofeather.to_geofeather(lane_count_debug, LANE_COUNT_DEBUG_FILE)
+    lane_count_debug.to_feather(LANE_COUNT_DEBUG_FILE)
     WranglerLogger.debug('Wrote lane_counts_diff to {}'.format(LANE_COUNT_DEBUG_FILE))
 
     return None
@@ -910,7 +910,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     #     how   = 'left'
     # )
     # OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'osmnx_shst_lane_tag_permutations.feather')
-    # geofeather.to_geofeather(osmnx_shst_temp_gdf, OUTPUT_FILE)
+    # osmnx_shst_temp_gdf.to_feather(OUTPUT_FILE)
     # WranglerLogger.debug('Wrote {}'.format(OUTPUT_FILE))
 
     # these are the new columns we'll be setting; initialize them now to be the right type.  -1 mean unset
@@ -1982,7 +1982,7 @@ def consolidate_lane_accounting(osmnx_shst_gdf, OUTPUT_DIR):
     links_with_bus_hov_lanes.reset_index(drop=True, inplace=True)
     WranglerLogger.debug('export {:,} links with bus or hov lanes'.format(links_with_bus_hov_lanes.shape[0]))
     BUS_HOV_LANES_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'links_with_bus_hov_lanes.feather')
-    geofeather.to_geofeather(links_with_bus_hov_lanes, BUS_HOV_LANES_DEBUG_FILE)
+    links_with_bus_hov_lanes.to_feather(BUS_HOV_LANES_DEBUG_FILE)
     WranglerLogger.debug('Wrote links_with_bus_hov_lanes to {}'.format(BUS_HOV_LANES_DEBUG_FILE))
 
     # when hov_lane_osmSplit != -1
@@ -4322,7 +4322,7 @@ def route_bus_shst(SHST_MATCH_OUTPUT_DIR, drive_link_gdf, trips, unique_shape_id
         if ('_matched.feather' in filename) & ('_matched.feather.crs' not in filename):
             agency_raw_name = filename.split('_matched')[0]
             WranglerLogger.info('read shst matching result for {}'.format(agency_raw_name))
-            shst_matched = gpd.read_geofeather(os.path.join(SHST_MATCH_OUTPUT_DIR, filename))
+            shst_matched = gpd.read_feather(os.path.join(SHST_MATCH_OUTPUT_DIR, filename))
             # add agency_raw_name
             shst_matched['agency_raw_name'] = agency_raw_name
 
