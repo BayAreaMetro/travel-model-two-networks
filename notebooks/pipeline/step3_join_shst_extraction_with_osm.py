@@ -104,7 +104,7 @@ if __name__ == '__main__':
     #    Resulting dataframe has fields:
     #    ['u','v','key','osmid','reversed','length','geometry'] plus the fields OSM way tags in methods.OSM_WAY_TAGS
     WranglerLogger.info('3. Reading osmnx links from {}'.format(OSM_LINK_FILE))
-    osmnx_link_gdf = gpd.read_geofeather(OSM_LINK_FILE)
+    osmnx_link_gdf = gpd.read_feather(OSM_LINK_FILE)
     WranglerLogger.info('Finished reading {:,} rows of osmnx links'.format(len(osmnx_link_gdf)))
     WranglerLogger.debug('osmnx link data has the following attributes:\n{}'.format(osmnx_link_gdf.dtypes))
     WranglerLogger.debug('head:\n{}'.format(osmnx_link_gdf.head(10)))

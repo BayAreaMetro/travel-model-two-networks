@@ -613,7 +613,7 @@ def merge_osmnx_with_shst(osm_ways_from_shst_gdf, osmnx_link_gdf, OUTPUT_DIR):
     )
     null_shst_geom_gdf.reset_index(drop=True, inplace=True)
     OSMNX_ONLY_DEBUG_FILE = os.path.join(OUTPUT_DIR, 'osmnx_ways_without_shst.feather')
-    null_shst_geom_gdf.to_feather(null_shst_geom_gdf, OSMNX_ONLY_DEBUG_FILE)
+    null_shst_geom_gdf.to_feather(OSMNX_ONLY_DEBUG_FILE)
     WranglerLogger.debug('Wrote null_osmnx_geom_gdf to {}'.format(OSMNX_ONLY_DEBUG_FILE))
 
     # remove those rows which didn't correspond to osmnx ways
