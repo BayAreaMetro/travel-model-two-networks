@@ -9,6 +9,9 @@ set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
 # Output: roadway network in geofeather format, with SharedStreet geometries and OSMX link/node attributes,
     [OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_link.feather[.crs]
     [OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather[.crs]
+
+Optionally, for debugging, set DEBUG_BOUNDING_BOX environment variable with lat1,lon1,lat2,lon2
+e.g., 37.866893,-122.309461,37.758647,-122.163130
 """
 
 from warnings import WarningMessage
@@ -201,9 +204,7 @@ if __name__ == '__main__':
                             osmnx_shst_gdf.drop_duplicates(subset=['id', 'fromIntersectionId',
                                                                    'toIntersectionId', 'shstReferenceId',
                                                                    'shstGeometryId']).shape[0],
-                            shst_aggregated_gdf.shape[0]))
-    WranglerLogger.info('shst_aggregated_gdf has columns {}; head:\n{}'.format(
-        list(shst_aggregated_gdf.columns), shst_aggregated_gdf.head()))                       
+                            shst_aggregated_gdf.shape[0]))                    
 
     # write this to look at it
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "shst_consolidated_gdf_QAQC.feather")
