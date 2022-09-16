@@ -902,7 +902,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
                              'forward_bus_lane','backward_bus_lane','forward_hov_lane'], dropna=False)).reset_index(drop=False)
     osmnx_lane_tag_permutations_df.rename(columns={0:'lane_count_type_numrows'},inplace=True)  # the count column is named 0 by default
     # give it a new index and write it
-    osmnx_lane_tag_permutations_df['lane_count_type'] = osmnx_lane_tag_permutations_df.index
+    # osmnx_lane_tag_permutations_df['lane_count_type'] = osmnx_lane_tag_permutations_df.index
     WranglerLogger.debug('osmnx_lane_permutations_df:\n{}'.format(osmnx_lane_tag_permutations_df))
     OUTPUT_FILE = os.path.join(OUTPUT_DIR, 'osmnx_lane_tag_permutations.csv')
     osmnx_lane_tag_permutations_df.to_csv(OUTPUT_FILE, header=True, index=False)
@@ -957,7 +957,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
 
     # CASE 2: two-way, missing 'lanes' but have either 'lanes:backward' or 'lanes:forward' or both; have 'lanes:both_way'
     type2_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.isnull() & \
+                osmnx_shst_gdf['lanes'].isnull() & \
                 ((osmnx_shst_gdf['lanes:forward'].notnull()) | (osmnx_shst_gdf['lanes:backward'].notnull())) & \
                 (osmnx_shst_gdf['lanes:both_ways'].notnull())
     WranglerLogger.debug(
@@ -979,7 +979,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # CASE 3: two-way, missing 'lanes', 'lanes:backward' and 'lanes:forward'; no 'lanes:both_way'
     # have either 'lanes_from_turns_forward' or 'lanes_from_turns_backward' or both != -1
     type3_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.isnull() & \
+                osmnx_shst_gdf['lanes'].isnull() & \
                 (osmnx_shst_gdf['lanes:forward'].isnull()) & \
                 (osmnx_shst_gdf['lanes:backward'].isnull()) & \
                 (osmnx_shst_gdf['lanes:both_ways'].isnull()) & \
@@ -1003,7 +1003,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # CASE 4: two-way, missing 'lanes', 'lanes:backward' and 'lanes:forward'; but have 'lanes:both_way'
     # have either 'lanes_from_turns_forward' or 'lanes_from_turns_backward' or both != -1
     type4_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.isnull() & \
+                osmnx_shst_gdf['lanes'].isnull() & \
                 (osmnx_shst_gdf['lanes:forward'].isnull()) & \
                 (osmnx_shst_gdf['lanes:backward'].isnull()) & \
                 (osmnx_shst_gdf['lanes:both_ways'].notnull()) & \
@@ -1026,7 +1026,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
 
     # CASE 5: two-way, have 'lanes' but are missing either 'lanes:backward' or 'lanes:forward'; no 'lanes:both_way'
     type5_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.notnull() & \
+                osmnx_shst_gdf['lanes'].notnull() & \
                 ((osmnx_shst_gdf['lanes:forward'].isnull() & osmnx_shst_gdf['lanes:backward'].notnull()) |
                  (osmnx_shst_gdf['lanes:forward'].notnull() & osmnx_shst_gdf['lanes:backward'].isnull())) & \
                 (osmnx_shst_gdf['lanes:both_ways'].isnull())
@@ -1051,7 +1051,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
 
     # CASE 6: two-way, have 'lanes' but are missing either 'lanes:backward' or 'lanes:forward'; have 'lanes:both_way'
     type6_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.notnull() & \
+                osmnx_shst_gdf['lanes'].notnull() & \
                 ((osmnx_shst_gdf['lanes:forward'].isnull() & osmnx_shst_gdf['lanes:backward'].notnull()) |
                  (osmnx_shst_gdf['lanes:forward'].notnull() & osmnx_shst_gdf['lanes:backward'].isnull())) & \
                 (osmnx_shst_gdf['lanes:both_ways'].notnull())
@@ -1077,8 +1077,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
 
     # CASE 7: two-way, have even number 'lanes', but are missing both 'lanes:backward' and 'lanes:forward'; no 'lanes:both_way'
     type7_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.notnull() & \
-                (osmnx_shst_gdf.lanes % 2 == 0) & \
+                osmnx_shst_gdf['lanes'].notnull() & \
+                (osmnx_shst_gdf['lanes'] % 2 == 0) & \
                 (osmnx_shst_gdf['lanes:forward'].isnull() & osmnx_shst_gdf['lanes:backward'].isnull()) & \
                 (osmnx_shst_gdf['lanes:both_ways'].isnull())
     WranglerLogger.debug(
@@ -1098,8 +1098,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # CASE 8: two-way, have odd number 'lanes', but are missing both 'lanes:backward' and 'lanes:forward'; no 'lanes:both_way'
     # have either 'lanes_from_turns_forward' or 'lanes_from_turns_backward', or both, != -1
     type8_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.notnull() & \
-                (osmnx_shst_gdf.lanes % 2 == 1) & \
+                osmnx_shst_gdf['lanes'].notnull() & \
+                (osmnx_shst_gdf['lanes'] % 2 == 1) & \
                 osmnx_shst_gdf['lanes:forward'].isnull() & \
                 osmnx_shst_gdf['lanes:backward'].isnull() & \
                 osmnx_shst_gdf['lanes:both_ways'].isnull() & \
@@ -1130,8 +1130,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
 
     # CASE 9: two-way, have odd number 'lanes', but are missing both 'lanes:backward' and 'lanes:forward'; have 'lanes:both_way'
     type9_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                osmnx_shst_gdf.lanes.notnull() & \
-                (osmnx_shst_gdf.lanes % 2 == 1) & \
+                osmnx_shst_gdf['lanes'].notnull() & \
+                (osmnx_shst_gdf['lanes'] % 2 == 1) & \
                 osmnx_shst_gdf['lanes:forward'].isnull() & \
                 osmnx_shst_gdf['lanes:backward'].isnull() & \
                 (osmnx_shst_gdf['lanes:both_ways'].notnull())
@@ -1154,8 +1154,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # CASE 10: two-way, have even number 'lanes', but are missing both 'lanes:backward' and 'lanes:forward'; have 'lanes:both_way'
     # have either 'lanes_from_turns_forward' or 'lanes_from_turns_backward', or both, != -1
     type10_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                 osmnx_shst_gdf.lanes.notnull() & \
-                 (osmnx_shst_gdf.lanes % 2 == 0) & \
+                 osmnx_shst_gdf['lanes'].notnull() & \
+                 (osmnx_shst_gdf['lanes'] % 2 == 0) & \
                  osmnx_shst_gdf['lanes:forward'].isnull() & \
                  osmnx_shst_gdf['lanes:backward'].isnull() & \
                  osmnx_shst_gdf['lanes:both_ways'].notnull() & \
@@ -1189,13 +1189,13 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # either 'lanes:forward' + 'lanes:backward' == 'lanes' (no 'lanes:both_way') or 
     # 'lanes:forward' + 'lanes:backward' + 'lanes:both_way' == 'lanes' (have 'lanes:both_way')
     type11_w_bothway_idx  = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                             osmnx_shst_gdf.lanes.notnull() & \
+                             osmnx_shst_gdf['lanes'].notnull() & \
                              osmnx_shst_gdf['lanes:forward'].notnull() & \
                              osmnx_shst_gdf['lanes:backward'].notnull() & \
                              osmnx_shst_gdf['lanes:both_ways'].notnull() & \
                              (osmnx_shst_gdf['lanes:forward'] + osmnx_shst_gdf['lanes:backward'] + osmnx_shst_gdf['lanes:both_ways'] == osmnx_shst_gdf['lanes'])
     type11_wo_bothway_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                             osmnx_shst_gdf.lanes.notnull() & \
+                             osmnx_shst_gdf['lanes'].notnull() & \
                              osmnx_shst_gdf['lanes:forward'].notnull() & \
                              osmnx_shst_gdf['lanes:backward'].notnull() & \
                              osmnx_shst_gdf['lanes:both_ways'].isnull() & \
@@ -1222,13 +1222,13 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # either 'lanes:forward' + 'lanes:backward' != 'lanes' (no 'lanes:both_way') or 
     # 'lanes:forward' + 'lanes:backward' + 'lanes:both_way' != 'lanes' (have 'lanes:both_way')
     type12_w_bothway_idx  = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                             osmnx_shst_gdf.lanes.notnull() & \
+                             osmnx_shst_gdf['lanes'].notnull() & \
                              osmnx_shst_gdf['lanes:forward'].notnull() & \
                              osmnx_shst_gdf['lanes:backward'].notnull() & \
                              osmnx_shst_gdf['lanes:both_ways'].notnull() & \
                              (osmnx_shst_gdf['lanes:forward'] + osmnx_shst_gdf['lanes:backward'] + osmnx_shst_gdf['lanes:both_ways'] != osmnx_shst_gdf['lanes'])
     type12_wo_bothway_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                             osmnx_shst_gdf.lanes.notnull() & \
+                             osmnx_shst_gdf['lanes'].notnull() & \
                              osmnx_shst_gdf['lanes:forward'].notnull() & \
                              osmnx_shst_gdf['lanes:backward'].notnull() & \
                              osmnx_shst_gdf['lanes:both_ways'].isnull() & \
@@ -1251,8 +1251,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
         lane_tags_counting.append(np.int8(12))
 
     # CASE 13: one-way, have 'lanes'
-    type13_idx = (osmnx_shst_gdf.osm_dir_tag==1) & \
-                  osmnx_shst_gdf.lanes.notnull()
+    type13_idx = (osmnx_shst_gdf['osm_dir_tag']==1) & \
+                  osmnx_shst_gdf['lanes'].notnull()
     WranglerLogger.debug(
         '{:,} links of type13, by roadway categories:\n{}'.format(
             type13_idx.sum(), osmnx_shst_gdf.loc[type13_idx==True].roadway.value_counts()))
@@ -1265,8 +1265,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
         lane_tags_counting.append(np.int8(13))
     
     # CASE 14: one-way, missing 'lanes', have 'lanes:forward'
-    type14_idx = (osmnx_shst_gdf.osm_dir_tag==1) & \
-                  osmnx_shst_gdf.lanes.isnull() & \
+    type14_idx = (osmnx_shst_gdf['osm_dir_tag']==1) & \
+                  osmnx_shst_gdf['lanes'].isnull() & \
                   osmnx_shst_gdf['lanes:forward'].notnull()
     WranglerLogger.debug(
         '{:,} links of type14, by roadway categories:\n{}'.format(
@@ -1280,8 +1280,8 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
         lane_tags_counting.append(np.int8(14))
     
     # CASE 15: one-way, 'lanes' and 'lanes:forward' both missing, have 'lanes_from_turns_forward'
-    type15_idx = (osmnx_shst_gdf.osm_dir_tag==1) & \
-                  osmnx_shst_gdf.lanes.isnull() & \
+    type15_idx = (osmnx_shst_gdf['osm_dir_tag']==1) & \
+                  osmnx_shst_gdf['lanes'].isnull() & \
                   osmnx_shst_gdf['lanes:forward'].isnull() & \
                   (osmnx_shst_gdf['lanes_from_turns_forward'] != -1)  
     WranglerLogger.debug(
@@ -1321,16 +1321,16 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # have odd number 'lanes' but no 'lanes:both_way', or have even number 'lanes' and 'lanes:both_way'==1
 
     type17_wo_bothway_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                            osmnx_shst_gdf.lanes.notnull() & \
-                            (osmnx_shst_gdf.lanes % 2 == 1) & \
+                            osmnx_shst_gdf['lanes'].notnull() & \
+                            (osmnx_shst_gdf['lanes'] % 2 == 1) & \
                             osmnx_shst_gdf['lanes:forward'].isnull() & \
                             osmnx_shst_gdf['lanes:backward'].isnull() & \
                             osmnx_shst_gdf['lanes:both_ways'].isnull() & \
                             (osmnx_shst_gdf['lanes_from_turns_forward'] == -1) & \
                             (osmnx_shst_gdf['lanes_from_turns_backward'] == -1)
     type17_w_bothway_idx  = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                            osmnx_shst_gdf.lanes.notnull() & \
-                            (osmnx_shst_gdf.lanes % 2 == 0) & \
+                            osmnx_shst_gdf['lanes'].notnull() & \
+                            (osmnx_shst_gdf['lanes'] % 2 == 0) & \
                             osmnx_shst_gdf['lanes:forward'].isnull() & \
                             osmnx_shst_gdf['lanes:backward'].isnull() & \
                             osmnx_shst_gdf['lanes:both_ways'].notnull() & \
@@ -1380,7 +1380,7 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # CASE 18: two-way, missing 'lanes', 'lanes:backward' and 'lanes:forward'; but have 'lanes:both_way'
     # both 'lanes_from_turns_forward' and 'lanes_from_turns_backward' == -1
     type18_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                 osmnx_shst_gdf.lanes.isnull() & \
+                 osmnx_shst_gdf['lanes'].isnull() & \
                  osmnx_shst_gdf['lanes:forward'].isnull() & \
                  osmnx_shst_gdf['lanes:backward'].isnull() & \
                  osmnx_shst_gdf['lanes:both_ways'].notnull() & \
@@ -1405,14 +1405,14 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
         
     # CASE 19: two-way or one-way, missing all lane tags or turns tags for imputation
     type19_twoway_idx = (osmnx_shst_gdf['osm_dir_tag'] == 2) & \
-                         osmnx_shst_gdf.lanes.isnull() & \
+                         osmnx_shst_gdf['lanes'].isnull() & \
                          (osmnx_shst_gdf['lanes:forward'].isnull()) & \
                          (osmnx_shst_gdf['lanes:backward'].isnull()) & \
                          (osmnx_shst_gdf['lanes:both_ways'].isnull()) & \
                          (osmnx_shst_gdf['lanes_from_turns_forward'] == -1) & \
                          (osmnx_shst_gdf['lanes_from_turns_backward'] == -1)
-    type19_oneway_idx = (osmnx_shst_gdf.osm_dir_tag==1) & \
-                         osmnx_shst_gdf.lanes.isnull() & \
+    type19_oneway_idx = (osmnx_shst_gdf['osm_dir_tag']==1) & \
+                         osmnx_shst_gdf['lanes'].isnull() & \
                          osmnx_shst_gdf['lanes:forward'].isnull() & \
                          (osmnx_shst_gdf['lanes_from_turns_forward'] == -1)
     type19_idx = type19_twoway_idx | type19_oneway_idx
@@ -1453,11 +1453,11 @@ def impute_num_lanes_each_direction_from_osm(osmnx_shst_gdf, OUTPUT_DIR):
     # done
     WranglerLogger.info('Finished imputing lane counts')
     WranglerLogger.debug('two-way links lane count stats:\n{}'.format(
-        osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag==2].groupby(
+        osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag']==2].groupby(
             ['roadway', 'hierarchy', 'forward_lanes', 'backward_lanes', 'bothways_lanes'])['id'].\
                 count().reset_index().rename(columns={'id': 'num_link'}).sort_values(['hierarchy', 'forward_lanes'])))
     WranglerLogger.debug('one-way links lane count stats:\n{}'.format(
-        osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_dir_tag==1].groupby(
+        osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag']==1].groupby(
             ['roadway', 'hierarchy', 'forward_lanes'])['id'].\
                 count().reset_index().rename(columns={'id': 'num_link'}).sort_values(['hierarchy', 'forward_lanes'])))
     WranglerLogger.debug('lane_count_type stats:\n{}'.format(osmnx_shst_gdf['lane_count_type'].value_counts(dropna=False)))
@@ -1612,7 +1612,7 @@ def add_two_way_osm(osmnx_shst_gdf):
     # get two-way links; basing our judgement on what these are using the SharedStreet assesment
     # of oneway because the geometries are from SharedStreets, which combines some link+reverse
     # links into a single bi-directional link sometimes, and we want to create the reverse of those
-    reverse_osmnx_shst_gdf = osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag'] == 2].copy()
+    reverse_osmnx_shst_gdf = osmnx_shst_gdf.loc[osmnx_shst_gdf['osm_dir_tag'] == 2].copy().reset_index(drop=True)
 
     WranglerLogger.debug('osmnx_shst_gdf has {:,} two-way OSM ways, which contain {:,} geometries'.format(
         len(reverse_osmnx_shst_gdf),
@@ -1632,7 +1632,6 @@ def add_two_way_osm(osmnx_shst_gdf):
         inplace=True,
     )
     # reverse the geometries themselves, enabling offset and arrows to work when this is drawn in GIS
-    reverse_osmnx_shst_gdf.reset_index(inplace=True)
     reverse_osmnx_shst_gdf['geometry'] = reverse_geometry(reverse_osmnx_shst_gdf)
 
     # also reverse nodeIds
@@ -1704,7 +1703,7 @@ def add_two_way_osm(osmnx_shst_gdf):
 
     # add variable to note that it's a reverse that we've created
     osmnx_shst_gdf["reverse"] = False
-    reverse_osmnx_shst_gdf["reverse"] = True
+    reverse_osmnx_shst_gdf["reverse"] = True 
 
     # concatenate the reversed links and the initial links
     link_all_gdf = pd.concat( [osmnx_shst_gdf, reverse_osmnx_shst_gdf], sort=False, ignore_index=True)
@@ -2086,26 +2085,43 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     osmnx_shst_gdf      = osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_agg == False]              # no aggregation needed for this set
     gc.collect() # garbage collect a bit
 
-    # check the no_aggregation_grouped's waySections_len -- why are any > 1?  Warrn about these
+    # check the no_aggregation_grouped's waySections_len -- some > 1. Warrn about these
     WranglerLogger.debug("no aggregation osmnx_shst_gdf.waySections_len.value_counts():\n{}".format(
-        osmnx_shst_gdf['waySections_len'].value_counts()))
+        osmnx_shst_gdf['waySections_len'].value_counts(dropna=False)))
     WranglerLogger.warn("no_aggregation osmnx_shst_gdf.loc[no_aggregation_grouped.waySections_len>1]: \n{}".format(
         osmnx_shst_gdf.loc[osmnx_shst_gdf.waySections_len>1]))
+    # NOTE: if shst and osm data is completely consistent, when osm_agg == True, waySections_len should be > 1; when osm_agg==False,
+    # waySections_len should == 1. However, there are cases when osm_agg==False and waySections_len > 1. This is usually because the
+    # different osm ways that make one shst link have different oneway/twoway designations, therefore while not all osm ways had
+    # a reversed link created in the previous step add_two_way_osm(osmnx_shst_gdf).
+    #
+    # A deeper reason why shst would aggregate one-way osm way(s) and two-way osm way(s) into one link: a common case is the inconsistency
+    # between osm data and shst data, due to data vintage or other reasons. See the following example:
+    #    In ShSt extract, shst_link_gdf['id'] == '0a4969ec5d302669580f3cfe2cee0f5c' is a one-way shst link:
+    #    'forwardReferenceId' = '641d20a277c64fc507e5ee9e50602bfb'
+    #    'backReferenceId'  = ''
+    #    'metadata': 
+    #       {958536: {'geometryId': '0a4969ec5d302669580f3cfe2cee0f5c',
+    #           'gisMetadata': array([], dtype=object),
+    #           'osmMetadata': {'name': 'Stevens Creek Boulevard',
+    #           'waySections': array([
+    #               {'link': False, 'name': 'Stevens Creek Boulevard', 'nodeIds': array(['65430949', '4168013079'], dtype=object), 'oneWay': True,
+    #                'roadClass': 'Primary', 'roundabout': False, 'wayId': '415855066', 'waySections_len': 2, 'waySection_ord': 1, 'geometryId': '0a4969ec5d302669580f3cfe2cee0f5c'},
+    #               {'link': False, 'name': 'Stevens Creek Boulevard', 'nodeIds': array(['4168013079', '65430951'], dtype=object), 'oneWay': True,
+    #                'roadClass': 'Primary', 'roundabout': False, 'wayId': '415855073', 'waySections_len': 2, 'waySection_ord': 2, 'geometryId': '0a4969ec5d302669580f3cfe2cee0f5c'}],
+    #           dtype=object)}}}
+    # 
+    #   So, both osm ways are "oneway".
+    #   However, in the latest osmnx extract, osmid == 415855066 has oneway = True, but osmid == 415855073 has oneway = False.
+    #   Therefore in add_two_way_osm(osmnx_shst_gdf), a reversed link was created by osm way 415855073, but not for osm way 415855066.
+    #
+    # This also explains links missing shstReferenceId, which is created in add_two_way_osm(osmnx_shst_gdf) from 'forwardReferenceId' and 'backReferenceId';
+    # the reversed link created from osm way 415855073 is missing shstReferenceId.
 
     # For those rows that we'll be aggregating: sort them, reset the index and save a copy of that index
     need_aggregation_df.sort_values(by=SHST_ONEWAY_ID_COLS + ['waySection_ord'], inplace=True)  # sort to groupby columns + waySection_ord
     need_aggregation_df.reset_index(drop=True, inplace=True)                             # reset index for this sort
     need_aggregation_df['need_aggregation_df_index'] = need_aggregation_df.index         # save index as it's own column for max_length_index
-
-    # Groupby our unique, one-way shared street ID column set
-    need_aggregation_grouped = need_aggregation_df.groupby(SHST_ONEWAY_ID_COLS)
-
-    # Look at the size distribution of what's being aggregated
-    need_aggregation_grouped_sizes = need_aggregation_grouped.size()  # series with index = SHST_ONEWAY_ID_COLS, value=num
-    WranglerLogger.debug("need_aggregation_grouped_sizes: type={}\n{}".format(
-        type(need_aggregation_grouped_sizes), need_aggregation_grouped_sizes))
-    WranglerLogger.debug("need_aggregation_grouped_sizes.value_counts():\n{}".format(
-        need_aggregation_grouped_sizes.value_counts()))
  
     # Aggregation methods: concatenating values as strings
     def _concat_way_values(x):
@@ -2178,13 +2194,11 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
         'fwd_osmid'             : pd.NamedAgg(column='osmid',               aggfunc=_concat_way_values),
         'fwd_waySection_ord'    : pd.NamedAgg(column='waySection_ord',      aggfunc=_concat_way_values),
         'fwd_osmnx_shst_merge'  : pd.NamedAgg(column='osmnx_shst_merge',    aggfunc=_concat_way_values),
-        'fwd_index'             : pd.NamedAgg(column='index',               aggfunc=_concat_way_values),  # what is this column ?? suggest finding creation upstream and dropping
         # reverse version
         'rev_wayId'             : pd.NamedAgg(column='wayId',               aggfunc=_reverse_concat_way_values),
         'rev_osmid'             : pd.NamedAgg(column='osmid',               aggfunc=_reverse_concat_way_values),
         'rev_waySection_ord'    : pd.NamedAgg(column='waySection_ord',      aggfunc=_reverse_concat_way_values),
         'rev_osmnx_shst_merge'  : pd.NamedAgg(column='osmnx_shst_merge',    aggfunc=_reverse_concat_way_values),
-        'rev_index'             : pd.NamedAgg(column='index',               aggfunc=_reverse_concat_way_values),  # what is this column ?? suggest finding creation upstream and dropping
         # shst metadata for osm links
         'oneway_shst'           : pd.NamedAgg(column='oneway_shst',         aggfunc='_max_length_index'),
         'roundabout'            : pd.NamedAgg(column='roundabout',          aggfunc='_max_length_index'),
@@ -2216,11 +2230,6 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
         'bike_access'           : pd.NamedAgg(column='bike_access',         aggfunc='_max_length_index'), # suggest using min() instead
         # lanes accounting
         'taxi'                  : pd.NamedAgg(column='taxi',                aggfunc='_max_length_index'),
-        'through_only'          : pd.NamedAgg(column='through_only',        aggfunc='_max_length_index'),
-        'through_turn'          : pd.NamedAgg(column='through_turn',        aggfunc='_max_length_index'),
-        'merge_turn'            : pd.NamedAgg(column='merge_turn',          aggfunc='_max_length_index'),
-        'merge_only'            : pd.NamedAgg(column='merge_only',          aggfunc='_max_length_index'),
-        'turn_only'             : pd.NamedAgg(column='turn_only',           aggfunc='_max_length_index'),
         'lanes_tot'             : pd.NamedAgg(column='lanes_tot',           aggfunc='_max_length_index'),
         'lanes_gp'              : pd.NamedAgg(column='lanes_gp',            aggfunc='_max_length_index'),
         'lanes_hov'             : pd.NamedAgg(column='lanes_hov',           aggfunc='_max_length_index'),
@@ -2244,26 +2253,34 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     WranglerLogger.debug('max_length_columns: {}'.format(max_length_columns))
     agg_dict = agg_dict_keep
 
+    # Before groupby by the unique, one-way shared street ID column set and do aggregation, make a copy of the 'length' field as 'length_for_indexing' and fill null with -1.
+    # NOTE on why need to do this: 
+    # For length-based aggregation, after gropuby, this step (https://github.com/BayAreaMetro/travel-model-two-networks/blob/dfdab49007a5c0d9babab9dcfe5f2fb48efb2741/notebooks/pipeline/methods.py#L2249)
+    # gets the indexes of osmnx links with the max 'length' in each group. When a group (one shst link) contains multiple osm ways but not all these osm ways
+    # found a join in osmnx extract links (length is null), the longest non-null way will be chosen by idxmax(). But when all the osm ways in a group failed to join with osmnx extrat,
+    # idxmax() will return null, then the length-based aggregation will fail, the corresponding shst links will have null in all the attributes
+    # with aggfunc '_max_length_index' in agg_dict. This answers this question regarding null in attributes from shst metadata: 
+    # https://github.com/BayAreaMetro/travel-model-two-networks/blob/dfdab49007a5c0d9babab9dcfe5f2fb48efb2741/notebooks/pipeline/methods.py#L2363.
+    # However, should not just fill null in 'length' with -1 because 'length' needs to be aggregated by sum() later.
+    need_aggregation_df['length_for_indexing'] = need_aggregation_df['length']
+    WranglerLogger.debug('{:,} rows have null length due to missing corresponding link from osmnx extract; fill with -1'.format(
+        need_aggregation_df.loc[need_aggregation_df.length_for_indexing.isnull()].shape[0]
+    ))
+    need_aggregation_df['length_for_indexing'].fillna(-1, inplace=True)
+    
+    # Groupby our unique, one-way shared street ID column set
+    need_aggregation_grouped = need_aggregation_df.groupby(SHST_ONEWAY_ID_COLS)
+
+    # Look at the size distribution of what's being aggregated
+    need_aggregation_grouped_sizes = need_aggregation_grouped.size()  # series with index = SHST_ONEWAY_ID_COLS, value=num
+    WranglerLogger.debug("need_aggregation_grouped_sizes: type={}\n{}".format(
+        type(need_aggregation_grouped_sizes), need_aggregation_grouped_sizes))
+    WranglerLogger.debug("need_aggregation_grouped_sizes.value_counts():\n{}".format(
+        need_aggregation_grouped_sizes.value_counts()))
+
     # create the max length index for selection
     # max_length_index_df has columns in groubpy_cols + max_length_index which corresponds to the index having max length for the group
-    max_length_index_df = need_aggregation_grouped['length'].idxmax().reset_index(drop=False).rename(columns={'length': 'max_length_index'})
-    WranglerLogger.debug('column max_length_index has {:,} null values; converting to int'.format(
-            max_length_index_df['max_length_index'].isnull().sum()))
-
-    # some of these are null; this is because these shst links have failed to join with any omnx links
-    null_max_length_index_df = max_length_index_df.loc[pd.isnull(max_length_index_df.max_length_index)]
-    WranglerLogger.debug('null_max_length_index_df pre-join length={}'.format(len(null_max_length_index_df)))
-    null_max_length_index_df = pd.merge(
-        left        =null_max_length_index_df,
-        right       =need_aggregation_df,
-        left_on     =SHST_ONEWAY_ID_COLS,
-        right_on    =SHST_ONEWAY_ID_COLS,
-        how         ='left')
-    WranglerLogger.debug('null_max_length_index_df post-join length={} osmnx_shst_merge.value_counts():\n{}'.format(
-        len(null_max_length_index_df), null_max_length_index_df['osmnx_shst_merge'].value_counts()))
-
-    # filter out those nulls and use the remainder to do the aggregation
-    max_length_index_df = max_length_index_df.loc[pd.notnull(max_length_index_df.max_length_index)]  # filter out null
+    max_length_index_df = need_aggregation_grouped['length_for_indexing'].idxmax().reset_index(drop=False).rename(columns={'length_for_indexing': 'max_length_index'})
     max_length_index_df['max_length_index'] = max_length_index_df['max_length_index'].astype(int)    # convert index to int
     # WranglerLogger.debug('max_length_index_df: type={} head:\n{}'.format(type(max_length_index_df), max_length_index_df.head()))
     # WranglerLogger.debug('max_length_index_df[max_length_index].describe()\n{}'.format(max_length_index_df['max_length_index'].describe()))
@@ -2271,7 +2288,8 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     # select the max length columns by merging with need_aggregation_df
     max_length_index_df = pd.merge(
         left        =max_length_index_df,
-        right       =need_aggregation_df[SHST_ONEWAY_ID_COLS + ['need_aggregation_df_index'] + max_length_columns],  # only need join cols and max_length_columns
+                    # only need join cols and max_length_columns, and 'length_for_indexing' to flag shst links with no osmnx info
+        right       =need_aggregation_df[SHST_ONEWAY_ID_COLS + ['need_aggregation_df_index'] + max_length_columns + ['length_for_indexing']],
         left_on     =SHST_ONEWAY_ID_COLS + ['max_length_index'],
         right_on    =SHST_ONEWAY_ID_COLS+['need_aggregation_df_index'],
         how         ='left',
@@ -2281,7 +2299,13 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     assert(merge_value_counts['both']==len(max_length_index_df))
     # WranglerLogger.debug('max_length_index_df.head():\n{}'.format(max_length_index_df.head()))
     # WranglerLogger.debug('max_length_index_df[_merge].value_counts():\n{}'.format(max_length_index_df['_merge'].value_counts()))
-    max_length_index_df.drop(columns=['max_length_index','need_aggregation_df_index','_merge'], inplace=True) # drop intermediate columns
+
+    # log shst links completely missing osmnx info, meaning the length-based aggregation actually just keeps 'first' of each group. 
+    WranglerLogger.debug(
+        '{:,} rows of aggregated shst links have null length and other osmnx attributes due to missing corresponding link from osmnx extract'.format(
+            max_length_index_df.loc[max_length_index_df['length_for_indexing'] == -1].shape[0]
+    ))
+    max_length_index_df.drop(columns=['max_length_index','need_aggregation_df_index','length_for_indexing','_merge'], inplace=True) # drop intermediate columns
 
     # FINALLY: AGGREGATE THE GROUPS!  pass agg_dict as kwargs so the key is interpretted as the variable name
     osmnx_agg_df = need_aggregation_grouped.aggregate(**agg_dict)
@@ -2296,7 +2320,6 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     osmnx_agg_df['osmid'           ] = osmnx_agg_df['fwd_osmid'           ]
     osmnx_agg_df['waySection_ord'  ] = osmnx_agg_df['fwd_waySection_ord'  ]
     osmnx_agg_df['osmnx_shst_merge'] = osmnx_agg_df['fwd_osmnx_shst_merge']
-    osmnx_agg_df['index'           ] = osmnx_agg_df['fwd_index'           ]
     osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'u'               ] = osmnx_agg_df['rev_u'               ]
     osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'v'               ] = osmnx_agg_df['rev_v'               ]
     osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'nodeIds'         ] = osmnx_agg_df['rev_nodeIds'         ]
@@ -2304,7 +2327,6 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'osmid'           ] = osmnx_agg_df['rev_osmid'           ]
     osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'waySection_ord'  ] = osmnx_agg_df['rev_waySection_ord'  ]
     osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'osmnx_shst_merge'] = osmnx_agg_df['rev_osmnx_shst_merge']
-    osmnx_agg_df.loc[osmnx_agg_df.reverse==True, 'index'           ] = osmnx_agg_df['rev_index'           ]
     # drop the fwd_ and rev_ versions
     osmnx_agg_df.drop(columns=
         ['fwd_u',               'rev_u',
@@ -2313,8 +2335,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
          'fwd_wayId',           'rev_wayId',
          'fwd_osmid',           'rev_osmid',
          'fwd_waySection_ord',  'rev_waySection_ord',
-         'fwd_osmnx_shst_merge','rev_osmnx_shst_merge',
-         'fwd_index',           'rev_index'], inplace=True)
+         'fwd_osmnx_shst_merge','rev_osmnx_shst_merge'], inplace=True)
     WranglerLogger.debug("after aggregate() and rev_+fwd_, osmnx_agg_df.head():\n{}".format(osmnx_agg_df.head()))
 
     # merge aggregate version with the max_length_index aggregates
@@ -2330,7 +2351,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     # make column types match original where applicable
     for col_name in osmnx_shst_gdf.columns:
         if col_name not in osmnx_agg_gdf.columns:
-            WranglerLogger.warn('Column named {} of type {} was dropped in aggregation'.format(col_name, 
+            WranglerLogger.warning('Column named {} of type {} was dropped in aggregation'.format(col_name, 
                 osmnx_shst_gdf[col_name].dtype))
             continue
 
@@ -2346,8 +2367,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
             # => fill NA for these with a default and then bring the type back into alignment
 
             # for lanes, -1 means no data so convert NaN to this and go back to int8
-            if (col_name.startswith('lane') or col_name.startswith('merge') or \
-                col_name.startswith('through') or col_name.startswith('turn')):
+            if (col_name.startswith('lanes') or col_name == 'lane_count_type'):
                 osmnx_agg_gdf.loc[pd.isnull(osmnx_agg_gdf[col_name]), col_name] = -1
                 osmnx_agg_gdf[col_name] = osmnx_agg_gdf[col_name].astype(np.int8) # convert type
             # [drive,walk,bike]_access - default to true
@@ -2355,15 +2375,11 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
                 osmnx_agg_gdf.loc[pd.isnull(osmnx_agg_gdf[col_name]), col_name] = True
                 osmnx_agg_gdf[col_name] = osmnx_agg_gdf[col_name].astype(bool) # convert type
             else:
-                WranglerLogger.warn('TODO: handle {}'.format(col_name))
+                WranglerLogger.warning('TODO: handle {}'.format(col_name))
                 # log value counts
                 WranglerLogger.debug('osmnx_agg_gdf[{}].value_counts():\n{}'.format(
                     col_name, osmnx_agg_gdf[col_name].value_counts(dropna=False))
-                )    
-    # TODO: why are any of these null?  Aren't they from shst metadata?  Are some of those null?
-    WranglerLogger.debug('osmnx_agg_gdf[oneway_shst].value_counts()\n{}'.format(
-        osmnx_agg_gdf['oneway_shst'].value_counts(dropna=False)
-    ))
+                )
 
     # put it back together with the rows that didn't need aggregation and reset index
     osmnx_shst_gdf = pd.concat([osmnx_shst_gdf, osmnx_agg_gdf], axis='index', ignore_index=True)
@@ -2379,8 +2395,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     osmnx_shst_gdf = osmnx_shst_gdf.astype({
         'wayId'         :'str', 
         'waySection_ord':'str',
-        'osmid'         :'str',
-        'index'         :'str'})
+        'osmid'         :'str'})
     return osmnx_shst_gdf
 
 
