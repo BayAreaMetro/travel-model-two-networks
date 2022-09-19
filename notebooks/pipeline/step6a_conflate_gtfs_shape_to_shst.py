@@ -1,5 +1,5 @@
 USAGE = """
-Conflate GTFS data ares third-party data for SharedStreet conflation.
+Conflate GTFS data to SharedStreet roadway links.
 
 set INPUT_DATA_DIR, OUTPUT_DATA_DIR environment variable
 Inputs: 
