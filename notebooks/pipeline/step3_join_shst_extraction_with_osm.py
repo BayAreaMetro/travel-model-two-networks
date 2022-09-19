@@ -177,22 +177,7 @@ if __name__ == '__main__':
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, "osmnx_shst_gdf_lane_accounting_QAQC.feather")
     osmnx_shst_gdf.to_feather(OUTPUT_FILE)
     WranglerLogger.info("Wrote {:,} rows to {}".format(len(osmnx_shst_gdf), OUTPUT_FILE))
-
-    # # drop interim fields before continue
-    # osmnx_shst_gdf.drop(columns=[
-    #     'lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',      # raw OSMnx lane count
-    #     'turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',  # raw OSMnx turn info
-    #     'hov', 'hov:lanes', 'lanes:hov',                                    # raw OSMnx hov info
-    #     'bus', 'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward',      # raw OSMnx bus info
-    #     'forward_lanes', 'backward_lanes',                                  # interim lane count
-    #     'bothways_lanes',                                                   # interim middle turn count
-    #     'backward_bus_lane', 'forward_bus_lane',                            # interim bus lane count
-    #     'forward_hov_lane',                                                 # interim hov lane count
-    #     'turns:lanes_osmSplit', 'bothways_lane_osmSplit',                   # interim turn info
-    #     'through_only',                                                     # interim turn lane counts
-    #     'lane_count_from_turns', 'lanes_non_gp'                             # validation lane count
-    #     ], inplace=True)
-
+ 
     # 9. aggregate osm ways back to ShSt based links
     # At this point, osmnx_shst_gdf has duplicated shstReferenceId because some sharedstreets links contain more than
     # one OSM Ways. This step consolidates the values so that each sharedstreets link has one row.
@@ -408,6 +393,21 @@ if __name__ == '__main__':
     # TODO: maybe move to later, after transit routing?
     # 5. flag drive dead end, and make dead-end links and nodes drive_access=0
     link_BayArea_gdf, node_BayArea_gdf = methods.make_dead_end_non_drive(link_BayArea_gdf, node_BayArea_gdf)
+
+    # 6. drop interim fields created for lane accounting
+    link_BayArea_gdf.drop(columns=[
+    # raw oxmnx attributes
+    #     'lanes', 'lanes:backward', 'lanes:forward', 'lanes:both_ways',      # raw OSMnx lane count
+    #     'turn', 'turn:lanes', 'turn:lanes:forward', 'turn:lanes:backward',  # raw OSMnx turn info
+    #     'hov', 'hov:lanes', 'lanes:hov',                                    # raw OSMnx hov info
+    #     'bus', 'lanes:bus', 'lanes:bus:forward', 'lanes:bus:backward',      # raw OSMnx bus info     
+    # interim lane/turn fields created for lane accounting
+        'forward_bus_lane', 'forward_hov_lane', 'lanes_from_turns_forward', 'turns_list_forward',
+        'forward_lanes', 'bothways_lanes', 'onedir_lanes_osmSplit', 
+        'turns:lanes_osmSplit', 'bus_lane_osmSplit', 'hov_lane_osmSplit', 
+        'bothways_lane_osmSplit', 'lanes_from_turns_osmSplit',
+        'merge_only', 'through_turn', 'merge_turn', 'turn_only', 'through_only'
+        ], inplace=True)
 
     #####################################
     # export link, node

@@ -2085,7 +2085,7 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
     osmnx_shst_gdf      = osmnx_shst_gdf.loc[osmnx_shst_gdf.osm_agg == False]              # no aggregation needed for this set
     gc.collect() # garbage collect a bit
 
-    # check the no_aggregation_grouped's waySections_len -- some > 1. Warrn about these
+    # check the no_aggregation_grouped's waySections_len -- some > 1. Warn about these
     WranglerLogger.debug("no aggregation osmnx_shst_gdf.waySections_len.value_counts():\n{}".format(
         osmnx_shst_gdf['waySections_len'].value_counts(dropna=False)))
     WranglerLogger.warn("no_aggregation osmnx_shst_gdf.loc[no_aggregation_grouped.waySections_len>1]: \n{}".format(
@@ -6608,12 +6608,12 @@ def gtfs_point_shapes_to_link_gdf(gtfs_shape_file):
 
         # group stations/stops to get line 
         line_df = gtfs_shape_gdf.groupby(['shape_id'])['geometry'].apply(lambda x:LineString(x.tolist())).reset_index()
-        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry', crs='ESPG:{}'.format(LAT_LONG_EPSG))
-
-        return line_gdf  
+        line_gdf = gpd.GeoDataFrame(line_df, geometry = 'geometry', crs=LAT_LONG_EPSG)
+        WranglerLogger.debug('successfully created transit line geodataframe')
+        return line_gdf
 
     except:
-        WranglerLogger.info('failed to create line geojson')
+        WranglerLogger.warning('failed to create transit line geodataframe')
         return None
 
 

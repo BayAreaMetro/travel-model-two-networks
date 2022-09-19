@@ -44,7 +44,7 @@ def conflate_gfts_shape(gtfs_shape_file, gtfs_raw_name):
     """
 
     # first, convert "shapes.txt" in the GTFS data to transit line geodataframe
-    WranglerLogger.info('try converting shapes.txt to transit line geodataframe')  
+    WranglerLogger.info('converting shapes.txt to transit line geodataframe')  
     line_gdf = methods.gtfs_point_shapes_to_link_gdf(gtfs_shape_file)
 
     if line_gdf is not None:
