@@ -602,20 +602,29 @@ if __name__ == '__main__':
     # the rail-only nodes and links will start from each county's latest roadway "model_node_id" / "model_link_id".
     # Since current we are skipping model_node_id and model_link_id creation, skip this part as well.
                                                   
-    
+    # 6. write out links_gdf and nodes_gdf with roadway and transit-only links and nodes
+    LINK_OUTPUT_FILE = os.path.join(GTFS_OUTPUT_DIR, 'step6_link.feather')
+    NODE_OUTPUT_FILE = os.path.join(GTFS_OUTPUT_DIR, 'step6_node.feather')
+    roadway_and_rail_links_gdf.to_feather(LINK_OUTPUT_FILE)
+    WranglerLogger.info('Wrote {:,} links to {}'.format(roadway_and_rail_links_gdf.shape[0], LINK_OUTPUT_FILE))
+    roadway_and_rail_nodes_gdf.to_feather(NODE_OUTPUT_FILE)
+    WranglerLogger.info('Wrote {:,} links to {}'.format(roadway_and_rail_nodes_gdf.shape[0], NODE_OUTPUT_FILE))
+
     ####################################
     # write out standard transit data
     # NOTE: the following uses v12 bus routing results
     methods.v12_write_standard_transit(STANDARD_TRANSIT_DIR,
                                        representative_trip_df,
-                                       stop_gdf,
                                        v12_shape_point_df,
                                        freq_df,
+                                       stop_gdf,
                                        all_stop_times_df,
                                        all_routes_df,
                                        all_trips_df,
+                                       all_agency_df,
+                                       all_fare_attributes_df,
+                                       all_fare_rules_df,
                                        unique_rail_nodes_gdf)
     
     ####################################
     # TODO: create rail walk access/egress links and assign them model_link_id
-

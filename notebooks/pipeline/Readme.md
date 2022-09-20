@@ -53,7 +53,7 @@ Use OMNx to extract OSM data for the Bay Area and save as geojson files.
   * County shapefile, [`[INPUT_DATA_DIR]/step0_boundaries/San_Francisco_Bay_Region_Counties.shp`](https://opendata.mtc.ca.gov/datasets/MTC::san-francisco-bay-region-counties-1/about), which covers water areas to ensure that OSMnx extract includes bridges. 
   * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 * Output:
-  * OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/[link,node].feather[.crs]`
+  * OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/[link,node].feather`
    
 Data is fetched using [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon) using `simplify=False`, so there are typically multiple links per OSM way.  (This is because if `simplify=True`, OSMnx will aggregate some OSM ways into a single link, which we don't want; see a nice explanation of this process in [OSMnx: Python for Street Networks](https://geoffboeing.com/2016/11/osmnx-python-street-networks/))
 
@@ -78,11 +78,11 @@ Create nodes from links;
 Some cleanups: tag links and nodes by county, remove out-of-region links and nodes, drop circular links and circular-link-only nodes, drop duplicate links between same node pairs; drop duplicates by unique ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'].
 
 * Input:
-  * Shared Street extract (from step1), `[INPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].feather[.crs]`
-  * OSM link extract (from step2), `[INPUT_DATA_DIR]/external/external/step2_osmnx_extracts/link.feather[.crs]`
+  * Shared Street extract (from step1), `[INPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].feather`
+  * OSM link extract (from step2), `[INPUT_DATA_DIR]/external/external/step2_osmnx_extracts/link.feather`
 * Output:
-  * Shared Street links with OSMNX attributes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_link.feather[.crs]`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'link', 'name_shst_metadata', 'nodeIds', 'oneway_shst', 'roadClass', 'roundabout', 'wayId', 'waySections_len', 'waySection_ord', 'shstGeometryId', 'u', 'v', 'osmid', 'highway', 'oneway_osmnx', 'name', 'ref', 'maxspeed', 'lanes', 'hov', 'hov:lanes', 'bridge', 'lanes:forward', 'turn:lanes:forward', 'service', 'cycleway', 'sidewalk', 'access', 'width', 'turn:lanes', 'lanes:both_ways', 'junction', 'shoulder', 'bus', 'tunnel', 'turn', 'est_width', 'lanes:hov', 'lanes:bus', 'area', 'lanes:bus:forward', 'taxi', 'length_osmnx', 'osmnx_shst_merge', 'roadway', 'hierarchy', 'drive_access', 'walk_access', 'bike_access', 'osm_dir_tag', 'lane_count_type', 'forward_lanes', 'bothways_lanes', 'onedir_lanes_osmSplit', 'reverse', 'lanes_tot', 'lanes_gp', 'lanes_hov', 'lanes_busonly', 'lanes_gp_through', 'lanes_gp_turn', 'lanes_gp_aux', 'lanes_gp_mix', 'lanes_gp_bothways', 'osm_agg', 'county', 'length_meter', 'link_cnt'
-  * Network nodes derived from the above, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather[.crs]`, with columns: 'osm_node_id', 'shst_node_id', 'county, 'drive_access', 'walk_access', 'bike_access', 'geometry'
+  * Shared Street links with OSMNX attributes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_link.feather`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'link', 'name_shst_metadata', 'nodeIds', 'oneway_shst', 'roadClass', 'roundabout', 'wayId', 'waySections_len', 'waySection_ord', 'shstGeometryId', 'u', 'v', 'osmid', 'highway', 'oneway_osmnx', 'name', 'ref', 'maxspeed', 'lanes', 'hov', 'hov:lanes', 'bridge', 'lanes:forward', 'turn:lanes:forward', 'service', 'cycleway', 'sidewalk', 'access', 'width', 'turn:lanes', 'lanes:both_ways', 'junction', 'shoulder', 'bus', 'tunnel', 'turn', 'est_width', 'lanes:hov', 'lanes:bus', 'area', 'lanes:bus:forward', 'taxi', 'length_osmnx', 'osmnx_shst_merge', 'roadway', 'hierarchy', 'drive_access', 'walk_access', 'bike_access', 'osm_dir_tag', 'lane_count_type', 'reverse', 'lanes_tot', 'lanes_gp', 'lanes_hov', 'lanes_busonly', 'lanes_gp_through', 'lanes_gp_turn', 'lanes_gp_aux', 'lanes_gp_mix', 'lanes_gp_bothways', 'osm_agg', 'county', 'length_meter', 'link_cnt'
+  * Network nodes derived from the above, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather`, with columns: 'osm_node_id', 'shst_node_id', 'county, 'drive_access', 'walk_access', 'bike_access', 'geometry'
 
 ### [Step 4: Conflate Third Party Data with Base Networks from Step 3]
 Four parts, run in sequence:
@@ -167,6 +167,7 @@ Merge the SharedStreets match results in step4b with the base networks data crea
 
 #### [step6a_conflate_gtfs_shape_to_shst.py](step6a_conflate_gtfs_shape_to_shst.py)
 Conflate the shapes from transit GTFS to SharedStreets roadway links.
+Skip with a warning if a GTFS feed doesn't contain the 'shapes.txt' file.
 
 * Input: `[INPUT_DATA_DIR]/step6_gtfs/2015_input/[gtfs_name]/shapes.txt`, GTFS shape data represented by lat/lon of points along the shape.
 
@@ -190,12 +191,10 @@ Write out aggregated, processed transit data into standard formats.
   * County shapefile, `INPUT_DATA_DIR/step0_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp`, used to tag rail/ferry-only links and nodes by county
 
 * Output:
-  * Transit standard files (*Final output for transit*), in `../../data/processed/version_12/`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`
-  * Network Standard link shapes, link attributes, and nodes, `../../data/interim/step6_gtfs/version_12/shape.geojson`, `../../data/interim/step6_gtfs/version_12/link.feather`, `../../data/interim/step6_gtfs/version_12/node.geojson`
-  * CUBE travel model transit network, `../../data/processed/version_12/transit.LIN`
+  * Transit standard files (*Final output for transit*), in `[OUTPUT_DATA_DIR]/step6_gtfs/standard_transit`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
+  * Network Standard link shapes, link attributes, and nodes, `[OUTPUT_DATA_DIR]/step6_gtfs/link.feather`, `[OUTPUT_DATA_DIR]/step6_gtfs/node.feather`
   * consolidated GTFS data (mainly for QAQC), in `[OUTPUT_DATA_DIR]/step6_gtfs/consolidated_gtfs/`, including the following files: `routes.txt`, `trips.txt`, `stops.txt`, `shapes.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
-  * Tansit route true shape (for QAQC), `../../data/interim/step6_gtfs/transit_route.geojson`
-  * interim output: bus and rail/ferry routing results, along with some QAQC files(mainly for QAQC), in `[OUTPUT_DATA_DIR]/step6_gtfs/transit_routing/`
+  * interim output: bus and rail/ferry routing results, in `[OUTPUT_DATA_DIR]/step6_gtfs/transit_routing/`
 
 
 ### [Step7: Build Controid Connectors](step7_centroid_connector_builder)
