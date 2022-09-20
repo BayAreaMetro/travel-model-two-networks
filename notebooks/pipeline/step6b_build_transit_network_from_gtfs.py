@@ -340,8 +340,8 @@ if __name__ == '__main__':
 
     # load roadway nodes and links
     WranglerLogger.debug('load roadway links from {} and nodes from {}'.format(ROADWAY_LINK_FILE, ROADWAY_NODE_FILE))
-    link_gdf = geofeather.from_geofeather(ROADWAY_LINK_FILE)
-    node_gdf = geofeather.from_geofeather(ROADWAY_NODE_FILE)
+    link_gdf = gpd.read_feather(ROADWAY_LINK_FILE)
+    node_gdf = gpd.read_feather(ROADWAY_NODE_FILE)
 
     # subset drive nodes and drive links
     drive_link_gdf = link_gdf[link_gdf.drive_access == True]
@@ -373,7 +373,7 @@ if __name__ == '__main__':
     # export for debug
     v12_BUS_OSMNX_ROUTING_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'b12_bus_osmnx_routing.feather')
     WranglerLogger.info('Saving V12 bus osmnx routing result to {}'.format(v12_BUS_OSMNX_ROUTING_QAQC_FILE))
-    geofeather.to_geofeather(v12_bus_osmnx_link_shape_gdf, v12_BUS_OSMNX_ROUTING_QAQC_FILE)
+    v12_bus_osmnx_link_shape_gdf.to_feather(v12_BUS_OSMNX_ROUTING_QAQC_FILE)
 
     # 2: bus shst routing, based on gtfs shapes to sharedstreets conflation
     WranglerLogger.info('Routing bus using shst matching')
@@ -387,7 +387,7 @@ if __name__ == '__main__':
     # export for debug
     v12_BUS_SHST_ROUTING_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'b12_bus_shst_routing_QAQC.feather')
     WranglerLogger.info('Saving V12 bus shst routing result to {}'.format(v12_BUS_SHST_ROUTING_QAQC_FILE))
-    geofeather.to_geofeather(v12_bus_shst_link_shape_gdf, v12_BUS_SHST_ROUTING_QAQC_FILE)
+    v12_bus_shst_link_shape_gdf.to_feather(v12_BUS_SHST_ROUTING_QAQC_FILE)
     
     # 3: combine routing results of the two approaches
     v12_bus_routed_link_gdf, v12_shape_not_routed_list = \
@@ -406,7 +406,7 @@ if __name__ == '__main__':
 
     v12_BUS_ROUTING_ALL_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'v12_bus_routing_all.feather')
     WranglerLogger.info('Saving V12 bus routing consolidated results to {}'.format(v12_BUS_ROUTING_ALL_QAQC_FILE))
-    geofeather.to_geofeather(v12_bus_routed_link_gdf_QAQC, v12_BUS_ROUTING_ALL_QAQC_FILE)
+    v12_bus_routed_link_gdf_QAQC.to_feather(v12_BUS_ROUTING_ALL_QAQC_FILE)
 
     ####################################
     # route buses - Ranch methods
@@ -555,11 +555,11 @@ if __name__ == '__main__':
     RANCH_RAIL_NODE_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_unique_nodes_QAQC.feather')
     RANCH_RAIL_STOPS_QAQC_FILE = os.path.join(TRANSIT_ROUTING_QAQC_DIR, 'ranch_rail_stops_QAQC.feather')
     WranglerLogger.info('exporting ranch non-bus links to {}'.format(RANCH_RAIL_LINKS_QAQC_FILE))
-    geofeather.to_geofeather(rail_trip_links_gdf, RANCH_RAIL_LINKS_QAQC_FILE)
+    rail_trip_links_gdf.to_feather(RANCH_RAIL_LINKS_QAQC_FILE)
     WranglerLogger.info('exporting ranch unique non-bus nodes to {}'.format(RANCH_RAIL_NODE_QAQC_FILE))
-    geofeather.to_geofeather(agency_unique_rail_nodes_gdf, RANCH_RAIL_NODE_QAQC_FILE) 
+    agency_unique_rail_nodes_gdf.to_feather(RANCH_RAIL_NODE_QAQC_FILE) 
     WranglerLogger.info('exporting ranch non-bus stops to {}'.format(RANCH_RAIL_STOPS_QAQC_FILE))
-    geofeather.to_geofeather(rail_stops_gdf, RANCH_RAIL_STOPS_QAQC_FILE)
+    rail_stops_gdf.to_feather(RANCH_RAIL_STOPS_QAQC_FILE)
 
     ####################################
     # consolidate and clean up roadway and transit networks
