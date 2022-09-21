@@ -3,6 +3,8 @@
 :: See Readme.md for details
 ::
 
+goto step4
+
 :: Step1: Extract SharedStreets
 :step1
 python step1_extract_shst.py
@@ -26,6 +28,19 @@ if errorlevel 1 goto error
 :: Step3: Join shst extraction with OSMnx extraction
 :step3
 python step3_join_shst_extraction_with_osm.py
+if errorlevel 1 goto error
+
+:: Step4: Conflate 3rd party roadway
+:step4
+
+set THIRD_PARTY=TomTom TM2_nonMarin TM2_Marin SFCTA CCTA ACTC PeMS
+FOR %%A in (%THIRD_PARTY%) DO (
+  python step4a_conflate_third_party_roadway_to_shst.py %%A --docker_container_name %SHST_DOCKER_CONTAINER%
+  if errorlevel 1 goto error
+)
+
+:: Step6: Conflate GTFS shapes
+python step6a_conflate_gtfs_shape_to_shst.py --docker_container_name %SHST_DOCKER_CONTAINER%
 if errorlevel 1 goto error
 
 echo Successfully completed building networks

@@ -11,14 +11,8 @@ Outputs:
 # "representative trips" in GTFS data. But fortunately the number of transit shapes needed
 # for shst match is not that huge, so performance is ok with the entire dataset.
 
-import geopandas as gpd
-import geofeather
-import geojson
-from geojson import Feature, FeatureCollection
-import json
-from shapely.geometry import Point, LineString
 import pandas as pd
-import os, datetime
+import argparse, os, datetime, traceback
 import methods
 from network_wrangler import WranglerLogger, setupLogging
 
@@ -37,12 +31,11 @@ BOUNDARY_DIR = os.path.join(INPUT_DATA_DIR, 'step0_boundaries')
 GTFS_OUTPUT_DIR = os.path.join(OUTPUT_DATA_DIR, 'step6_gtfs')
 CONFLATION_SHST = os.path.join(GTFS_OUTPUT_DIR, 'conflation_shst')
 
-def conflate_gfts_shape(gtfs_shape_file, gtfs_raw_name):
+def conflate_gfts_shape(gtfs_shape_file, gtfs_raw_name, docker_container_name=None):
     """
     Use the 'shapes.txt' file in GTFS data to match non-rail and non-ferry transit lines to sharedstreest network.
 
     """
-
     # first, convert "shapes.txt" in the GTFS data to transit line geodataframe
     WranglerLogger.info('converting shapes.txt to transit line geodataframe')  
     line_gdf = methods.gtfs_point_shapes_to_link_gdf(gtfs_shape_file)
@@ -54,10 +47,14 @@ def conflate_gfts_shape(gtfs_shape_file, gtfs_raw_name):
         # shorter 'agency_name' which has spaces
         (matched_gdf, unmatched_gdf) = methods.conflate(
             gtfs_raw_name, line_gdf, ['shape_id'], 'transit',
-            GTFS_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR)
+            GTFS_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
 
 if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=USAGE)
+    parser.add_argument('--docker_container_name', required=False, help='Docker conainer name to use; otherwise, will create a new one.')
+    args = parser.parse_args()
+
     # create output folder if not exist
     if not os.path.exists(CONFLATION_SHST):
         print('creating output folde {}'.format(CONFLATION_SHST))
@@ -68,7 +65,7 @@ if __name__ == '__main__':
     pd.set_option("display.max_columns", 500)
     pd.set_option("display.width", 50000)
     LOG_FILENAME = os.path.join(
-        CONFLATION_SHST,
+        GTFS_OUTPUT_DIR,
         "step6a_gtfs_shape_shst_match_{}.info.log".format(datetime.datetime.now().strftime("%Y%m%d_%H%M")),
     )
     setupLogging(LOG_FILENAME, LOG_FILENAME.replace('info', 'debug'))
@@ -80,31 +77,37 @@ if __name__ == '__main__':
         # check if all GTFS data is in 'gtfs_name_dict'; there might be gtfs data in the folder that is not
         # needed for conflation, so just 'warning', not 'error'
         if gtfs_raw_name not in methods.gtfs_name_dict:
-            WranglerLogger.debug('{} not in gtfs_name_dict, skip!'.format(gtfs_raw_name))
+            WranglerLogger.warn('{} not in gtfs_name_dict, skipping'.format(gtfs_raw_name))
+            continue
         
-        else:
-            # recode the long GTFS feed name into a shorter name
-            gtfs_name = methods.gtfs_name_dict[gtfs_raw_name]
+        # recode the long GTFS feed name into a shorter name
+        gtfs_name = methods.gtfs_name_dict[gtfs_raw_name]
 
-            # rails and ferries do not use roadway network, skip them for sharedstreets match
-            if gtfs_name in methods.rail_gtfs:
-                WranglerLogger.info('skiping rail: {}'.format(gtfs_name))
-            elif gtfs_name in methods.ferry_gtfs:
-                WranglerLogger.info('skiping ferry: {}'.format(gtfs_name))
+        # rails and ferries do not use roadway network, skip them for sharedstreets match
+        if gtfs_name in methods.rail_gtfs:
+            WranglerLogger.info('skipping rail: {}'.format(gtfs_name))
+            continue
+        elif gtfs_name in methods.ferry_gtfs:
+            WranglerLogger.info('skipping ferry: {}'.format(gtfs_name))
+            continue
             
-            # run sharedstreets match for non-rail and non-ferry transit lines
-            else:
-                WranglerLogger.info('conflating {} with GTFS data: {}'.format(gtfs_name, gtfs_raw_name))
+        # run sharedstreets match for non-rail and non-ferry transit lines
+        WranglerLogger.info('conflating {} with GTFS data: {}'.format(gtfs_name, gtfs_raw_name))
 
-                # first, create a line geodataframe from 'shapes.txt' in GTFS data, which is 
-                #  to match non-rail and non-ferry transit lines to sharedstreest network
-                gtfs_shape_file = os.path.join(GTFS_INPUT_DIR, gtfs_raw_name, 'shapes.txt')
+        # first, create a line geodataframe from 'shapes.txt' in GTFS data, which is 
+        # to match non-rail and non-ferry transit lines to sharedstreest network
+        gtfs_shape_file = os.path.join(GTFS_INPUT_DIR, gtfs_raw_name, 'shapes.txt')
 
-                if not os.path.exists(gtfs_shape_file):
-                    WranglerLogger.warning('shapes.txt does not exist!')
-                
-                else:
-                    try:
-                        gdf = conflate_gfts_shape(gtfs_shape_file, gtfs_raw_name)
-                    except:
-                        WranglerLogger.warning('cannot conflate {} !'.format(gtfs_raw_name))
+        if not os.path.exists(gtfs_shape_file):
+            WranglerLogger.warning('shapes.txt does not exist!')
+            continue
+
+        try:
+            gdf = conflate_gfts_shape(gtfs_shape_file, gtfs_raw_name, args.docker_container_name)
+        except Exception as inst:
+            WranglerLogger.error('Exception caught while running conflate_gfts_shape() for {}!'.format(gtfs_raw_name))
+            WranglerLogger.error(type(inst))
+            WranglerLogger.error(inst)
+            WranglerLogger.exception(inst)
+        
+
