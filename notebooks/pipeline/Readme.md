@@ -7,6 +7,8 @@ Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-
 which are used for SharedStreets networrk extraction.  Performs extraction using [Docker](https://www.docker.com/) 
 through python docker package.  See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker)
 
+Note: I had problems with Docker Desktop for Windows v4.12.0 similar to this one about a (109, 'ReadFile' 'The pipe has ended')[https://github.com/aws/aws-sam-cli/issues/4222]. Downgrading to Docker Desktop v4.11.1 resolved my issue.
+
 * Input:
   * County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pieces, resulting in 14 rows: [`[INPUT_DATA_DIR]/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
   * [Dockerfile](Dockerfile) which defines Docker image to use for SharedStreets extraction
