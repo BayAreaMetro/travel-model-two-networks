@@ -105,6 +105,13 @@ if __name__ == '__main__':
                 col_new = 'id_orig'
                 input_gdf.rename(columns={col:col_new}, inplace=True)
                 WranglerLogger.info("    => renamed to {}".format(col_new))
+            # it appears that if 'index' is a column, when ArcGIS Pro loads the geopackage layer, it will convert the column name
+            # to '"index"', which is invalid and will cause the 'Failed to create a page cursor' when loading the data table or clicking on a feature
+            # to explore the attributes (though querying still works, e.g. in definition query, select by attribute, creating symbology, etc.).
+            elif col == 'index':
+                col_new = 'index_orig'
+                input_gdf.rename(columns={col:col_new}, inplace=True)
+                WranglerLogger.info("    => renamed to {}".format(col_new))
             # todo fix this upstream. Also this isn't robust to more than 2
             elif col.lower() == prev_col_name:
                 col_new = col+"_2"
