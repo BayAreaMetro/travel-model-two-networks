@@ -2027,8 +2027,6 @@ def consolidate_lane_accounting(osmnx_shst_gdf, OUTPUT_DIR):
         osmnx_shst_gdf[['lanes_gp_through', 'lanes_gp_turn', 'lanes_gp_aux', 'lanes_gp_mix', 'lanes_gp_bothways']].sum(axis=1)
     
     # 4. get 'lanes_tot' = 'lanes_gp' + 'lanes_hov' + 'lanes_busonly'
-    osmnx_shst_gdf.loc[osmnx_shst_gdf['onedir_lanes_osmSplit'] != -1, 'lanes_tot'] = \
-        osmnx_shst_gdf[['lanes_gp', 'lanes_hov', 'lanes_busonly']].sum(axis=1)
 
     # convert to int8
     osmnx_shst_gdf['lanes_tot'] = osmnx_shst_gdf['lanes_tot'].astype(np.int8)
@@ -2610,8 +2608,8 @@ def tag_nodes_links_by_county_name(node_gdf, link_gdf, COUNTY_BOUNDARY_FILE):
     link_with_county_gdf.rename(columns={'NAME': 'county'}, inplace=True)
 
     # reset index for potentially exporting to geofeather for QAQC
-    node_with_county_gdf.reset_index(inplace=True)
-    link_with_county_gdf.reset_index(inplace=True)
+    node_with_county_gdf.reset_index(inplace=True, drop=True)
+    link_with_county_gdf.reset_index(inplace=True, drop=True)
 
     # for some reason, we now have a column (looks like the geometry column), named None: delete it
     if None in list(node_with_county_gdf.columns):
@@ -3588,20 +3586,136 @@ def determine_number_of_gp_lanes(
     )
 
 
-def determine_road_name(link_gdf):
+def determine_road_name(link_gdf, ROAD_SHIELD_LONG_NAME_CROSSWALK_FILE):
     """
+    Determine road names using available sources with heuristics.
+
     Sources of name:
-     - osmnx        : 'ref' (freeway shield number, e.g. 'I 80', 'CA 4')
-                      'name' (less-used freeway name, e.g. 'Shoreline Highway', and names of other streets)
-     - sharedstreets: 'name_shst_metadata' (name in the metadata)
-     - TomTom       : 'tomtom_name' (less-used freeway name, and names of other streets)
-                      'tomtom_shieldnum' (freeway shield number, but without the letter, e.g. 80, 580)
+     - osmnx        : 'ref' (freeway shield letter and number not including direction, e.g. 'I 80', 'CA 4')
+                      'name' (less-used freeway name, e.g. 'Shoreline Highway', and names of non-freeway roads)
+     - sharedstreets: 'name_shst_metadata' (name in the metadata, similar to osmnx 'name')
+     - TomTom       : 'tomtom_name' (commonly-used freeway name, e.g. 'I-80 W', 'CA-84 E', and names of non-freeway roads)
+                      'tomtom_shieldnum' (freeway shield number, but without the letter, e.g. 80, 580; ' ' for non-freeway roads)
+                      'tomtom_rtedir' (freeway direction, though missing some)
      - SFCTA        : 'sfcta_STREETNAME'
 
-    Rules:
-    - osmnx: if 'ref' not null, use 'ref', otherwise use 'name'
-    - sfcta_STREETNAME: if not null, use it
+    Road name heuristics rules:
+    - use osmnx 'ref' if available
+    - if 'tomtom_rtedir' also available, append it to 'ref' 
+    - if osmnx 'ref' missinb, use 'tomtom_name' if available
+    - if both 'ref' and 'tomtom_name' missing, use 'sfcta_NAME' if available
+    - if 'ref', 'tomtom_name', 'sfcta_NAME' all missing, use 'name_shst_metadata' if available
+    - if 'ref', 'tomtom_name', 'sfcta_NAME', 'name_shst_metadata' all missing, use osmnx 'name' if available
+
+    Returns: not return anything, but adds two columns to link_gdf: 'road_name' (str), 'road_name_heuristic' (int8).
+    Also export the road_shield_long_name_crosswalk.
+
     """
+
+    WranglerLogger.info('Starting determining road name')
+
+    # mainly for QAQC: create a crosswalk between shield number based road names (e.g. 'I 80') and long road names (e.g. 'Shoreline Highway')
+    # based on the 'ref' and 'name' tags from osm.
+    road_shield_long_name_crosswalk = link_gdf.loc[(link_gdf['ref'] != '') & (link_gdf['name'] != '')][[
+        'ref', 'name', 'highway', 'roadway', 'hierarchy']].drop_duplicates().sort_values(['hierarchy', 'ref'])
+    road_shield_long_name_crosswalk.rename(columns = {'highway'  : 'highway_osmnx',
+                                                      'roadway'  : 'roadway_tm2',
+                                                      'hierarchy': 'hierarchy_tm2',
+                                                      'ref'      : 'ref_osmnx',
+                                                      'name'     : 'name_osmnx'}, inplace=True)
+    # export
+    road_shield_long_name_crosswalk.to_csv(ROAD_SHIELD_LONG_NAME_CROSSWALK_FILE, index=False)
+
+    # road name heuristics is based on the following name sources
+    name_cols = ['name_shst_metadata', 'name', 'ref', 'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir', 'sfcta_STREETNAME', 'sfcta_NAMETYPE']
+
+    # print out unique values of each
+    for colname in name_cols:
+        WranglerLogger.debug('{} value counts:\n{}'.format(colname, link_gdf[colname].value_counts(dropna=False)))
+
+    # clean up '', ' ', and null in these fields, make them all '' to simplify the heuristics
+    # NOTE: null usually due to links failing to get a match in a third-party data source; '' usually represents missing data in the raw third-party
+    # data, except for 'tomtom_name' which has ' ' for missing road name
+    for colname in name_cols:
+        link_gdf.loc[link_gdf[colname].isnull() | (link_gdf[colname].isin(['', ' '])), colname] = ''
+
+    # concat 'sfcta_STREETNAME' and 'sfcta_NAMETYPE' to get the full name
+    link_gdf['sfcta_NAME'] = ''
+    link_gdf.loc[(link_gdf['sfcta_STREETNAME'] != '') & (link_gdf['sfcta_NAMETYPE'] != ''), 'sfcta_NAME'] = link_gdf['sfcta_STREETNAME'] + ' ' + link_gdf['sfcta_NAMETYPE']
+    link_gdf.loc[(link_gdf['sfcta_STREETNAME'] != '') & (link_gdf['sfcta_NAMETYPE'] == ''), 'sfcta_NAME'] = link_gdf['sfcta_STREETNAME']
+    link_gdf['sfcta_NAME'] = link_gdf['sfcta_NAME'].apply(lambda x: ' '.join(w.capitalize() for w in x.split()))
+
+    # add new fields with default values
+    new_name_cols = ['road_name', 'road_name_heuristic']
+    link_gdf['road_name'] = ''
+    link_gdf['road_name_heuristic'] = np.int8(-1)
+
+    # start road name heuristics
+    # idx_1: if osmnx 'ref' available, use it
+    idx_1 = link_gdf['ref'] != ''
+    link_gdf.loc[idx_1, 'road_name'] = link_gdf['ref']
+    link_gdf.loc[idx_1, 'road_name_heuristic'] = 1
+
+    # idx_2: since 'ref' doesn't include direction info, therefore if 'tomtom_rtedir' available, append it to 'ref'
+    idx_2 = (link_gdf['ref'] != '') & (link_gdf['tomtom_name'].notnull()) & (link_gdf['tomtom_rtedir'] != '') & (link_gdf['tomtom_rtedir'].notnull())
+    link_gdf.loc[idx_2, 'road_name'] = link_gdf['ref'] + ' ' + link_gdf['tomtom_rtedir']
+    link_gdf.loc[idx_2, 'road_name_heuristic'] = 2
+
+    # idx_3: if osmnx 'ref' missinb, use 'tomtom_name' if available
+    idx_3 = (link_gdf['ref'] == '') & (link_gdf['tomtom_name'] != '') & (link_gdf['tomtom_name'].notnull())
+    link_gdf.loc[idx_3, 'road_name'] = link_gdf['tomtom_name']
+    link_gdf.loc[idx_3, 'road_name_heuristic'] = 3
+
+    # idx_4: if both 'ref' and 'tomtom_name' missing, use 'sfcta_NAME' if available
+    idx_4 = (link_gdf['ref'] == '') & (link_gdf['tomtom_name'] == '') & (link_gdf['sfcta_NAME'] != '')
+    link_gdf.loc[idx_4, 'road_name'] = link_gdf['sfcta_NAME']
+    link_gdf.loc[idx_4, 'road_name_heuristic'] = 4
+
+    # idx_5: if 'ref', 'tomtom_name', 'sfcta_NAME' all missing, use 'name_shst_metadata' if available
+    idx_5 = (link_gdf['ref'] == '') & (link_gdf['tomtom_name'] == '') & (link_gdf['sfcta_NAME'] == '') & (link_gdf['name_shst_metadata'] != '')
+    link_gdf.loc[idx_5, 'road_name'] = link_gdf['name_shst_metadata']
+    link_gdf.loc[idx_5, 'road_name_heuristic'] = 5
+
+    # idx_6: if 'ref', 'tomtom_name', 'sfcta_NAME', 'name_shst_metadata' all missing, use osmnx 'name' if available
+    idx_6 = (link_gdf['ref'] == '') & (link_gdf['tomtom_name'] == '') & (link_gdf['sfcta_NAME'] == '') & (link_gdf['name_shst_metadata'] == '') & (
+            link_gdf['name'] != '')
+    link_gdf.loc[idx_6, 'road_name'] = link_gdf['name']
+    link_gdf.loc[idx_6, 'road_name_heuristic'] = 6
+
+    # update naming convention: shst 'name_shst_metadata' and osmnx 'name' use the long verion of road name type, e.g. 'Avenue'.
+    # SFCTA network uses abbreviated road name types, most of them are consistent with osmnx 'ref' and 'tomtom_name', e.g. 'Ave',
+    # except for 'Al' ('Aly'), 'Ex' ('Expy'), 'Wy' ('Way'), 'Pz' ('Plaza'). The final 'road_name' adopts SFCTA's version except
+    # for the above listed, which uses TomTom's more widely-adopted version. 
+    to_short_name_dict = {' Avenue'    : ' Ave',
+                          ' Street'    : ' St',
+                          ' Road'      : ' Rd',
+                          ' Expressway': ' Expy',
+                          ' Parkway'   : ' Pkwy',
+                          ' Court'     : ' Ct',
+                          ' Terrace'   : ' Terr', 
+                          ' Circle'    : ' Cir',
+                          ' Boulevard' : ' Blvd',
+                          ' Place'     : ' Pl',
+                          ' Drive'     : ' Dr',
+                          ' Highway'   : ' Hwy',
+                          ' Alley'     : ' Aly',
+                          ' Lane'      : ' Ln'}
+    for longname in to_short_name_dict:  
+        link_gdf['road_name'] = link_gdf['road_name'].apply(lambda x: x.replace(longname, to_short_name_dict[longname]))              
+                        
+    # for sfcta_NAME ends with 'Al', 'Ex', 'Wy', 'Pz', replace with 'Aly', 'Expy', 'Way', 'Plaza'
+    # for tomtom_name ends with 'Ter', replace with 'Terr'
+    replace_end_dict = {' Al' : ' Aly',
+                        ' Ex' : ' Expy',
+                        ' Wy' : ' Way',
+                        ' Pz' : ' Plaza',
+                        ' Ter': ' Terr'}
+    for endname in replace_end_dict:
+        link_gdf.loc[link_gdf['road_name'].str.endswith(endname), 'road_name'] = \
+            link_gdf['road_name'].apply(lambda x: x[:-len(endname)] + replace_end_dict[endname])
+    
+    return None
+
 
 def determine_number_of_bus_lanes(link_gdf):
     """
