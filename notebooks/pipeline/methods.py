@@ -2026,7 +2026,13 @@ def consolidate_lane_accounting(osmnx_shst_gdf, OUTPUT_DIR):
     osmnx_shst_gdf.loc[osmnx_shst_gdf['onedir_lanes_osmSplit'] != -1, 'lanes_gp'] = \
         osmnx_shst_gdf[['lanes_gp_through', 'lanes_gp_turn', 'lanes_gp_aux', 'lanes_gp_mix', 'lanes_gp_bothways']].sum(axis=1)
     
-    # 4. get 'lanes_tot' = 'lanes_gp' + 'lanes_hov' + 'lanes_busonly'
+    # 4. subtract bus-only lane and hov lane from 'lanes_gp' and 'lanes_gp_through' 
+    osmnx_shst_gdf.loc[osmnx_shst_gdf['lanes_busonly'] > 0, 'lanes_gp'] = osmnx_shst_gdf['lanes_gp'] - osmnx_shst_gdf['lanes_busonly']
+    osmnx_shst_gdf.loc[osmnx_shst_gdf['lanes_busonly'] > 0, 'lanes_gp_through'] = osmnx_shst_gdf['lanes_gp_through'] - osmnx_shst_gdf['lanes_busonly']
+    osmnx_shst_gdf.loc[osmnx_shst_gdf['lanes_hov'] > 0, 'lanes_gp'] = osmnx_shst_gdf['lanes_gp'] - osmnx_shst_gdf['lanes_hov']
+    osmnx_shst_gdf.loc[osmnx_shst_gdf['lanes_hov'] > 0, 'lanes_gp_through'] = osmnx_shst_gdf['lanes_gp_through'] - osmnx_shst_gdf['lanes_hov']
+
+    # 5. get 'lanes_tot' = 'lanes_gp' + 'lanes_hov' + 'lanes_busonly'
     osmnx_shst_gdf.loc[osmnx_shst_gdf['onedir_lanes_osmSplit'] != -1, 'lanes_tot'] = \
         osmnx_shst_gdf[['lanes_gp', 'lanes_hov', 'lanes_busonly']].sum(axis=1)
 
