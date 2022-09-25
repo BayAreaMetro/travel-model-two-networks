@@ -2230,6 +2230,21 @@ def aggregate_osm_ways_back_to_shst_link(osmnx_shst_gdf):
         'maxspeed'              : pd.NamedAgg(column='maxspeed',            aggfunc='_max_length_index'),
         'cycleway'              : pd.NamedAgg(column='cycleway',            aggfunc='_max_length_index'),
         'sidewalk'              : pd.NamedAgg(column='sidewalk',            aggfunc='_max_length_index'),
+        # the following osm lane and turn tags contain the raw info for QAQC and third-party data conflation
+        # note that 'lanes:backward', 'turn:lanes:backward', 'lanes:bus:backward' are not included because they have been
+        # dropped after creating the reversed links for two-way roads
+        'lanes'                 : pd.NamedAgg(column='lanes',               aggfunc='_max_length_index'),
+        'lanes:forward'         : pd.NamedAgg(column='lanes:forward',       aggfunc='_max_length_index'), 
+        'lanes:both_ways'       : pd.NamedAgg(column='lanes:both_ways',     aggfunc='_max_length_index'), 
+        'turn'                  : pd.NamedAgg(column='turn',                aggfunc='_max_length_index'), 
+        'turn:lanes'            : pd.NamedAgg(column='turn:lanes',          aggfunc='_max_length_index'), 
+        'turn:lanes:forward'    : pd.NamedAgg(column='turn:lanes:forward',  aggfunc='_max_length_index'), 
+        'hov'                   : pd.NamedAgg(column='hov',                 aggfunc='_max_length_index'), 
+        'hov:lanes'             : pd.NamedAgg(column='hov:lanes',           aggfunc='_max_length_index'),
+        'lanes:hov'             : pd.NamedAgg(column='lanes:hov',           aggfunc='_max_length_index'),
+        'bus'                   : pd.NamedAgg(column='bus',                 aggfunc='_max_length_index'),
+        'lanes:bus'             : pd.NamedAgg(column='lanes:bus',           aggfunc='_max_length_index'), 
+        'lanes:bus:forward'     : pd.NamedAgg(column='lanes:bus:forward',   aggfunc='_max_length_index'),
         # access
         'drive_access'          : pd.NamedAgg(column='drive_access',        aggfunc='_max_length_index'), # suggest using min() instead
         'walk_access'           : pd.NamedAgg(column='walk_access',         aggfunc='_max_length_index'), # suggest using min() instead
