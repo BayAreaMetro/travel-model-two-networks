@@ -101,7 +101,7 @@ if __name__ == '__main__':
                 col_new = 'x' + col + '_rename'
                 input_gdf.rename(columns={col:col_new}, inplace=True)
                 WranglerLogger.info("    => renamed to {}".format(col_new))
-            elif col in ['id', 'index', 'key']:     # if column is 'id', 'index' or 'key', ArcGIS Pro will convert them to '"id"', '"index"' or '"key"'
+            elif col in ['id', 'index', 'key', 'DELETE']:     # if column is 'id', 'index' or 'key', ArcGIS Pro will convert them to '"id"', '"index"' or '"key"'
                                                     # when loads the geopackage layer, which is invalid and will cause the 'Failed to create a page cursor' error
                                                     # when trying to load the data table or click on a feature to explore the attributes (though querying still works, 
                                                     # e.g. in definition query, select by attribute, creating symbology, etc.).
