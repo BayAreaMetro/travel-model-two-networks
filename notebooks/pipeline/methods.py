@@ -3178,7 +3178,7 @@ def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, th
             unmatched_geofeather = os.path.join(THIRD_PARTY_OUTPUT_DIR, third_party, CONFLATION_SHST, 'unmatched.feather')
         elif third_party_type == 'transit':
             unmatched_geofeather = os.path.join(CONFLATION_SHST, '{}_unmatched.feather'.format(third_party))
-        unmatched_gdf.to_feather(unmatched_gdf, unmatched_geofeather)
+        unmatched_gdf.to_feather(unmatched_geofeather)
         WranglerLogger.info('Wrote {:,} lines to {}'.format(len(unmatched_gdf), unmatched_geofeather))
 
         WranglerLogger.info('Sharedstreets failed to match {:,} out of {:,} total unique ids'.format(
