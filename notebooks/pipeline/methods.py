@@ -1490,13 +1490,12 @@ def count_bus_lanes(osmnx_shst_gdf, OUTPUT_DIR):
 
     # for any link, bus = 'designated' indicates one bus-only lane
     osmnx_shst_gdf.loc[(osmnx_shst_gdf.bus == 'designated'), 'forward_bus_lane'] = 1
+    # if two-way, bus = 'designated' also indicating one bus-only lane in the opposite direction
+    osmnx_shst_gdf.loc[(osmnx_shst_gdf.osm_dir_tag==2) & (osmnx_shst_gdf.bus == 'designated'), 'backward_bus_lane'] = 1
 
     # if 'bus' is na, but 'lanes:bus' or 'lanes:bus:forward' has value (1), set forward_bus_lane as 1
     osmnx_shst_gdf.loc[(osmnx_shst_gdf.bus == '') & (osmnx_shst_gdf['lanes:bus'] == 1), 'forward_bus_lane'] = 1
     osmnx_shst_gdf.loc[(osmnx_shst_gdf.bus == '') & osmnx_shst_gdf['lanes:bus'].isnull() & (osmnx_shst_gdf['lanes:bus:forward'] == 1), 'forward_bus_lane'] = 1
-
-    # for two-way links, bus = 'designated' indicating one bus-only lane for each direction
-    osmnx_shst_gdf.loc[(osmnx_shst_gdf.osm_dir_tag==2) & (osmnx_shst_gdf.bus == 'designated'), 'backward_bus_lane'] = 1
 
     # if 'bus' is na, but 'lanes:bus:forward' or 'lanes:bus:backward' has value (1), set bus lane for both direction
     osmnx_shst_gdf.loc[(osmnx_shst_gdf.osm_dir_tag==2) & (osmnx_shst_gdf.bus == '') & (osmnx_shst_gdf['lanes:bus:forward' ] == 1), 'forward_bus_lane' ] = 1
@@ -2876,6 +2875,109 @@ def identify_dead_end_nodes(links):
     single_node_list = A_B_df[A_B_df.v == 1].u.tolist()
 
     return single_node_list
+
+
+def merge_legacy_tm2_network_hov_links_with_gp(model_network_links_gdf):
+    """
+    Identifies the corresponding GP link of each HOV or non-truck link, and recode the lane count of the 
+    HOV or non-truck links as new columns to the dataframe of GP links.
+
+    Returns: a dataframe containing GP links (with or without hov/non-truck lanes) and hov/non-truck only links,
+    with three lane count columns representing different types of lanes:
+        'NUMLANES_gp': number of GP lanes
+        'NUMLANES_hov': number of hov lanes
+        'NUMLANES_nontruck': number of non-truck lanes
+
+    """
+    # subset hov_nontruck links, gp links, and the dummy links that connect those
+    hov_nontruck_links_gdf = model_network_links_gdf.loc[
+        model_network_links_gdf['USECLASS'].isin([2, 3, 4]) & (model_network_links_gdf['CNTYPE'] == 'TANA')]
+    WranglerLogger.debug('{:,} hov and non-truck links'.format(hov_nontruck_links_gdf.shape[0]))
+
+    gp_links_gdf = model_network_links_gdf.loc[
+        (model_network_links_gdf['CNTYPE'] == 'TANA') & (model_network_links_gdf['USECLASS'] == 0)]
+    WranglerLogger.debug('{:,} GP links'.format(gp_links_gdf.shape[0]))
+
+    dummy_links_df = model_network_links_gdf.loc[
+        model_network_links_gdf['CNTYPE'] == 'USE'][['A', 'B']]
+    WranglerLogger.debug('{:,} dummy links connecting hov/non-truck links to GP links'.format(dummy_links_df.shape[0]))
+
+    # find the corresponding GP link for each hov/non-truck link through three merges
+    # 1) find the dummy link used to access each hov/non-truck link from GP link
+    link_group1_gdf = pd.merge(
+        left = hov_nontruck_links_gdf,
+        right = dummy_links_df[['A', 'B']].rename(columns = {'A': 'A_access', 'B': 'B_access'}),
+        left_on = 'A',
+        right_on= 'B_access',
+        how='left',
+        indicator=True)
+    # NOTE: there are 100+ hov links not connected to a dummy link - keep them separate
+    WranglerLogger.debug('hov/non-truck to dummy link merge status:\n{}'.format(
+        link_group1_gdf['_merge'].value_counts(dropna=False)
+    ))
+    hov_nontruck_only_links_gdf = link_group1_gdf.loc[link_group1_gdf['_merge'] == 'left_only']
+    # for hov/non-truck links connected to a dummy link, keep the only needed columns before next merge
+    link_group1_df = link_group1_gdf.loc[
+        link_group1_gdf['_merge'] == 'both'][['A', 'B', 'NUMLANES', 'USECLASS', 'A_access', 'B_access']]
+
+    # 2) find the dummy link used to egress each hov/non-truck link into GP link
+    link_group2_df = pd.merge(
+        left = link_group1_df,
+        right = dummy_links_df[['A', 'B']].rename(columns = {'A': 'A_egress', 'B': 'B_egress'}),
+        left_on = 'B',
+        right_on= 'A_egress',
+        how='inner')
+
+    # 3) find the GP link that connects to both dummy links
+    link_group3_df = pd.merge(
+        left = link_group2_df,
+        right = gp_links_gdf[['A', 'B']].rename(columns = {'A': 'A_gp', 'B': 'B_gp'}),
+        left_on = ['A_access', 'B_egress'],
+        right_on = ['A_gp', 'B_gp'],
+        how='inner')
+
+    # now link_group3_df has columns 'A', 'B', 'NUMLANES', 'USECLASS', 'A_access', 'B_access', 'A_egress', 'B_egress', 'A_gp', 'B_gp'
+    # recode hov and non-truck 'NUMLANES' into new fields: 'NUMLANES_hov', 'NUMLANES_nontruck'
+    link_group3_df.loc[link_group3_df['USECLASS'] == 4, 'NUMLANES_nontruck'] = link_group3_df['NUMLANES']
+    link_group3_df.loc[link_group3_df['USECLASS'].isin([2, 3]), 'NUMLANES_hov'] = link_group3_df['NUMLANES']
+
+    # merge 'NUMLANES_hov', 'NUMLANES_nontruck' into GP links
+    gp_links_with_all_lanes_gdf = pd.merge(
+        left = gp_links_gdf.rename(columns = {'NUMLANES': 'NUMLANES_gp'}),
+        right = link_group3_df[['A_gp', 'B_gp', 'NUMLANES_hov', 'NUMLANES_nontruck']],
+        left_on = ['A', 'B'],
+        right_on = ['A_gp', 'B_gp'],
+        how='left')
+
+    # add the new fields also to hov links not connected to a dummy link 
+    hov_nontruck_only_links_gdf.loc[
+        hov_nontruck_only_links_gdf['USECLASS'] == 4, 'NUMLANES_nontruck'] = hov_nontruck_only_links_gdf['NUMLANES']
+    hov_nontruck_only_links_gdf.loc[
+        hov_nontruck_only_links_gdf['USECLASS'].isin([2, 3]), 'NUMLANES_hov'] = hov_nontruck_only_links_gdf['NUMLANES']
+    # hov_nontruck_only_links_gdf.drop('NUMLANES', axis=1)
+
+    # concat GP links and hov/non-truck only links
+    links_with_all_lanes_gdf = pd.concat([gp_links_with_all_lanes_gdf, hov_nontruck_only_links_gdf])
+
+    # fill in na with 0 and set field type to int8
+    for colname in ['NUMLANES_gp', 'NUMLANES_hov', 'NUMLANES_nontruck']:
+        links_with_all_lanes_gdf[colname].fillna(0, inplace=True)
+        links_with_all_lanes_gdf[colname].astype(np.int8)
+
+    WranglerLogger.debug(
+        'consolidated into {:,} links, of which {:,} GP links have > 0 HOV lane(s); {:,} GP links have > 0 non-truck lane(s);\
+        {:,} GP links with all gp lanes; {:,} links with only hov lanes'.format(
+            links_with_all_lanes_gdf.shape[0],
+            ((links_with_all_lanes_gdf['NUMLANES_hov'] > 0) & (links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
+            ((links_with_all_lanes_gdf['NUMLANES_nontruck'] > 0) & (links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
+            ((links_with_all_lanes_gdf['NUMLANES_hov'] == 0) & (links_with_all_lanes_gdf['NUMLANES_nontruck'] == 0) & (links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
+            (links_with_all_lanes_gdf['NUMLANES_gp'] == 0).sum()
+    ))
+
+    # drop interim columns
+    links_with_all_lanes_gdf.drop(['A_gp', 'B_gp', 'NUMLANES', 'A_access', 'B_access', '_merge'], axis=1)
+
+    return links_with_all_lanes_gdf
 
 
 def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, third_party_type,
