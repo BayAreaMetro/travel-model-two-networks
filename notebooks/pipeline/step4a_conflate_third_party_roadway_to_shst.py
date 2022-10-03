@@ -17,6 +17,7 @@ Outputs: two sets of data for each of the above sources:
 
 """
 import argparse, datetime, os, sys
+from textwrap import wrap
 import methods
 import docker
 import numpy as np
@@ -58,8 +59,8 @@ BOUNDARY_DIR = os.path.join(INPUT_DATA_DIR, 'step0_boundaries')
 THIRD_PARTY_INPUT_DIR = os.path.join(INPUT_DATA_DIR, 'step4_third_party_data')
 THIRD_PARTY_INPUT_FILES = {
     TOMTOM          : os.path.join(THIRD_PARTY_INPUT_DIR, TOMTOM,        'input', 'network2019', 'Network_region.gdb'),
-    TM2_NON_MARIN   : os.path.join(THIRD_PARTY_INPUT_DIR, TM2_NON_MARIN, 'input', 'mtc_final_network_base.shp'),
-    TM2_MARIN       : os.path.join(THIRD_PARTY_INPUT_DIR, TM2_MARIN,     'input', 'mtc_final_network_base.shp'),
+    TM2_NON_MARIN   : os.path.join(THIRD_PARTY_INPUT_DIR, TM2_NON_MARIN, 'input', 'mtc_final_network_base_prj.feather'),
+    TM2_MARIN       : os.path.join(THIRD_PARTY_INPUT_DIR, TM2_MARIN,     'input', 'mtc_final_network_base_prj.feather'),
     SFCTA           : os.path.join(THIRD_PARTY_INPUT_DIR, SFCTA,         'input', 'SanFrancisco_links.shp'),
     CCTA            : os.path.join(THIRD_PARTY_INPUT_DIR, CCTA,          'input', 'ccta_2015_network.shp'),
     ACTC            : os.path.join(THIRD_PARTY_INPUT_DIR, ACTC,          'input', 'AlamedaCo_MASTER_20190410_no_cc.shp'),
@@ -316,25 +317,60 @@ def conflate_TOMTOM(docker_container_name):
 
 def conflate_TM2_NON_MARIN(docker_container_name):
     """
-    Conflate TM2 (NonMarin) data with sharedstreets
+    Conflate TM2 (NonMarin) data with sharedstreets.
+    I didn't find the documentation for this version of the network. Based on visual inspections, the following
+    fields are relevant.
+
+    * NUMLANES   = model number of lanes
+    * ASSIGNABLE = is link used for assignment
+    * CNTYPE	 = link connector type
+                   BIKE: bike link (all have 'NUMLANES'==0)
+                   CRAIL: commuter rail
+                   FERRY: ferry link
+                   HRAIL: heavy rail link
+                   LRAIL: light rail link
+                   MAZ: MAZ connector link
+                   PED: ped link (all have 'NUMLANES'==0)
+                   TANA: regular network link
+                   TAP: TAP link
+                   TAZ: TAZ connector link
+                   USE: HOV (user class) link
+    * TRANSIT	 = is link transit
+                   0: not transit
+                   1: transit (including CNTYPE 'TAP', 'LRAIL', 'CRAIL', 'HRAIL', 'FERRY')
+    * FT	     = facility type
+                   0: Connector
+                   1: Freeway to Freeway
+                   2: Freeway
+                   3: Expressway
+                   4: Collector
+                   5: Ramp
+                   6: Special Facility
+                   7: Major Arterial
+    * USECLASS	 = link user class
+                   0: NA; link open to everyone
+                   2: HOV 2+
+                   3: HOV 3+
+                   4: No combination trucks
+
     TODO: What files are written?
     """
     # Prepare TM2 non-Marin for conflation
     WranglerLogger.info('loading TM2_nonMarin data from {}'.format(THIRD_PARTY_INPUT_FILES[TM2_NON_MARIN]))
-    tm2_link_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TM2_NON_MARIN])
-    WranglerLogger.debug('TM2_Marin raw data dtypes: \n{}'.format(tm2_link_gdf.dtypes))
+    tm2_link_gdf = gpd.read_feather(THIRD_PARTY_INPUT_FILES[TM2_NON_MARIN])
+    WranglerLogger.info('{:,} rows, {:,} unique A+B combos'.format(
+        tm2_link_gdf.shape[0],
+        tm2_link_gdf[['A', 'B']].drop_duplicates().shape[0]))
+    WranglerLogger.debug('TM2_nonMarin raw data dtypes: \n{}'.format(tm2_link_gdf.dtypes))
+    WranglerLogger.debug('TM2_nonMarin raw data projection: \n{}'.format(tm2_link_gdf.crs))
 
-    # define initial ESPG
-    # todo: delete this; it should be defined in the dataset
-    tm2_link_gdf.crs = "esri:102646"
+    # since it is model network, HOV/non-truck lanes and GP lanes have separate links, represented by 'USE'==2/3 or 4.
+    # this step finds the cooresponding 
+    tm2_link_gdf = methods.merge_legacy_tm2_network_hov_links_with_gp(tm2_link_gdf)
 
     # select only road way links
-    WranglerLogger.info('TM2_nonMarin link data CNTYPE stats: \n{}'.format(
-        tm2_link_gdf.CNTYPE.value_counts(dropna=False)))
-
-    tm2_link_roadway_gdf = tm2_link_gdf.loc[tm2_link_gdf.CNTYPE.isin(["BIKE", "PED", "TANA"])]
-
-    WranglerLogger.info('TM2_nonMarin has {:,} roadway links, {:,}  unique A-B combination'.format(
+    tm2_link_roadway_gdf = tm2_link_gdf.loc[tm2_link_gdf.CNTYPE == 'TANA']
+    WranglerLogger.debug('TM2_nonMarin has {:,} roadway links, {:,}  unique A-B combination'.format(
         tm2_link_roadway_gdf.shape[0], len(tm2_link_roadway_gdf.groupby(["A", "B"]).count())))
 
     # conflate the given dataframe with SharedStreets
@@ -357,15 +393,18 @@ def conflate_TM2_MARIN(docker_container_name):
     # TODO: evaluate if can use the PEMS info.
 
     * NUMLANES   = model number of lanes
+    # LANES      = TomTom number of lanes
+    ? PEMSID	 = PEMS ID
+    ? PEMSLANES	 = PEMS number of lanes
     * ASSIGNABLE = is link used for assignment
     * CNTYPE	 = link connector type
-                   BIKE: bike link
+                   BIKE: bike link (all have 'NUMLANES'==0)
                    CRAIL: commuter rail
                    FERRY: ferry link
                    HRAIL: heavy rail link
                    LRAIL: light rail link
                    MAZ: MAZ connector link
-                   PED: ped link
+                   PED: ped link (all have 'NUMLANES'==0)
                    TANA: regular network link
                    TAP: TAP link
                    TAZ: TAZ connector link
@@ -385,8 +424,6 @@ def conflate_TM2_MARIN(docker_container_name):
                    2: HOV 2+
                    3: HOV 3+
                    4: No combination trucks
-    ? PEMSID	 = PEMS ID
-    ? PEMSLANES	 = PEMS number of lanes
     ? TOLLSEG	 = toll segment
     ? TOLLBOOTH	 = toll link. Links with values less than 11 are bridge tolls; 11 or above are value tolls
     * B_CLASS	 = BikeMapper bike class
@@ -418,12 +455,12 @@ def conflate_TM2_MARIN(docker_container_name):
     """
     # Prepare TM2 Marin for conflation
     WranglerLogger.info('loading TM2_Marin data from {}'.format(os.path.join(THIRD_PARTY_INPUT_FILES[TM2_MARIN])))
-    tm2_marin_link_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[TM2_MARIN])
+    tm2_marin_link_gdf = gpd.read_feather(THIRD_PARTY_INPUT_FILES[TM2_MARIN])
+    WranglerLogger.info('{:,} rows, {:,} unique A+B combos'.format(
+        tm2_marin_link_gdf.shape[0],
+        tm2_marin_link_gdf[['A', 'B']].drop_duplicates().shape[0]))
     WranglerLogger.debug('TM2_Marin raw data dtypes: \n{}'.format(tm2_marin_link_gdf.dtypes))
-
-    # define initial ESPG
-    # todo: delete this; it should be defined in the dataset
-    tm2_marin_link_gdf.crs = CRS("esri:102646")
+    WranglerLogger.debug('TM2_Marin raw data projection: \n{}'.format(tm2_marin_link_gdf.crs))
 
     # - select only road way links, CNTYPE=='TANA' (exclude PED and BIKE since methods.conflate() uses car-rule);
     # - this would also exclude TRANSIT==1, FT==0, FT==6, so no need to drop them separately
@@ -462,6 +499,10 @@ def conflate_TM2_MARIN(docker_container_name):
     #           2: 20
     #           4: 2
     #           5: 1
+
+    # since it is model network, HOV/non-truck lanes and GP lanes have separate links, represented by 'USE'==2/3 or 4.
+    # this step finds the cooresponding 
+    tm2_marin_link_gdf = methods.merge_legacy_tm2_network_hov_links_with_gp(tm2_marin_link_gdf)
 
     WranglerLogger.info('TM2_Marin link data CNTYPE stats: \n{}'.format(
         tm2_marin_link_gdf.CNTYPE.value_counts(dropna=False)))
@@ -504,6 +545,21 @@ def conflcate_SFCTA(docker_container_name):
                    9: Transit only
                    4: no trucks
     * FT         = facility type
+                   1 Fwy-Fwy Connector
+                   2 Freeway
+                   3 Expressway
+                   4 Collector
+                   5 Ramp
+                   6 Centroid Connector
+                   7 Major Arterial
+                   8
+                   9 Alley
+                   10 Metered Ramp
+                   11 Local
+                   12 Minor Arterial
+                   13 Bike-only
+                   14
+                   15 Super Arterial
     * STREETNAME = name of roads
     ? DISTANCE        = length of link in miles
     * LANE_{AM,PM,OP} = mumber of general purpose lanes in AM, excluding bus lanes
@@ -549,11 +605,11 @@ def conflcate_SFCTA(docker_container_name):
     WranglerLogger.info('After filtering to links inside boundary_04, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
     # remove "special facility" (FT 6)
-    sfcta_gdf = sfcta_gdf.loc[sfcta_gdf.FT != 6]
-    WranglerLogger.info('After filter to FT != 6, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
+    sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.FT != 6) & sfcta_gdf.FT.notnull()]
+    WranglerLogger.info('After filter to FT != 6 and FT not null, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
-    # drop 6 transit-only links with USE==9, LANE==0 and BUSLANE==1.
-    # drop 142 bike-only links (bike paths in open space) with USE==0, LANE==0.
+    # drop 6 transit-only links with USE==9, LANE==0 and BUSLANE==1; these links have "PROJ" == "FolsomTransitLanes", are bus lane created for the transportation project
+    # drop 142 links with USE == 0 and LANE==0, either bike-only links (bike paths in open space) with FT==13, or planned bike lane (has 'PROJ').                                                                  
     sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.USE != 9) & (sfcta_gdf.USE != 0)]
     WranglerLogger.info('After filter to USE != 9 and USE != 0, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
@@ -561,10 +617,20 @@ def conflcate_SFCTA(docker_container_name):
     sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.TYPE != 'PATH') & (sfcta_gdf.TYPE != 'PLAZA')]
     WranglerLogger.info('After filter to TYPE != PATH and TYPE != PLAZA, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
-    # conflate the given dataframe with SharedStreets
+    # separate bike-only links
+    sfcta_drive_gdf = sfcta_gdf.loc[sfcta_gdf.FT != 13]
+    sfcta_bike_gdf = sfcta_gdf.loc[sfcta_gdf.FT == 13]
+    WranglerLogger.info('{:,} driveway links, {:,} bike-only links'.format(sfcta_drive_gdf.shape[0], sfcta_bike_gdf.shape[0]))
+
+    # conflate the given drive network dataframe with SharedStreets using car rule
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        SFCTA, sfcta_gdf, ['A','B'], 'roadway_link',
+        SFCTA, sfcta_drive_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
+    
+    # # TODO (maybe): conflate the bike-only links with SharedStreets using bike rule or pedestrian rule
+    # (bike_matched_gdf, bike_unmatched_gdf) = methods.conflate(
+    #     SFCTA, sfcta_bike_gdf, ['A','B'], 'bike_link',
+    #     THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating SFCTA data')
 
@@ -572,8 +638,22 @@ def conflcate_SFCTA(docker_container_name):
 def conflate_CCTA(docker_container_name):
     """
     Conflate ACTC data with sharedstreets
-    See CCTA network documentation at Box: https://mtcdrive.box.com/s/lsnml5tpbrhrcjfiabw8zbjd5y9r1ow6.
-    TODO: the documentation doesn't really have data dictionary for the network data, only for loaded network it appears. 
+
+    NOTE: CCTA network documentation at Box: https://mtcdrive.box.com/s/lsnml5tpbrhrcjfiabw8zbjd5y9r1ow6. However,
+    how "decennial_model_update_Model User Guide.pdf" contains info on network data dictionary (Table 4.1, Table 4.2),
+    but it refers to "MTC network", not the TransCAD network as what the data is. In most cases this is fine,
+    except that the network doesn't have A, B fields, therefore cannot apply method.merge_legacy_tm2_network_hov_links_with_gp().
+    
+    Link attributes relevant to conflation:
+    * DIR           = tag of one-way or two-way links
+                      1: one-way
+                      0: two-way
+    * [AB/BA]_LANES = number of lanes of each direction
+    * [AB/BA]_FT    = facility type
+    * [AB/BA]_USE   = use restrictions
+                      1: Facility open to all vehicles
+                      2 and 3: HOV2 and HOV3
+                      4: no trucks
 
     Outputs:
     -- matched_gdf.feather: ACTC links matched to SharedStreets links under the match command config 
@@ -593,16 +673,20 @@ def conflate_CCTA(docker_container_name):
     # Prepare CCTA for conflation
     WranglerLogger.info('loading CCTA data from {}'.format(THIRD_PARTY_INPUT_FILES[CCTA]))
     ccta_raw_gdf = gpd.read_file(THIRD_PARTY_INPUT_FILES[CCTA])
+    WranglerLogger.debug('CCTA raw data has {:,} rows, {:,} unique ID'.format(
+        ccta_raw_gdf.shape[0], ccta_raw_gdf.ID.nunique()))
     WranglerLogger.debug('CCTA raw data dtypes: \n{}'.format(ccta_raw_gdf.dtypes))
-    WranglerLogger.info('CCTA crs:\n{}'.format(ccta_raw_gdf.crs))
+    WranglerLogger.debug('CCTA crs:\n{}'.format(ccta_raw_gdf.crs))
 
-    # filter out connectors
+    # filter out connectors (FT == 6)
     ccta_gdf = ccta_raw_gdf.loc[(ccta_raw_gdf.AB_FT != 6) & (ccta_raw_gdf.BA_FT != 6)]
-    WranglerLogger.info('CCTA data has {:,} rows, {:,} unique ID'.format(
-        ccta_gdf.shape[0], ccta_gdf.ID.nunique()))
+    WranglerLogger.debug('{:,} rows after dropping connector links'.format(ccta_gdf.shape[0]))
+    # NOTE: there are links with FT == 13 which is not included in the dictionary. Based on visual inspection, they
+    # appear to be HOV links.
 
     # this network is from transcad, for one way streets, dir=1;
     # for two-way streets, there is only one links with dir=0, need to create other direction
+    WranglerLogger.debug('DIR value counts:\n{}'.format(ccta_gdf['DIR'].value_counts(dropna=False)))
     # from shapely.geometry import LineString
     WranglerLogger.debug('creating reversed links')
     two_way_links_gdf = ccta_gdf.loc[ccta_gdf.DIR == 0].copy()
@@ -622,60 +706,87 @@ def conflate_CCTA(docker_container_name):
     two_way_links_gdf['ID'] = two_way_links_gdf['ID'] + 9000000
     two_way_links_gdf['reversed'] = True
 
+    ccta_gdf['reversed'] = False
     ccta_gdf = pd.concat([ccta_gdf, two_way_links_gdf], sort=False, ignore_index=True)
     # double check
-    WranglerLogger.info('after creating other direction for two-way roads, ccta data has {:,} links, {:,} unique ID'.format(
+    WranglerLogger.debug('after creating other direction for two-way roads, ccta data has {:,} links, {:,} unique ID'.format(
         ccta_gdf.shape[0], ccta_gdf.ID.nunique()))
+    
+    # after creating reversed links for two-way streets, drop the fields starting with 'BA_'
+    drop_cols = [c for c in ccta_gdf.columns if c[:3] == 'BA_']
+    ccta_gdf.drop(columns=drop_cols, axis=1, inplace=True)
 
+    # this is a model network which contains hov and non-truck links, but it doesn't have A, B field, therefore unable to
+    # easily map hov/non-truck links to the corresponding GP links. Separate these links.
+    ccta_gp_links_gdf = ccta_gdf.loc[ccta_gdf['AB_USE'] == 1]
+    ccta_gp_links_gdf.rename(columns = {'AB_LANES': 'AB_LANES_GP'}, inplace=True)
+    WranglerLogger.debug('{:,} GP links'.format(ccta_gp_links_gdf.shape[0]))
+    ccta_hovnontruck_links_gdf = ccta_gdf.loc[ccta_gdf['AB_USE'] != 1]
+    ccta_hovnontruck_links_gdf.rename(columns = {'AB_LANES': 'AB_LANES_nonGP'}, inplace=True)
+    WranglerLogger.debug('{:,} GP links'.format(ccta_hovnontruck_links_gdf.shape[0]))
+    
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 3 hours
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        CCTA, ccta_gdf, ['ID'], 'roadway_link',
+        CCTA, ccta_gp_links_gdf, ['ID'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
+    # TODO: (maybe): conflate ccta_hov_nontruck_links_gdf using --tile-hierarchy setting only for freeway, however, shst lacks documentation
+    # on --tile-hierarchy numbering, pending.
+
     WranglerLogger.info('finished conflating CCTA data')
-    WranglerLogger.info('Sharedstreets matched {} out of {} total CCTA Links.'.format(
-        matched_gdf['ID'].nunique(), ccta_gdf.shape[0]))
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} CCTA GP Links.'.format(
+        matched_gdf['ID'].nunique(), ccta_gp_links_gdf.shape[0]))
 
 def conflate_ACTC(docker_container_name):
     """
     Conflate ACTC data with sharedstreets
-    See ACTC network documentation at Box: https://mtcdrive.box.com/s/ta7mn21vhnemv07ch8irz87vfdgunw2a
+    See ACTC network documentation at Box: https://mtcdrive.box.com/s/ta7mn21vhnemv07ch8irz87vfdgunw2a, in 'Documents -> 19752_Alameda_Countywide_Model_20190404.pdf'.
 
     Link attributes relevant to conflation:
-    * 'BASE_LN'     = 2000 number of lanes in each direction (excluding turn lanes)
-    * 'BASE_AUX'    = 2000 number of auxiliary lanes
-    * 'BASE_NMT'    = bike facility class (added to the network during the 2014-2015 model update)
-                      0: No bicycle or pedestrian use
-                      1: Bicycles/pedestrians allowed, no special facilities
-                      2: Bike lanes (Class II)
-                      3: Bike paths (Class I)
-                      4: Cycle tracks (Class IV)
-    * 'NMT2010'     = bike facility class in year 2010
-    * 'NMT2020'     = bike facility class in year 2020
+    * FT                    = facility type
+                              1: Freeway to freeway ramp
+                              2: Freeway
+                              3: Expressway/Highway
+                              4: Collector
+                              5: Ramp
+                              6: Connector link
+                              7: Arterial
+                              8: Metered ramp
+                              9: Special types
+    * USE                   = use restrictions
+    #                         TODO: the documentation is missing info on 'USE"
+    * LN                    = number of lanes in each direction (through lanes only, excluding turn lanes, including auxiliary lane)
+    * AUX                   = number of auxiliary lanes
+    * NMT[2010/2020/2040]   = bike facility class (added to the network during the 2014-2015 model update)
+                              0: No bicycle or pedestrian use (freeways, etc...)
+                              1: Bicycles/pedestrians allowed, no special facilities
+                              2: Bike lanes (Class II)
+                              3: Bike paths (Class I)
+                              4: Cycle tracks (Class IV)
+    
+    Each attribute, except for NMT, has 4 sets of fields, representing a base (2000) condition and up to 3 planned or already implemented improvements.
+    For example, LN:
+    * BASE_LN       = 2000 number of lanes
+    * IMP1_YEAR     = year of 1st round of road/bike improvement if applicable
+    * IMP1_LN       = number of lanes corresponding to IMP1_YEAR
+    * IMP2_YEAR     = year of 2nd round of road/bike improvement if applicable
+    * IMP2_LN       = number of lanes corresponding to IMP2_YEAR
+    * IMP3_YEAR     = year of 3rd round of road/bike improvement if applicable
+    * IMP3_LN       = number of lanes corresponding to IMP3_YEAR
 
-    * 'IMP1_YEAR'   = year of 1st round of road/bike improvement if applicable
-    * 'IMP1_LN'     = number of lanes in each direction corresponding to IMP1_YEAR
-    * 'IMP1_AUX'    = number of auxiliary lanes corresponding to IMP1_YEAR
-    * 'IMP1_NMT'    = bike facility class corresponding to IMP1_YEAR
 
-    * 'IMP2_YEAR'   = year of 2nd round of road/bike improvement if applicable
-    * 'IMP2_LN'     = number of lanes in each direction corresponding to IMP1_YEAR
-    * 'IMP2_AUX'    = number of auxiliary lanes corresponding to IMP2_YEAR
-    * 'IMP2_NMT'    = bike facility class corresponding to IMP2_YEAR
-
-    * 'IMP3_YEAR'   = year of 3rd round of road/bike improvement if applicable
-    * 'IMP3_LN'     = number of lanes in each direction corresponding to IMP3_YEAR
-    * 'IMP3_AUX'    = number of auxiliary lanes corresponding to IMP3_YEAR
-    * 'IMP3_NMT'    = bike facility class corresponding to IMP3_YEAR
-
-    Notes on the attributes:
-    -- LN (lanes): WSP's code for the bi-county modeling project only uses 'BASE_LN'. However, when 'IMP1_YEAR'/'IMP2_YEAR'/'IMP3_YEAR' == 2015,
-       corresponding 'IMP1_LN'/'IMP2_LN'/'IMP3_LN' better reflect network status in year 2015.
-    -- NMT (bike): WSP's code for the bi-county modeling project used both 'NMT2010' and 'NMT2020'. 
-    -- AUX: it appears that the AUX lane data cannot accurately represent turn/merge lanes, mainly because the
-       links are not granular enough, therefore a link with AUX=1 could cover a long stretch of road without auxiliary lane.
-       So, will not use 'AUX' attributes for conflation.
+    NOTE on the attributes:
+    --- need to consolidate 2000 value and improvement values into a set of 2015 value
+    --- LN (lanes): WSP's code for the bi-county modeling project only uses 'BASE_LN'. However, when 'IMP1_YEAR'/'IMP2_YEAR'/'IMP3_YEAR' == 2015,
+        corresponding 'IMP1_LN'/'IMP2_LN'/'IMP3_LN' better reflect network status in year 2015.
+    --- NMT (bike): WSP's code for the bi-county modeling project used both 'NMT2010' and 'NMT2020'. 
+    --- AUX: it appears that the AUX lane data cannot accurately represent merge lanes, mainly because the links are not granular enough, therefore
+        a link with AUX=1 could cover a long stretch of road without auxiliary lane. So, will not use 'AUX' attributes for conflation.
+    --- The network is a model network, where HOV lane(s) are in their individual links, with different A, B nodes from the corresponding GP link.
+        However, since the dataset already excluded links with FT==6, no dummy link is available for consolidating hov and gp links, therefore,
+        dropping links other than USE==1 before running shst matching.
+        TODO: may consider run shst matching on links with USE != 1 separately using different matching rules, e.g. --tile-hierarchy.
 
     Outputs:
     -- matched_gdf.feather: ACTC links matched to SharedStreets links under the match command config 
@@ -700,33 +811,50 @@ def conflate_ACTC(docker_container_name):
     WranglerLogger.debug('ACTC raw data dtypes:\n{}'.format(actc_raw_gdf.dtypes))
     WranglerLogger.debug('ACTC crs:\n{}'.format(actc_raw_gdf.crs))
 
-    # consolidate 2000 lane count and 2015 changes to get 2015 lane count, and drop links with lane==0 in 2015
-    actc_raw_gdf['lanes_2015'] = actc_raw_gdf['BASE_LN']
-    # if IMP1_YEAR == 2015, update to IMP1_LN
-    LN_IMP1_2015_idx = (actc_raw_gdf['IMP1_YEAR'] == 2015) & (actc_raw_gdf['IMP1_LN'] != actc_raw_gdf['lanes_2015'])
-    WranglerLogger.debug('update lanes for {:,} links from IMP1'.format(LN_IMP1_2015_idx.sum()))
-    actc_raw_gdf.loc[LN_IMP1_2015_idx, 'lanes_2015'] = actc_raw_gdf['IMP1_LN']
-    # if IMP2_YEAR == 2015, update to IMP2_LN
-    LN_IMP2_2015_idx = (actc_raw_gdf['IMP2_YEAR'] == 2015) & (actc_raw_gdf['IMP2_LN'] != actc_raw_gdf['lanes_2015'])
-    WranglerLogger.debug('update lanes for {:,} links from IMP2'.format(LN_IMP2_2015_idx.sum()))
-    actc_raw_gdf.loc[LN_IMP2_2015_idx, 'lanes_2015'] = actc_raw_gdf['IMP2_LN']
-    # if IMP1_YEAR == 2015, update to IMP3_LN
-    LN_IMP3_2015_idx = (actc_raw_gdf['IMP3_YEAR'] == 2015) & (actc_raw_gdf['IMP3_LN'] != actc_raw_gdf['lanes_2015'])
-    WranglerLogger.debug('update lanes for {:,} links from IMP3'.format(LN_IMP3_2015_idx.sum()))
-    actc_raw_gdf.loc[LN_IMP3_2015_idx, 'lanes_2015'] = actc_raw_gdf['IMP3_LN']
+    # consolidate 2000 attributes and improvements that occurred in 2015 to get 2015 lane count, and drop links with lane==0 in 2015 (many of them have FT==9)
+    attrs_to_impute = ['LN', 'FT', 'USE']
+    for attr in attrs_to_impute:
+        WranglerLogger.debug('imputing 2015 value of {}'.format(attr))
+        actc_raw_gdf['2015_'+attr] = actc_raw_gdf['BASE_'+attr]
+        # if IMP1_YEAR == 2015, update to IMP1_attr
+        IMP1_2015_idx = (actc_raw_gdf['IMP1_YEAR'] == 2015) & (actc_raw_gdf['IMP1_'+attr] != actc_raw_gdf['2015_'+attr])
+        WranglerLogger.debug('update {} for {:,} links from IMP1'.format(attr, IMP1_2015_idx.sum()))
+        actc_raw_gdf.loc[IMP1_2015_idx, '2015_'+attr] = actc_raw_gdf['IMP1_'+attr]
+        # if IMP2_YEAR == 2015, update to IMP2_attr
+        IMP2_2015_idx = (actc_raw_gdf['IMP2_YEAR'] == 2015) & (actc_raw_gdf['IMP2_'+attr] != actc_raw_gdf['2015_'+attr])
+        WranglerLogger.debug('update {} for {:,} links from IMP2'.format(attr, IMP2_2015_idx.sum()))
+        actc_raw_gdf.loc[IMP2_2015_idx, '2015_'+attr] = actc_raw_gdf['IMP2_'+attr]
+        # if IMP1_YEAR == 2015, update to IMP3_attr
+        IMP3_2015_idx = (actc_raw_gdf['IMP3_YEAR'] == 2015) & (actc_raw_gdf['IMP3_'+attr] != actc_raw_gdf['2015_'+attr])
+        WranglerLogger.debug('update {} for {:,} links from IMP3'.format(attr, IMP3_2015_idx.sum()))
+        actc_raw_gdf.loc[IMP3_2015_idx, '2015_'+attr] = actc_raw_gdf['IMP3_'+attr]
+        WranglerLogger.debug(
+            'finished imputing, {} value counts:\n{}'.format('2015_'+attr, actc_raw_gdf['2015_'+attr].value_counts(dropna=False)))
+        
     # drop links with lane==0 in 2015
-    actc_raw_gdf = actc_raw_gdf.loc[actc_raw_gdf['lanes_2015'] > 0].reset_index()
-    WranglerLogger.debug('after dropping lanes==0 in 2015, {:,} links remain'.format(actc_raw_gdf.shape[0]))
+    actc_gdf = actc_raw_gdf.loc[actc_raw_gdf['2015_LN'] > 0].reset_index(drop=True)
+    WranglerLogger.debug('after dropping lanes==0 in 2015, {:,} links remain'.format(actc_gdf.shape[0]))
+    
+    # separate GP links and hov/non-truck links
+    actc_gp_links_gdf = actc_gdf.loc[actc_gdf['2015_USE'] == 1].reset_index(drop=True)
+    actc_gp_links_gdf.rename(columns = {'2015_LN': '2015_LN_GP'}, inplace=True)
+    WranglerLogger.debug('{:,} GP links'.format(actc_gp_links_gdf.shape[0]))
+    actc_hov_nontruck_links_gdf = actc_gdf.loc[actc_gdf['2015_USE'].isin([2, 3, 4])].reset_index(drop=True)
+    actc_hov_nontruck_links_gdf.rename(columns = {'2015_LN': '2015_LN_nonGP'}, inplace=True)
+    WranglerLogger.debug('{:,} HOV/non-truck links'.format(actc_hov_nontruck_links_gdf.shape[0]))
 
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 2.5-3 hours
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        ACTC, actc_raw_gdf, ['A','B'], 'roadway_link',
+        ACTC, actc_gp_links_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
+    
+    # TODO (maybe): conflate actc_hov_nontruck_links_gdf using --tile-hierarchy setting only for freeway, however, shst lacks documentation
+    # on --tile-hierarchy numbering, pending.
 
     WranglerLogger.info('finished conflating ACTC data')
-    WranglerLogger.info('Sharedstreets matched {} out of {} total ACTC Links.'.format(
-        len(matched_gdf.groupby(['A', 'B']).count()), actc_raw_gdf.shape[0]))
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} ACTC GP Links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), actc_gp_links_gdf.shape[0]))
 
 
 if __name__ == '__main__':
@@ -766,7 +894,7 @@ if __name__ == '__main__':
     if args.third_party == TOMTOM:
         conflate_TOMTOM(args.docker_container_name)
     elif args.third_party == TM2_NON_MARIN:
-        conflate_TM2_NON_MARIN()
+        conflate_TM2_NON_MARIN(args.docker_container_name)
     elif args.third_party == TM2_MARIN:
         conflate_TM2_MARIN(args.docker_container_name)
     elif args.third_party == SFCTA:
