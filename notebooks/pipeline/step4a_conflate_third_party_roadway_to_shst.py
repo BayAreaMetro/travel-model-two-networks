@@ -775,9 +775,11 @@ def conflate_ACTC(docker_container_name):
     * IMP3_YEAR     = year of 3rd round of road/bike improvement if applicable
     * IMP3_LN       = number of lanes corresponding to IMP3_YEAR
 
-
     NOTE on the attributes:
-    --- need to consolidate 2000 value and improvement values into a set of 2015 value
+    --- Will consolidate 2000 value and improvement values into a set of 2015 value.
+    --- For improvements, the documentation only provides the LN example, IMP1_LN == 0 means the road no longer exists. However, for other attributes,
+        e.g. FT and USE, most links have IMP1_FT/IMP1_USE == 0, which doesn't seem to be a real improvement change, but should be no change instead.
+    --- TODO: 'IMP1_YEAR', 'IMP2_YEAR', 'IMP3_YEAR' have value 9999 - what is it? 
     --- LN (lanes): WSP's code for the bi-county modeling project only uses 'BASE_LN'. However, when 'IMP1_YEAR'/'IMP2_YEAR'/'IMP3_YEAR' == 2015,
         corresponding 'IMP1_LN'/'IMP2_LN'/'IMP3_LN' better reflect network status in year 2015.
     --- NMT (bike): WSP's code for the bi-county modeling project used both 'NMT2010' and 'NMT2020'. 
@@ -812,26 +814,56 @@ def conflate_ACTC(docker_container_name):
     WranglerLogger.debug('ACTC crs:\n{}'.format(actc_raw_gdf.crs))
 
     # consolidate 2000 attributes and improvements that occurred in 2015 to get 2015 lane count, and drop links with lane==0 in 2015 (many of them have FT==9)
+    # Please refer to the 'NOTE on the attributes' part above.
     attrs_to_impute = ['LN', 'FT', 'USE']
     for attr in attrs_to_impute:
-        WranglerLogger.debug('imputing 2015 value of {}'.format(attr))
+        WranglerLogger.debug('imputing 2015 {}'.format(attr))
+        # default to 2000 value
         actc_raw_gdf['2015_'+attr] = actc_raw_gdf['BASE_'+attr]
-        # if IMP1_YEAR == 2015, update to IMP1_attr
-        IMP1_2015_idx = (actc_raw_gdf['IMP1_YEAR'] == 2015) & (actc_raw_gdf['IMP1_'+attr] != actc_raw_gdf['2015_'+attr])
+
+        # if IMP1_YEAR between 2000 and 2015, update to IMP1_attr
+        if attr == 'LN':
+            IMP1_2015_idx = (actc_raw_gdf['IMP1_YEAR'] <= 2015) & \
+                            (actc_raw_gdf['IMP1_YEAR'] > 2000) & \
+                            (actc_raw_gdf['IMP1_'+attr] != actc_raw_gdf['2015_'+attr])   # the improvement changed lane count
+        elif attr in ['FT', 'USE']:
+            IMP1_2015_idx = (actc_raw_gdf['IMP1_YEAR'] <= 2015) & \
+                            (actc_raw_gdf['IMP1_YEAR'] > 2000) & \
+                            (actc_raw_gdf['IMP1_'+attr] != actc_raw_gdf['2015_'+attr]) & \
+                            (actc_raw_gdf['IMP1_'+attr] != 0)                            # the new FT or USE value is not 0 
         WranglerLogger.debug('update {} for {:,} links from IMP1'.format(attr, IMP1_2015_idx.sum()))
         actc_raw_gdf.loc[IMP1_2015_idx, '2015_'+attr] = actc_raw_gdf['IMP1_'+attr]
-        # if IMP2_YEAR == 2015, update to IMP2_attr
-        IMP2_2015_idx = (actc_raw_gdf['IMP2_YEAR'] == 2015) & (actc_raw_gdf['IMP2_'+attr] != actc_raw_gdf['2015_'+attr])
+
+        # if IMP2_YEAR between 2000 and 2015, update to IMP2_attr
+        if attr == 'LN':
+            IMP2_2015_idx = (actc_raw_gdf['IMP2_YEAR'] <= 2015) & \
+                            (actc_raw_gdf['IMP2_YEAR'] > 2000) & \
+                            (actc_raw_gdf['IMP2_'+attr] != actc_raw_gdf['2015_'+attr])
+        elif attr in ['FT', 'USE']:
+            IMP2_2015_idx = (actc_raw_gdf['IMP2_YEAR'] <= 2015) & \
+                            (actc_raw_gdf['IMP2_YEAR'] > 2000) & \
+                            (actc_raw_gdf['IMP2_'+attr] != actc_raw_gdf['2015_'+attr]) & \
+                            (actc_raw_gdf['IMP2_'+attr] != 0)
         WranglerLogger.debug('update {} for {:,} links from IMP2'.format(attr, IMP2_2015_idx.sum()))
         actc_raw_gdf.loc[IMP2_2015_idx, '2015_'+attr] = actc_raw_gdf['IMP2_'+attr]
-        # if IMP1_YEAR == 2015, update to IMP3_attr
-        IMP3_2015_idx = (actc_raw_gdf['IMP3_YEAR'] == 2015) & (actc_raw_gdf['IMP3_'+attr] != actc_raw_gdf['2015_'+attr])
+
+        # if IMP1_YEAR between 2000 and 2015, update to IMP3_attr
+        if attr == 'LN':
+            IMP3_2015_idx = (actc_raw_gdf['IMP3_YEAR'] <= 2015) & \
+                            (actc_raw_gdf['IMP3_YEAR'] > 2000) & \
+                            (actc_raw_gdf['IMP3_'+attr] != actc_raw_gdf['2015_'+attr])
+        elif attr in ['FT', 'USE']:
+            IMP3_2015_idx = (actc_raw_gdf['IMP3_YEAR'] <= 2015) & \
+                            (actc_raw_gdf['IMP3_YEAR'] > 2000) & \
+                            (actc_raw_gdf['IMP3_'+attr] != actc_raw_gdf['2015_'+attr]) & \
+                            (actc_raw_gdf['IMP3_'+attr] != 0)        
         WranglerLogger.debug('update {} for {:,} links from IMP3'.format(attr, IMP3_2015_idx.sum()))
+
         actc_raw_gdf.loc[IMP3_2015_idx, '2015_'+attr] = actc_raw_gdf['IMP3_'+attr]
         WranglerLogger.debug(
             'finished imputing, {} value counts:\n{}'.format('2015_'+attr, actc_raw_gdf['2015_'+attr].value_counts(dropna=False)))
-        
-    # drop links with lane==0 in 2015
+
+    # drop links with lane==0 in 2015, these are links added post 2015
     actc_gdf = actc_raw_gdf.loc[actc_raw_gdf['2015_LN'] > 0].reset_index(drop=True)
     WranglerLogger.debug('after dropping lanes==0 in 2015, {:,} links remain'.format(actc_gdf.shape[0]))
     
