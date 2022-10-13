@@ -2949,35 +2949,24 @@ def merge_legacy_tm2_network_hov_links_with_gp(model_network_links_gdf):
         right_on = ['A_gp', 'B_gp'],
         how='left')
 
-    # add the new fields also to hov links not connected to a dummy link 
-    hov_nontruck_only_links_gdf.loc[
-        hov_nontruck_only_links_gdf['USECLASS'] == 4, 'NUMLANES_nontruck'] = hov_nontruck_only_links_gdf['NUMLANES']
-    hov_nontruck_only_links_gdf.loc[
-        hov_nontruck_only_links_gdf['USECLASS'].isin([2, 3]), 'NUMLANES_hov'] = hov_nontruck_only_links_gdf['NUMLANES']
-    # hov_nontruck_only_links_gdf.drop('NUMLANES', axis=1)
-
-    # concat GP links and hov/non-truck only links
-    links_with_all_lanes_gdf = pd.concat([gp_links_with_all_lanes_gdf, hov_nontruck_only_links_gdf])
-
     # fill in na with 0 and set field type to int8
     for colname in ['NUMLANES_gp', 'NUMLANES_hov', 'NUMLANES_nontruck']:
-        links_with_all_lanes_gdf[colname].fillna(0, inplace=True)
-        links_with_all_lanes_gdf[colname].astype(np.int8)
+        gp_links_with_all_lanes_gdf[colname].fillna(0, inplace=True)
+        gp_links_with_all_lanes_gdf[colname].astype(np.int8)
 
     WranglerLogger.debug(
         'consolidated into {:,} links, of which {:,} GP links have > 0 HOV lane(s); {:,} GP links have > 0 non-truck lane(s);\
-        {:,} GP links with all gp lanes; {:,} links with only hov lanes'.format(
-            links_with_all_lanes_gdf.shape[0],
-            ((links_with_all_lanes_gdf['NUMLANES_hov'] > 0) & (links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
-            ((links_with_all_lanes_gdf['NUMLANES_nontruck'] > 0) & (links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
-            ((links_with_all_lanes_gdf['NUMLANES_hov'] == 0) & (links_with_all_lanes_gdf['NUMLANES_nontruck'] == 0) & (links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
-            (links_with_all_lanes_gdf['NUMLANES_gp'] == 0).sum()
+        {:,} GP links with all gp lanes'.format(
+            gp_links_with_all_lanes_gdf.shape[0],
+            ((gp_links_with_all_lanes_gdf['NUMLANES_hov'] > 0) & (gp_links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
+            ((gp_links_with_all_lanes_gdf['NUMLANES_nontruck'] > 0) & (gp_links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum(),
+            ((gp_links_with_all_lanes_gdf['NUMLANES_hov'] == 0) & (gp_links_with_all_lanes_gdf['NUMLANES_nontruck'] == 0) & (gp_links_with_all_lanes_gdf['NUMLANES_gp'] > 0)).sum()
     ))
 
     # drop interim columns
-    links_with_all_lanes_gdf.drop(['A_gp', 'B_gp', 'NUMLANES', 'A_access', 'B_access', '_merge'], axis=1)
+    gp_links_with_all_lanes_gdf.drop(['A_gp', 'B_gp'], axis=1, inplace=True)
 
-    return links_with_all_lanes_gdf
+    return gp_links_with_all_lanes_gdf
 
 
 def conflate(third_party: str, third_party_gdf: gpd.GeoDataFrame, id_columns, third_party_type,

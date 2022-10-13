@@ -314,6 +314,8 @@ def conflate_TOMTOM(docker_container_name):
 
     WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total TomTom Links.'.format(
+        len(tomtom_matched_gdf.groupby(['ID','reversed']).count()), tomtom_gdf.shape[0]))
 
 def conflate_TM2_NON_MARIN(docker_container_name):
     """
@@ -375,7 +377,7 @@ def conflate_TM2_NON_MARIN(docker_container_name):
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        TM2_NON_MARIN, tm2_link_roadway_gdf, ['A','B'], 'roadway_link',
+        TM2_NON_MARIN, tm2_link_roadway_gdf, ['A', 'B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating TM2_nonMarin data')
@@ -617,10 +619,14 @@ def conflcate_SFCTA(docker_container_name):
     sfcta_gdf = sfcta_gdf.loc[(sfcta_gdf.TYPE != 'PATH') & (sfcta_gdf.TYPE != 'PLAZA')]
     WranglerLogger.info('After filter to TYPE != PATH and TYPE != PLAZA, SFCTA network has {:,} links'.format(len(sfcta_gdf)))
 
-    # separate bike-only links
+    # separate drive links and bike-only links
     sfcta_drive_gdf = sfcta_gdf.loc[sfcta_gdf.FT != 13]
+    # cannot easily consolidate HOV links (USE=2, 3) to the corresponding GP links, therefore drop them from the drive links
+    sfcta_drive_gdf = sfcta_drive_gdf.loc[sfcta_drive_gdf.USE == 1]
+    WranglerLogger.info('{:} drive links after dropping HOV links'.format(sfcta_drive_gdf.shape[0]))
+
     sfcta_bike_gdf = sfcta_gdf.loc[sfcta_gdf.FT == 13]
-    WranglerLogger.info('{:,} driveway links, {:,} bike-only links'.format(sfcta_drive_gdf.shape[0], sfcta_bike_gdf.shape[0]))
+    WranglerLogger.info('{:,} drive links, {:,} bike-only links'.format(sfcta_drive_gdf.shape[0], sfcta_bike_gdf.shape[0]))
 
     # conflate the given drive network dataframe with SharedStreets using car rule
     (matched_gdf, unmatched_gdf) = methods.conflate(
@@ -640,9 +646,8 @@ def conflate_CCTA(docker_container_name):
     Conflate ACTC data with sharedstreets
 
     NOTE: CCTA network documentation at Box: https://mtcdrive.box.com/s/lsnml5tpbrhrcjfiabw8zbjd5y9r1ow6. However,
-    how "decennial_model_update_Model User Guide.pdf" contains info on network data dictionary (Table 4.1, Table 4.2),
-    but it refers to "MTC network", not the TransCAD network as what the data is. In most cases this is fine,
-    except that the network doesn't have A, B fields, therefore cannot apply method.merge_legacy_tm2_network_hov_links_with_gp().
+    how "decennial_model_update_Model User Guide.pdf" contains info on network data dictionary (Table 4.1, Table 4.2).
+    The network doesn't have A, B fields, therefore cannot apply method.merge_legacy_tm2_network_hov_links_with_gp().
     
     Link attributes relevant to conflation:
     * DIR           = tag of one-way or two-way links
@@ -650,6 +655,18 @@ def conflate_CCTA(docker_container_name):
                       0: two-way
     * [AB/BA]_LANES = number of lanes of each direction
     * [AB/BA]_FT    = facility type
+                      1: Freeway to freeway connector
+                      2: Freeway
+                      3: Expressway
+                      4: Collector
+                      5: Freeway Ramp
+                      6: Dummy Link
+                      7: Major Arterial
+                      8: Metered Ramp
+                      9: Special (not used)
+                      10: Special (not used)
+                      11: Local Street (potential new facility type)
+                      12: Minor Arterial (potential new facility type)
     * [AB/BA]_USE   = use restrictions
                       1: Facility open to all vehicles
                       2 and 3: HOV2 and HOV3
