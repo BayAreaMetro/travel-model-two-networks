@@ -390,34 +390,25 @@ if __name__ == '__main__':
 
     # In case 1), suggest dropping the one that has no osmnx info (length==0, osmid==0 (due to fillna), index==0, osmnx_shst_merge=='shst_only').
     # In case 2), the duplicates are essentially the same link, so keeping any of them should be fine.
-    unique_link_BayArea_gdf = link_BayArea_gdf.sort_values(by=['osmid'], ascending=[False])
-    unique_link_BayArea_gdf = unique_link_BayArea_gdf.drop_duplicates(
+    link_BayArea_gdf = link_BayArea_gdf.sort_values(by=['osmid'], ascending=[False])
+    unique_link_BayArea_gdf = link_BayArea_gdf.drop_duplicates(
         subset=['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'], 
         keep='first')
     # unique_link_BayArea_gdf become a dataframe after drop_duplicates(), so convert it back
     unique_link_BayArea_gdf = gpd.GeoDataFrame(unique_link_BayArea_gdf, 
                                                geometry='geometry', 
                                                crs=link_BayArea_gdf.crs)
-    link_BayArea_gdf = unique_link_BayArea_gdf.copy()
-
-    # 4. drop duplicated links between same u/v pair
-    # NOTE: this step relied on links having no duplicated shstReferenceId
-    link_BayArea_gdf = methods.drop_duplicated_links_between_same_u_v_pair(link_BayArea_gdf, SHST_WITH_OSM_DIR)
-
-    # TODO: maybe move to later, after transit routing?
-    # 5. flag drive dead end, and make dead-end links and nodes drive_access=0
-    link_BayArea_gdf, node_BayArea_gdf = methods.make_dead_end_non_drive(link_BayArea_gdf, node_BayArea_gdf)
 
     #####################################
     # export link, node
 
-    WranglerLogger.info('Final network links have the following fields:\n{}'.format(link_BayArea_gdf.dtypes))
+    WranglerLogger.info('Final network links have the following fields:\n{}'.format(unique_link_BayArea_gdf.dtypes))
     WranglerLogger.info('Final network nodes have the following fields:\n{}'.format(node_BayArea_gdf.dtypes))
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_link.feather')
     WranglerLogger.info('Saving links to {}'.format(OUTPUT_FILE))
-    link_BayArea_gdf.reset_index(inplace=True, drop=True)
-    link_BayArea_gdf.to_feather(OUTPUT_FILE)
+    unique_link_BayArea_gdf.reset_index(inplace=True, drop=True)
+    unique_link_BayArea_gdf.to_feather(OUTPUT_FILE)
 
     OUTPUT_FILE = os.path.join(SHST_WITH_OSM_DIR, 'step3_node.feather')
     WranglerLogger.info('Saving nodes to {}'.format(OUTPUT_FILE))
