@@ -72,7 +72,6 @@ CONFLATION_SHST = 'conflation_shst'
 CONFLATION_PEMS_= os.path.join(THIRD_PARTY_OUTPUT_DIR, PEMS, 'nearest_match')
 
 
-
 def reverse_TomTom(to_reverse_gdf):
     """
     Reverse the given links, in place, by:
@@ -298,7 +297,7 @@ def conflate_TOMTOM(docker_container_name):
         'verified_x':'verified'},
     inplace = True)
 
-    # finally, filter out rows that have no usable attributes, where usable attributes = NAME, LANES, speed
+    # filter out rows that have no usable attributes, where usable attributes = NAME, LANES, speed
     tomtom_gdf['no_data'] = False
     tomtom_gdf.loc[ (tomtom_gdf['NAME_strlen'] <= 1) & \
                     (tomtom_gdf['speed'].isnull()) & \
@@ -308,14 +307,43 @@ def conflate_TOMTOM(docker_container_name):
     tomtom_gdf.drop(columns=['no_data'], inplace=True)
     WranglerLogger.debug('Final TomTom dataset for conflation => {:,} rows'.format(len(tomtom_gdf)))
 
+    # finally, convert tomtom FRC to standard road type
+    tomtom_FRC_dict = {
+        0: "0-Motorway, Freeway, or Other Major Road",
+        1: "1-Major Road Less Important than a Motorway",
+        2: "2-Other Major Road",
+        3: "3-Secondary Road",
+        4: "4-Local Connecting Road",
+        5: "5-Local Road of High Importance",
+        6: "6-Local Road",
+        7: "7-Local Road of Minor Importance",
+        8: "8-Other Road"
+    }
+    tomtom_gdf['FRC_def'] = tomtom_gdf['FRC'].map(tomtom_FRC_dict)
+    WranglerLogger.debug('TomTom FRC standardized value counts:\n{}'.format(
+        tomtom_gdf.FRC_def.value_counts(dropna=False)))
+
     (tomtom_matched_gdf, tomtom_unmatched_gdf) = methods.conflate(
         TOMTOM, tomtom_gdf, ['ID','reversed'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
+    
+    # evaluate shst matching performance and write out for QAQC
+    # tomtom_pre_shst_match_gdf_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'TomTom', 'conflation_shst', 'TomTom.in.feather')
+    # tomtom_pre_shst_match_gdf = gpd.read_feather(tomtom_pre_shst_match_gdf_FILE)
+    shst_match_eval = pd.merge(
+        left  = tomtom_gdf[['ID', 'reversed', 'FRC', 'FRC_def']].rename(columns = {'FRC'    : 'all_links_FRC',
+                                                                                   'FRC_def': 'all_links_FRC_def'}),
+        right = tomtom_matched_gdf[['ID', 'reversed', 'FRC', 'FRC_def']].drop_duplicates().rename(columns = {'FRC'    : 'matched_links_FRC',
+                                                                                                             'FRC_def': 'matched_links_FRC_def'}),
+        on    = ['ID', 'reversed'],
+        how   = 'left')
+    shst_match_eval_FILE = os.path.join(THIRD_PARTY_OUTPUT_DIR, TOMTOM, CONFLATION_SHST, 'shst_match_eval_{}.csv'.format(TOMTOM))
+    shst_match_eval.to_csv(shst_match_eval_FILE, index=False)
 
-    WranglerLogger.debug('TomTom has the following dtypes:\n{}'.format(tomtom_gdf.dtypes))
     WranglerLogger.info('finished conflating TomTom data')
-    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total TomTom Links.'.format(
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total TomTom links.'.format(
         len(tomtom_matched_gdf.groupby(['ID','reversed']).count()), tomtom_gdf.shape[0]))
+
 
 def conflate_TM2_NON_MARIN(docker_container_name):
     """
@@ -371,28 +399,57 @@ def conflate_TM2_NON_MARIN(docker_container_name):
     tm2_link_gdf = methods.merge_legacy_tm2_network_hov_links_with_gp(tm2_link_gdf)
 
     # select only road way links
-    tm2_link_roadway_gdf = tm2_link_gdf.loc[tm2_link_gdf.CNTYPE == 'TANA']
+    tm2_link_gdf = tm2_link_gdf.loc[tm2_link_gdf.CNTYPE == 'TANA']
     WranglerLogger.debug('TM2_nonMarin has {:,} roadway links, {:,}  unique A-B combination'.format(
-        tm2_link_roadway_gdf.shape[0], len(tm2_link_roadway_gdf.groupby(["A", "B"]).count())))
+        tm2_link_gdf.shape[0], len(tm2_link_gdf.groupby(["A", "B"]).count())))
+
+    # finally, convert legacy TM2 data FT to standard road type
+    legacy_TM2_FT_dict = {
+        0: "0-Connector",
+        1: "1-Freeway to Freeway",
+        2: "2-Freeway",
+        3: "3-Expressway",
+        4: "4-Collector",
+        5: "5-Ramp",
+        6: "6-Special Facility",
+        7: "7-Major Arterial",
+    }
+    tm2_link_gdf['FT_def'] = tm2_link_gdf['FT'].map(legacy_TM2_FT_dict)
+    WranglerLogger.debug('TM2_nonMarin FT standardized value counts:\n{}'.format(
+        tm2_link_gdf.FT_def.value_counts(dropna=False)))
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
-        TM2_NON_MARIN, tm2_link_roadway_gdf, ['A', 'B'], 'roadway_link',
+        TM2_NON_MARIN, tm2_link_gdf, ['A', 'B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
+    # evaluate shst matching performance and write out for QAQC
+    # tm2nonMarin_pre_shst_match_gdf_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'TM2_nonMarin', 'conflation_shst', 'TM2_nonMarin.in.feather')
+    # tm2nonMarin_pre_shst_match_gdf = gpd.read_feather(tm2nonMarin_pre_shst_match_gdf_FILE)
+    shst_match_eval = pd.merge(
+        left  = tm2_link_gdf[['A', 'B', 'FT', 'FT_def']].rename(columns = {'FT'    : 'all_links_FT',
+                                                                           'FT_def': 'all_links_FT_def'}),
+        right = matched_gdf[['A', 'B', 'FT', 'FT_def']].drop_duplicates().rename(columns = {'FT'    : 'matched_links_FT', 
+                                                                                            'FT_def': 'matched_links_FT_def'}),
+        on    = ['A', 'B'],
+        how   = 'left')
+    shst_match_eval_FILE = os.path.join(THIRD_PARTY_OUTPUT_DIR, TM2_NON_MARIN, CONFLATION_SHST, 'shst_match_eval_{}.csv'.format(TM2_NON_MARIN))
+    shst_match_eval.to_csv(shst_match_eval_FILE, index=False)
+
     WranglerLogger.info('finished conflating TM2_nonMarin data')
-    WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_nonMarin Links.'.format(
-        len(matched_gdf.groupby(['A', 'B']).count()), tm2_link_roadway_gdf.shape[0]))
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total TM2_nonMarin links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), tm2_link_gdf.shape[0]))
         
 
 def conflate_TM2_MARIN(docker_container_name):
     """
     Conflate ACTC data with sharedstreets.
-    See Marin version of the network documentation at http://bayareametro.github.io/travel-model-two/Marin/input/
+    See Marin version of the network documentation at http://bayareametro.github.io/travel-model-two/Marin/input/.
+    For FT dictionary, refer to "TAMDM User's Guide (2020-09-17)" at https://www.tam.ca.gov/planning/travel-demand-model-traffic-monitoring/#documentslinks.
 
     Subset the data to only those links that have meaningful data that we want. Exclude TomTom attributes 
     (FRC, NAME, FREEWAY, TOLLRD, ONEWAY, LANE, RAMP, RTEDIR) since TomTom data is conflated separately.
-    # TODO: evaluate if can use the PEMS info.
+    # TODO: looking at the data, all TANA links in Marin County have FT = 11, 12, 13, or 14, not in the dictionary!!
 
     * NUMLANES   = model number of lanes
     # LANES      = TomTom number of lanes
@@ -413,7 +470,7 @@ def conflate_TM2_MARIN(docker_container_name):
                    USE: HOV (user class) link
     * TRANSIT	 = is link transit
     * FT	     = facility type
-                   0: Connector
+                   0: Special Connector
                    1: Freeway to Freeway
                    2: Freeway
                    3: Expressway
@@ -421,6 +478,10 @@ def conflate_TM2_MARIN(docker_container_name):
                    5: Ramp
                    6: Special Facility
                    7: Major Arterial
+                   11: Minor Arterial
+                   12: Major Collector
+                   13: Minor Collector
+                   14: Local
     * USECLASS	 = link user class
                    0: NA; link open to everyone
                    2: HOV 2+
@@ -521,19 +582,52 @@ def conflate_TM2_MARIN(docker_container_name):
         tm2_marin_link_gdf['ONEWAY'].value_counts(dropna=False).index.tolist(),
         tm2_marin_link_gdf['ONEWAY'].value_counts(dropna=False)))
     # drop N: Closed in Both Directions
-    tm2_marin_link_gdf = tm2_marin_link_gdf.loc[ tm2_marin_link_gdf.ONEWAY != 'N']
+    tm2_marin_link_gdf = tm2_marin_link_gdf.loc[tm2_marin_link_gdf.ONEWAY != 'N']
     WranglerLogger.debug('Filtered to ONEWAY != N, have {:,} rows'.format(len(tm2_marin_link_gdf)))
     # this dataset doesn't have ONEWAY==TF, and two-way links already have reversed lingstrings, no need
     # to create reversed geometry as in the TomTom case
+
+    # finally, convert legacy TM2 data FT to standard road type
+    Marin_TM2_FT_dict = {
+        0: "0-Connector",
+        1: "1-Freeway to Freeway",
+        2: "2-Freeway",
+        3: "3-Expressway",
+        4: "4-Collector",
+        5: "5-Ramp",
+        6: "6-Special Facility",
+        7: "7-Major Arterial",
+        11: '11-Minor Arterial',
+        12: '12-Major Collector',
+        13: '13-Minor Collector',
+        14: '14-Local'
+    }
+    tm2_marin_link_gdf['FT_def'] = tm2_marin_link_gdf['FT'].map(Marin_TM2_FT_dict)
+    WranglerLogger.debug('TM2_Marin FT standardized value counts:\n{}'.format(
+        tm2_marin_link_gdf.FT_def.value_counts(dropna=False)))
 
     # conflate the given dataframe with SharedStreets
     (matched_gdf, unmatched_gdf) = methods.conflate(
         TM2_MARIN, tm2_marin_link_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)    
 
+    # evaluate shst matching performance and write out for QAQC
+    # tm2Marin_pre_shst_match_gdf_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'TM2_Marin', 'conflation_shst', 'TM2_Marin.in.feather')
+    # tm2Marin_pre_shst_match_gdf = gpd.read_feather(tm2Marin_pre_shst_match_gdf_FILE)
+    shst_match_eval = pd.merge(
+        left  = tm2_marin_link_gdf[['A', 'B', 'FT', 'FT_def']].rename(columns = {'FT'    : 'all_links_FT',
+                                                                                 'FT_def': 'all_links_FT_def'}),
+        right = matched_gdf[['A', 'B', 'FT', 'FT_def']].drop_duplicates().rename(columns = {'FT'    : 'matched_links_FT', 
+                                                                                            'FT_def': 'matched_links_FT_def'}),
+        on    = ['A', 'B'],
+        how   = 'left')
+    shst_match_eval_FILE = os.path.join(THIRD_PARTY_OUTPUT_DIR, TM2_MARIN, CONFLATION_SHST, 'shst_match_eval_{}.csv'.format(TM2_MARIN))
+    shst_match_eval.to_csv(shst_match_eval_FILE, index=False)
+
     WranglerLogger.info('finished conflating TM2_Marin data')
-    WranglerLogger.info('Sharedstreets matched {} out of {} total TM2_Marin Links.'.format(
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} total TM2_Marin links.'.format(
         len(matched_gdf.groupby(['A', 'B']).count()), tm2_marin_link_gdf.shape[0]))
+
 
 def conflcate_SFCTA(docker_container_name):
     """
@@ -628,17 +722,50 @@ def conflcate_SFCTA(docker_container_name):
     sfcta_bike_gdf = sfcta_gdf.loc[sfcta_gdf.FT == 13]
     WranglerLogger.info('{:,} drive links, {:,} bike-only links'.format(sfcta_drive_gdf.shape[0], sfcta_bike_gdf.shape[0]))
 
+    # finally, convert FT to readily interpretable definitions
+    sfcta_FT_dict = {
+        1: '1-Fwy-Fwy Connector',
+        2: '2-Freeway',
+        3: '3-Expressway',
+        4: '4-Collector',
+        5: '5-Ramp',
+        6: '6-Centroid Connector',
+        7: '7-Major Arterial',
+        9: '9-Alley',
+        10: '10-Metered Ramp',
+        11: '11-Local',
+        12: '12-Minor Arterial',
+        13: '13-Bike-only',
+        15: '15-Super Arterial'}
+    sfcta_drive_gdf['FT_def'] = sfcta_drive_gdf['FT'].map(sfcta_FT_dict)
+    WranglerLogger.debug('SFCTA FT definitions value counts:\n{}'.format(sfcta_drive_gdf.FT_def.value_counts(dropna=False)))
+
     # conflate the given drive network dataframe with SharedStreets using car rule
     (matched_gdf, unmatched_gdf) = methods.conflate(
         SFCTA, sfcta_drive_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
-    
+
+    # evaluate shst matching performance and write out for QAQC
+    # sfcta_pre_shst_match_gdf_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'SFCTA', 'conflation_shst', 'SFCTA.in.feather')
+    # sfcta_pre_shst_match_gdf = gpd.read_feather(sfcta_pre_shst_match_gdf_FILE)
+    shst_match_eval = pd.merge(
+        left  = sfcta_drive_gdf[['A', 'B', 'FT', 'FT_def']].rename(columns = {'FT'    : 'all_links_FT',
+                                                                              'FT_def': 'all_links_FT_def'}),
+        right = matched_gdf[['A', 'B', 'FT', 'FT_def']].drop_duplicates().rename(columns = {'FT'    : 'matched_links_FT',
+                                                                                            'FT_def': 'matched_links_FT_def'}),
+        on    = ['A', 'B'],
+        how   = 'left')
+    shst_match_eval_FILE = os.path.join(THIRD_PARTY_OUTPUT_DIR, SFCTA, CONFLATION_SHST, 'shst_match_eval_{}.csv'.format(SFCTA))
+    shst_match_eval.to_csv(shst_match_eval_FILE, index=False)
+
     # # TODO (maybe): conflate the bike-only links with SharedStreets using bike rule or pedestrian rule
     # (bike_matched_gdf, bike_unmatched_gdf) = methods.conflate(
     #     SFCTA, sfcta_bike_gdf, ['A','B'], 'bike_link',
     #     THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
     WranglerLogger.info('finished conflating SFCTA data')
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} SFCTA drive links.'.format(
+        len(matched_gdf.groupby(['A', 'B']).count()), sfcta_drive_gdf.shape[0]))
 
 
 def conflate_CCTA(docker_container_name):
@@ -733,6 +860,21 @@ def conflate_CCTA(docker_container_name):
     drop_cols = [c for c in ccta_gdf.columns if c[:3] == 'BA_']
     ccta_gdf.drop(columns=drop_cols, axis=1, inplace=True)
 
+    # convert FT to readily interpretable definitions
+    ccta_FT_dict = {
+        1: '1-Freeway to freeway connector',
+        2: '2-Freeway',
+        3: '3-Expressway',
+        4: '4-Collector',
+        5: '5-Freeway Ramp',
+        6: '6-Dummy Link',
+        7: '7-Major Arterial',
+        8: '8-Metered Ramp',
+        11: '11-Local Street',
+        12: '12-Minor Arterial'}
+    ccta_gdf['AB_FT_def'] = ccta_gdf['AB_FT'].map(ccta_FT_dict)
+    WranglerLogger.debug('CCTA FT definitions value counts:\n{}'.format(ccta_gdf.AB_FT_def.value_counts(dropna=False)))  
+
     # this is a model network which contains hov and non-truck links, but it doesn't have A, B field, therefore unable to
     # easily map hov/non-truck links to the corresponding GP links. Separate these links.
     ccta_gp_links_gdf = ccta_gdf.loc[ccta_gdf['AB_USE'] == 1]
@@ -741,19 +883,33 @@ def conflate_CCTA(docker_container_name):
     ccta_hovnontruck_links_gdf = ccta_gdf.loc[ccta_gdf['AB_USE'] != 1]
     ccta_hovnontruck_links_gdf.rename(columns = {'AB_LANES': 'AB_LANES_nonGP'}, inplace=True)
     WranglerLogger.debug('{:,} GP links'.format(ccta_hovnontruck_links_gdf.shape[0]))
-    
+
     # conflate the given dataframe with SharedStreets
     # lmz: this step takes me 3 hours
     (matched_gdf, unmatched_gdf) = methods.conflate(
         CCTA, ccta_gp_links_gdf, ['ID'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
 
+    # evaluate shst matching performance and write out for QAQC
+    # ccta_pre_shst_match_gdf_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'CCTA', 'conflation_shst', 'CCTA.in.feather')
+    # ccta_pre_shst_match_gdf = gpd.read_feather(ccta_pre_shst_match_gdf_FILE)
+    shst_match_eval = pd.merge(
+        left  = ccta_gp_links_gdf[['ID', 'AB_FT', 'AB_FT_def']].rename(columns = {'AB_FT'    : 'all_links_FT',
+                                                                                  'AB_FT_def': 'all_links_FT_def'}),
+        right = matched_gdf[['ID', 'AB_FT', 'AB_FT_def']].drop_duplicates().rename(columns = {'AB_FT'    : 'matched_links_FT',
+                                                                                              'AB_FT_def': 'matched_links_FT_def'}),
+        on    = 'ID',
+        how   = 'left')
+    shst_match_eval_FILE = os.path.join(THIRD_PARTY_OUTPUT_DIR, CCTA, CONFLATION_SHST, 'shst_match_eval_{}.csv'.format(CCTA))
+    shst_match_eval.to_csv(shst_match_eval_FILE, index=False)
+
     # TODO: (maybe): conflate ccta_hov_nontruck_links_gdf using --tile-hierarchy setting only for freeway, however, shst lacks documentation
     # on --tile-hierarchy numbering, pending.
 
     WranglerLogger.info('finished conflating CCTA data')
-    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} CCTA GP Links.'.format(
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} CCTA GP links.'.format(
         matched_gdf['ID'].nunique(), ccta_gp_links_gdf.shape[0]))
+
 
 def conflate_ACTC(docker_container_name):
     """
@@ -882,8 +1038,26 @@ def conflate_ACTC(docker_container_name):
 
     # drop links with lane==0 in 2015, these are links added post 2015
     actc_gdf = actc_raw_gdf.loc[actc_raw_gdf['2015_LN'] > 0].reset_index(drop=True)
-    WranglerLogger.debug('after dropping lanes==0 in 2015, {:,} links remain'.format(actc_gdf.shape[0]))
-    
+    WranglerLogger.debug('after dropping 2015_LN==0, {:,} links remain'.format(actc_gdf.shape[0]))
+
+    # drop links with FT==6 in 2015
+    actc_gdf = actc_gdf.loc[actc_gdf['2015_FT'] != 6].reset_index(drop=True)
+    WranglerLogger.debug('after dropping 2015_FT==6, {:,} links remain'.format(actc_gdf.shape[0]))
+
+    # convert FT to readily interpretable definitions
+    actc_FT_dict = {
+        1: '1-Freeway to freeway ramp',
+        2: '2-Freeway',
+        3: '3-Expressway/Highway',
+        4: '4-Collector',
+        5: '5-Ramp',
+        6: '6-Connector link',
+        7: '7-Arterial',
+        8: '8-Metered Ramp',
+        9: '9-Special types'}
+    actc_gdf['2015_FT_def'] = actc_gdf['2015_FT'].map(actc_FT_dict)
+    WranglerLogger.debug('ACTC FT definitions value counts:\n{}'.format(actc_gdf['2015_FT_def'].value_counts(dropna=False)))
+
     # separate GP links and hov/non-truck links
     actc_gp_links_gdf = actc_gdf.loc[actc_gdf['2015_USE'] == 1].reset_index(drop=True)
     actc_gp_links_gdf.rename(columns = {'2015_LN': '2015_LN_GP'}, inplace=True)
@@ -897,12 +1071,25 @@ def conflate_ACTC(docker_container_name):
     (matched_gdf, unmatched_gdf) = methods.conflate(
         ACTC, actc_gp_links_gdf, ['A','B'], 'roadway_link',
         THIRD_PARTY_OUTPUT_DIR, OUTPUT_DATA_DIR, CONFLATION_SHST, BOUNDARY_DIR, docker_container_name)
+
+    # evaluate shst matching performance and write out for QAQC
+    # actc_pre_shst_match_gdf_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'ACTC', 'conflation_shst', 'ACTC.in.feather')
+    # actc_pre_shst_match_gdf = gpd.read_feather(actc_pre_shst_match_gdf_FILE)
+    shst_match_eval = pd.merge(
+        left  = actc_gp_links_gdf[['A', 'B', '2015_FT', '2015_FT_def']].rename(columns = {'2015_FT'    : 'all_links_FT',
+                                                                                          '2015_FT_def': 'all_links_FT_def'}),
+        right = matched_gdf[['A', 'B', '2015_FT', '2015_FT_def']].drop_duplicates().rename(columns = {'2015_FT'    : 'matched_links_FT',
+                                                                                                      '2015_FT_def': 'matched_links_FT_def'}),
+        on    = ['A', 'B'],
+        how   = 'left')
+    shst_match_eval_FILE = os.path.join(THIRD_PARTY_OUTPUT_DIR, ACTC, CONFLATION_SHST, 'shst_match_eval_{}.csv'.format(ACTC))
+    shst_match_eval.to_csv(shst_match_eval_FILE, index=False)
     
     # TODO (maybe): conflate actc_hov_nontruck_links_gdf using --tile-hierarchy setting only for freeway, however, shst lacks documentation
     # on --tile-hierarchy numbering, pending.
 
     WranglerLogger.info('finished conflating ACTC data')
-    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} ACTC GP Links.'.format(
+    WranglerLogger.info('Sharedstreets matched {:,} out of {:,} ACTC GP links.'.format(
         len(matched_gdf.groupby(['A', 'B']).count()), actc_gp_links_gdf.shape[0]))
 
 
@@ -922,7 +1109,7 @@ if __name__ == '__main__':
     pd.set_option("display.max_columns", 500)
     pd.set_option("display.width", 50000)
     LOG_FILENAME = os.path.join(
-        THIRD_PARTY_OUTPUT_DIR, args.third_party,
+        THIRD_PARTY_OUTPUT_DIR, args.third_party, CONFLATION_SHST,
         "step4_conflate_third_party_{}_{}.info.log".format(
             args.third_party, datetime.datetime.now().strftime("%Y%m%d_%H%M")),
     )
