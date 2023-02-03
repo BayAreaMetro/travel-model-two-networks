@@ -3361,7 +3361,7 @@ def pems_station_sheild_dir_nearest_match(pems_gdf, link_gdf, pems_type_roadway_
                 # 3rd, sort by snap_distance
                 tmp_gdf.sort_values(by=['snap_distance'], inplace=True)
                 # 4th, for each station, keep the link with the shortest snap distance
-                closest_gdf = tmp.groupby(["station", "longitude", "latitude"]).first().reset_index()
+                closest_gdf = tmp_gdf.groupby(["station", "longitude", "latitude"]).first().reset_index()
 
                 # add it to the matching result gdf
                 pems_match_gdf = pd.concat([pems_match_gdf, closest_gdf],

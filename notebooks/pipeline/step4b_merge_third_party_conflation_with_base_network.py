@@ -40,15 +40,10 @@ SFCTA_MATCHED_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'SFCTA', 'conflation_
 CCTA_MATCHED_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'CCTA', 'conflation_shst', 'matched.feather')
 ACTC_MATCHED_FILE = os.path.join(THIRD_PARTY_MATCHED_DIR, 'ACTC', 'conflation_shst', 'matched.feather')
 
-# TODO: move PEMS conflation out of Pipeline to validation
-# INPUT_PEMS_FILE = os.path.join(INPUT_DATA_DIR, 'step4_third_party_data', 'PeMS', 'input', 'pems_period.csv')
-# PEMS_MATCHED_DIR = os.path.join(THIRD_PARTY_MATCHED_DIR, 'pems')
-
 # output
 CONFLATION_RESULT_DIR = os.path.join(OUTPUT_DATA_DIR, 'step4_third_party_data', 'output_with_all_third_party_data')
 CONFLATED_LINK_GEOFEATHER_FILE = os.path.join(CONFLATION_RESULT_DIR, 'step4_link.feather')
-# conflation summary table
-CONFLATION_SUMMARY_FILE = os.path.join(CONFLATION_RESULT_DIR, 'conflation_result.csv')
+ROAD_SHIELD_LONG_NAME_CROSSWALK_FILE = os.path.join(CONFLATION_RESULT_DIR, 'road_shield_long_name_crosswalk.csv')
 
 if __name__ == '__main__':
     # create output directories if not exist
@@ -77,72 +72,88 @@ if __name__ == '__main__':
     ####################################
     # Read base network from step 3
     WranglerLogger.info('Reading shst_oxmnx links from {}'.format(SHST_OSMNX_LINK_FILE))
-    link_gdf = geofeather.from_geofeather(SHST_OSMNX_LINK_FILE)
-    link_gdf = gpd.GeoDataFrame(link_gdf, crs=lat_lon_epsg_str)
+    link_gdf = gpd.read_feather(SHST_OSMNX_LINK_FILE)
 
-    WranglerLogger.info('loaded {:,} shst_osmnx links, with {:,} unique shstReferenceId and {:,} unique shapes'.format(
-        link_gdf.shape[0], link_gdf.shstReferenceId.nunique(), link_gdf.shstGeometryId.nunique())
+    # verify link_gdf contains no duplicated ['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId']
+    # which is the join key bwteen third-party data and shst+osmnx base network. Note that this is achieved in step3: 
+    # https://github.com/BayAreaMetro/travel-model-two-networks/blob/76c99020af6b023fa232d655610304826ff70b8d/notebooks/pipeline/step3_join_shst_extraction_with_osm.py#L323,
+    # with ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'] having the same de-dup effect.        
+    # NOTE on duplicated shstReferenceId at this point: there are cases when for a two-way street, shst created two records with different
+    # 'fromIntersectionId'/'toIntersectionId', each containing two-way osm ways, instead of creating one shst record with 'fromIntersectionId'
+    # and 'toIntersectionId' simply flipped, but the two shst records still just have 'forwardReferenceId' and 'backReferenceId' flipped,
+    # therefore when creating reverse links for two-way streets, a reverse link was created for each of the shst records. This is essentially
+    # a data issue on the ShSt side. Example: shstReferenceId '431c41541438629028f30f5770836ae1', or in shst extract, forwardReferenceId or
+    # backReferenceId is '431c41541438629028f30f5770836ae1'.
+    unique_shst_link_IDs = ['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId']
+    WranglerLogger.info('loaded {:,} shst_osmnx links: {:,} unique shstReferenceId,\
+        {:,} unique combinations of shstReferenceId + shstGeometryId + fromIntersectionId + toIntersectionId,\
+        {:,} unique shapes'.format(
+        link_gdf.shape[0], link_gdf.shstReferenceId.nunique(),
+        link_gdf[unique_shst_link_IDs].drop_duplicates().shape[0],
+        link_gdf.shstGeometryId.nunique())
     )
     WranglerLogger.info('shst_osmnx links have columns: \n{}'.format(list(link_gdf)))
 
     ####################################
     # Load ShSt match results of third-party data sources, deduplicates, and update field names
 
+    # NOTE on de-duplication method: 
+    # In the shst matching result, there are cases where multiple third-party links were matched to one shst link.
+    #
+    # WSP's v12 pipeline attributed this to links crossing the subregion boundaries, and simply dropped duplicates and kept one third-party link for each shst link.
+    # In their work for the bi-county model where CCTA and ACTC network datasets were processed, they kept all third-party links matched to the same shst link, 
+    # and generated a 'max' and a 'min' value for the shst link.
+    #
+    # Upon visual inspections, I identified additional reasons for the "duplicated" match. ShSt matching is essentially a many-to-many match, especially when
+    # shst links and third-party links split a same roadway segment at different places. Consider the following three cases:
+    #   1) one third-party link is split into multiple pieces and matched to different shst links. The fields 'gisTotalSegments' amd 'gisSegmentIndex' 
+    #      in the match output show the breakdown. This case alone doesn't create duplicated shst links in the matching result. 
+    #   2) multiple third-party links are matched to one (usually quite long) shst link, with each representing a portion of the shst link. This creates
+    #      duplicated shst links in the matching output, and the 'geometry' of each row now represents the partial shst geometry, in other words, 
+    #      the 'matched' portion, instead of the entire shst link's geometry.
+    #   3) multiple third-party links are matched to one shst link without breaking up the shst link. This also creates duplicated shst links in the matching output,
+    #      but each row still represents the entire shst link's geometry; however, the 'score' field usually has different values.
+    #  
+    # Apply the following de-duplication approach:
+    #   To address case 2), calculate the length of the matched partial shst links, and keep the longest one to represent the shst link.
+    #   To address case 3) where all matched links have the same length, keep the matched links with the smallest 'score'. I didn't find any documentation on
+    #       how "score" is calculated except for this part of the code (https://github.com/sharedstreets/sharedstreets-js/blob/98f8b78d0107046ed2ac1f681cff11eb5a356474/src/commands/match.ts#L696).
+    #      I created an issue (https://github.com/sharedstreets/sharedstreets-js/issues/107). But from maps, it appears that a lower score represents a higher
+    #      similarity between the raw third-party link's shape and the matched link's shape.
+
     ### TomTom
     WranglerLogger.info('loading TomTom ShSt matching result: {}'.format(TOMTOM_MATCHED_FILE))
     # tomtom_match_gdf = methods.read_shst_matched(TOMTOM_MATCHED_DIR, 'tomtom_*.out.matched.geojson')
-    tomtom_matched_gdf = geofeather.from_geofeather(TOMTOM_MATCHED_FILE)
+    tomtom_matched_gdf = gpd.read_feather(TOMTOM_MATCHED_FILE)
+    WranglerLogger.debug('{:,} TomTom matched records'.format(tomtom_matched_gdf.shape[0]))
 
-    # TODO: decide on a de-duplicate method:
-    # Duplicates may come from links crossing the subregion boundaries, or from multiple third-party links being matched 
-    # to the same sharedstreets link, often because a shst link is long (already aggregated, similar to in the situation of shst-osm relationship).
-    # In the latter case, in the matching output, each row has the shst-related attributes (e.g. shstReferecenId) of the entire shst link, and 
-    # the third-party attributes (e.g. FT) of the third-party link, and the "matched" geometry - a segment of the shst link's geometry (which often
-    # has a different shape from the raw third-party link).  
-    # In WSP's code, for data sources other than CCTA and ACTC, it simply dropped duplicates and kept one third-party link for each shst link, and use
-    # its value (FT, LANES) to represent the shst link; for CCTA and ACTC datasets, it kept all third-party links matched to the same shst link, 
-    # and generated a 'max' and a 'min' value for the shst link. 
-    #
-    # Upon a spot check with visual inspection, it appears that two approaches worth exploring, both call "drop_duplicates(
-    # subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])" to keep only one row, but use different condition 
-    # to select which row to keep: 
-    #   1) keep the row with the highest 'score' in shst match output. I didn't find any documentation on how "score" is calculated except for 
-    #      this part of the code (https://github.com/sharedstreets/sharedstreets-js/blob/98f8b78d0107046ed2ac1f681cff11eb5a356474/src/commands/match.ts#L696).
-    #      I raised an issue (https://github.com/sharedstreets/sharedstreets-js/issues/107). But from maps, it appears that a higher score represents a higher
-    #      similarity between the raw third-party link's shape and the matched link's shape. 
-    #   2) calculate the length of the matched links, and keep the longest one. This assumes that all the third-party links got matched to the correct shst link,
-    #      so we use the longest segment to reprenet the entire shst link. 
-    # I tend to think approach 2) makes more sense.
-
-    # convert to meter-based crs and calculate the length of each segment, then drop duplicates
+    # convert to meter-based crs and calculate the length of each segment, then drop duplicates by keeping largest length and smallest score
     tomtom_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
     tomtom_matched_gdf['matched_segment_length'] = tomtom_matched_gdf.length
-    tomtom_matched_gdf.sort_values(['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'matched_segment_length'], 
-                                   ascending=False,
+    tomtom_matched_gdf.sort_values(unique_shst_link_IDs + ['matched_segment_length', 'score'], 
+                                   ascending=[True] * len(unique_shst_link_IDs) + [False, True],
                                    inplace=True)
 
-    unique_tomtom_matched_gdf = tomtom_matched_gdf.drop_duplicates(
-        subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
-    WranglerLogger.info('after dropping duplicates, {} TomTom links remain'.format(
+    unique_tomtom_matched_gdf = tomtom_matched_gdf.drop_duplicates(subset=unique_shst_link_IDs)
+    WranglerLogger.debug('keep {:,} TomTom matched records based on unique shst link'.format(
         unique_tomtom_matched_gdf.shape[0]))
 
     # only keep fields needed for link attributes heuristics
-    unique_tomtom_matched_gdf = unique_tomtom_matched_gdf[[
-        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'ID', 'reversed', 'F_JNCTID', 'T_JNCTID', 'RAMP', 'FREEWAY',
-        'LANES', 'FRC', 'NAME', 'SHIELDNUM', 'RTEDIR', 'TOLLRD']]
+    unique_tomtom_matched_gdf = unique_tomtom_matched_gdf[
+        unique_shst_link_IDs + ['ID', 'reversed', 'RAMP', 'FREEWAY', 'LANES', 'FRC', 'FRC_def', 'NAME', 'SHIELDNUM', 'RTEDIR', 'TOLLRD']]
     
     # add data source prefix to column names
-    unique_tomtom_matched_gdf.rename(columns={"ID": "tomtom_ID",
-                                              "reversed": 'tomtom_reversed',
-                                              'RAMP': 'tomtom_RAMP',
-                                              'FREEWAY': 'tomtom_FREEWAY',
-                                              "LANES": "tomtom_lanes",
-                                              "FRC": "tomtom_FRC",
-                                              "NAME": "tomtom_name",
+    unique_tomtom_matched_gdf.rename(columns={"ID"       : "tomtom_ID",
+                                              "reversed" : 'tomtom_reversed',
+                                              'RAMP'     : 'tomtom_RAMP',
+                                              'FREEWAY'  : 'tomtom_FREEWAY',
+                                              "LANES"    : "tomtom_lanes",
+                                              "FRC"      : "tomtom_FRC",
+                                              'FRC_def'  : 'tomtom_FRC_def',
+                                              "NAME"     : "tomtom_name",
                                               "SHIELDNUM": "tomtom_shieldnum",
-                                              "RTEDIR": "tomtom_rtedir",
-                                              'TOLLRD': 'tomtom_TOLLRD'},
+                                              "RTEDIR"   : "tomtom_rtedir",
+                                              'TOLLRD'   : 'tomtom_TOLLRD'},
                                      inplace=True)
 
     # print out unique values for each key attribute to help fix typos
@@ -156,166 +167,171 @@ if __name__ == '__main__':
     ### TM2 nonMarin data
     # read shst match result
     WranglerLogger.info('read TM2 nonMarin conflation result from {}'.format(TM2_nonMarin_MATCHED_FILE))
-    tm2nonMarin_matched_gdf = geofeather.from_geofeather(TM2_nonMarin_MATCHED_FILE)
+    tm2nonMarin_matched_gdf = gpd.read_feather(TM2_nonMarin_MATCHED_FILE)
+    WranglerLogger.debug('{:,} tm2_nonMarin matched records'.format(tm2nonMarin_matched_gdf.shape[0]))
 
-    # convert to meter-based crs and calculate the length of each segment, then drop duplicates
+    # convert to meter-based crs and calculate the length of each segment, then drop duplicates by keeping largest length and smallest score
     tm2nonMarin_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
     tm2nonMarin_matched_gdf['matched_segment_length'] = tm2nonMarin_matched_gdf.length
-    tm2nonMarin_matched_gdf.sort_values(['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'matched_segment_length'], 
-                                        ascending=False,
+    tm2nonMarin_matched_gdf.sort_values(unique_shst_link_IDs + ['matched_segment_length', 'score'], 
+                                        ascending=[True] * len(unique_shst_link_IDs) + [False, True],
                                         inplace=True)
 
-    unique_tm2nonMarin_matched_gdf = tm2nonMarin_matched_gdf.drop_duplicates(
-        subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
+    unique_tm2nonMarin_matched_gdf = tm2nonMarin_matched_gdf.drop_duplicates(subset=unique_shst_link_IDs)
+    WranglerLogger.info('keep {:,} TM2_nonMarin matched records based on unique shst link'.format(unique_tm2nonMarin_matched_gdf.shape[0]))
 
     # only keep fields needed for link attributes heuristics
-    unique_tm2nonMarin_matched_gdf = unique_tm2nonMarin_matched_gdf[[
-        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'A', 'B', 'NUMLANES', 'FT', 'ASSIGNABLE']]
+    unique_tm2nonMarin_matched_gdf = unique_tm2nonMarin_matched_gdf[
+        unique_shst_link_IDs + ['A', 'B', 'NUMLANES_gp', 'NUMLANES_hov', 'NUMLANES_nontruck', 'FT', 'FT_def', 'ASSIGNABLE']]
 
     # add data source prefix to column names
-    unique_tm2nonMarin_matched_gdf.rename(columns={'A': 'TM2nonMarin_A',
-                                                   'B': 'TM2nonMarin_B',
-                                                   'NUMLANES': 'TM2nonMarin_LANES',
-                                                   'FT': 'TM2nonMarin_FT',
-                                                   'ASSIGNABLE': 'TM2nonMarin_ASSIGNABLE'},
-                                          inplace=True)
+    unique_tm2nonMarin_matched_gdf.rename(columns={'A'                  : 'TM2nonMarin_A',
+                                                   'B'                  : 'TM2nonMarin_B',
+                                                   'NUMLANES_gp'        : 'TM2nonMarin_LANES_GP',
+                                                   'NUMLANES_hov'       : 'TM2nonMarin_LANES_HOV',
+                                                   'NUMLANES_nontruck'  : 'TM2nonMarin_LANES_nonTruck',
+                                                   'FT'                 : 'TM2nonMarin_FT',
+                                                   'FT_def'             : 'TM2nonMarin_FT_def',
+                                                   'ASSIGNABLE'         : 'TM2nonMarin_ASSIGNABLE'},
+                                           inplace=True)
 
     ### TM2 Marin data
     # read shst match result
     WranglerLogger.info('read TM2 Marin conflation result from {}'.format(TM2_Marin_MATCHED_FILE))
-    tm2marin_matched_gdf = geofeather.from_geofeather(TM2_Marin_MATCHED_FILE)
+    tm2marin_matched_gdf = gpd.read_feather(TM2_Marin_MATCHED_FILE)
+    WranglerLogger.debug('{:,} tm2_Marin matched records'.format(tm2marin_matched_gdf.shape[0]))
 
-    # convert to meter-based crs and calculate the length of each segment, then drop duplicates
+    # convert to meter-based crs and calculate the length of each segment for de-duplication downstream
     tm2marin_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
     tm2marin_matched_gdf['matched_segment_length'] = tm2marin_matched_gdf.length
-    tm2marin_matched_gdf.sort_values(['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'matched_segment_length'], 
-                                     ascending=False,
+    tm2marin_matched_gdf.sort_values(unique_shst_link_IDs + ['matched_segment_length', 'score'], 
+                                     ascending=[True] * len(unique_shst_link_IDs) + [False, True],
                                      inplace=True)
 
-    unique_tm2marin_matched_gdf = tm2marin_matched_gdf.drop_duplicates(
-        subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
-    WranglerLogger.info('{:,} rows after dropping duplicates'.format(unique_tm2marin_matched_gdf.shape[0]))
+    unique_tm2Marin_matched_gdf = tm2marin_matched_gdf.drop_duplicates(subset=unique_shst_link_IDs)
+    WranglerLogger.info('keep {:,} TM2_Marin matched records based on unique shst link'.format(unique_tm2Marin_matched_gdf.shape[0]))
 
     # only keep fields needed for link attributes heuristics
-    unique_tm2marin_matched_gdf = unique_tm2marin_matched_gdf[[
-        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'A', 'B', 'NUMLANES', 'FT', 'USECLASS', 'ASSIGNABLE']]
+    unique_tm2Marin_matched_gdf = unique_tm2Marin_matched_gdf[
+        unique_shst_link_IDs + ['A', 'B', 'MARIN', 'NUMLANES_gp', 'NUMLANES_hov', 'NUMLANES_nontruck', 'FT', 'FT_def', 'ASSIGNABLE']]
 
     # add data source prefix to column names
-    unique_tm2marin_matched_gdf.rename(columns={'A': 'TM2Marin_A',
-                                                'B': 'TM2Marin_B',
-                                                'NUMLANES': 'TM2Marin_LANES',
-                                                'FT': 'TM2Marin_FT',
-                                                'USECLASS': 'TM2Marin_USECLASS',
-                                                'ASSIGNABLE': "TM2Marin_ASSIGNABLE"},
-                                       inplace=True)
+    unique_tm2Marin_matched_gdf.rename(columns={'A'                 : 'TM2Marin_A',
+                                                'B'                 : 'TM2Marin_B',
+                                                'MARIN'             : 'TM2Marin_tag',
+                                                'NUMLANES_gp'       : 'TM2Marin_LANES_GP',
+                                                'NUMLANES_hov'      : 'TM2Marin_LANES_HOV',
+                                                'NUMLANES_nontruck' : 'TM2Marin_LANES_nonTruck',
+                                                'FT'                : 'TM2Marin_FT',
+                                                'FT_def'            : 'TM2Marin_FT_def',
+                                                'ASSIGNABLE'        : 'TM2Marin_ASSIGNABLE'},
+                                        inplace=True)
 
     ### SFCTA data
     # read shst match result
     WranglerLogger.info('read sfcta stick network conflation result from {}'.format(SFCTA_MATCHED_FILE))
-    sfcta_stick_matched_gdf = geofeather.from_geofeather(SFCTA_MATCHED_FILE)
+    sfcta_matched_gdf = gpd.read_feather(SFCTA_MATCHED_FILE)
+    WranglerLogger.debug('{:,} SFCTA matched records'.format(sfcta_matched_gdf.shape[0]))
 
-    # convert to meter-based crs and calculate the length of each segment, then drop duplicates
-    sfcta_stick_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
-    sfcta_stick_matched_gdf['matched_segment_length'] = sfcta_stick_matched_gdf.length
-    sfcta_stick_matched_gdf.sort_values(['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'matched_segment_length'], 
-                                        ascending=False,
-                                        inplace=True)
-
-    unique_sfcta_matched_gdf = sfcta_stick_matched_gdf.drop_duplicates(
-        subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
-    WranglerLogger.info('{:,} rows after dropping duplicates'.format(unique_sfcta_matched_gdf.shape[0]))
+    # convert to meter-based crs and calculate the length of each segment, then drop duplicates by keeping largest length and smallest score
+    sfcta_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
+    sfcta_matched_gdf['matched_segment_length'] = sfcta_matched_gdf.length
+    sfcta_matched_gdf.sort_values(unique_shst_link_IDs + ['matched_segment_length', 'score'], 
+                                  ascending=[True] * len(unique_shst_link_IDs) + [False, True],
+                                  inplace=True)
+    unique_sfcta_matched_gdf = sfcta_matched_gdf.drop_duplicates(subset=unique_shst_link_IDs)
+    WranglerLogger.info('keep {:,} SFCTA matched records based on unique shst link'.format(unique_sfcta_matched_gdf.shape[0]))
 
     # only keep fields needed for link attributes heuristics
-    unique_sfcta_matched_gdf = unique_sfcta_matched_gdf[[
-        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'A', 'B', 'FT', 'STREETNAME', 'LANE_AM', 'LANE_OP', 'LANE_PM',
-        'BUSLANE_AM', 'BUSLANE_PM', 'BUSLANE_OP', 'BIKE_CLASS', 'USE']]
+    unique_sfcta_matched_gdf = unique_sfcta_matched_gdf[
+        unique_shst_link_IDs + ['A', 'B', 'FT', 'FT_def', 'STREETNAME', 'TYPE', 
+                                'LANE_AM', 'LANE_OP', 'LANE_PM', 'BUSLANE_AM', 'BUSLANE_PM', 'BUSLANE_OP', 'BIKE_CLASS']]
 
     # add data source prefix to column names
-    unique_sfcta_matched_gdf.rename(columns={"A"         : "sfcta_A",
-                                             "B"         : "sfcta_B",
-                                             "FT"        : "sfcta_FT",
-                                             "STREETNAME": "sfcta_STREETNAME",
-                                             "LANE_AM"   : "sfcta_LANE_AM",
-                                             "LANE_OP"   : "sfcta_LANE_OP",
-                                             "LANE_PM"   : "sfcta_LANE_PM",
-                                             "BUSLANE_AM": "sfcta_BUSLANE_AM",
-                                             "BUSLANE_PM": "sfcta_BUSLANE_PM",
-                                             "BUSLANE_OP": "sfcta_BUSLANE_OP",
-                                             "BIKE_CLASS": "sfcta_BIKE_CLASS",
-                                             "USE"       : "sfcta_USE"},
+    unique_sfcta_matched_gdf.rename(columns={'A'         : 'sfcta_A',
+                                             'B'         : 'sfcta_B',
+                                             'FT'        : 'sfcta_FT',
+                                             'FT_def'    : 'sfcta_FT_def',
+                                             'STREETNAME': 'sfcta_STREETNAME',
+                                             'TYPE'      : 'sfcta_NAMETYPE', 
+                                             'LANE_AM'   : 'sfcta_LANE_AM_GP',
+                                             'LANE_OP'   : 'sfcta_LANE_OP_GP',
+                                             'LANE_PM'   : 'sfcta_LANE_PM_GP',
+                                             'BUSLANE_AM': 'sfcta_BUSLANE_AM',
+                                             'BUSLANE_PM': 'sfcta_BUSLANE_PM',
+                                             'BUSLANE_OP': 'sfcta_BUSLANE_OP',
+                                             'BIKE_CLASS': 'sfcta_BIKE_CLASS'},
                                     inplace=True)
 
     ### CCTA data
     # read shst match result
     WranglerLogger.info('read CCTA conflation result from {}'.format(CCTA_MATCHED_FILE))
-    ccta_matched_gdf = geofeather.from_geofeather(CCTA_MATCHED_FILE)
+    ccta_matched_gdf = gpd.read_feather(CCTA_MATCHED_FILE)
+    WranglerLogger.debug('{:,} CCTA matched records'.format(ccta_matched_gdf.shape[0]))
 
     # drop duplicates
-    # NOTE: WSP's by-county work simply dropped duplicates; here modify the method to be consistent with others
-    # convert to meter-based crs and calculate the length of each segment, then drop duplicates
+    # NOTE: use the V13 method instead of WSP's by-county network rebuild method
     ccta_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
     ccta_matched_gdf['matched_segment_length'] = ccta_matched_gdf.length
-    ccta_matched_gdf.sort_values(['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'matched_segment_length'], 
-                                     ascending=False,
-                                     inplace=True)
+    ccta_matched_gdf.sort_values(unique_shst_link_IDs + ['matched_segment_length', 'score'], 
+                                 ascending=[True] * len(unique_shst_link_IDs) + [False, True],
+                                 inplace=True)
 
-    unique_ccta_matched_gdf = ccta_matched_gdf.drop_duplicates(
-        subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
-    WranglerLogger.info('{:,} rows after dropping duplicates'.format(unique_ccta_matched_gdf.shape[0]))
+    unique_ccta_matched_gdf = ccta_matched_gdf.drop_duplicates(subset=unique_shst_link_IDs)
+    WranglerLogger.info('keep {:,} CCTA matched records based on unique shst link'.format(unique_ccta_matched_gdf.shape[0]))
 
     # only keep fields needed for link attributes heuristics
-    unique_ccta_matched_gdf = unique_ccta_matched_gdf[[
-        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'ID', 'AB_LANES']]
+    unique_ccta_matched_gdf = unique_ccta_matched_gdf[unique_shst_link_IDs + ['ID', 'AB_FT', 'AB_FT_def', 'AB_LANES_GP']]
 
     # add data source prefix to column names
-    unique_ccta_matched_gdf.rename(columns={'ID': 'CCTA_ID',
-                                            'AB_LANES': 'CCTA_AB_LANES'},
+    unique_ccta_matched_gdf.rename(columns={'ID'         : 'CCTA_ID',
+                                            'AB_FT'      : 'CCTA_FT',
+                                            'AB_FT_def'  : 'CCTA_FT_def',
+                                            'AB_LANES_GP': 'CCTA_LANES_GP'},
                                    inplace=True)
 
     ### ACTC data
     # read shst match result
     WranglerLogger.info('read ACTC conflation result from {}'.format(ACTC_MATCHED_FILE))
-    actc_matched_gdf = geofeather.from_geofeather(ACTC_MATCHED_FILE)
+    actc_matched_gdf = gpd.read_feather(ACTC_MATCHED_FILE)
+    WranglerLogger.debug('{:,} ACTC matched records'.format(actc_matched_gdf.shape[0]))
 
-    # NOTE: WSP's by-county work simply dropped duplicates; here modify the method to be consistent with others
-    # convert to meter-based crs and calculate the length of each segment, then drop duplicates
+    # NOTE: use the V13 method instead of WSP's by-county network rebuild method
     actc_matched_gdf.to_crs(CRS(nearest_match_epsg_str), inplace=True)
     actc_matched_gdf['matched_segment_length'] = actc_matched_gdf.length
-    actc_matched_gdf.sort_values(['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'matched_segment_length'], 
-                                     ascending=False,
-                                     inplace=True)
+    actc_matched_gdf.sort_values(unique_shst_link_IDs + ['matched_segment_length', 'score'], 
+                                 ascending=[True] * len(unique_shst_link_IDs) + [False, True],
+                                 inplace=True)
 
     unique_actc_matched_gdf = actc_matched_gdf.drop_duplicates(
-        subset=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
-    WranglerLogger.info('{:,} rows after dropping duplicates'.format(unique_actc_matched_gdf.shape[0]))
+        subset=unique_shst_link_IDs)
+    WranglerLogger.info('keep {:,} ACTC matched records based on unique shst link'.format(unique_actc_matched_gdf.shape[0]))
 
     # only keep fields needed for link attributes heuristics
-    unique_actc_matched_gdf = unique_actc_matched_gdf[[
-        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
-        'A', 'B', 'lanes_2015', 'NMT2010', 'NMT2020']]
+    unique_actc_matched_gdf = unique_actc_matched_gdf[
+        unique_shst_link_IDs + ['A', 'B', '2015_FT', '2015_FT_def', '2015_LN_GP', 'NMT2010', 'NMT2020']]
 
     # add data source prefix to column names
-    unique_actc_matched_gdf.rename(columns={'A': 'ACTC_A',
-                                            'B': 'ACTC_B',
-                                            'lanes_2015': 'ACTC_lanes2015',
-                                            'nmt2010': 'ACTC_nmt2010',
-                                            'nmt2020': 'ACTC_nmt2020'},
+    unique_actc_matched_gdf.rename(columns={'A'          : 'ACTC_A',
+                                            'B'          : 'ACTC_B',
+                                            '2015_FT'    : 'ACTC_FT', 
+                                            '2015_FT_def': 'ACTC_FT_def', 
+                                            '2015_LN_GP' : 'ACTC_LN_GP_2015',
+                                            'NMT2010'    : 'ACTC_nmt2010',
+                                            'NMT2020'    : 'ACTC_nmt2020'},
                                    inplace=True)
  
     ####################################
     # merge third-party conflation results to the base network links from step3
     WranglerLogger.info('Mergeing third-party data conflation results with base network link_gdf')
 
-    # TomTom: 'tomtom_ID', 'tomtom_reversed', 'tomtom_RAMP', 'tomtom_FREEWAY', 'tomtom_lanes', 
-    #         'tomtom_FRC', 'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir', 'tomtom_TOLLRD'
-    WranglerLogger.info('add TomTom attributes to base network from step3')
+    # TomTom: 'tomtom_ID', 'tomtom_reversed', 'tomtom_RAMP', 'tomtom_FREEWAY', 'tomtom_lanes', 'tomtom_FRC', 'tomtom_FRC_def',
+    #         'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir', 'tomtom_TOLLRD'
+    tomtom_new_fields = list(set(list(unique_tomtom_matched_gdf)) - set(unique_shst_link_IDs))
+    WranglerLogger.info('add TomTom attributes: {}'.format(tomtom_new_fields))
     link_with_third_party_gdf = pd.merge(link_gdf,
                                          unique_tomtom_matched_gdf,
-                                         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'],
+                                         on=unique_shst_link_IDs,
                                          how='left')
 
     WranglerLogger.debug('{:,} base network links have TomTom attributes, stats by roadway type:\n{}'.format(
@@ -325,12 +341,14 @@ if __name__ == '__main__':
         (link_with_third_party_gdf.tomtom_ID.isnull()).sum(),
         link_with_third_party_gdf.loc[link_with_third_party_gdf.tomtom_ID.isnull()]['roadway'].value_counts(dropna=False)))
     
-    # TM2_nonMarin: 'TM2nonMarin_A', 'TM2nonMarin_B', 'TM2nonMarin_LANES', 'TM2nonMarin_FT', 'TM2nonMarin_ASSIGNABLE'
-    WranglerLogger.info('add TM2_nonMarin attributes')
+    # TM2_nonMarin: 'TM2nonMarin_A', 'TM2nonMarin_B', 'TM2nonMarin_LANES_GP', 'TM2nonMarin_LANES_HOV', 'TM2nonMarin_LANES_nonTruck',
+    # 'TM2nonMarin_FT', 'TM2nonMarin_FT_def', 'TM2nonMarin_ASSIGNABLE'
+    tm2nonmarin_new_fields = list(set(list(unique_tm2nonMarin_matched_gdf)) - set(unique_shst_link_IDs))
+    WranglerLogger.info('add TM2_nonMarin attributes: {}'.format(tm2nonmarin_new_fields))
     link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
                                          unique_tm2nonMarin_matched_gdf,
                                          how='left',
-                                         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
+                                         on=unique_shst_link_IDs)
 
     WranglerLogger.debug('{:,} base network links have TM2_nonMarin attributes, stats by roadway type:\n{}'.format(
         (link_with_third_party_gdf.TM2nonMarin_A.notnull()).sum(),
@@ -339,12 +357,14 @@ if __name__ == '__main__':
         (link_with_third_party_gdf.TM2nonMarin_A.isnull()).sum(),
         link_with_third_party_gdf.loc[link_with_third_party_gdf.TM2nonMarin_A.isnull()]['roadway'].value_counts(dropna=False)))
 
-    # TM2_Marin: 'TM2Marin_A', 'TM2Marin_B', 'TM2Marin_LANES', 'TM2Marin_FT', 'TM2Marin_USECLASS, 'TM2Marin_ASSIGNABLE'
-    WranglerLogger.info('add TM2_Marin attributes')
+    # TM2_Marin: 'TM2Marin_A', 'TM2Marin_B', 'TM2Marin_tag', 'TM2Marin_LANES_GP', 'TM2Marin_LANES_HOV', 'TM2Marin_LANES_nonTruck',
+    # 'TM2Marin_FT', 'TM2Marin_FT_def', 'TM2Marin_ASSIGNABLE'
+    tm2marin_new_fields = list(set(list(unique_tm2Marin_matched_gdf)) - set(unique_shst_link_IDs))
+    WranglerLogger.info('add TM2_Marin attributes: {}'.format(tm2marin_new_fields))
     link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
-                                         unique_tm2marin_matched_gdf,
+                                         unique_tm2Marin_matched_gdf,
                                          how='left',
-                                         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
+                                         on=unique_shst_link_IDs)
 
     WranglerLogger.debug('{:,} base network links have TM2_Marin attributes, stats by roadway type:\n{}'.format(
         (link_with_third_party_gdf.TM2Marin_A.notnull()).sum(),
@@ -353,13 +373,15 @@ if __name__ == '__main__':
         (link_with_third_party_gdf.TM2Marin_A.isnull()).sum(),
         link_with_third_party_gdf.loc[link_with_third_party_gdf.TM2Marin_A.isnull()]['roadway'].value_counts(dropna=False)))                                         
 
-    # SFCTA: 'sfcta_A', 'sfcta_B', 'sfcta_FT', 'sfcta_STREETNAME', 'sfcta_LANE_AM', 'sfcta_LANE_OP', 'sfcta_LANE_PM',
-    #        'sfcta_BUSLANE_AM', 'sfcta_BUSLANE_PM', 'sfcta_BUSLANE_OP', 'sfcta_BIKE_CLASS', 'sfcta_USE'
-    WranglerLogger.info('add SFCTA attributes')
+    # SFCTA: 'sfcta_A', 'sfcta_B', 'sfcta_FT', 'sfcta_FT_def', 'sfcta_STREETNAME', 'sfcta_NAMETYPE',
+    # 'sfcta_LANE_AM_GP', 'sfcta_LANE_OP_GP', 'sfcta_LANE_PM_GP', 'sfcta_BUSLANE_AM', 'sfcta_BUSLANE_PM', 'sfcta_BUSLANE_OP',
+    # 'sfcta_BIKE_CLASS'
+    sfcta_new_fields = list(set(list(unique_sfcta_matched_gdf)) - set(unique_shst_link_IDs))
+    WranglerLogger.info('add SFCTA attributes: {}'.format(sfcta_new_fields))
     link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
                                          unique_sfcta_matched_gdf,
                                          how='left',
-                                         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
+                                         on=unique_shst_link_IDs)
 
     WranglerLogger.debug('{:,} base network links have SFCTA attributes, stats by roadway type:\n{}'.format(
         (link_with_third_party_gdf.sfcta_A.notnull()).sum(),
@@ -368,12 +390,13 @@ if __name__ == '__main__':
         (link_with_third_party_gdf.sfcta_A.isnull()).sum(),
         link_with_third_party_gdf.loc[link_with_third_party_gdf.sfcta_A.isnull()]['roadway'].value_counts(dropna=False)))
 
-    # CCTA: 'CCTA_ID', 'CCTA_AB_LANES'
-    WranglerLogger.info('add CCTA attributes')
+    # CCTA: 'CCTA_ID', 'CCTA_FT', 'CCTA_FT_def', 'CCTA_LANES_GP'
+    ccta_new_fields = list(set(list(unique_ccta_matched_gdf)) - set(unique_shst_link_IDs))
+    WranglerLogger.info('add CCTA attributes: {}'.format(ccta_new_fields))
     link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
                                          unique_ccta_matched_gdf,
                                          how='left',
-                                         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
+                                         on=unique_shst_link_IDs)
 
     WranglerLogger.debug('{:,} base network links have CCTA attributes, stats by roadway type:\n{}'.format(
         (link_with_third_party_gdf.CCTA_ID.notnull()).sum(),
@@ -382,12 +405,13 @@ if __name__ == '__main__':
         (link_with_third_party_gdf.CCTA_ID.isnull()).sum(),
         link_with_third_party_gdf.loc[link_with_third_party_gdf.CCTA_ID.isnull()]['roadway'].value_counts(dropna=False)))
 
-    # ACTC: 'ACTC_A', 'ACTC_B', 'ACTC_lanes2015', 'ACTC_nmt2010', 'ACTC_nmt2020'
-    WranglerLogger.info('add ACTC attributes')
+    # ACTC: 'ACTC_A', 'ACTC_B', 'ACTC_FT',  'ACTC_FT_def', 'ACTC_LN_GP_2015', 'ACTC_nmt2010', 'ACTC_nmt2020'
+    actc_new_fields = list(set(list(unique_actc_matched_gdf)) - set(unique_shst_link_IDs))
+    WranglerLogger.info('add ACTC attributes: {}'.format(actc_new_fields))
     link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
                                          unique_actc_matched_gdf,
                                          how='left',
-                                         on=['shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId'])
+                                         on=unique_shst_link_IDs)
 
     WranglerLogger.debug('{:,} base network links have ACTC attributes, stats by roadway type:\n{}'.format(
         (link_with_third_party_gdf.ACTC_A.notnull()).sum(),
@@ -396,285 +420,31 @@ if __name__ == '__main__':
         (link_with_third_party_gdf.ACTC_A.isnull()).sum(),
         link_with_third_party_gdf.loc[link_with_third_party_gdf.ACTC_A.isnull()]['roadway'].value_counts(dropna=False)))
 
-    # TODO: the following part is PEMS conflation. Consider moving out of Pipeline.
-    """
     ####################################
-    # Conflate PEMS data by matching to TomTom route, direction, and facility type
-
-    # load PEMS raw data
-    WranglerLogger.info('Loading PEMS raw data from {}'.format(INPUT_PEMS_FILE))
-    pems_raw_df = pd.read_csv(INPUT_PEMS_FILE)
-
-    WranglerLogger.info('drop points without complete longitude and latitude info')
-    pems_df = pems_raw_df[~((pems_raw_df.longitude.isnull()) | (pems_raw_df.latitude.isnull()))]
-    WranglerLogger.debug('after dropping, PEMS data went from {} rows to {} rows'.format(pems_raw_df.shape[0],
-                                                                                         pems_df.shape[0]))
-    # PEMS data contains multiple years
-    for yr in pems_df.year.unique():
-        WranglerLogger.debug('for year {}: PEMS data contains {} stations, {} unique route+direction comb'.format(
-            yr,
-            pems_df.loc[pems_df.year == yr]['station'].nunique(),
-            pems_df[['route', 'direction']].drop_duplicates().shape[0]))
-
-    # generate 'geometry' and convert to geodataframe
-    WranglerLogger.info('create "geometry" from longitude and latitude')
-    pems_df['geometry'] = [Point(xy) for xy in zip(pems_df.longitude, pems_df.latitude)]
-    pems_gdf = gpd.GeoDataFrame(pems_df,
-                                geometry=pems_df['geometry'],
-                                crs={'init': lat_lon_epsg_str})
-
-    # convert crs to meter-based for nearest match algorithm
-    WranglerLogger.info('convert to meter-based epsg:26915')
-    pems_gdf = pems_gdf.to_crs(CRS(nearest_match_epsg_str))
-
-    # get TomTom 'tomtom_shieldnum', 'tomtom_rtedir' in the correct crs
-    WranglerLogger.info('Preparing TomTom Shieldnum and rtedir for conflation with PEMS')
-    # subset link_with_third_party_gdf to only keep needed fields
-    tomtom_for_pems_conflation_gdf = link_with_third_party_gdf[list(link_gdf) + ['tomtom_shieldnum', 'tomtom_rtedir']]
-    # convert crs to meter-based for nearest match algorithm
-    tomtom_for_pems_conflation_gdf = tomtom_for_pems_conflation_gdf.to_crs(CRS(nearest_match_epsg_str))
-
-    # To match PEMS to the nearest link with the same shieldnum and direction, examine these values first
-    WranglerLogger.info('Matching PEMS to the nearest link with the same shieldnum and direction')
-    WranglerLogger.debug('PEMS road "type" value counts:\n{}'.format(pems_gdf['type'].value_counts(dropna=False)))
-    WranglerLogger.debug('base network "roadway" value counts:\n{}'.format(
-        tomtom_for_pems_conflation_gdf['roadway'].value_counts(dropna=False)))
-    WranglerLogger.debug('PEMS route value counts:\n{}'.format(pems_gdf['route'].value_counts(dropna=False)))
-    WranglerLogger.debug('TomTom shieldnum value counts:\n{}'.format(
-        tomtom_for_pems_conflation_gdf['tomtom_shieldnum'].value_counts(dropna=False)))
-
-    # only for QAQC: write out links whose shieldnum is include in PEMS routes - these are candidates for nearest match
-    candidate_links_for_PEMS_match_QAQC_gdf = tomtom_for_pems_conflation_gdf.loc[
-        tomtom_for_pems_conflation_gdf['tomtom_shieldnum'].isin(pems_gdf['route'].unique().astype(str))]
-    candidate_links_for_PEMS_match_QAQC_gdf.reset_index(drop=True, inplace=True)
-
-    WranglerLogger.debug('TomTom unique shieldnum+tomtom_rtedir comb:\n{}'.format(
-        tomtom_for_pems_conflation_gdf.groupby(['tomtom_shieldnum', 'tomtom_rtedir'])['shstReferenceId'].count().reset_index().rename(columns={'station': 'row_count'})))
-    WranglerLogger.debug('PEMS unique route+direction comb:\n{}'.format(
-        pems_gdf.groupby(['route', 'direction'])['station'].count().reset_index().rename(columns={'station': 'row_count'})))
-
-    OUTPUT_FILE = os.path.join(CONFLATION_RESULT_DIR, 'candidate_links_for_PEMS_match_QAQC.feather')
-    geofeather.to_geofeather(candidate_links_for_PEMS_match_QAQC_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {} rows to {}".format(candidate_links_for_PEMS_match_QAQC_gdf.shape[0], OUTPUT_FILE))
-
-    # 1. create a PEMS road "type" to base network "roadway" dictionary
-    WranglerLogger.debug('PEMS "type" field value counts:\n{}'.format(pems_gdf.type.value_counts(dropna=False)))
-    WranglerLogger.debug('base network "roadway" field value counts:\n{}'.format(
-        tomtom_for_pems_conflation_gdf.roadway.value_counts(dropna=False)))
-
-    roadway_types = tomtom_for_pems_conflation_gdf.loc[tomtom_for_pems_conflation_gdf['roadway'].notnull()]['roadway'].unique()
-    pems_type_roadway_crosswalk = {'ML': ['tertiary', 'primary', 'secondary', 'motorway', 'trunk'],
-                                   'HV': [c for c in roadway_types if c.endswith("_link")],
-                                   'FF': [c for c in roadway_types if c.endswith("_link")],
-                                   'OR': [c for c in roadway_types if c.endswith("_link")],
-                                   'FR': [c for c in roadway_types if c.endswith("_link")]}
-
-    # 2. match PEMS stations to base network links based on PEMS route + direction, and TomTom shieldnum + rtedir
-    pems_nearest_match = methods.pems_station_sheild_dir_nearest_match(pems_gdf,
-                                                            tomtom_for_pems_conflation_gdf,
-                                                            pems_type_roadway_crosswalk)
-
-    # 3. merge it back to pems_gdf
-    WranglerLogger.info('Merging PEMS nearest sheildnum+direction matching result back to pems_gdf')
-    pems_nearest_gdf = pd.merge(pems_gdf,
-                                pems_nearest_match.drop(['point', 'geometry'], axis=1),
-                                how='left',
-                                on=['station', 'longitude', 'latitude', 'route', 'direction', 'type'])
-    WranglerLogger.info('Finished PEMS nearest sheildnum+direction matching')
-    WranglerLogger.debug('{} out of {} PEMS records found a matching link, {} stations, with "type" value counts:\n{}'.format(
-        (pems_nearest_gdf.shstReferenceId.notnull()).sum(),
-        pems_nearest_gdf.shape[0],
-        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()].station.nunique(),
-        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()]['type'].value_counts()
-    ))
-    WranglerLogger.debug('{} PEMS records failed to find a matching link, representing {} stations, with "type" value counts:\n{}'.format(
-        (pems_nearest_gdf.shstReferenceId.isnull()).sum(),
-        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()].station.nunique(),
-        pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]['type'].value_counts()
-    ))
-
-    # QAQC: write out PEMS data not able to find nearest sheildnum+direction match for debugging
-    pems_nearest_debug_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]
-    pems_nearest_debug_gdf.reset_index(drop=True, inplace=True)
-    OUTPUT_FILE = os.path.join(CONFLATION_RESULT_DIR, 'PEMS_no_nearest_match_QAQC.feather')
-    geofeather.to_geofeather(pems_nearest_debug_gdf, OUTPUT_FILE)
-    WranglerLogger.info("Wrote {} rows to {}".format(pems_nearest_debug_gdf.shape[0], OUTPUT_FILE))
-   
-    # TODO: decide if 4. is useful
-    
-    # 4. () For those that failed in nearest sheildnum+direction match, use nearest match only based on facility type
-    # get PEMS station+type+location that failed to find nearest match
-    pems_ft_matched_df = pd.DataFrame()
-    
-    pems_sheild_dir_unmatched_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.isnull()]
-    pems_sheild_dir_unmatched_station_df = pems_sheild_dir_unmatched_gdf[['station', 'type', 'latitude', 'longitude']].drop_duplicates()
-    WranglerLogger.debug('PEMS records not find a nearest sheildnum+direction match represent {} '
-                         'unique PEMS station/type/location'.format(pems_sheild_dir_unmatched_station_df.shape[0]))
-    # convert all links to lat/lon epsg (epsg:4326)
-    link_for_pems_ft_match_gdf = tomtom_for_pems_conflation_gdf.to_crs(CRS(lat_lon_epsg_str))
-
-    # call the function to do facility type based shortest distance match
-    pems_stations_ft_matched_gdf = methods.pems_match_ft(pems_sheild_dir_unmatched_station_df,
-                                                         link_for_pems_ft_match_gdf,
-                                                         pems_type_roadway_crosswalk)
-
-    # join the result back to pems_sheild_dir_unmatched_gdf
-    pems_ft_matched_df = pd.merge(pems_sheild_dir_unmatched_gdf.drop('shstReferenceId', axis=1),
-                                  pems_stations_ft_matched_gdf[['shstReferenceId', 'station', 'longitude', 'latitude', 'type']],
-                                  how='left',
-                                  on=['station', 'type', 'longitude', 'latitude'])
-    WranglerLogger.info('facility type based matching matched {} additional stations'.format(
-        pems_ft_matched_df.station.nunique()))
-    WranglerLogger.info('facility types of still unmatched PEMS records:\n{}'.format(
-        pems_ft_matched_df.loc[pems_ft_matched_df.shstReferenceId.isnull()]['type'].value_counts()))   
-
-    # TODO: decide if 5. is needed
-    # 5. finally, use ShSt match to fill in unmatched
-    pems_shst_matched_df = pd.DataFrame()
-
-    # 6. concatenate matching results from the two methods
-    pems_sheild_dir_matched_gdf = pems_nearest_gdf.loc[pems_nearest_gdf.shstReferenceId.notnull()]
-    pems_conflation_result = pd.concat([pems_sheild_dir_matched_gdf, pems_ft_matched_df, pems_shst_matched_df],
-                                       sort=False,
-                                       ignore_index=True)
-
-    # 7. post-process PEMS matching results
-    # link can have multiple pems station on it, so trying to get the mode of #lanes by station type
-    # TODO: the initial code uses three years' PEMS data 2014, 2015, 2016 to represent 2015 lane count. Decide if want to apply the year filter before running matching, which would have reduce run time.
-    # first, get lane count for each unique comb of shstReferenceId and PEMS type
-    pems_lanes_by_shstRef_type_df = pems_conflation_result.loc[
-        (pems_conflation_result['year'].isin([2014, 2015, 2016]))].groupby(
-        ['shstReferenceId', 'type', 'lanes'])['station'].count().sort_values(ascending=False).reset_index()[[
-            'shstReferenceId', 'type', 'lanes']].drop_duplicates(subset=['shstReferenceId', 'type'])
-    WranglerLogger.debug('pems_lanes_by_shstRef_type_df has {} rows, with header:\n{}'.format(
-        pems_lanes_by_shstRef_type_df.shape[0],
-        pems_lanes_by_shstRef_type_df.head(10)
-    ))
-    # then, expand the dataframe so 'type' is in columns
-    pems_lanes_by_shstRef_type_df = pems_lanes_by_shstRef_type_df.pivot_table(
-        index=['shstReferenceId'], values='lanes', columns='type').fillna(0).reset_index()
-
-    # get a dataframe of all PEMS stations matched to each shstReferenceId
-    link_pems_station_df = pems_conflation_result.loc[
-        (pems_conflation_result['year'].isin([2014, 2015, 2016]))].drop_duplicates(
-            subset=['shstReferenceId', 'station']).groupby(
-                ['shstReferenceId'])['station'].apply(list).reset_index().rename(columns={'station': 'PEMS_station_ID'})
-    WranglerLogger.debug('link_pems_station_df has {} rows, with header:\n{}'.format(
-        link_pems_station_df.shape[0],
-        link_pems_station_df.head(10)
-    ))
-    # merge the two
-    pems_lanes_df = pd.merge(pems_lanes_by_shstRef_type_df,
-                             link_pems_station_df,
-                             how='left',
-                             on='shstReferenceId')
-    # rename
-    pems_lanes_df.rename(columns={'FF': 'pems_lanes_FF',
-                                  'FR': 'pems_lanes_FR',
-                                  'HV': 'pems_lanes_HV',
-                                  'ML': 'pems_lanes_ML',
-                                  'OR': 'pems_lanes_OR'},
-                         inplace=True)
-    WranglerLogger.info('Finished conflating PEMS lane counts, got PEMS lane counts for {} unique shst links'.format(
-        pems_lanes_df.shstReferenceId.nunique()
-    ))
-
-    # recode 'lanes_[]' fields into 'lanes' and 'ft' fields
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FR'].isnull(), 'pems_ft'] = 'Ramp'
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_OR'].isnull(), 'pems_ft'] = 'Ramp'
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FF'].isnull(), 'pems_ft'] = 'Freeway to Freeway'
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_ML'].isnull(), 'pems_ft'] = 'Freeway'
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_HV'].isnull(), 'pems_ft'] = 'Freeway'
-
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FR'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_FR']
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_OR'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_OR']
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_FF'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_FF']
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_ML'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_ML']
-    pems_lanes_df.loc[~pems_lanes_df['pems_lanes_HV'].isnull(), 'pems_lanes'] = pems_lanes_df['pems_lanes_HV'] + pems_lanes_df['pems_lanes']
-
-    # merge PEMS conflation result into link_with_third_party_gdf
-    link_with_third_party_gdf = pd.merge(link_with_third_party_gdf,
-                                         pems_lanes_df,
-                                         how='left',
-                                         on='shstReferenceId')
-
-    WranglerLogger.info('after conflation, {:,} links with the follow columns: \n{}'.format(
-        link_with_third_party_gdf.shape[0],
-        list(link_with_third_party_gdf)))
-    """
-
-    ####################################
-    # TODO: resolve duplicated shstReferenceId
-    # some duplicated shstReferenceId come from discrepancy between shst and osmnx (showing in 'osmnx_shst_merge', 
-    #      e.g. shstReferenceId == '001516bb08e57c92f78df14c9dcfb6d7', shst has one link between nodeIds '1276183745', '1276184111',
-    #      but ).
-    # some come from circular links (same u/v, e.g. shstReferenceId == '00f297d3c36358ee88d583809275164c').
     WranglerLogger.info('Write out third-party conflation result data base')
-
-    # convert tomtom FRC to standard road type
-    tomtom_FRC_dict = {
-        0: "0-Motorway, Freeway, or Other Major Road",
-        1: "1-Major Road Less Important than a Motorway",
-        2: "2-Other Major Road",
-        3: "3-Secondary Road",
-        4: "4-Local Connecting Road",
-        5: "5-Local Road of High Importance",
-        6: "6-Local Road",
-        7: "7-Local Road of Minor Importance",
-        8: "8-Other Road"
-    }
-    link_with_third_party_gdf['tomtom_FRC_def'] = link_with_third_party_gdf['tomtom_FRC'].map(tomtom_FRC_dict)
-    WranglerLogger.debug('TomTom FRC standardized value counts:\n{}'.format(
-        link_with_third_party_gdf.tomtom_FRC_def.value_counts(dropna=False)))
-
-    # convert legacy TM2 data FT to standard road type
-    TM2_FT_dict = {
-        0: "0-Connector",
-        1: "1-Freeway to Freeway",
-        2: "2-Freeway",
-        3: "3-Expressway",
-        4: "4-Collector",
-        5: "5-Ramp",
-        6: "6-Special Facility",
-        7: "7-Major Arterial",
-    }
-    link_with_third_party_gdf['TM2nonMarin_FT_def'] = link_with_third_party_gdf['TM2nonMarin_FT'].map(TM2_FT_dict)
-    WranglerLogger.debug('TM2nonMarin FT standardized value counts:\n{}'.format(
-        link_with_third_party_gdf.TM2nonMarin_FT_def.value_counts(dropna=False)))
-
     # write out conflation data base
     conflation_result_fields = [
-        'shstReferenceId', 'roadway', 'drive_access', 'bike_access', 'walk_access',
+        'shstReferenceId', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId',
+        'roadway', 'hierarchy', 'drive_access', 'bike_access', 'walk_access',
         # lane accounting
-        ## OSMNX
-        'lanes_gp', 'lanes_tot', 
-        'tomtom_ID', 'tomtom_reversed', 'tomtom_RAMP', 'tomtom_FREEWAY', 'tomtom_FRC', 'tomtom_FRC_def', 'tomtom_lanes', 
-        'F_JNCTID', 'T_JNCTID', 'tomtom_name', 'tomtom_shieldnum', 'tomtom_rtedir', 'tomtom_TOLLRD', 
-        'TM2Marin_A', 'TM2Marin_B', 'TM2Marin_FT', 'TM2Marin_LANES', 'TM2Marin_ASSIGNABLE',
-        'TM2nonMarin_A', 'TM2nonMarin_B', 'TM2nonMarin_FT', 'TM2nonMarin_FT_def', 'TM2nonMarin_LANES',
-        'TM2nonMarin_ASSIGNABLE',
-        'sfcta_A', 'sfcta_B', "sfcta_STREETNAME", 'sfcta_FT', 'sfcta_LANE_AM', 'sfcta_LANE_OP', 'sfcta_LANE_PM',
-        'sfcta_BUSLANE_AM', 'sfcta_BUSLANE_PM', 'sfcta_BUSLANE_OP', 'sfcta_BIKE_CLASS', 'sfcta_USE',
-        'ACTC_A', 'ACTC_B', 'ACTC_base_lanes_min', 'ACTC_base_lanes_max', 'ACTC_nmt2010_min', 'ACTC_nmt2010_max',
-        'ACTC_nmt2020_min', 'ACTC_nmt2020_max',
-        'CCTA_ID', 'CCTA_base_lanes_min', 'CCTA_base_lanes_max',
-        'PEMS_station_ID', 'pems_ft', 'pems_lanes'
-    ]
+        'osm_dir_tag', 'lane_count_type', 'reverse', 'lanes_tot', 'lanes_gp', 'lanes_hov', 'lanes_busonly', 
+        'lanes_gp_through', 'lanes_gp_turn', 'lanes_gp_aux', 'lanes_gp_mix', 'lanes_gp_bothways', 'osm_agg',
+        # other
+        'county', 'length_meter'] + tomtom_new_fields + tm2nonmarin_new_fields + tm2marin_new_fields + sfcta_new_fields + ccta_new_fields + actc_new_fields
+    
+    link_conflation_fields_df = link_with_third_party_gdf[conflation_result_fields]
+    LINK_WITH_THIRD_PARTY_CSV_FILE = os.path.join(CONFLATION_RESULT_DIR, 'link_with_all_third_party_attrs.csv')
+    WranglerLogger.info('export conflation fields to {}'.format(LINK_WITH_THIRD_PARTY_CSV_FILE))
+    link_conflation_fields_df.to_csv(LINK_WITH_THIRD_PARTY_CSV_FILE, index=False)
 
-    link_conflation_fields_gdf = link_with_third_party_gdf[conflation_result_fields].rename(
-        columns={'lanes_tot': 'osmnx_lanes_tot',
-                 'lanes_gp': 'osmnx_lanes_gp',
-                 'tomtom_link_id': 'tomtom_unique_id'})
-
-    WranglerLogger.info('export conflation fields to {}'.format(CONFLATION_SUMMARY_FILE))
-    link_conflation_fields_gdf.to_csv(CONFLATION_SUMMARY_FILE, index=False)
+    # export the spatial to inspect on a map to decide lane heuristics rule
+    LINK_WITH_THIRD_PARTY_FILE = os.path.join(CONFLATION_RESULT_DIR, 'link_with_all_third_party_attrs.feather')
+    link_with_third_party_gdf.to_feather(LINK_WITH_THIRD_PARTY_FILE)
 
     ####################################
-    # Apply road name heuristics to finalize road names
-
-    
-    # TODO
-    methods.determine_road_name(link_conflation_fields_gdf)
+    # Apply road name heuristics to finalize road names, adding two new field 'road_name' (str), 'road_name_heuristic' (int8),
+    # also writing out 'road_shield_long_name_crosswalk' mainly for QAQC 
+    methods.determine_road_name(link_with_third_party_gdf, ROAD_SHIELD_LONG_NAME_CROSSWALK_FILE)
 
     ####################################
     # Apply lane heuristics to finalize lane accounting
