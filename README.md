@@ -24,6 +24,7 @@ Data used in this repository (the /data folder) is stored in [MTC's Box folder](
 (tm2_network_dev_py38) pip install .\Shapely-1.8.2-cp38-cp38-win_amd64.whl
 (tm2_network_dev_py38) pip install geopandas osmnx
 :: can check that geopandas sees pygeos here: import geopandas; geopandas.show_versions()
+(tm2_network_dev_py38) pip install geojson, partridge, dbfread, urlopen, pyarrow, glob
 :: Install network_wrangler
 (tm2_network_dev_py38) C:
 (tm2_network_dev_py38) cd C:\Users\lzorn\Documents\GitHub\network_wrangler
