@@ -1,13 +1,19 @@
+# this script reproject county model networks to the same coordinate system as TM2's
+
 import arcpy
 
-# input data is in GCS_WGS_1984 coordinate system
-input_features = r"C:/Users/ftsang/Documents/tm2_network_exploration/County Networks/Contra_Costa/CCTA Model Networks - MTC Transmittal/CCTA_2018_Network.shp"
-
-# output data
-output_feature_class = r"C:/Users/ftsang/Documents/tm2_network_exploration/tm2_roadway_QA/CCTA_2018_epsg102645.shp"
-
-# create a spatial reference object for the output coordinate system
+# TM2's coordinate system
 out_coordinate_system = arcpy.SpatialReference('NAD 1983 StatePlane California V FIPS 0405 (US Feet)')
 
-# run the tool
-arcpy.Project_management(input_features, output_feature_class, out_coordinate_system)
+# Contra Costa
+# --------------
+
+# Contra Costa shared two networks with us - 2010 and 2018
+
+input_features = r"C:\Users\ftsang\Box\Modeling and Surveys\Development\Travel Model Two Development\Model Inputs\County Networks\Contra_Costa\CCTA Model Networks - MTC Transmittal\CCTA_2018_Network.shp"
+output_features = r"M:\Development\Travel Model Two\Supply\Network_QA_2022\Maps_to_publish\county_networks_reprojected\CCTA_2018_epsg102645.shp"
+arcpy.Project_management(input_features, output_features, out_coordinate_system)
+
+input_features = r"C:\Users\ftsang\Box\Modeling and Surveys\Development\Travel Model Two Development\Model Inputs\County Networks\Contra_Costa\CCTA Model Networks - MTC Transmittal\CCTA_2010_Network.shp"
+output_features = r"M:\Development\Travel Model Two\Supply\Network_QA_2022\Maps_to_publish\county_networks_reprojected\CCTA_2010_epsg102645.shp"
+arcpy.Project_management(input_features, output_features, out_coordinate_system)

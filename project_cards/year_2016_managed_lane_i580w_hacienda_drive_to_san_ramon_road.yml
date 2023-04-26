@@ -1,0 +1,86 @@
+project: Year 2016 Modify USE on I-580 WB Hacienda Drive to San Ramon Road
+tags:
+- Year 2016
+#- Managed Lanes Review
+#- Express Lanes
+#- toll review
+# Commenting out for https://github.com/BayAreaMetro/travel-model-two-networks/issues/53
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3067636
+      - 3041958
+      - 3048620
+      - 3140144
+      - 3033500
+      - 3050501
+      - 3155030
+      - 3066092
+    - shstReferenceId:
+      - 65af4d7f984466b88ecdf15f08301963
+      - 3eff6dccf15c73d234efd35263f75ab5
+      - 490affff13418987c7529f10ebb9e0a9
+      - d2f99f87044aef8a06d8ce1d766d464a
+      - 32592aba8221b16d2f477899302c97cf
+      - 4bd1ec7ca19decb37a39fba90d7bd847
+      - e9400d37e59b02cd60a604119eb1165b
+      - 636874cec92deb99f92128010c387a59
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      change: -1
+    - time:
+      - '10:00'
+      - '15:00'
+      change: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+  - property: segment_id
+    set: 29
+  - property: ML_tollseg
+    set: 5
+  - property: ML_tollbooth
+    set: 29
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 4
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 4
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 4
+  - property: ML_access
+    set: all
+  - property: ML_egress
+    set: all

@@ -413,6 +413,13 @@ def read_shst_extract(path, suffix):
 def highway_attribute_list_to_value(x, highway_to_roadway_dict, roadway_hierarchy_dict):
     """
     clean up osm highway, and map to standard roadway
+
+    Assumption:
+    - if multiple OSM ways of the same SHST link have the same roadway type (converted from 'highway'), use that type
+    - if multiple OSM ways of the same SHST link have different roadway type, use the type with the smallest "hierarchy" value, 
+    i.e. the highest hierarchy, For example, a SHST link that contains a "motorway" OSM way and a "footway" OSM way would be labeled as "motorway".
+    - if missing OSM 'highway' info, use 'roadClass' field which is from shst extraction.
+
     """
     if type(x.highway) == list:
         value_list = list(set([highway_to_roadway_dict[c] for c in x.highway]))
@@ -659,11 +666,15 @@ def generate_centroid_connectors(run_type, existing_drive_cc_df, node_gdf, exist
     return new_cc_gdf, new_centroid_gdf
 
 
-def consolidate_cc(link, drive_centroid, node, new_drive_cc, new_walk_cc = pd.DataFrame(), new_bike_cc = pd.DataFrame()):
+def consolidate_cc(link, node, new_drive_cc, new_walk_cc = pd.DataFrame(), new_bike_cc = pd.DataFrame()):
+
+    """
+    consolidates TAZ/MAZ drive concetroid connectors with walk and bike centroid connectors if exist (for MAZ),
+    returns a link file and a shape file of all TAZ/MAZ centroid connectors
+    """
     
     link_gdf = link.copy()
     node_gdf = node.copy()
-    drive_centroid_gdf = drive_centroid.copy()
     new_drive_cc_gdf = new_drive_cc.copy()
     
     if len(new_walk_cc) > 0:
@@ -838,7 +849,7 @@ def isDuplicate(a, b, zoneUnique):
     zoneUnique += [a]
     
 
-def get_non_near_connectors(all_cc):
+def get_non_near_connectors(all_cc, taz_N_list, maz_N_list, node_two_geometry_id_list):
     
     all_cc_link_gdf = all_cc.copy()
     

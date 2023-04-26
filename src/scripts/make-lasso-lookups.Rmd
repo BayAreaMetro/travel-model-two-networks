@@ -234,6 +234,12 @@ sfcta_df <- conflation_df %>%
   mutate(max_lanes = pmax(lanes_am, lanes_md, lanes_pm)) %>%
   left_join(., select(osm_names_df, shstReferenceId, simple_name), by = c("shstReferenceId")) %>%
   rowwise() %>%
+  # 'osm_sfcta_names_dist' uses the 'stringdist' method (computes pairwise string distances, https://www.rdocumentation.org/packages/stringdist/versions/0.9.8/topics/stringdist) to analyze
+  # the discrepancy between OSM road names and SFCTA road names. If the names are the same
+  # regardless of upper/lower case letters, dist = 0; if one of the names is missing, dist = na;
+  # if the two names are different, the larger dist is, the more different the two strings are.
+  # Example: stringdist('LINCOLN', 'Lincoln') = 0, stringdist('1ST', na) = na, 
+  # stringdist('HIGHLAND', 'Patton') = 7, stringdist('CHAIN OF LAKES', 'Chain of Lakes East') = 5.
   mutate(osm_sfcta_names_dist = if_else(is.na(name), 100.0, stringdist(tolower(name), tolower(simple_name)))) %>%
   ungroup() %>%
   mutate(osm_sfcta_names_dist = replace_na(osm_sfcta_names_dist, 100.0)) %>%

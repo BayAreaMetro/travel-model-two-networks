@@ -1,0 +1,82 @@
+project: Year 2016 Modify USE on I-580 WB Isabel Ave to Fallon Road
+tags:
+- Year 2016
+#- Managed Lanes Review
+#- Express Lanes
+#- toll review
+# Commenting out for https://github.com/BayAreaMetro/travel-model-two-networks/issues/53
+dependencies: ''
+changes:
+- category: Parallel Managed lanes
+  facility:
+    link:
+    - model_link_id:
+      - 3107714
+      - 3065012
+      - 3012030
+      - 3019925
+      - 3093492
+      - 3071758
+    - shstReferenceId:
+      - a23e3fab641c888e6b97f648e9edd669
+      - 61c7d24a236574a8c7f1950a64bb1c1c
+      - 1224345577927b818c8620e07e82eb6c
+      - 1e1178e625b1d47178fee604db3c6339
+      - 8cc848f994ac4555ee51aca2e51b591a
+      - 6bf7d03afceb37ba01b7f859ff938ab4
+  properties:
+  - property: lanes
+    change: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      change: -1
+    - time:
+      - '10:00'
+      - '15:00'
+      change: -1
+    - time:
+      - '15:00'
+      - '19:00'
+      change: -1
+  - property: ML_lanes
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 1
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 1
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 1
+  - property: segment_id
+    set: 29
+  - property: ML_tollseg
+    set: 3
+  - property: ML_tollbooth
+    set: 29
+  - property: ML_useclass
+    set: 0
+    timeofday:
+    - time:
+      - '6:00'
+      - '10:00'
+      set: 4
+    - time:
+      - '10:00'
+      - '15:00'
+      set: 4
+    - time:
+      - '15:00'
+      - '19:00'
+      set: 4
+  - property: ML_access
+    set: all
+  - property: ML_egress
+    set: all
