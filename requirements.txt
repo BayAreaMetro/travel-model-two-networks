@@ -1,0 +1,11 @@
+network-wrangler
+# used for sharedstreets extraction and matching
+docker
+# 1.2.0 needed for this feature:
+osmnx >= 1.2.0
+# cKDTree used in methods
+scipy
+# peartree used in methods.get_representative_feed_from_gtfs()
+peartree
+# tag_nodes_links_by_county_name() uses pygeos via geopandas
+pygeos

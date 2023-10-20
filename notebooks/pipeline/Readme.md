@@ -1,99 +1,146 @@
 
 <img src="https://github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/TM2_network_rebuild_flow.png" width="800">
 
-### [Step 0: Prepare for SharedStreets extraction](step0_prepare_for_shst_extraction.ipynb)
+### [Step 1: Extract SharedStreets](step1_extract_shst.py)
 
-Export county boundary polygons for SharedStreets Extraction.  Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson files.
+Converts county shapefile to [WGS 84](https://spatialreference.org/ref/epsg/wgs-84/) and exports as geojson boundary polygons.
+which are used for SharedStreets networrk extraction.  Performs extraction using [Docker](https://www.docker.com/) 
+through python docker package.  See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker)
 
-* Input: County shapefile, `../../data/external/county_boundaries/county_5m%20-%20Copy.shp` -- Get this from [`BOX_TM2NET_DATA > external > county_boundaries > county_5m - Copy.shp`](https://mtcdrive.box.com/s/jj5grp9eso5r1ljbztwjid6znzrzc6g7)
-* Output: County boundaries, `../../data/external/county_boundaries/boundary_[1-14].json`
+Note: I had problems with Docker Desktop for Windows v4.12.0 similar to this one about a (109, 'ReadFile' 'The pipe has ended')[https://github.com/aws/aws-sam-cli/issues/4222]. Downgrading to Docker Desktop v4.11.1 resolved my issue.
 
-### [Step 1: SharedStreets extraction](step1_shst_extraction.sh)
+* Input:
+  * County/sub-county shapefile, based on [Census Cartographic Boundary File, cb_2018_us_county_5m.zip](https://www.census.gov/geographies/mapping-files/time-series/geo/carto-boundary-file.html), filtered to the Bay Area and with a few counties cut into smaller pieces, resulting in 14 rows: [`[INPUT_DATA_DIR]/step0_boundaries/cb_2018_us_county_5m_BayArea.shp`](https://mtcdrive.box.com/s/mzxbqhysv1oqaomzvz5pd96g04q0mbs8)
+  * [Dockerfile](Dockerfile) which defines Docker image to use for SharedStreets extraction
 
-Use [Docker](https://www.docker.com/) to build an image as instructed by the [Dockerfile](Dockerfile).
-See [sharedstreets-js docker documentation](https://github.com/sharedstreets/sharedstreets-js#docker), and extract SharedStreet networks data by the boundaries defined in step 0.
-
-Installing Docker Desktop and getting Docker to run on an Mac machine is straightforward. Setting up Docker on a Windows machine requires BIOS configuration. Path referencing and line-ending format are also different in Mac versus Windows. See the inline comments for examples. 
-
-* Input: 
-  * [Dockerfile](github.com/BayAreaMetro/travel-model-two-networks/blob/develop/notebooks/pipeline/Dockerfile), used to build the shst image  
-  * County boundaries (Step 0 output), `../../data/external/county_boundaries/boundary_[1-14].json`
-* Output: Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`, log files with columns: 
-   'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
+* Output:
+  * 14 county/sub-county boundaries, `[OUTPUT_DATA_DIR]/step0_boundaries/boundary_[01-14].geojson`:
+    * 01: Contra Costa east
+    * 02: Sonoma
+    * 03: Solano
+    * 04: San Francisco
+    * 05: Marin
+    * 06: Santa Clara east
+    * 07: San Mateo
+    * 08: Napa
+    * 09: Alameda east
+    * 10: Contra Costa west
+    * 11: Alameda south/west
+    * 12: Santa Clara central
+    * 13: Santa Clara west
+    * 14: Alameda north/west
+  * Shared Street extract, `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[01-14].out.geojson` with columns: 
+    'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'roadClass', 'metadata', 'geometry'
+    * Note that these extracts cover a rectangle, so shst converts the above boundaries into a containing rectangular boundary
+  * Shared Street extract logs: `[OUTPUT_DATA_DIR]/step1_shst_extracts/mtc_[01-14].tiles.txt`
+  * Log file: `[OUTPUT_DATA_DIR]/step1_shst_extracts/step1_extract_shst_[YYmmdd_HHMM].[info,debug].log`
 
 See [SharedStreets Geometries](https://github.com/sharedstreets/sharedstreets-ref-system#sharedstreets-geometries)
 
-### [Step 2: OSMnx extraction](step2_osmnx_extraction.ipynb)
+**Conversion to geofeather using [convert_geojson_to_geofeather.py](../../src/scripts/convert_geojson_to_geofeather.py)**:
+
+`python convert_geojson_to_geofeather.py "%OUTPUT_DATA_DIR%\step1_shst_extracts"`
+
+This is much faster to read/write so will be used for subsequent steps instead of the geojson files.
+
+**Optional conversion to geopackage using [convert_geojson_to_geopackage.py](../../src/scripts/convert_geojson_to_geopackage.py)**:
+
+`python convert_geojson_to_geopackage.py "%OUTPUT_DATA_DIR%\step1_shst_extracts" "%OUTPUT_DATA_DIR%\step1_shst_extracts\mtc_all_out.gpkg"`
+
+### [Step 2: OSMnx extraction](step2_osmnx_extraction.py)
 
 Use OMNx to extract OSM data for the Bay Area and save as geojson files.
 
 * Input:
-  * County shapefile, `../../data/external/county_boundaries/county_5m%20-%20Copy.shp`
+  * County shapefile, [`[INPUT_DATA_DIR]/step0_boundaries/San_Francisco_Bay_Region_Counties.shp`](https://opendata.mtc.ca.gov/datasets/MTC::san-francisco-bay-region-counties-1/about), which covers water areas to ensure that OSMnx extract includes bridges. 
   * OpenStreetMap via [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon)
 * Output:
-  * OSM link extract, `../../data/external/osmnx_extract/link.geojson` with columns: 'osmid', 'oneway', 'lanes', 'ref', 'name', 'highway', 'maxspeed',
-       'length', 'bridge', 'service', 'width', 'access', 'junction', 'tunnel', 'est_width', 'area', 'landuse', 'u', 'v', 'key', 'geometry'
-  * OSM node extract, `../../data/external/osmnx_extract/node.geojson` with columns: 'y', 'x', 'osmid', 'ref', 'highway', 'geometry'
+  * OSMnx link and node extract geofeather, `[OUTPUT_DATA_DIR]/step2_osmnx_extracts/[link,node].feather`
+   
+Data is fetched using [`osmnx.graph.graph_from_polygon()`](https://osmnx.readthedocs.io/en/stable/osmnx.html#osmnx.graph.graph_from_polygon) using `simplify=False`, so there are typically multiple links per OSM way.  (This is because if `simplify=True`, OSMnx will aggregate some OSM ways into a single link, which we don't want; see a nice explanation of this process in [OSMnx: Python for Street Networks](https://geoffboeing.com/2016/11/osmnx-python-street-networks/))
 
-### [Step 3: Process SharedStreets Extraction to Network Standard and Conflate with OSM](step3_join_shst_extraction_with_osm.ipynb)
+Link data includes columns:
+* osmid: the OpenStreetMap way ID (e.g. 619590730 for this link: https://www.openstreetmap.org/way/619590730)
+* geometry: the shape of the link
+* length: the length of the link, in meters; this is added by OSMnx
+* u, v: the OSM node ID of the start and end of the link.  However, OSMnx seems to still be doing some simplification
+  under the hood, so these are often 0 rather than corresponding the the OSM values. For example, for OSM way [619590730 referenced above](https://www.openstreetmap.org/way/619590730), the way is split into two links, and only one has the the u value, [1723738865](https://www.openstreetmap.org/node/1723738865); the rest are zeros.
+* key: this is an OSMnx identifier for when multiple parallel links exist with the same u,v; key then distinguishes between them so that (u,v,key) is unique.  I believe this is only relevant if `simplify=True`, however, as there are many links with (u,v,key)=(0,0,0)
+* all the other columns are specified in [`methods.OSM_WAY_TAGS`](methods.py#L14)
 
-Add OSM attributes to extracted SharedStreets network and convert to Network Standard data formats. 
+Node data include columns:
+* osmid: the OpenStreetMap node ID (e.g. 1723738865 for https://www.openstreetmap.org/node/1723738865).  However, this is often missing and set to 0 even when real node IDs exist; see the discussion on the u,v columns in the link dataset above. **Because of this, this dataset isn't used subsequently.**
+* y, x: latitude and longitude of the node
+* some of the tags in methods.OSM_WAY_TAGS also have corresponding data for nodes so they're included here.  For the set of tags we're using, this looks like it's only 'highway' and 'ref'
+
+### [Step 3: Process SharedStreets Extraction to Network Standard and Conflate with OSM](step3_join_shst_extraction_with_osm.py)
+
+Join link attributes from osmnx extract to SharedStreets extract;
+Create nodes from links;
+Some cleanups: tag links and nodes by county, remove out-of-region links and nodes, drop circular links and circular-link-only nodes, drop duplicate links between same node pairs; drop duplicates by unique ['fromIntersectionId', 'toIntersectionId', 'u', 'v', 'shstReferenceId'].
 
 * Input:
-  * OSM link extract, `../../data/external/osmnx_extract/link.geojson`
-  * OSM node extract, `../../data/external/osmnx_extract/node.geojson`
-  * Shared Street extract, `../../data/external/sharedstreets_extract/mtc_[1-14].out.geojson`
+  * Shared Street extract (from step1), `[INPUT_DATA_DIR]/external/step1_shst_extracts/mtc_[1-14].feather`
+  * OSM link extract (from step2), `[INPUT_DATA_DIR]/external/external/step2_osmnx_extracts/link.feather`
 * Output:
-  * Network Standard link shapes, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`, identified by these shst features: 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId'; with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry'
-  * Network Standard link attributes, `../../data/interim/step3_join_shst_extraction_with_osm/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
-  * Network Standard nodes, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'drive_access', 'walk_access', 'bike_access', 'geometry'
+  * Shared Street links with OSMNX attributes, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_link.feather`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'shstReferenceId', 'geometry', 'link', 'name_shst_metadata', 'nodeIds', 'oneway_shst', 'roadClass', 'roundabout', 'wayId', 'waySections_len', 'waySection_ord', 'shstGeometryId', 'u', 'v', 'osmid', 'highway', 'oneway_osmnx', 'name', 'ref', 'maxspeed', 'lanes', 'hov', 'hov:lanes', 'bridge', 'lanes:forward', 'turn:lanes:forward', 'service', 'cycleway', 'sidewalk', 'access', 'width', 'turn:lanes', 'lanes:both_ways', 'junction', 'shoulder', 'bus', 'tunnel', 'turn', 'est_width', 'lanes:hov', 'lanes:bus', 'area', 'lanes:bus:forward', 'taxi', 'length_osmnx', 'osmnx_shst_merge', 'roadway', 'hierarchy', 'drive_access', 'walk_access', 'bike_access', 'osm_dir_tag', 'lane_count_type', 'reverse', 'lanes_tot', 'lanes_gp', 'lanes_hov', 'lanes_busonly', 'lanes_gp_through', 'lanes_gp_turn', 'lanes_gp_aux', 'lanes_gp_mix', 'lanes_gp_bothways', 'osm_agg', 'county', 'length_meter', 'link_cnt'
+  * Network nodes derived from the above, `[OUTPUT_DATA_DIR]/interim/step3_join_shst_with_osm/step3_node.feather`, with columns: 'osm_node_id', 'shst_node_id', 'county, 'drive_access', 'walk_access', 'bike_access', 'geometry'
 
 ### [Step 4: Conflate Third Party Data with Base Networks from Step 3]
 Four parts, run in sequence:
 
-#### [step4a_prepare_conflate_with_third_party.ipynb](step4a_prepare_conflate_with_third_party.ipynb)
-Prepare third party data (remove duplicates, remove unnecessary records, partition regional network datasets by the 14 boundaries, set to the correct projection EPSG 4326) for SharedStreets matching.
-* Input:
-  * TomTom network for the Bay Area (pending)
-  * TM2 non-Marion version, `../../data/external/TM2_nonMarin/mtc_final_network_base.shp`
-  * TM2 Marin version, `../../data/external/TM2_Marin/mtc_final_network_base.shp`
-  * SFCTA Stick network, `../../data/external/sfcta/SanFrancisco_links.shp`
-  * PEMS count, `../../data/external/mtc/pems_period.csv`
-* Output:
-  * `../../data/external/tomtom/tomtom[1-14].in.geojson`
-  * `../../data/external/TM2_nonMarin/tm2nonMarin_[1-14].in.geojson`
-  * `../../data/external/TM2_Marin/tm2Marin_[1-14].in.geojson`
-  * `../../data/external/sfcta/sfcta_in.geojson`
-  * `../../data/external/mtc/pems.in.geojson`
+#### [step4a: Prepare third-party data for SharedStreet conflation.py](step4a_prepare_third_party_data_for_conflation.py)
+Prepare third party data for SharedStreets matching, including: remove duplicates, remove non roadway links (e.g. centroid connectors), add missing links (e.g. add the other link for two-way links) partition regional network datasets by the 14 boundaries, set to the standard lat-lon EPSG 4326.
+##### Input:
+* Inputs are in the following structure: `[INPUT_DATA_DIR]/step4_third_party_data/[third_party]/input`:
+  * TomTom network: `network2019/Network_region.gdb/mn_nw`
+  * TM2 non-Marin: `mtc_final_network_base.shp`
+  * TM2 Marin: `mtc_final_network_base.shp`
+  * SFCTA network: `SanFrancisco_links.shp`
+  * ACTC network: `AlamedaCo_MASTER_20190410_no_cc.shp`
+  * CCTA network: `ccta_2015_network.shp`
+
+##### Output:
+One set of data only containing unique identifier for each link and link geometry (`[data_source]_[1-14].in.geojson`), which will be used in SharedStreet matching in step4b - including all link attributes would substantially increase run time   
+* TomTom network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TomTom/tomtom[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TomTom/tomtom_raw.geojson`
+* TM2 non-Marion version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_nonMarin/tm2nonMarin_raw.geojson`
+* TM2 Marin version, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/TM2_Marin/tm2Marin_raw.geojson`
+* SFCTA Stick network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/sfcta/sfcta_in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/sfcta/sfcta_raw.geojson`
+* ACTC network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/actc/actc_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/actc/actc_raw.geojson`
+* CCTA network, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/ccta/ccta_[1-14].in.geojson`, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/ccta/ccta_raw.geojson`
+
+Additionally, a geopackage (with each data source in a layer) containing all link attributes which will be joined back to matched links in step4d, `[ROOT_OUTPUT_DATA_DIR]/external/step4a_third_party_data/modified/modified_all_attrs.gpkg`
 
 #### [step4b_third_party_shst_match.sh](step4b_third_party_shst_match.sh)
-Matche third party datasets to SharedStreets References using various rules.
+Match third party datasets to SharedStreets References using various rules.
 
-* Input: output of step4a
+##### Input: 
+* Output of step4a
 
-* Output:
-  TOMTOM data:
-  * `../../data/interim/tomtom/bike_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
-  * `../../data/interim/tomtom/car_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
-  * `../../data/interim/tomtom/ped_rules/[1-14]_tomtom.out.[matched,unmatched].geojson`
-
-  Legacy TM2 non-Marin data:
-  * `../../data/interim/TM2_nonMarin/car_rules/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_nonMarin/ped_rules/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_nonMarin/reverse_dir/[1-14]_tm2nonMarin.out.[matched,unmatched].geojson`
-
-  Legacy TM2 Marin data:
-  * `../../data/interim/TM2_Marin/car_rules/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_Marin/ped_rules/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
-  * `../../data/interim/TM2_Marin/reverse_dir/[1-14]_tm2Marin.out.[matched,unmatched].geojson`
-
-  SFCTA stick network data:
-  * `../../data/interim/sfcta/car_rules/sfcta.out.[matched,unmatched].geojson`
-  * `../../data/interim/sfcta/ped_rules/sfcta.out.[matched,unmatched].geojson`
-  * `../../data/interim/sfcta/reverse_dir/sfcta.out.[matched,unmatched].geojson`
-
-  PEMS data:
-  * `../../data/interim/mtc/pems.out.matched.geojson`
+##### Output: 
+Folder `[ROOT_OUTPUT_DATA_DIR]/interim/step4b_third_party_shst_match`, containing the following data and sub-folders. For each input geojson file, up to two files are created - one containing successfully matched links (`[]_matched.geojson`) whose link attributes from the corresponding data sources will be merged into the base network (ShSt+OSM) in the next step, the other containing links failed to match (`[]_unmatched.geojson`), which can be used for QAQC. 
+* TOMTOM data:
+  * `/TomTom/bike_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
+  * `/TomTom/car_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
+  * `/TomTom/ped_rules/tomtom_[1-14].out.[matched,unmatched].geojson`
+* Legacy TM2_non-Marin data:
+  * `/TM2_nonMarin/car_rules/tm2nonMarin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_nonMarin/ped_rules/tm2nonMarin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_nonMarin/reverse_dir/tm2nonMarin_[1-14].out.[matched,unmatched].geojson`
+* Legacy TM2_Marin data:
+  * `/TM2_Marin/car_rules/tm2Marin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_Marin/ped_rules/tm2Marin_[1-14].out.[matched,unmatched].geojson`
+  * `/TM2_Marin/reverse_dir/tm2Marin_[1-14].out.[matched,unmatched].geojson`
+* SFCTA stick network:
+  * `/sfcta/car_rules/sfcta.out.[matched,unmatched].geojson`
+  * `/sfcta/ped_rules/sfcta.out.[matched,unmatched].geojson`
+  * `/sfcta/reverse_dir/sfcta.out.[matched,unmatched].geojson`
+* ACTC model network:
+  * `/actc/actc_[1-14].out.[matched,unmatched].geojson`
+* CCTA model network:
+  * `/ccta/ccta_[1-14].out.[matched,unmatched].geojson`
+* PEMS:
+  * `/pems/pems.out.matched.geojson`
 
 #### [step4c_pems_conflation.ipynb](step4c_pems_conflation.ipynb)
 Further conflate PEMS data based on shield number (e.g., I-80), direction (e.g., E), and FT.
@@ -112,60 +159,44 @@ Merge the SharedStreets match results in step4b with the base networks data crea
 * Input:
   * Base networks including links and shapes from step3
   * Third party data ShSt match results from step4b
-  * PEMs conflation result from step4c 
+  * PEMS count, `[ROOT_INPUT_DATA_DIR]/external/step4a_third_party_data/raw/mtc/pems_period.csv`
 
 * Output:
   * Network Standard link attributes, `../../data/interim/step4_conflate_with_tomtom/link.feather` and `../../data/interim/step4_conflate_with_tomtom/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access'
   * `../../data/interim/conflation_result.csv`
 
-
-### [Step 5: Tidy Roadway](step5_tidy_roadway.ipynb)
-Add county tagging to network links, shapes, and nodes; remove out-of-the-region links and nodes, drop circular links and duplicate links between same node pairs; flag drive dead-end; number nodes, links, and link AB nodes.
-
-* Input:
-  * Network Standard link shapes from Step 3, `../../data/interim/step3_join_shst_extraction_with_osm/shape.geojson`
-  * Network Standard nodes from Step 3, `../../data/interim/step3_join_shst_extraction_with_osm/node.geojson`
-  * Network Standard link attributes from Step 4 (has attributes from conflation), `../../data/interim/step4_conflate_with_tomtom/link.feather`
-  * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp` -- Get this from [`BOX_TM2NET_DATA > external > county_boundaries > cb_2018_us_county_500k > cb_2018_us_county_500k.shp`](https://mtcdrive.box.com/s/sm86z4zol33l73oeufll881eabqecpnz)
-
-* Output:
-  * Network Standard link shapes, `../../data/interim/step5_tidy_roadway/shape.geojson`, with columns: 'id', 'fromIntersectionId', 'toIntersectionId', 'forwardReferenceId', 'backReferenceId', 'geometry', 'NAME'
-  * Network Standard link attributes, `../../data/interim/step5_tidy_roadway/link.feather` and `../../data/interim/step5_tidy_roadway/link.json`, with columns: 'shstReferenceId', 'id', 'shstGeometryId', 'fromIntersectionId', 'toIntersectionId', 'u', 'v', 'link', 'oneWay', 'roundabout', 'wayId', 'access', 'area', 'bridge', 'est_width', 'highway', 'junction', 'key', 'landuse', 'lanes', 'maxspeed', 'name', 'ref', 'service', 'tunnel', 'width', 'roadway', 'drive_access', 'walk_access', 'bike_access', 'model_link_id', 'length',  'county', 'county_numbering_start', 'A', 'B'
-  * Network Standard nodes, `../../data/interim/step5_tidy_roadway/node.geojson`, with columns: 'osm_node_id', 'shst_node_id', 'geometry', 'county', 'drive_access', 'walk_access', 'bike_access', 'model_node_id', 'county_numbering_start'
-
-
 ### Step 6: Conflate Transit GTFS Data with Roadway Network
-Three parts, run in sequence:
 
-#### [step6a_gtfs_shape_to_geojson_for_shst_js.ipynb](step6a_gtfs_shape_to_geojson_for_shst_js.ipynb)
-Convert the 'shape' data from transit gtfs into geojson for SharedStreets conflation.
+#### [step6a_conflate_gtfs_shape_to_shst.py](step6a_conflate_gtfs_shape_to_shst.py)
+Conflate the shapes from transit GTFS to SharedStreets roadway links.
+Skip with a warning if a GTFS feed doesn't contain the 'shapes.txt' file.
 
-* Input: `../../data/external/gtfs/2015/[operator_name]/shapes.txt`
-
-* Output: `../../data/external/gtfs/[operator_name].transit.geojson`, including the following operators: 'ACTransit_2015_8_14', 'Blue&Gold_gtfs_10_4_2017', 'Emeryville_2016_10_26', 'Fairfield_2015_10_14', 'GGTransit_2015_9_3', 'Marguerite_2016_10_10', 'MarinTransit_2015_8_31', 'MVGo_2016_10_26', 'petalumatransit-petaluma-ca-us__11_12_15', 'RioVista_2015_8_20', 'SamTrans_2015_8_20', 'SantaRosa_google_transit_08_28_15', 'SFMTA_2015_8_11', 'Soltrans_2016_5_20', 'SonomaCounty_2015_8_18', 'TriDelta-GTFS-2018-05-24_21-43-17', 'vacavillecitycoach-2020-ca-us', 'VTA_2015_8_27', 'westcat-ca-us_9_17_2015', 'Wheels_2016_7_13' 
-
-#### [step6b_conflate_with_gtfs.sh](step6b_conflate_with_gtfs.sh)
-Match transit gtfs shapes to SharedStreets network.
-
-* Input: shapes in geojson format (output of step6a)
-* Output: `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
-
-#### [step6c_gtfs_transit_network_builder_v3](step6c_gtfs_transit_network_builder_v3)
-Conflate transit gtfs data (including ShSt match results and other gtfs data) with roadway network. Also add rail walk access links.
-
-* Input:
-  * Network Standard link shapes, link attributes, and nodes from Step 5, `../../data/interim/step5_tidy_roadway/shape.geojson`, `../../data/interim/step5_tidy_roadway/link.feather`, `../../data/interim/step5_tidy_roadway/node.geojson`
-  * GTFS raw data, in `../../data/external/gtfs/2015/`
-  * ShSt match results (output of step6b), `../../data/interim/step6_gtfs/shst_match/[operator_name].out.matched.geojson`
-  * GTFS to TM2 mode crosswalk, `../../data/interim/gtfs_to_tm2_mode_crosswalk.csv`
-  * County shapefile, `../../data/external/county_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp` [question mark]
+* Input: `[INPUT_DATA_DIR]/step6_gtfs/2015_input/[gtfs_name]/shapes.txt`, GTFS shape data represented by lat/lon of points along the shape.
 
 * Output:
-  * Transit standard files (*Final output for transit*), in `../../data/processed/version_12/`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`
-  * Network Standard link shapes, link attributes, and nodes, `../../data/interim/step6_gtfs/version_12/shape.geojson`, `../../data/interim/step6_gtfs/version_12/link.feather`, `../../data/interim/step6_gtfs/version_12/node.geojson`
-  * CUBE travel model transit network, `../../data/processed/version_12/transit.LIN`
-  * consolidated gtfs input (mainly for QAQC), in `../../data/interim/step6_gtfs/consolidated_gtfs_input/`, including the following files: `routes.txt`, `trips.txt`, `stops.txt`, `shapes.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
-  * Tansit route true shape (for QAQC), `../../data/interim/step6_gtfs/transit_route.geojson`
+  * `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].matched.feather`, successfully matched shapes or shape segments
+  * output won't be used in later steps: `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].unmatched.feather`, unmatched shapes or shape segments
+  * interim output: `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].in.geojson` and `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].in.feather`, spatial data created from shapes.txt to represent transit route shapes
+  * interim output: `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].out.matched.geojson` and `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].out.unmatched.geojson`, output of shst matching method before being converted to .feather format
+
+#### [step6b_build_transit_network_from_gtfs.py](step6b_build_transit_network_from_gtfs.py)
+Combine multiple GTFS data into one aggregated data;
+Extract representative trips from GTFS;
+Route bus on roadway network;
+Route rail and ferry, and create rail/ferry-only nodes and links;
+Write out aggregated, processed transit data into standard formats.
+
+* Input:
+  * roadway links and nodes (output of step 3), `[INPUT_DATA_DIR]/step3_join_shst_with_osm/step3_link.feather`, `[INPUT_DATA_DIR]/step3_join_shst_with_osm/step3_node.feather`
+  * GTFS raw data, in folders `[INPUT_DATA_DIR]/step6_gtfs/2015_input/[gtfs_name]`
+  * ShSt match results (output of step6b), `[OUTPUT_DATA_DIR]/step6_gtfs/conflation_shst/[gtfs_name].matched.feather`
+  * County shapefile, `INPUT_DATA_DIR/step0_boundaries/cb_2018_us_county_500k/cb_2018_us_county_500k.shp`, used to tag rail/ferry-only links and nodes by county
+
+* Output:
+  * Transit standard files (*Final output for transit*), in `[OUTPUT_DATA_DIR]/step6_gtfs/standard_transit`, including the following files: `routes.txt`, `shapes.txt`, `trips.txt`, `frequencies.txt`, `stops.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
+  * Network Standard link shapes, link attributes, and nodes, `[OUTPUT_DATA_DIR]/step6_gtfs/link.feather`, `[OUTPUT_DATA_DIR]/step6_gtfs/node.feather`
+  * consolidated GTFS data (mainly for QAQC), in `[OUTPUT_DATA_DIR]/step6_gtfs/consolidated_gtfs/`, including the following files: `routes.txt`, `trips.txt`, `stops.txt`, `shapes.txt`, `stop_times.txt`, `agency.txt`, `fare_attributes.txt`, `fare_rules.txt`
+  * interim output: bus and rail/ferry routing results, in `[OUTPUT_DATA_DIR]/step6_gtfs/transit_routing/`
 
 
 ### [Step7: Build Controid Connectors](step7_centroid_connector_builder)

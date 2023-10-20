@@ -31,7 +31,7 @@ if __name__ == '__main__':
                                         nargs='*')
     args = parser.parse_args()
 
-    # verify input_gpgk file exists
+    # verify input_gpkg file exists
     if not os.path.exists(args.input_gpkg):
         error_str = 'input_gpkg [{}] doesn\'t exist'.format(args.input_gpkg)
         print(error_str)
