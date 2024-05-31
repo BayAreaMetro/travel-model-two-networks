@@ -17,3 +17,8 @@ changes:
     roadway: taz
     walk_access: 0
     assignable: 1
+- category: Roadway Deletion
+  links:
+    model_link_id:
+    - 7135835
+    - 7137048
