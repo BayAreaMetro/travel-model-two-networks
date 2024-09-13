@@ -9,7 +9,7 @@ changes:
   - A: 3097287
     B: 3004598
     bike_access: 0
-    county: Alameda
+    county: Contra Costa
     drive_access: 1
     model_link_id: 2517014
     rail_only: 0
@@ -21,7 +21,7 @@ changes:
   - A: 3043615
     B: 3097287
     bike_access: 0
-    county: Alameda
+    county: Contra Costa
     drive_access: 1
     model_link_id: 2517015
     rail_only: 0
@@ -33,7 +33,7 @@ changes:
 
   nodes:
   - bike_access: 0
-    county: Alameda
+    county: Contra Costa
     drive_access: 1
     rail_only: 0
     walk_access: 0
