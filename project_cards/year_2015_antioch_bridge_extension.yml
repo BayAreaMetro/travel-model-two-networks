@@ -1,0 +1,43 @@
+project: year 2015 antioch bridge removed 
+tags:
+- year 2015
+- highway review
+dependencies: ''
+changes:
+- category: Add New Roadway
+  links:
+  - A: 3097287
+    B: 3004598
+    bike_access: 0
+    county: Alameda
+    drive_access: 1
+    model_link_id: 2517014
+    rail_only: 0
+    walk_access: 0
+    lanes: 1
+    assignable: 1
+    ft: 4
+    roadway: primary
+  - A: 3043615
+    B: 3097287
+    bike_access: 0
+    county: Alameda
+    drive_access: 1
+    model_link_id: 2517015
+    rail_only: 0
+    walk_access: 1
+    lanes: 2
+    assignable: 1
+    ft: 4
+    roadway: primary
+
+  nodes:
+  - bike_access: 0
+    county: Alameda
+    drive_access: 1
+    rail_only: 0
+    walk_access: 0
+    model_node_id: 3097287
+    osm_node_id: ''
+    Y: -121.75168384978434
+    X: 38.032691190761
