@@ -1,8 +1,7 @@
 
 project: Year 2015 Exclude Trucks on I580
 tags:
-- Year 2015
-- Exclude Trucks
+ - Year 2015
 dependencies: ''
 changes:
 - category: Roadway Property Change
