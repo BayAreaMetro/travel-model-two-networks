@@ -1,4 +1,4 @@
-project: year 2015 antioch bridge extension
+project: Year 2015 antioch bridge extension
 tags:
 - year 2015
 - highway review
@@ -30,7 +30,6 @@ changes:
     assignable: 1
     ft: 4
     roadway: primary
-
   nodes:
   - bike_access: 0
     county: Contra Costa
