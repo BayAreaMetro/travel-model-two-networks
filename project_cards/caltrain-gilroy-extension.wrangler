@@ -1,0 +1,112 @@
+---
+project: Extend caltrain to Gilroy
+category: Add Transit
+tags:
+  - "Add Transit"
+dependencies:
+  prerequisites:
+    - "caltrain to gilroy extension northbound rail links"
+---
+
+# southbound runs in PM
+
+## find the existing limited train and extend it to Gilroy
+### stop_times
+sb_stop_times_add_df = pd.DataFrame(
+  {"trip_id" : ["7973", "7973","7973",
+                "7973", "7973", "7973"],
+   "stop_sequence" : [11,12,13,14,15,16],
+   "arrival_time" : [4560,4980,5340,
+                     6120,6480,7260],
+   "departure_time" : [4560,4980,5340,
+                     6120,6480,7260],
+   "stop_id" : ["6653","6655","6657",
+                "6659","6661","6663"]
+  }
+)
+
+self.feed.stop_times = self.feed.stop_times.append(
+  sb_stop_times_add_df,
+  sort = False,
+  ignore_index = True
+)
+
+sb_shapes_add_df = pd.DataFrame(
+  {"shape_id" : ["482", "482","482",
+                 "482", "482", "482"],
+   "shape_pt_sequence" : [23,24,25,
+                          26,27,28],
+   "shape_model_node_id" : ["2192808","2192809","2192810",
+                            "2192811","2192812","2192813"],
+  }
+)
+
+self.feed.shapes = self.feed.shapes.append(
+  sb_shapes_add_df,
+  sort = False,
+  ignore_index = True
+)
+
+# northbound runs in AM
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Capitol Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), 'model_node_id'] = 2192809
+self.feed.stops.loc[(self.feed.stops.stop_name == "Capitol Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "Capitol Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "shst_node_id"] = ""
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Blossom Hill Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), 'model_node_id'] = 2192810
+self.feed.stops.loc[(self.feed.stops.stop_name == "Blossom Hill Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "Blossom Hill Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "shst_node_id"] = ""
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Morgan Hill Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), 'model_node_id'] = 2192811
+self.feed.stops.loc[(self.feed.stops.stop_name == "Morgan Hill Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "Morgan Hill Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "shst_node_id"] = ""
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "San Martin Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), 'model_node_id'] = 2192812
+self.feed.stops.loc[(self.feed.stops.stop_name == "San Martin Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "San Martin Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "shst_node_id"] = ""
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "Gilroy Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), 'model_node_id'] = 2192813
+self.feed.stops.loc[(self.feed.stops.stop_name == "Gilroy Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "Gilroy Caltrain") & (self.feed.stops.agency_raw_name == "Caltrain_2015_5_13") & (self.feed.stops.platform_code == "NB"), "shst_node_id"] = ""
+
+## find the existing limited train and extend it to Gilroy
+### stop_times
+nb_stop_times_add_df = pd.DataFrame(
+  {"trip_id" : ["7978", "7978","7978",
+                "7978", "7978", "7978"],
+   "stop_sequence" : [1,2,3,4,5,6],
+   "arrival_time" : [0,780,1140,
+                     1920,2280,2700],
+   "departure_time" : [0,780,1140,
+                     1920,2280,2700],
+   "stop_id" : ["6662","6660","6658",
+                "6656","6654","6652"]
+  }
+)
+
+self.feed.stop_times.loc[self.feed.stop_times.trip_id == "7978", "stop_sequence"] += 6
+self.feed.stop_times.loc[self.feed.stop_times.trip_id == "7978", "arrival_time"] += 3060
+self.feed.stop_times.loc[self.feed.stop_times.trip_id == "7978", "departure_time"] += 3060
+
+self.feed.stop_times = self.feed.stop_times.append(
+  nb_stop_times_add_df,
+  sort = False,
+  ignore_index = True
+)
+
+nb_shapes_add_df = pd.DataFrame(
+  {"shape_id" : ["484", "484","484",
+                 "484", "484", "484"],
+   "shape_pt_sequence" : [1,2,3,4,5,6],
+   "shape_model_node_id" : ["2192813","2192812","2192811",
+                            "2192810","2192809","2192808"],
+  }
+)
+
+self.feed.shapes.loc[self.feed.shapes.shape_id == "484", "shape_pt_sequence"] += 6
+
+self.feed.shapes = self.feed.shapes.append(
+  nb_shapes_add_df,
+  sort = False,
+  ignore_index = True
+)
