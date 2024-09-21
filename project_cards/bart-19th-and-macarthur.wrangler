@@ -1,0 +1,15 @@
+---
+project: change southbound BART 19th and marcarthur station node id
+category: Add Transit
+tags:
+- 'Major Transit'
+dependencies:
+---
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "19th St. Oakland") & (self.feed.stops.agency_raw_name == "BART_2015_8_3"), "model_node_id"] = 2625944
+self.feed.stops.loc[(self.feed.stops.stop_name == "19th St. Oakland") & (self.feed.stops.agency_raw_name == "BART_2015_8_3"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "19th St. Oakland") & (self.feed.stops.agency_raw_name == "BART_2015_8_3"), "shst_node_id"] = ""
+
+self.feed.stops.loc[(self.feed.stops.stop_name == "MacArthur") & (self.feed.stops.agency_raw_name == "BART_2015_8_3"), 'model_node_id'] = 2625943
+self.feed.stops.loc[(self.feed.stops.stop_name == "MacArthur") & (self.feed.stops.agency_raw_name == "BART_2015_8_3"), "osm_node_id"] = ""
+self.feed.stops.loc[(self.feed.stops.stop_name == "MacArthur") & (self.feed.stops.agency_raw_name == "BART_2015_8_3"), "shst_node_id"] = ""

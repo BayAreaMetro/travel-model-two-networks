@@ -1,0 +1,21 @@
+---
+project: change am southbound BART yellow line stopping pattern
+category: Add Transit
+tags:
+- 'Major Transit'
+dependencies:
+---
+
+# BART Yellow Line AM Southbound  
+# The network creation process chose a GTFS trip between Pleasant Hill/Contra Costa Centre and Montgomery St. as the representative trip for the AM time period. Although this trip has the same shape (s404, the most common shape) as the full service trips, it makes fewer stops. This happened because the network creation step that chose the representative trip picked the first trip of the most common shape in every time period, and in the Yellow Line case, the first trip of shape s404 in the AM stops only between Pleasant Hill/Contra Costa Centre and Montgomery St. 
+# replace the AM stop pattern with other time periods
+
+# drop existing AM records
+self.feed.stop_times = self.feed.stop_times[self.feed.stop_times.trip_id != "5877"]
+
+# copy from EA
+copy_pattern_df = self.feed.stop_times[self.feed.stop_times.trip_id == "5781"].copy()
+copy_pattern_df["trip_id"] = "5877"
+
+# append
+self.feed.stop_times = pd.concat([self.feed.stop_times, copy_pattern_df], sort = False, ignore_index = True)
