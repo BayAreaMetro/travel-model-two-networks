@@ -11,7 +11,7 @@ changes:
     bike_access: 0
     county: Contra Costa
     drive_access: 1
-    model_link_id: 2517014
+    model_link_id: 26067407
     rail_only: 0
     walk_access: 0
     lanes: 1
@@ -23,7 +23,7 @@ changes:
     bike_access: 0
     county: Contra Costa
     drive_access: 1
-    model_link_id: 2517015
+    model_link_id: 26067408
     rail_only: 0
     walk_access: 1
     lanes: 2
