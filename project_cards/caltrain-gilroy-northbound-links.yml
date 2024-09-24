@@ -39,16 +39,9 @@ changes:
 - category: Add New Roadway
   links:
   - A: 2192809
-    B: 2192808
+    B: 2192814
     model_link_id: 26067405
     lanes: 1
     ft: 99
     rail_only: 1
-- category: Add New Roadway
-  links:
-  - A: 2192808
-    B: 2192807
-    model_link_id: 26067406
-    lanes: 1
-    ft: 99
-    rail_only: 1
+
